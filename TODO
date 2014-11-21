@@ -7,6 +7,8 @@
 	- Enable chaining in process loop
 	- Remove extraneous string primitives
 		Define as flat/text JSON, compile down
+	- Inherit action from ruleset
+	- Auto rule nolog if action == chain
 
 - Memoize parse_collection results
 
@@ -47,5 +49,7 @@
 
 - Compile down using LuaJIT
 	- Prod/debug builds
+
+- Add X-WAF-EVENTS headers to upstream req
 
 - Unit testing with Test::Socket::Nginx

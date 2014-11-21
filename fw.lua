@@ -1,20 +1,37 @@
 local fw = {}
 
+-- microsecond precision
+local ffi = require("ffi")
+ffi.cdef[[
+	typedef long time_t;
+
+	typedef struct timeval {
+		time_t tv_sec;
+		time_t tv_usec;
+	} timeval;
+
+	int gettimeofday(struct timeval* t, void* tzp);
+]]
+
+local function gettimeofday()
+	local gettimeofday_struct = ffi.new("timeval")
+	ffi.C.gettimeofday(gettimeofday_struct, nil)
+	return tonumber(gettimeofday_struct.tv_sec) * 1000000 + tonumber(gettimeofday_struct.tv_usec)
+end
+
 local cookiejar = require "resty.cookie"
 local cjson = require "cjson"
 
 -- eventually this goes away in the name of performance
 require("logging.file")
 local logger = logging.file('/var/log/freewaf/fw.log')
-logger:setLevel(logging.WARN)
-
--- logs to /fw/shm/sock/event_listener.sock
-local event_logger = require "resty.logger.socket"
+logger:setLevel(logging.DEBUG)
 
 -- module-level table to define rule operators
 -- no need to recreated this with every request
 local operators = {
 	REGEX = function(tables, pattern, opts) return fw.regex_match(tables, pattern, opts) end,
+	NOT_REGEX = function(tables, pattern, opts) return false end,
 	EQUALS = function(a, b) return fw.equals(a, b) end,
 	NOT_EQUALS = function(a, b) return fw.not_equals(a, b) end,
 	EXISTS = function(haystack, needle) return fw.table_has_value(needle, haystack) end,
@@ -29,9 +46,9 @@ local actions = {
 		logger:debug("rule.action was LOG, since we already called log_event this is relatively meaningless")
 		--fw.finish()
 	end,
-	DENY = function()
+	DENY = function(start)
 		logger:debug("rule.action was DENY, so telling nginx to quit!")
-		fw.finish()
+		fw.finish(start)
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end,
 	IGNORE = function()
@@ -178,26 +195,6 @@ function fw.table_clear(t)
 	return t
 end
 
--- upper-case the first letter of every word
-function fw.normalize(s)
-	return s:gsub("(%l)(%w*)", function(a, b) return string.upper(a) .. b end)
-end
-
--- properly case the HEADER_NAMES collection
-function fw.normalize_header_names(headers)
-	local header_names = fw.table_keys(headers)
-	local new_headers = {}
-	local n = 0
-
-	for _, header in ipairs(header_names) do
-		n = n + 1
-		new_headers[n] = fw.normalize(header)
-		logger:debug("header is now " .. new_headers[n])
-	end
-
-	return new_headers
-end
-
 -- regex matcher (uses POSIX patterns via ngx.re.match)
 -- data is a table of strings
 function fw.regex_match(table, pattern, opts)
@@ -333,9 +330,9 @@ function fw.build_common_args(collections)
 end
 
 -- use the lookup table to figure out what to do
-function fw.rule_action(action)
+function fw.rule_action(action, start)
 	logger:info("Taking the following action: " .. action)
-	local _ = actions[action]()
+	local _ = actions[action](start)
 end
 
 -- if we need to bail, 503 is distinguishable from the 500 that gets thrown from a lua failure
@@ -345,42 +342,9 @@ function fw.fatal_fail(msg)
 end
 
 -- debug
-function fw.finish()
-	ngx.update_time()
-	logger:debug("Finished at " .. ngx.now())
-	logger:warn("Finished fw.exec in: " .. ngx.now() - ngx.req.start_time())
-end
-
--- setup the socket logger
-function fw.init_logger()
-	if not event_logger.initted() then
-    	local ok, err = event_logger.init{
-			host = '127.0.0.1',
-			port = '7000',
-			flush_limit = 32768,
-			drop_limit = 1048576,
-	    }   
-    	if not ok then
-        	fw.fatail_fail("failed to initialize the logger: ", err)
-	        return
-		end
-		logger:debug("Initializing logger")
-		fw.event_logger_timer()
-	end
-end
-
-function fw.do_flush(premature)
-	if premature then return end
-	if event_logger.initted() then
-		logger:debug("Flushing log via timer")
-		event_logger.flush()
-	end
-	fw.event_logger_timer()
-end
-
-function fw.event_logger_timer()
-	local ok, err = ngx.timer.at(15, fw.do_flush)
-	if not ok then ngx.log(ngx.ERR, "failed to create timer for flushing logs: ", err) end
+function fw.finish(start)
+	local finish = gettimeofday()
+	logger:warn("Finished fw.exec in: " .. finish - start)
 end
 
 
@@ -389,9 +353,8 @@ end
 -- because the lua api only loads this module once, so module-level variables
 -- can be cross-polluted
 function fw.exec(opts)
+local start = gettimeofday()
 logger:debug("Request started: " .. ngx.req.start_time())
-ngx.update_time()
-logger:debug("Beginning fw.exec: " .. ngx.now())
 
 if (type(opts) ~= "table") then
 	fw.fatal_fail("opts is not a table, it is a " .. type(opts))
@@ -407,8 +370,6 @@ end
 if (not fw.table_has_value(opts.mode, allowed_modes)) then
 	fw.fatal_fail("Invalid operational mode provided: " .. tostring(mode))
 end
-
-fw.init_logger()
 
 local user_id = opts.user_id
 local active_rulesets = opts.active_rulesets
@@ -476,13 +437,17 @@ local collections = {
 	URI = request_uri,
 	URI_ARGS = request_uri_args,
 	HEADERS = request_headers,
-	HEADER_NAMES = fw.normalize_header_names(request_headers),
+	HEADER_NAMES = fw.table_keys(request_headers),
 	USER_AGENT = request_ua,
 	REQUEST_LINE = request_request_line,
 	COOKIES = request_cookies,
 	REQUEST_BODY = request_post_args,
 	REQUEST_ARGS = request_common_args
 }
+
+local ctx = {}
+ctx.mode = mode
+ctx.start = start
 
 for _, ruleset in ipairs(active_rulesets) do
 	logger:info("Beginning ruleset " .. ruleset)
@@ -491,76 +456,66 @@ for _, ruleset in ipairs(active_rulesets) do
 	local rs = require("fw_rules.rs_" .. ruleset)
 
 	for __, rule in ipairs(rs.rules()) do
-		logger:info("Beginning run of rule " .. rule.id)
-		if (type(rule.id) == "string") then
-			rule.id = tonumber(rule.id) -- i'm lazy
-		end
-		if (fw.table_has_value(rule.id, ignored_rules)) then
-			logger:info("Ignoring rule " .. rule.id)
-			break
-		end
-
-		local match
-		local match_type
-		local match_pattern
-		local match_collection
-		local matchcount = 0
-
-		logger:debug("We will need " .. #rule.vars .. " matches")
-		for ___, var in ipairs(rule.vars) do
-
-			-- fucking hack
-			if (type(var.type) == "string") then
-				logger:warn("var.type " .. var.type .. " is a string, so building a table out of it")
-				var.type = { var.type }
-			end
-
-			for i, _var in ipairs(var.type) do
-				logger:debug("Parsing the collection " .. var.type[i])
-				local t, specific = fw.parse_collection(collections[var.type[i]], var.opts[i])
-
-				if (t == nil) then
-					logger:info("Collection " .. tostring(var.type[i]) .. " was not found or was nil after applying " .. tostring(var.opts[i].specific))
-				else
-					logger:debug("Matching with the following operator: " .. var.operator)
-					match = operators[var.operator](t, var.pattern)
-					if (match) then 
-						match_type = var.operator
-						match_pattern = var.pattern
-						match_collection = tostring(var.type[i]) .. tostring(specific)
-						matchcount = matchcount + 1
-						break -- if we have a match from this var, we probably dont need to keep going
-					end
-				end
-				logger:debug("Matchcount is now " .. matchcount)
-			end
-
-			if (not match) then
-				logger:info("Breaking because we didn't find a previous match, so no reason to keep going")
-				break
-			end
-		end
-
-		if (matchcount >= #rule.vars) then
-			logger:info("Matchcount was sufficient (" .. matchcount .. ") to trigger rule action " .. rule.action)
-			if (rule.action ~= "IGNORE") then
-				fw.log_event(user_id, request_client, request_uri, rule.id, match, match_type, match_pattern, match_collection)
-			end
-
-			if (mode == "ACTIVE") then
-				fw.rule_action(rule.action)
-			end
+		if (not fw.table_has_value(rule.id, ignored_rules)) then
+			logger:debug("Beginning run of rule " .. rule.id)
+			_process_rule(rule, collections, ctx)
 		else
-			logger:info("Matchcount of " .. matchcount .. " was insufficient to trigger action")
+			logger:info("Ignoring rule " .. rule.id)
 		end
-
-		logger:info("Run of rule " .. rule.id .. " finished")
 	end
 end
 
-fw.finish()
+fw.finish(start)
 
 end -- fw.exec()
+
+function _process_rule(rule, collections, ctx)
+	local id = rule.id
+	local var = rule.var
+	local opts = rule.opts
+	local action = rule.action
+	local description = rule.description
+
+	if (opts.chainchild == true and ctx.chained == false) then
+		logger:info("This is a chained rule, but we don't have a previous match, so not processing")
+		return
+	end
+
+	logger:debug("parsing collections for rule " .. id)
+	local t, specific = fw.parse_collection(collections[var.type], var.opts)
+
+	if (not t) then
+		logger:info("parse_collection didnt return anything for " .. var.type)
+	else
+		local match = operators[var.operator](t, var.pattern)
+		if (match) then
+			logger:info("Match of rule " .. id .. "!")
+			if (action == "CHAIN") then
+				ctx.chained = true
+				logger:info("CHAIN parent matched, moving on to the next rule")
+				return
+			end
+
+			local match_type = var.operator
+			local match_pattern = var.pattern
+			local match_collection = tostring(var.type) .. tostring(specific)
+
+			if (not opts.nolog) then
+				fw.log_event(user_id, request_client, request_uri, rule.id, match, match_type, match_pattern, match_collection)
+			else
+				logger:info("We had a match, but not logging because opts.nolog is set")
+			end
+
+			if (ctx.mode == "ACTIVE") then
+				fw.rule_action(action, ctx.start)
+			end
+		end
+	end
+
+	if (opts.chainend == true) then
+		ctx.chained = false
+	end
+end
 
 function fw.log_event(user, request_client, request_uri, rule_id, match, match_type, match_pattern, match_collection)
 	local t = {
@@ -576,7 +531,7 @@ function fw.log_event(user, request_client, request_uri, rule_id, match, match_t
 		collection = match_collection
 	}
 
-	event_logger.log(cjson.encode(t) .. "\n")
+	logger:warn("EVENT LOGGED! " .. rule_id)
 end
 
 return fw
