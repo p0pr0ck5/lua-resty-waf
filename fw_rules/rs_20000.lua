@@ -164,7 +164,7 @@ local _rules = {
 		},
 		opts = {},
 		action = "LOG",
-		descripton = "Request sent with abnormal Range header"
+		description = "Request sent with abnormal Range header"
 	},
 	{
 		id = 20015,
@@ -188,7 +188,7 @@ local _rules = {
 		},
 		opts = {},
 		action = "LOG",
-		descripton = "Excessive number of byte range fields within one request"
+		description = "Excessive number of byte range fields within one request"
 	},
 	{
 		id = 20017,
