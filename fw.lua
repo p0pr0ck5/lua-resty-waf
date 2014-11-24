@@ -30,8 +30,8 @@ logger:setLevel(logging.DEBUG)
 -- module-level table to define rule operators
 -- no need to recreated this with every request
 local operators = {
-	REGEX = function(tables, pattern, opts) return fw.regex_match(tables, pattern, opts) end,
-	NOT_REGEX = function(tables, pattern, opts) return false end,
+	REGEX = function(subject, pattern, opts) return fw.regex_match(subject, pattern, opts) end,
+	NOT_REGEX = function(subject, pattern, opts) return not fw.regex_match(subject, pattern, opts) end,
 	EQUALS = function(a, b) return fw.equals(a, b) end,
 	NOT_EQUALS = function(a, b) return fw.not_equals(a, b) end,
 	EXISTS = function(haystack, needle) return fw.table_has_value(needle, haystack) end,
@@ -61,20 +61,21 @@ local allowed_modes = { "INACTIVE", "DEBUG", "ACTIVE" }
 
 -- used for operators.EXISTS
 function fw.equals(a, b)
-	logger:debug("Comparing " .. tostring(a) .. " and " .. tostring(b))
-
-	_a = a
-	_b = b
-
-	if (type(_a) == "table") then
-		logger:warn("We were passed a table for comparison, taking the first value instead (" ..tostring(a[1]) .. ")")
-		_a = a[1]
-	end	
-
-	if (type(_a) ~= type(_b)) then
-		fw.fatal_fail(type(_a) .. " " .. tostring(_a) .. " is not the same type as " .. type(b) .. " " .. tostring(b))
+	local equals
+	if (type(a) == "table") then
+		logger:debug("Needle is a table, so recursing!")
+		for _, v in ipairs(a) do
+			equals = fw.equals(v, b)
+			if (equals) then
+				break
+			end
+		end
+	else
+		logger:info("Comparing " .. a .. " and " .. b)
+		equals = a == b
 	end
-	return _a == _b
+
+	return equals
 end
 
 -- used for operators.NOT_EXISTS
@@ -196,29 +197,30 @@ function fw.table_clear(t)
 end
 
 -- regex matcher (uses POSIX patterns via ngx.re.match)
--- data is a table of strings
-function fw.regex_match(table, pattern, opts)
-	if (type(table) ~= "table") then
-		logger:warn("regex_match received a " .. type(table) .. " for its target table when it should have been a table!") -- was previously fw.fatal_fail
-		table = { tostring(table) } -- we probably got a string
-	end
-	if (type(pattern) ~= "string") then
-		fw.fatal_fail("regex_match received a " .. type(pattern) .. " for its pattern when it should have been a string!")
-	end
+function fw.regex_match(subject, pattern, opts)
+	local opts = "oij"
+	local from, to, err
+	local match
 
-	-- by default we'll be case insensitive
-	-- need to look over PCRE opts
-	opts = opts or "oij"
-
-	for i, value in ipairs(table) do
-		logger:debug("matching " .. value .. " against " .. pattern)
-		local from, to, err = ngx.re.find(value, pattern, opts)
+	if (type(subject) == "table") then
+		logger:debug("subject is a table, so recursing!")
+		for _, v in ipairs(subject) do
+			match = fw.regex_match(v, pattern, opts)
+			if (match) then
+				break
+			end
+		end
+	else
+		logger:debug("matching " .. subject .. " against " .. pattern)
+		from, to, err = ngx.re.find(subject, pattern, opts)
 		if err then logger:error("error in waf.regexmatch: " .. err) end
 		if from then
-			logger:debug("match! " .. string.sub(value, from, to))
-			return string.sub(value, from, to)
+			logger:debug("regex match! " .. string.sub(subject, from, to))
+			match = string.sub(subject, from, to)
 		end
 	end
+
+	return match
 end
 
 -- return a subset of a collection based on the options provided
