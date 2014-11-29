@@ -223,65 +223,38 @@ function fw.regex_match(subject, pattern, opts)
 	return match
 end
 
--- return a subset of a collection based on the options provided
-function fw.parse_collection(collection, opts)
-	local t
+local function _parse_collection(collection, opts)
+	local lookup = {
+		specific = function(collection, value)
+			logger:debug("_parse_collection is getting a specific value: " .. value)
+			return collection[value]
+		end,
+		ignore = function(collection, value)
+			logger:debug("_parse_collection is ignoring a value: " .. value)
+			local _collection = {}
+			_collection = fw.table_copy(collection)
+			_collection[value] = nil
+			return _collection
+		end,
+		keys = function(collection)
+			logger:debug("_parse_collection is getting the keys")
+			return fw.table_keys(collection)
+		end,
+		values = function(collection)
+			logger:debug("_parse_collection is getting the values")
+			return fw.table_values(collection)
+		end
+	}
 
 	if (type(collection) ~= "table") then
-		logger:info("parse_collection was sent a " .. type(collection) .. " instead of a collection table, creating a new table for " .. tostring(collection))
-		return { collection }, ""
-	end
-
-	if (type(opts) ~= "table") then
-		logger:warn("parse_collection was sent " .. tostring(opts) .. " (a " .. type(opts) .. ") instead of an opts table, so setting it to nil")
-		opts = nil
+		return collection
 	end
 
 	if (opts == nil) then
-		return collection, ""
+		return collection
 	end
 
-	if (opts.specific ~= nil) then
-		return collection[opts.specific], ":" .. opts.specific
-	end
-
-	if (opts.ignore ~= nil) then
-		t = fw.table_copy(collection)
-		if (t[opts.ignore] ~= nil) then
-			t[opts.ignore] = nil
-		end
-		return fw.table_values(t), ":!" .. opts.ignore -- if we just return t we potentially get a table with non-integer keys
-	end
-
-	if (opts.keys ~= nil) then
-		return fw.table_keys(collection), ":keys"
-	end
-
-	if (opts.values ~= nil) then
-		return fw.table_values(collection), ":values"
-	end
-
-	if (opts.all ~= nil) then
-		local n = 0
-		t = {}
-
-		-- need to get keys and values separate in case a key was duplicated (the value would be a table)
-		for _, key in ipairs(fw.table_keys(collection)) do
-			n = n + 1
-			t[n] = key
-			logger:debug("parse_collection local table t[" .. n .. "]: " .. t[n])
-		end
-		for _,value in ipairs(fw.table_values(collection)) do
-			n = n + 1
-			t[n] = value
-			logger:debug("parse_collection local table t[" .. n .. "]: " .. t[n])
-		end
-		return t, ":all"
-	end
-
-	-- maybe need to look at alternatives to falling all the way through
-	logger:debug("No opts and collection was a table, so just getting the whole thing " .. tostring(collection))
-	return collection, ""
+	return lookup[opts.key](collection, opts.value)
 end
 
 -- COMMON_ARGS holds request params including GET and POST params, and cookies
@@ -484,7 +457,7 @@ function _process_rule(rule, collections, ctx)
 	end
 
 	logger:debug("parsing collections for rule " .. id)
-	local t, specific = fw.parse_collection(collections[var.type], var.opts)
+	local t = _parse_collection(collections[var.type], var.opts)
 
 	if (not t) then
 		logger:info("parse_collection didnt return anything for " .. var.type)
@@ -500,7 +473,7 @@ function _process_rule(rule, collections, ctx)
 
 			local match_type = var.operator
 			local match_pattern = var.pattern
-			local match_collection = tostring(var.type) .. tostring(specific)
+			local match_collection = tostring(var.type)
 
 			if (not opts.nolog) then
 				fw.log_event(user_id, request_client, request_uri, rule.id, match, match_type, match_pattern, match_collection)

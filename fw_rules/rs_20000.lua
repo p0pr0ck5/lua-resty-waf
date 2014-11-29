@@ -17,7 +17,7 @@ local _rules = {
 		id = 20002,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "content-length" },
+			opts = { key = "specific", value = "content-length" },
 			pattern = [=[^[\d]+$]=],
 			operator = "NOT_REGEX",
 		},
@@ -41,7 +41,7 @@ local _rules = {
 		id = 20004,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "content-length" },
+			opts = { key = "specific", value = "content-length" },
 			pattern = "0",
 			operator = "NOT_EQUALS"
 		},
@@ -77,7 +77,7 @@ local _rules = {
 		id = 20007,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "content-encoding" },
+			opts = { key = "specific", value = "content-encoding" },
 			pattern = "Identity",
 			operator = "EQUALS"
 		},
@@ -89,7 +89,7 @@ local _rules = {
 		id = 20008,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "expect" },
+			opts = { key = "specific", value = "expect" },
 			pattern = [=[100-continue]=],
 			operator = "REGEX"
 		},
@@ -124,7 +124,7 @@ local _rules = {
 		id = 20011,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "pragma" },
+			opts = { key = "specific", value = "pragma" },
 			pattern = "no-cache",
 			operator = "EQUALS"
 		},
@@ -158,7 +158,7 @@ local _rules = {
 		id = 20014,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "range" },
+			opts = { key = "specific", value = "range" },
 			pattern = [=[^bytes=0-]=],
 			operator = "REGEX"
 		},
@@ -170,7 +170,7 @@ local _rules = {
 		id = 20015,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "range" },
+			opts = { key = "specific", value = "range" },
 			pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 			operator = "REGEX"
 		},
@@ -182,7 +182,7 @@ local _rules = {
 		id = 20016,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "request-range" },
+			opts = { key = "specific", value = "request-range" },
 			pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 			operator = "REGEX"
 		},
@@ -194,7 +194,7 @@ local _rules = {
 		id = 20017,
 		var = {
 			type = "HEADERS",
-			opts = { specific = "connection" },
+			opts = { key = "specific", value = "connection" },
 			pattern = [=[\b(keep-alive|close),\s?(keep-alive|close)\b]=],
 			operator = "REGEX"
 		},
