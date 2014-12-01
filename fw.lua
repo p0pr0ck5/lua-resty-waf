@@ -340,10 +340,6 @@ local function _process_rule(rule, collections, ctx)
 				return
 			end
 
-			local match_type = var.operator
-			local match_pattern = var.pattern
-			local match_collection = tostring(var.type)
-
 			if (not opts.nolog) then
 				_log_event(request_client, request_uri, rule, match)
 			else
