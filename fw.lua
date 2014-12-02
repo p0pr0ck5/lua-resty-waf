@@ -320,9 +320,17 @@ local actions = {
 		logger:debug("rule.action was LOG, since we already called log_event this is relatively meaningless")
 		--fw.finish()
 	end,
-	DENY = function(start)
+	CHAIN = function(ctx)
+		logger:debug("Setting the context chained flag to true")
+		ctx.chained = true
+	end,
+	SKIPRS = function(ctx)
+		logger:debug("Setting the skip ruleset flag")
+		ctx.skiprs = true
+	end,
+	DENY = function(ctx)
 		logger:debug("rule.action was DENY, so telling nginx to quit!")
-		_finish(start)
+		_finish(ctx.start)
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end,
 	IGNORE = function()
@@ -357,11 +365,6 @@ local function _process_rule(rule, collections, ctx)
 		local match = operators[var.operator](t, var.pattern)
 		if (match) then
 			logger:info("Match of rule " .. id .. "!")
-			if (action == "CHAIN") then
-				ctx.chained = true
-				logger:info("CHAIN parent matched, moving on to the next rule")
-				return
-			end
 
 			if (not opts.nolog) then
 				_log_event(request_client, request_uri, rule, match)
@@ -370,7 +373,7 @@ local function _process_rule(rule, collections, ctx)
 			end
 
 			if (ctx.mode == "ACTIVE") then
-				_rule_action(action, ctx.start)
+				_rule_action(action, ctx)
 			end
 		end
 	end
@@ -487,7 +490,14 @@ function _M.exec(opts)
 		logger:debug("Requiring rs_" .. ruleset)
 		local rs = require("fw_rules.rs_" .. ruleset)
 
+		ctx.skiprs = false
+
 		for __, rule in ipairs(rs.rules()) do
+			if (ctx.skiprs == true) then
+				logger:info("skiprs is set, so breaking!")
+				break
+			end
+
 			if (not _table_has_value(rule.id, ignored_rules)) then
 				logger:debug("Beginning run of rule " .. rule.id)
 				_process_rule(rule, collections, ctx)
