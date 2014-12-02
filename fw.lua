@@ -320,6 +320,11 @@ local actions = {
 		logger:debug("rule.action was LOG, since we already called log_event this is relatively meaningless")
 		--fw.finish()
 	end,
+	ACCEPT = function(ctx)
+		logger:debug("An explicit ACCEPT was sent, so ending this phase with ngx.OK")
+		_finish(ctx.start)
+		ngx.exit(ngx.OK)
+	end,
 	CHAIN = function(ctx)
 		logger:debug("Setting the context chained flag to true")
 		ctx.chained = true
