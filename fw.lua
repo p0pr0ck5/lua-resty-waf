@@ -237,6 +237,19 @@ local function _parse_collection(collection, opts)
 		values = function(collection)
 			logger:debug("_parse_collection is getting the values")
 			return _table_values(collection)
+		end,
+		all = function(collection)
+			local n = 0
+			local _collection = {}
+			for _, key in ipairs(_table_keys(collection)) do
+				n = n + 1
+				_collection[n] = key
+			end
+			for _, value in ipairs(_table_values(collection)) do
+				n = n + 1
+				_collection[n] = value
+			end
+			return _collection
 		end
 	}
 
@@ -501,6 +514,9 @@ function _M.exec(opts)
 	local ctx = {}
 	ctx.mode = mode
 	ctx.start = start
+	ctx.chained = false
+	ctx.skip = false
+	ctx.skiprs = false
 
 	for _, ruleset in ipairs(active_rulesets) do
 		logger:info("Beginning ruleset " .. ruleset)
