@@ -329,6 +329,10 @@ local actions = {
 		logger:debug("Setting the context chained flag to true")
 		ctx.chained = true
 	end,
+	SKIP = function(ctx)
+		logger:debug("Setting the context skip flag to true")
+		ctx.skip = true
+	end,
 	SKIPRS = function(ctx)
 		logger:debug("Setting the skip ruleset flag")
 		ctx.skiprs = true
@@ -358,6 +362,15 @@ local function _process_rule(rule, collections, ctx)
 
 	if (opts.chainchild == true and ctx.chained == false) then
 		logger:info("This is a chained rule, but we don't have a previous match, so not processing")
+		return
+	end
+
+	if (ctx.skip == true) then
+		logger:info("Skipflag is set, not processing")
+		if (opts.skipend == true) then
+			logger:debug("End of the skipchain, unsetting flag")
+			ctx.skip = false
+		end
 		return
 	end
 
@@ -495,11 +508,10 @@ function _M.exec(opts)
 		logger:debug("Requiring rs_" .. ruleset)
 		local rs = require("fw_rules.rs_" .. ruleset)
 
-		ctx.skiprs = false
-
 		for __, rule in ipairs(rs.rules()) do
 			if (ctx.skiprs == true) then
 				logger:info("skiprs is set, so breaking!")
+				ctx.skiprs = false
 				break
 			end
 
