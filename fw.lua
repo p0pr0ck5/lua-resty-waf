@@ -3,7 +3,7 @@ local _M = {}
 _M.version = "0.0.5"
 
 require("logging.file")
-local ac = require("ahocorasick")
+local ac = require("load_ac")
 local cjson = require("cjson")
 local cookiejar = require("resty.cookie")
 local ffi = require("ffi")
@@ -32,6 +32,9 @@ logger:setLevel(logging.DEBUG)
 
 -- sanity check
 local allowed_modes = { "INACTIVE", "DEBUG", "ACTIVE" }
+
+-- cached aho-corasick dictionary objects
+local _ac_dicts = {}
 
 -- used for operators.EXISTS
 local function _equals(a, b)
@@ -199,9 +202,19 @@ end
 
 -- efficient string search operator
 -- uses CF implementation of aho-corasick-lua
-local function _ac_lookup(needle, haystack)
-	local match
-	local _ac = ac.create(haystack)
+local function _ac_lookup(needle, haystack, ctx)
+	local id = ctx.id
+	local match, _ac
+
+	if (not _ac_dicts[id]) then
+		logger:debug("AC dict not found, calling libac.so")
+		_ac = ac.create_ac(haystack)
+		_ac_dicts[id] = _ac
+	else
+		logger:debug("AC dict found, pulling from the module cache")
+		_ac = _ac_dicts[id]
+	end
+
 	if (type(needle) == "table") then
 		logger:debug("needle is a table, so recursing!")
 		for _, v in ipairs(haystack) do
@@ -322,8 +335,8 @@ local operators = {
 	NOT_EQUALS = function(a, b) return _not_equals(a, b) end,
 	EXISTS = function(haystack, needle) return _table_has_value(needle, haystack) end,
 	NOT_EXISTS = function(haystack, needle) return _table_not_has_value(needle, haystack) end,
-	PM = function(needle, haystack) return _ac_lookup(needle, haystack) end,
-	NOT_PM = function(needle, haystack) return not _ac_lookup(needle, haystack) end
+	PM = function(needle, haystack, ctx) return _ac_lookup(needle, haystack, ctx) end,
+	NOT_PM = function(needle, haystack, ctx) return not _ac_lookup(needle, haystack, ctx) end
 }
 
 -- module-level table to define rule actions
@@ -373,6 +386,8 @@ local function _process_rule(rule, collections, ctx)
 	local action = rule.action
 	local description = rule.description
 
+	ctx.id = id
+
 	if (opts.chainchild == true and ctx.chained == false) then
 		logger:info("This is a chained rule, but we don't have a previous match, so not processing")
 		return
@@ -393,7 +408,7 @@ local function _process_rule(rule, collections, ctx)
 	if (not t) then
 		logger:info("parse_collection didnt return anything for " .. var.type)
 	else
-		local match = operators[var.operator](t, var.pattern)
+		local match = operators[var.operator](t, var.pattern, ctx)
 		if (match) then
 			logger:info("Match of rule " .. id .. "!")
 
