@@ -3,6 +3,7 @@ local _M = {}
 _M.version = "0.0.5"
 
 require("logging.file")
+local ac = require("ahocorasick")
 local cjson = require("cjson")
 local cookiejar = require("resty.cookie")
 local ffi = require("ffi")
@@ -196,6 +197,26 @@ local function _regex_match(subject, pattern, opts)
 	return match
 end
 
+-- efficient string search operator
+-- uses CF implementation of aho-corasick-lua
+local function _ac_lookup(needle, haystack)
+	local match
+	local _ac = ac.create(haystack)
+	if (type(needle) == "table") then
+		logger:debug("needle is a table, so recursing!")
+		for _, v in ipairs(haystack) do
+			match = _ac_lookup(v, haystack)
+			if (match) then
+				break
+			end
+		end
+	else
+		match = ac.match(_ac, needle)
+	end
+
+	return match
+end
+
 local function _parse_collection(collection, opts)
 	local lookup = {
 		specific = function(collection, value)
@@ -288,6 +309,8 @@ local operators = {
 	NOT_EQUALS = function(a, b) return _not_equals(a, b) end,
 	EXISTS = function(haystack, needle) return _table_has_value(needle, haystack) end,
 	NOT_EXISTS = function(haystack, needle) return _table_not_has_value(needle, haystack) end,
+	PM = function(needle, haystack) return _ac_lookup(needle, haystack) end,
+	NOT_PM = function(needle, haystack) return not _ac_lookup(needle, haystack) end
 }
 
 -- module-level table to define rule actions
