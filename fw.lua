@@ -30,13 +30,13 @@ end
 -- eventually this goes away in the name of performance
 logger:setLevel(logging.DEBUG)
 
--- sanity check
-local allowed_modes = { "INACTIVE", "DEBUG", "ACTIVE" }
-
 -- cached aho-corasick dictionary objects
-local _ac_dicts = {}
+local _ac_dicts
 
--- used for operators.EXISTS
+-- module-level options
+local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules
+
+-- used for operators.EQUALS
 local function _equals(a, b)
 	local equals
 	if (type(a) == "table") then
@@ -55,7 +55,7 @@ local function _equals(a, b)
 	return equals
 end
 
--- used for operators.NOT_EXISTS
+-- used for operators.NOT_EQUALS
 local function _not_equals(a, b)
 	return not _equals(a, b)
 end
@@ -136,7 +136,7 @@ local function _table_has_key(needle, haystack)
 	if (type(haystack) ~= "table") then
 		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
-	logger:debug("table key " .. needle .. "is " .. tostring(haystack[needle]))
+	logger:debug("table key " .. needle .. " is " .. tostring(haystack[needle]))
 	return haystack[needle] ~= nil
 end
 
@@ -452,29 +452,14 @@ end
 -- data associated with a given request in kept local in scope to this function
 -- because the lua api only loads this module once, so module-level variables
 -- can be cross-polluted
-function _M.exec(opts)
+function _M.exec()
 	local start = gettimeofday()
 	logger:debug("Request started: " .. ngx.req.start_time())
 
-	if (type(opts) ~= "table") then
-		_fatal_fail("opts is not a table, it is a " .. type(opts))
-	end
-
-	-- more sanity checks
-	local mode = opts.mode
-	if (mode == "INACTIVE") then
+	if (_mode == "INACTIVE") then
 		logger:info("Operational mode is INACTIVE, not running")
 		return
 	end
-
-	if (not _table_has_value(opts.mode, allowed_modes)) then
-		_fatal_fail("Invalid operational mode provided: " .. tostring(mode))
-	end
-
-	local user_id = opts.user_id
-	local active_rulesets = opts.active_rulesets
-	local ignored_rules = opts.ignored_rules
-	local allowed_methods = opts.allowed_methods
 
 	local request_client = ngx.var.remote_addr
 	local request_http_version = ngx.req.http_version()
@@ -485,20 +470,15 @@ function _M.exec(opts)
 	local request_ua = ngx.var.http_user_agent
 	local request_request_line = _get_request_line()
 
-	logger:debug("Comparing " .. request_client  .. " against whitelist")
-	if _table_has_value(request_client, opts.whitelist) then
-		logger:info("Allowing " .. request_client .. " because of whitelist")
-		ngx.exit(ngx.OK) -- exiting with OK passes to the next phase handler
+	if (_table_has_key(request_client, _whitelist)) then
+		logger:info(request_client .. " is whitelisted")
+		ngx.exit(ngx.OK)
 	end
 
-	logger:info("Handling a " .. request_method .. " request to " .. request_uri)
-
-	if (not _table_has_value(request_method, allowed_methods)) then
-		if (mode == "ACTIVE") then
-			_rule_action("DENY") -- special case since this isn't a rule, but we should still follow the proper chain
-		end
+	if (_table_has_key(request_client, _blacklist)) then
+		logger:info(request_client .. " is blacklisted")
+		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end
-
 
 	-- if we were POSTed to, read the body in, otherwise trash it (don't ignore it!)
 	-- we'll have a rule about body content with a GET, which brings up 2 questions:
@@ -546,7 +526,7 @@ function _M.exec(opts)
 	}
 
 	local ctx = {}
-	ctx.mode = mode
+	ctx.mode = _mode
 	ctx.start = start
 	ctx.collections = {}
 	ctx.collections_key = {}
@@ -554,7 +534,7 @@ function _M.exec(opts)
 	ctx.skip = false
 	ctx.skiprs = false
 
-	for _, ruleset in ipairs(active_rulesets) do
+	for _, ruleset in ipairs(_active_rulesets) do
 		logger:info("Beginning ruleset " .. ruleset)
 
 		logger:debug("Requiring rs_" .. ruleset)
@@ -567,7 +547,7 @@ function _M.exec(opts)
 				break
 			end
 
-			if (not _table_has_value(rule.id, ignored_rules)) then
+			if (not _table_has_key(rule.id, _ignored_rules)) then
 				logger:debug("Beginning run of rule " .. rule.id)
 				_process_rule(rule, collections, ctx)
 			else
@@ -578,5 +558,44 @@ function _M.exec(opts)
 
 	_finish(start)
 end -- fw.exec()
+
+function _M.init()
+	_mode = "DEBUG"
+	_whitelist = {}
+	_blacklist = {}
+	_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 }
+	_ignored_rules = {}
+
+	_ac_dicts = {}
+end
+
+function _M.set_option(option, value)
+	local lookup = {
+		mode = function(value)
+			_mode = value
+		end,
+		whitelist = function(value)
+			_whitelist[value] = true
+		end,
+		blacklist = function(value)
+			_blacklist[value] = true
+		end,
+		ignore_ruleset = function(value)
+			_active_rulesets = value
+		end,
+		ignore_rule = function(value)
+			_ignored_rules[value] = true
+		end
+	}
+
+	if (type(value) == "table") then
+		for _, v in ipairs(value) do
+			_M.set_option(option, v)
+		end
+	else
+		lookup[option](value)
+	end
+
+end
 
 return _M
