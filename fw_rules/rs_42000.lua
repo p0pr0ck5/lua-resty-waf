@@ -5,6 +5,18 @@ _M.version = "0.0.5"
 local _rules = {
 	{
 		id = 42001,
+		var = {
+			type = "REQUEST_ARGS",
+			opts = { key = "all" },
+			pattern = { "jscript", "onsubmit", "copyparentfolder", "document", "javascript", "meta", "onchange", "onmove", "onkeydown", "onkeyup", "activexobject", "onerror", "onmouseup", "ecmascript", "bexpression", "onmouseover", "vbscript:", "<![cdata[", "http:", ".innerhtml", "settimeout", "shell:", "onabort", "asfunction:", "onkeypress", "onmousedown", "onclick", ".fromcharcode", "background-image:", "x-javascript", "ondragdrop", "onblur", "mocha:", "javascript:", "onfocus", "lowsrc", "getparentfolder", "onresize", "@import", "alert", "script", "onselect", "onmouseout", "application", "onmousemove", "background", ".execscript", "livescript:", "vbscript", "getspecialfolder", ".addimport", "iframe", "onunload", "createtextrange", "<input", "onload" },
+			operator = "NOT_PM"
+		},
+		opts = { nolog = true },
+		action = "SKIP",
+		description = "Preliminary XSS check"
+	},
+	{
+		id = 42002,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -16,7 +28,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42002,
+		id = 42003,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -28,7 +40,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42003,
+		id = 42004,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -40,7 +52,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42004,
+		id = 42005,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -52,7 +64,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42005,
+		id = 42006,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -64,7 +76,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42006,
+		id = 42007,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -76,7 +88,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42007,
+		id = 42008,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -88,7 +100,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42008,
+		id = 42009,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -100,7 +112,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42009,
+		id = 42010,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -112,7 +124,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42010,
+		id = 42011,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -124,7 +136,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42011,
+		id = 42012,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -136,7 +148,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42012,
+		id = 42013,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -148,7 +160,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42013,
+		id = 42014,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -160,7 +172,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42014,
+		id = 42015,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -172,7 +184,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42015,
+		id = 42016,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -184,7 +196,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42016,
+		id = 42017,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -196,7 +208,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42017,
+		id = 42018,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -208,7 +220,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42018,
+		id = 42019,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -220,7 +232,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42019,
+		id = 42020,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -232,7 +244,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42020,
+		id = 42021,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -244,7 +256,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42021,
+		id = 42022,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -256,7 +268,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42022,
+		id = 42023,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -268,7 +280,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42023,
+		id = 42024,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -280,7 +292,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42024,
+		id = 42025,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -292,7 +304,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42025,
+		id = 42026,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -304,7 +316,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42026,
+		id = 42027,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -316,7 +328,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42027,
+		id = 42028,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -328,7 +340,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42028,
+		id = 42029,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -340,7 +352,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42029,
+		id = 42030,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -352,7 +364,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42030,
+		id = 42031,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -364,7 +376,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42031,
+		id = 42032,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -376,7 +388,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42032,
+		id = 42033,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -388,7 +400,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42033,
+		id = 42034,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -400,7 +412,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42034,
+		id = 42035,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -412,7 +424,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42035,
+		id = 42036,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -424,7 +436,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42036,
+		id = 42037,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -436,7 +448,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42037,
+		id = 42038,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -448,7 +460,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42038,
+		id = 42039,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -460,7 +472,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42039,
+		id = 42040,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -472,7 +484,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42040,
+		id = 42041,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -484,7 +496,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42042,
+		id = 42043,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -496,7 +508,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42042,
+		id = 42043,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -508,7 +520,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42043,
+		id = 42044,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -520,7 +532,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42044,
+		id = 42045,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -532,7 +544,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42045,
+		id = 42046,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -544,7 +556,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42046,
+		id = 42047,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -556,7 +568,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42047,
+		id = 42048,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -568,7 +580,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42048,
+		id = 42049,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -580,7 +592,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42049,
+		id = 42050,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -592,7 +604,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42050,
+		id = 42051,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -604,7 +616,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42051,
+		id = 42052,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -616,7 +628,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42052,
+		id = 42053,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -628,7 +640,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42053,
+		id = 42054,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -640,7 +652,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42054,
+		id = 42055,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -652,7 +664,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42055,
+		id = 42056,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -664,7 +676,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42056,
+		id = 42057,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -676,7 +688,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42057,
+		id = 42058,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -688,7 +700,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42058,
+		id = 42059,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -700,7 +712,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42059,
+		id = 42060,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -712,7 +724,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42060,
+		id = 42061,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -724,7 +736,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42061,
+		id = 42062,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -736,7 +748,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42062,
+		id = 42063,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -748,7 +760,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42063,
+		id = 42064,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -760,7 +772,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42064,
+		id = 42065,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -772,7 +784,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42065,
+		id = 42066,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -784,7 +796,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42066,
+		id = 42067,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -796,10 +808,10 @@ local _rules = {
 		},
 	},
 	{
-		id = 42067,
+		id = 42068,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
-		opts = {},
+		opts = { skipend = true },
 		var = {
 			operator = "REGEX",
 			pattern = "\\.fromcharcode\\b",
@@ -808,7 +820,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42068,
+		id = 42069,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - HTML Tag Handler",
 		opts = {},
@@ -820,7 +832,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42069,
+		id = 42070,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -832,7 +844,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42070,
+		id = 42071,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -844,7 +856,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42071,
+		id = 42072,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -856,7 +868,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42072,
+		id = 42073,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -868,7 +880,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42073,
+		id = 42074,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -880,7 +892,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42074,
+		id = 42075,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - Style Tag Manipulation",
 		opts = {},
@@ -892,7 +904,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42075,
+		id = 42076,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - JS Fragments",
 		opts = {},
@@ -904,7 +916,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42076,
+		id = 42077,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - CSS Fragments",
 		opts = {},
@@ -916,7 +928,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42077,
+		id = 42078,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -928,7 +940,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42078,
+		id = 42079,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - xss testing alert",
 		opts = {},
@@ -940,7 +952,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42079,
+		id = 42080,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - ASCII alert",
 		opts = {},
@@ -952,7 +964,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42080,
+		id = 42081,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - xss testing alert",
 		opts = {},
@@ -964,7 +976,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42081,
+		id = 42082,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting)",
 		opts = {},
@@ -976,7 +988,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42082,
+		id = 42083,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -988,7 +1000,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42083,
+		id = 42084,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1000,7 +1012,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42084,
+		id = 42085,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1012,7 +1024,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42085,
+		id = 42086,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1024,7 +1036,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42086,
+		id = 42087,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1036,7 +1048,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42087,
+		id = 42088,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1048,7 +1060,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42088,
+		id = 42089,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1060,7 +1072,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42089,
+		id = 42090,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1072,7 +1084,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42090,
+		id = 42091,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1084,7 +1096,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42091,
+		id = 42092,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1096,7 +1108,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42092,
+		id = 42093,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1108,7 +1120,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42093,
+		id = 42094,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1120,7 +1132,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42094,
+		id = 42095,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1132,7 +1144,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42095,
+		id = 42096,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
@@ -1144,7 +1156,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42096,
+		id = 42097,
 		action = "DENY",
 		description = "XSS (Cross-Site Scripting) - IE Filter",
 		opts = {},
