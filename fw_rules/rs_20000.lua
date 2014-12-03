@@ -6,7 +6,7 @@ local _rules = {
 		var = {
 			type = "REQUEST_LINE",
 			opts = nil,
-			pattern = [=[^(?i:(?:[a-z]{3,10}\s+(?:\w{3,7}?://[\w\-\./]*(?::\d+)?)?/[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?|connect (?:\d{1,3}\.){3}\d{1,3}\.?(?::\d+)?|options \*)\s+[\w\./]+|get /[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?)$]=],
+			pattern = [=[^(?:(?:[a-z]{3,10}\s+(?:\w{3,7}?://[\w\-\./]*(?::\d+)?)?/[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?|connect (?:\d{1,3}\.){3}\d{1,3}\.?(?::\d+)?|options \*)\s+[\w\./]+|get /[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?)$]=],
 			operator = "NOT_REGEX",
 		},
 		opts = {},
@@ -57,7 +57,7 @@ local _rules = {
 			pattern = "POST",
 			operator = "EQUALS"
 		},
-		opts = {},
+		opts = { nolog = true },
 		action = "CHAIN",
 		description = "POST request does not have a Content-Length Header"
 	},
