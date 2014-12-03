@@ -402,8 +402,27 @@ local function _process_rule(rule, collections, ctx)
 		return
 	end
 
-	logger:debug("parsing collections for rule " .. id)
-	local t = _parse_collection(collections[var.type], var.opts)
+	local t
+	local memokey
+	if (var.opts ~= nil) then
+		logger:debug("var opts is not nil")
+		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
+	else
+		logger:debug("var opts is nil, memo cache key is only the var type")
+		memokey = var.type
+	end
+
+	logger:debug("checking for memokey " .. memokey)
+
+	if (not ctx.collections_key[memokey]) then
+		logger:debug("parsing collections for rule " .. id)
+		t = _parse_collection(collections[var.type], var.opts)
+		ctx.collections[memokey] = t
+		ctx.collections_key[memokey] = true
+	else
+		logger:debug("parse collection cache hit!")
+		t = ctx.collections[memokey]
+	end
 
 	if (not t) then
 		logger:info("parse_collection didnt return anything for " .. var.type)
@@ -529,6 +548,8 @@ function _M.exec(opts)
 	local ctx = {}
 	ctx.mode = mode
 	ctx.start = start
+	ctx.collections = {}
+	ctx.collections_key = {}
 	ctx.chained = false
 	ctx.skip = false
 	ctx.skiprs = false
