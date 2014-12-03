@@ -217,8 +217,8 @@ local function _ac_lookup(needle, haystack, ctx)
 
 	if (type(needle) == "table") then
 		logger:debug("needle is a table, so recursing!")
-		for _, v in ipairs(haystack) do
-			match = _ac_lookup(v, haystack)
+		for _, v in ipairs(needle) do
+			match = _ac_lookup(v, haystack, ctx)
 			if (match) then
 				break
 			end
