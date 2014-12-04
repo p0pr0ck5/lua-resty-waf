@@ -26,7 +26,7 @@ You can download the PCRE source from the [PCRE website](http://www.pcre.org/).
 
 ##Performance
 
-FreeWAF was designed with efficiency and scalability in mind. It leverages Nginx's asynchronous processing model and an efficient design to process each transaction as quickly as possible. Early testing has show that deployments implementing all provided rulesets, which are designed to mimic the logic behind the ModSecurity CRS, process transactions in roughly 300-500 microseconds per request; this equals the performance advertised by [Cloudflare's WAF](https://www.cloudflare.com/waf). Tests were run on a reasonable hardware stack (E3-1230 CPU, 32 GB RAM, 2 x 840 EVO ), maxing at roughly 15,000 requests per second. See [this blog post](http://www.cryptobells.com/freewaf-a-high-performance-scalable-open-web-firewall) for more information.
+FreeWAF was designed with efficiency and scalability in mind. It leverages Nginx's asynchronous processing model and an efficient design to process each transaction as quickly as possible. Early testing has show that deployments implementing all provided rulesets, which are designed to mimic the logic behind the ModSecurity CRS, process transactions in roughly 300-500 microseconds per request; this equals the performance advertised by [Cloudflare's WAF](https://www.cloudflare.com/waf). Tests were run on a reasonable hardware stack (E3-1230 CPU, 32 GB RAM, 2 x 840 EVO in RAID 0), maxing at roughly 15,000 requests per second. See [this blog post](http://www.cryptobells.com/freewaf-a-high-performance-scalable-open-web-firewall) for more information.
 
 ##Installation
 
@@ -42,8 +42,10 @@ Note that by default FreeWAF runs in DEBUG mode, to prevent immediately affectin
 			fw = require "FreeWAF.fw" --global reference to the FreeWAF module
 			fw.init() --init sets up the module option defaults
 
-			-- each of these is optional
+			-- setup FreeWAF to deny requests that match a rule
 			fw.set_option("mode", "ACTIVE")
+
+			-- each of these is optional
 			fw.set_option("whitelist", "127.0.0.1")
 			fw.set_option("blacklist", "1.2.3.4")
 			fw.set_option("ignore_rule", 42094)
@@ -51,7 +53,7 @@ Note that by default FreeWAF runs in DEBUG mode, to prevent immediately affectin
 	}
 
 	server {
-		# FreeWAF works in Nginx's access phase, so any content delivery mechanism (e.g. HTTP proxy, fcgi proxy, direct static content) can be used
+		# FreeWAF works in Nginxs access phase, so any content delivery mechanism (e.g. HTTP proxy, fcgi proxy, direct static content) can be used
 
 		access_by_lua '
 			fw.exec()
@@ -141,7 +143,7 @@ Instructs the module to ignore a specified rule ID. Note that FreeWAF uses Lua t
 
 ##Limitations
 
-FreeWAF is ungoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo. 
+FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo. 
 
 ##License
 
