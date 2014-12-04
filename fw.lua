@@ -282,7 +282,9 @@ local actions = {
 	LOG = function()
 	end,
 	ACCEPT = function(ctx)
-		ngx.exit(ngx.OK)
+		if (ctx.mode == "ACTIVE") then
+			ngx.exit(ngx.OK)
+		end
 	end,
 	CHAIN = function(ctx)
 		ctx.chained = true
@@ -294,7 +296,9 @@ local actions = {
 		ctx.skiprs = true
 	end,
 	DENY = function(ctx)
-		ngx.exit(ngx.HTTP_FORBIDDEN)
+		if (ctx.mode == "ACTIVE") then
+			ngx.exit(ngx.HTTP_FORBIDDEN)
+		end
 	end,
 	IGNORE = function()
 	end
@@ -342,19 +346,15 @@ local function _process_rule(rule, collections, ctx)
 		t = ctx.collections[memokey]
 	end
 
-	if (not t) then
-	else
+	if (t) then
 		local match = operators[var.operator](t, var.pattern, ctx)
 		if (match) then
 
 			if (not opts.nolog) then
 				_log_event(request_client, request_uri, rule, match)
-			else
 			end
 
-			if (ctx.mode == "ACTIVE") then
-				_rule_action(action, ctx)
-			end
+			_rule_action(action, ctx)
 		end
 	end
 

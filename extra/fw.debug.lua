@@ -301,7 +301,9 @@ local actions = {
 	end,
 	ACCEPT = function(ctx)
 		ngx.log(ngx.DEBUG, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
-		ngx.exit(ngx.OK)
+		if (ctx.mode == "ACTIVE") then
+			ngx.exit(ngx.OK)
+		end
 	end,
 	CHAIN = function(ctx)
 		ngx.log(ngx.DEBUG, "Setting the context chained flag to true")
@@ -317,7 +319,9 @@ local actions = {
 	end,
 	DENY = function(ctx)
 		ngx.log(ngx.DEBUG, "rule.action was DENY, so telling nginx to quit!")
-		ngx.exit(ngx.HTTP_FORBIDDEN)
+		if (ctx.mode == "ACTIVE") then
+			ngx.exit(ngx.HTTP_FORBIDDEN)
+		end
 	end,
 	IGNORE = function()
 		ngx.log(ngx.DEBUG, "Ingoring rule for now")
@@ -388,9 +392,7 @@ local function _process_rule(rule, collections, ctx)
 				ngx.log(ngx.DEBUG, "We had a match, but not logging because opts.nolog is set")
 			end
 
-			if (ctx.mode == "ACTIVE") then
-				_rule_action(action, ctx)
-			end
+			_rule_action(action, ctx)
 		end
 	end
 
