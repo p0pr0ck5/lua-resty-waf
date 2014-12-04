@@ -1,3 +1,5 @@
+-- Custom Rules
+
 local _M = {}
 
 _M.version = "0.0.5"

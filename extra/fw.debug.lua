@@ -17,6 +17,7 @@ local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules
 local function _equals(a, b)
 	local equals
 	if (type(a) == "table") then
+		ngx.log(ngx.DEBUG, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
 			equals = _equals(v, b)
 			if (equals) then
@@ -24,6 +25,7 @@ local function _equals(a, b)
 			end
 		end
 	else
+		ngx.log(ngx.DEBUG, "Comparing " .. a .. " and " .. b)
 		equals = a == b
 	end
 
@@ -111,17 +113,20 @@ local function _table_has_key(needle, haystack)
 	if (type(haystack) ~= "table") then
 		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
+	ngx.log(ngx.DEBUG, "table key " .. needle .. " is " .. tostring(haystack[needle]))
 	return haystack[needle] ~= nil
 end
 
 -- determine if the haystack table has a needle for a key
 local function _table_has_value(needle, haystack)
+	ngx.log(ngx.DEBUG, "Searching for " .. needle)
 
 	if (type(haystack) ~= "table") then
 		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 
 	for _, value in pairs(haystack) do
+		ngx.log(ngx.DEBUG, "Checking " .. value)
 		if (value == needle) then return true end
 	end
 end
@@ -138,6 +143,7 @@ local function _regex_match(subject, pattern, opts)
 	local match
 
 	if (type(subject) == "table") then
+		ngx.log(ngx.DEBUG, "subject is a table, so recursing!")
 		for _, v in ipairs(subject) do
 			match = _regex_match(v, pattern, opts)
 			if (match) then
@@ -145,8 +151,11 @@ local function _regex_match(subject, pattern, opts)
 			end
 		end
 	else
+		ngx.log(ngx.DEBUG, "matching " .. subject .. " against " .. pattern)
 		from, to, err = ngx.re.find(subject, pattern, opts)
+		if err then ngx.log(ngx.WARN, "error in waf.regexmatch: " .. err) end
 		if from then
+			ngx.log(ngx.DEBUG, "regex match! " .. string.sub(subject, from, to))
 			match = string.sub(subject, from, to)
 		end
 	end
@@ -161,13 +170,16 @@ local function _ac_lookup(needle, haystack, ctx)
 	local match, _ac
 
 	if (not _ac_dicts[id]) then
+		ngx.log(ngx.DEBUG, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
 		_ac_dicts[id] = _ac
 	else
+		ngx.log(ngx.DEBUG, "AC dict found, pulling from the module cache")
 		_ac = _ac_dicts[id]
 	end
 
 	if (type(needle) == "table") then
+		ngx.log(ngx.DEBUG, "needle is a table, so recursing!")
 		for _, v in ipairs(needle) do
 			match = _ac_lookup(v, haystack, ctx)
 			if (match) then
@@ -184,18 +196,22 @@ end
 local function _parse_collection(collection, opts)
 	local lookup = {
 		specific = function(collection, value)
+			ngx.log(ngx.DEBUG, "_parse_collection is getting a specific value: " .. value)
 			return collection[value]
 		end,
 		ignore = function(collection, value)
+			ngx.log(ngx.DEBUG, "_parse_collection is ignoring a value: " .. value)
 			local _collection = {}
 			_collection = _table_copy(collection)
 			_collection[value] = nil
 			return _collection
 		end,
 		keys = function(collection)
+			ngx.log(ngx.DEBUG, "_parse_collection is getting the keys")
 			return _table_keys(collection)
 		end,
 		values = function(collection)
+			ngx.log(ngx.DEBUG, "_parse_collection is getting the values")
 			return _table_values(collection)
 		end,
 		all = function(collection)
@@ -240,6 +256,7 @@ local function _build_common_args(collections)
 						t[k] = { _v, v }
 					end
 				end
+				ngx.log(ngx.DEBUG, "t[" .. k .. "] contains " .. tostring(t[k]))
 			end
 		end
 	end
@@ -280,28 +297,36 @@ local operators = {
 -- this may get changed if/when heuristics gets introduced
 local actions = {
 	LOG = function()
+		ngx.log(ngx.DEBUG, "rule.action was LOG, since we already called log_event this is relatively meaningless")
 	end,
 	ACCEPT = function(ctx)
+		ngx.log(ngx.DEBUG, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
 		ngx.exit(ngx.OK)
 	end,
 	CHAIN = function(ctx)
+		ngx.log(ngx.DEBUG, "Setting the context chained flag to true")
 		ctx.chained = true
 	end,
 	SKIP = function(ctx)
+		ngx.log(ngx.DEBUG, "Setting the context skip flag to true")
 		ctx.skip = true
 	end,
 	SKIPRS = function(ctx)
+		ngx.log(ngx.DEBUG, "Setting the skip ruleset flag")
 		ctx.skiprs = true
 	end,
 	DENY = function(ctx)
+		ngx.log(ngx.DEBUG, "rule.action was DENY, so telling nginx to quit!")
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end,
 	IGNORE = function()
+		ngx.log(ngx.DEBUG, "Ingoring rule for now")
 	end
 }
 
 -- use the lookup table to figure out what to do
 local function _rule_action(action, start)
+	ngx.log(ngx.DEBUG, "Taking the following action: " .. action)
 	actions[action](start)
 end
 
@@ -315,11 +340,14 @@ local function _process_rule(rule, collections, ctx)
 	ctx.id = id
 
 	if (opts.chainchild == true and ctx.chained == false) then
+		ngx.log(ngx.DEBUG, "This is a chained rule, but we don't have a previous match, so not processing")
 		return
 	end
 
 	if (ctx.skip == true) then
+		ngx.log(ngx.DEBUG, "Skipflag is set, not processing")
 		if (opts.skipend == true) then
+			ngx.log(ngx.DEBUG, "End of the skipchain, unsetting flag")
 			ctx.skip = false
 		end
 		return
@@ -328,28 +356,36 @@ local function _process_rule(rule, collections, ctx)
 	local t
 	local memokey
 	if (var.opts ~= nil) then
+		ngx.log(ngx.DEBUG, "var opts is not nil")
 		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
 	else
+		ngx.log(ngx.DEBUG, "var opts is nil, memo cache key is only the var type")
 		memokey = var.type
 	end
 
+	ngx.log(ngx.DEBUG, "checking for memokey " .. memokey)
 
 	if (not ctx.collections_key[memokey]) then
+		ngx.log(ngx.DEBUG, "parsing collections for rule " .. id)
 		t = _parse_collection(collections[var.type], var.opts)
 		ctx.collections[memokey] = t
 		ctx.collections_key[memokey] = true
 	else
+		ngx.log(ngx.DEBUG, "parse collection cache hit!")
 		t = ctx.collections[memokey]
 	end
 
 	if (not t) then
+		ngx.log(ngx.DEBUG, "parse_collection didnt return anything for " .. var.type)
 	else
 		local match = operators[var.operator](t, var.pattern, ctx)
 		if (match) then
+			ngx.log(ngx.DEBUG, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
 				_log_event(request_client, request_uri, rule, match)
 			else
+				ngx.log(ngx.DEBUG, "We had a match, but not logging because opts.nolog is set")
 			end
 
 			if (ctx.mode == "ACTIVE") then
@@ -369,6 +405,7 @@ end
 -- can be cross-polluted
 function _M.exec()
 	if (_mode == "INACTIVE") then
+		ngx.log(ngx.DEBUG, "Operational mode is INACTIVE, not running")
 		return
 	end
 
@@ -382,10 +419,12 @@ function _M.exec()
 	local request_request_line = _get_request_line()
 
 	if (_table_has_key(request_client, _whitelist)) then
+		ngx.log(ngx.DEBUG, request_client .. " is whitelisted")
 		ngx.exit(ngx.OK)
 	end
 
 	if (_table_has_key(request_client, _blacklist)) then
+		ngx.log(ngx.DEBUG, request_client .. " is blacklisted")
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end
 
@@ -403,6 +442,7 @@ function _M.exec()
 		if (ngx.req.get_body_file() == nil) then
 			request_post_args = ngx.req.get_post_args()
 		else
+			ngx.log(ngxINFOO, "Skipping POST arguments because we buffered to disk")
 		end
 	end
 
@@ -439,18 +479,23 @@ function _M.exec()
 	ctx.skiprs = false
 
 	for _, ruleset in ipairs(_active_rulesets) do
+		ngx.log(ngx.DEBUG, "Beginning ruleset " .. ruleset)
 
+		ngx.log(ngx.DEBUG, "Requiring " .. ruleset)
 		local rs = require("FreeWAF.rules." .. ruleset)
 
 		for __, rule in ipairs(rs.rules()) do
 			if (ctx.skiprs == true) then
+				ngx.log(ngx.DEBUG, "skiprs is set, so breaking!")
 				ctx.skiprs = false
 				break
 			end
 
 			if (not _table_has_key(rule.id, _ignored_rules)) then
+				ngx.log(ngx.DEBUG, "Beginning run of rule " .. rule.id)
 				_process_rule(rule, collections, ctx)
 			else
+				ngx.log(ngx.DEBUG, "Ignoring rule " .. rule.id)
 			end
 		end
 	end

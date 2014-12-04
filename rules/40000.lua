@@ -1,3 +1,5 @@
+-- Generic Attacks
+
 local _M = {}
 
 _M.version = "0.0.5"
@@ -123,13 +125,13 @@ local _rules = {
 		action = "DENY",
 		description = "HTTP Response Splitting"
 	},
-	{   
+	{
 		id = 40011,
-		var = {    
+		var = {
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 			pattern = [=[(?:\bhttp\/(?:0\.9|1\.[01])|<(?:html|meta)\b)]=],
-			operator = "REGEX"   
+			operator = "REGEX"
 		},
 		opts = {},
 		action = "DENY",

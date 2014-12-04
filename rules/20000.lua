@@ -1,4 +1,8 @@
-local rs_20000 = {}
+-- HTTP Protocol Violations
+
+local _M = {}
+
+_M.version = "0.0.5"
 
 local _rules = {
 	{
@@ -204,8 +208,8 @@ local _rules = {
 	}
 }
 
-function rs_20000.rules()
+function _M.rules()
 	return _rules
 end
 
-return rs_20000
+return _M
