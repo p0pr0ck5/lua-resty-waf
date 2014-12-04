@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.0.5"
+_M.version = "0.1"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
