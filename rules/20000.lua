@@ -8,30 +8,6 @@ local _rules = {
 	{
 		id = 20001,
 		var = {
-			type = "REQUEST_LINE",
-			opts = nil,
-			pattern = [=[^(?:(?:[a-z]{3,10}\s+(?:\w{3,7}?://[\w\-\./]*(?::\d+)?)?/[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?|connect (?:\d{1,3}\.){3}\d{1,3}\.?(?::\d+)?|options \*)\s+[\w\./]+|get /[^?#]*(?:\?[^#\s]*)?(?:#[\S]*)?)$]=],
-			operator = "NOT_REGEX",
-		},
-		opts = {},
-		action = "LOG",
-		description = "Proper HTTP request per RFC 2616"
-	},
-	{
-		id = 20002,
-		var = {
-			type = "HEADERS",
-			opts = { key = "specific", value = "content-length" },
-			pattern = [=[^[\d]+$]=],
-			operator = "NOT_REGEX",
-		},
-		opts = {},
-		action = "LOG",
-		description = "Content-Length header must be a numeric value"
-	},
-	{
-		id = 20003,
-		var = {
 			type = "METHOD",
 			opts = nil,
 			pattern = [=[^(?:GET|HEAD)$]=],
@@ -42,7 +18,7 @@ local _rules = {
 		description = "GET/HEAD request with a body"
 	},
 	{
-		id = 20004,
+		id = 20002,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "content-length" },
@@ -54,7 +30,7 @@ local _rules = {
 		description = "GET/HEAD request with a body"
 	},
 	{
-		id = 20005,
+		id = 20003,
 		var = {
 			type = "METHOD",
 			opts = nil,
@@ -66,7 +42,7 @@ local _rules = {
 		description = "POST request does not have a Content-Length Header"
 	},
 	{
-		id = 20006,
+		id = 20004,
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
@@ -78,7 +54,7 @@ local _rules = {
 		description = "POST request does not have a Content-Length Header"
 	},
 	{
-		id = 20007,
+		id = 20005,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "content-encoding" },
@@ -90,7 +66,7 @@ local _rules = {
 		description = "Identity should not be used in Content-Encoding, only in Accept-Encoding"
 	},
 	{
-		id = 20008,
+		id = 20006,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "expect" },
@@ -102,7 +78,7 @@ local _rules = {
 		description = "Expect header sent in non-HTTP/1.1 request"
 	},
 	{
-		id = 20009,
+		id = 20007,
 		var = {
 			type = "HTTP_VERSION",
 			opts = nil,
@@ -114,7 +90,7 @@ local _rules = {
 		description = "Expect header sent in non-HTTP/1.1 request"
 	},
 	{
-		id = 20010,
+		id = 20008,
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
@@ -125,7 +101,7 @@ local _rules = {
 		action = "CHAIN",
 	},
 	{
-		id = 20011,
+		id = 20009,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "pragma" },
@@ -136,7 +112,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 20012,
+		id = 20010,
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
@@ -147,7 +123,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 20013,
+		id = 20011,
 		var = {
 			type = "HTTP_VERSION",
 			opts = nil,
@@ -159,7 +135,7 @@ local _rules = {
 		description = "HTTP/1.1 request sent with a Pragma:no-cache header, but no corresponding Cache-Control header"
 	},
 	{
-		id = 20014,
+		id = 20012,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "range" },
@@ -171,7 +147,7 @@ local _rules = {
 		description = "Request sent with abnormal Range header"
 	},
 	{
-		id = 20015,
+		id = 20013,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "range" },
@@ -183,7 +159,7 @@ local _rules = {
 		description = "Excessive number of byte range fields within one request"
 	},
 	{
-		id = 20016,
+		id = 20014,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "request-range" },
@@ -195,7 +171,7 @@ local _rules = {
 		description = "Excessive number of byte range fields within one request"
 	},
 	{
-		id = 20017,
+		id = 20015,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "connection" },
