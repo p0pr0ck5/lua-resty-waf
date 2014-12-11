@@ -527,7 +527,7 @@ function _M.exec()
 end -- fw.exec()
 
 function _M.init()
-	_mode = "DEBUG"
+	_mode = "SIMULATE"
 	_whitelist = {}
 	_blacklist = {}
 	_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 }
