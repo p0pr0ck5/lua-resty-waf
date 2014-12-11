@@ -11,7 +11,7 @@ local ffi = require("ffi")
 local _ac_dicts
 
 -- module-level options
-local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules, _debug
+local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules, _debug, _score_threshold
 
 local function _log(msg)
 	if (_debug == true) then
@@ -323,6 +323,11 @@ local actions = {
 		_log("Setting the skip ruleset flag")
 		ctx.skiprs = true
 	end,
+	SCORE = function(ctx)
+		local new_score = ctx.score + ctx.rule_score
+		_log("New score is " .. new_score)
+		ctx.score = new_score
+	end,
 	DENY = function(ctx)
 		_log("rule.action was DENY, so telling nginx to quit!")
 		if (ctx.mode == "ACTIVE") then
@@ -348,6 +353,7 @@ local function _process_rule(rule, collections, ctx)
 	local description = rule.description
 
 	ctx.id = id
+	ctx.rule_score = opts.score
 
 	if (opts.chainchild == true and ctx.chained == false) then
 		_log("This is a chained rule, but we don't have a previous match, so not processing")
@@ -485,6 +491,7 @@ function _M.exec()
 	ctx.chained = false
 	ctx.skip = false
 	ctx.skiprs = false
+	ctx.score = 0
 
 	for _, ruleset in ipairs(_active_rulesets) do
 		_log("Beginning ruleset " .. ruleset)
@@ -507,6 +514,16 @@ function _M.exec()
 			end
 		end
 	end
+
+	-- if we've made it this far, we haven't
+	-- explicitly DENY'd or ACCEPT'd the request,
+	-- so see if the score meets our threshold
+	if (ctx.score >= _score_threshold) then
+		-- should we provide a threshold breach rule action, instead of defaulting to DENY?
+		_log("Transaction score of " .. ctx.score .. " met our threshold limit!")
+		_rule_action("DENY", ctx)
+	end
+
 end -- fw.exec()
 
 function _M.init()
@@ -516,6 +533,7 @@ function _M.init()
 	_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 }
 	_ignored_rules = {}
 	_debug = false
+	_score_threshold = 5
 
 	_ac_dicts = {}
 end
@@ -539,6 +557,9 @@ function _M.set_option(option, value)
 		end,
 		debug = function(value)
 			_debug = value
+		end,
+		score_threshold = function(value)
+			_score_threshold = value
 		end
 	}
 

@@ -25,8 +25,8 @@ local _rules = {
 			pattern = "0",
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true },
-		action = "DENY",
+		opts = { chainend = true, chainchild = true, score = 2 },
+		action = "SCORE",
 		description = "GET/HEAD request with a body"
 	},
 	{
@@ -49,8 +49,8 @@ local _rules = {
 			pattern = "content-length",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainend = true, chainchild = true },
-		action = "LOG",
+		opts = { chainend = true, chainchild = true, score = 2 },
+		action = "SCORE",
 		description = "POST request does not have a Content-Length Header"
 	},
 	{
@@ -61,8 +61,8 @@ local _rules = {
 			pattern = "Identity",
 			operator = "EQUALS"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Identity should not be used in Content-Encoding, only in Accept-Encoding"
 	},
 	{
@@ -73,7 +73,7 @@ local _rules = {
 			pattern = [=[100-continue]=],
 			operator = "REGEX"
 		},
-		opts = {},
+		opts = { nolog = true },
 		action = "CHAIN",
 		description = "Expect header sent in non-HTTP/1.1 request"
 	},
@@ -85,8 +85,8 @@ local _rules = {
 			pattern = 1.1,
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true },
-		action = "LOG",
+		opts = { chainend = true, chainchild = true, score = 2 },
+		action = "SCORE",
 		description = "Expect header sent in non-HTTP/1.1 request"
 	},
 	{
@@ -97,7 +97,7 @@ local _rules = {
 			pattern = "pragma",
 			operator = "EXISTS"
 		},
-		opts = {},
+		opts = { nolog = true },
 		action = "CHAIN",
 	},
 	{
@@ -108,7 +108,7 @@ local _rules = {
 			pattern = "no-cache",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true },
+		opts = { chainchild = true, nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -119,7 +119,7 @@ local _rules = {
 			pattern = "cache-control",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainchild = true },
+		opts = { chainchild = true, nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -130,8 +130,8 @@ local _rules = {
 			pattern = 1.1,
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true },
-		action = "LOG",
+		opts = { chainend = true, chainchild = true, score = 2 },
+		action = "SCORE",
 		description = "HTTP/1.1 request sent with a Pragma:no-cache header, but no corresponding Cache-Control header"
 	},
 	{
@@ -142,8 +142,8 @@ local _rules = {
 			pattern = [=[^bytes=0-]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Request sent with abnormal Range header"
 	},
 	{
@@ -154,8 +154,8 @@ local _rules = {
 			pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Excessive number of byte range fields within one request"
 	},
 	{
@@ -166,8 +166,8 @@ local _rules = {
 			pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Excessive number of byte range fields within one request"
 	},
 	{
@@ -178,8 +178,8 @@ local _rules = {
 			pattern = [=[\b(keep-alive|close),\s?(keep-alive|close)\b]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Duplicate/broken connection header"
 	}
 }

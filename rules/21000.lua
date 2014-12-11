@@ -13,8 +13,8 @@ local _rules = {
 			pattern = "host",
 			operator = "NOT_EXISTS"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "No valid Host header"
 	},
 	{
@@ -25,8 +25,8 @@ local _rules = {
 			pattern = [=[^$]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Host header has no value"
 	},
 	{
@@ -48,8 +48,8 @@ local _rules = {
 			pattern = "accept",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainchild = true, chainend = true },
-		action = "LOG",
+		opts = { chainchild = true, chainend = true, score = 2 },
+		action = "SCORE",
 		description = "No valid Accept header"
 	},
 	{
@@ -71,8 +71,8 @@ local _rules = {
 			pattern = [=[^$]=],
 			operator = "REGEX"
 		},
-		opts = { chainchild = true, chainend = true },
-		action = "LOG",
+		opts = { chainchild = true, chainend = true, score = 2 },
+		action = "SCORE",
 		description = "Accept header has no value"
 	},
 	{
@@ -83,8 +83,8 @@ local _rules = {
 			pattern = "user-agent",
 			operator = "NOT_EXISTS"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "No valid User-Agent header"
 	},
 	{
@@ -95,8 +95,8 @@ local _rules = {
 			pattern = [=[^$]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "User-Agent header has no value"
 	},
 	{
@@ -107,7 +107,7 @@ local _rules = {
 			pattern = "content-type",
 			operator = "NOT_EXISTS"
 		},
-		opts = { nolog = true},
+		opts = { nolog = true },
 		action = "CHAIN",
 	},
 	{
@@ -118,8 +118,8 @@ local _rules = {
 			pattern = [=[^0$]=],
 			operator = "NOT_REGEX"
 		},
-		opts = { chainchild = true, chainend = true },
-		action = "LOG",
+		opts = { chainchild = true, chainend = true, score = 2 },
+		action = "SCORE",
 		description = "Request contains content, but missing Content-Type header"
 	},
 	{
@@ -130,8 +130,8 @@ local _rules = {
 			pattern = [=[^[\d.:]+$]=],
 			operator = "REGEX"
 		},
-		opts = {},
-		action = "LOG",
+		opts = { score = 2 },
+		action = "SCORE",
 		description = "Host header contains an IP address"
 	}
 }

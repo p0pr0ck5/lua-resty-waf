@@ -140,8 +140,8 @@ local _rules = {
 			pattern = "disabled",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, chainend = true },
-		action = "LOG",
+		opts = { chainchild = true, chainend = true, score = 5 },
+		action = "SCORE",
 		description = "Client attempted to register a Wordpress user, but user registration is disabled."
 	},
 	{
