@@ -181,7 +181,7 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 
 ##Rule Definitions
 
-FreeWAF uses Lua tables to define its rules. Rules are grouped based on purpose and severity, defined as a ruleset. Each rule requires the following elements:
+FreeWAF uses Lua tables to define its rules. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic the functionality of the ModSecurity CRS. Each rule requires the following elements:
 
 ###id
 
