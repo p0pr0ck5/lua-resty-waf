@@ -32,7 +32,7 @@ FreeWAF was designed with efficiency and scalability in mind. It leverages Nginx
 
 Clone the FreeWAF repo into Nginx/OpenResty's Lua package path. Module setup and configuration is detailed in the synopsis.
 
-Note that by default FreeWAF runs in DEBUG mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
+Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
 ##Synopsis
 
@@ -71,7 +71,7 @@ Several options can be configured during the init phase using the `set_option` f
 
 Sets the operational mode of the module. Options are ACTIVE, INACTIVE, and SIMULATE. In ACTIVE mode, rule matches are logged and actions are run. In SIMULATE mode, FreeWAF loops through each enabled rule and logs rule matches, but does not complete the action specified in a given run. INACTIVE mode prevents the module from running.
 
-By default, DEBUG is selected if mode is not explicitly set; this requires new users to actively implement blocking by setting the mode to ACTIVE.
+By default, SIMULATE is selected if mode is not explicitly set; this requires new users to actively implement blocking by setting the mode to ACTIVE.
 
 *Example*:
 
@@ -255,7 +255,7 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **URI_ARGS**: A table containing the request query strings. 
 * **USER_AGENT**: The value of the `User-Agent` header.
 
-Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contained two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
+Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.

@@ -456,7 +456,7 @@ function _M.exec()
 		if (ngx.req.get_body_file() == nil) then
 			request_post_args = ngx.req.get_post_args()
 		else
-			ngx.log(ngxINFOO, "Skipping POST arguments because we buffered to disk")
+			ngx.log(ngx.INFO, "Skipping POST arguments because we buffered to disk")
 		end
 	end
 
