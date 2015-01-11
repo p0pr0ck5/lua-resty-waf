@@ -179,6 +179,24 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 	}
 ```
 
+###log_level
+
+*Default*: ngx.INFO
+
+Sets the nginx log level constant used for debug logging.
+
+*Example*:
+
+```lua
+	http {
+		init_by_lua '
+			fw = require "FreeWAF.fw"
+			fw.init()
+			fw.set_option("log_level", ngx.DEBUG)
+		';
+	}
+```
+
 ##Rule Definitions
 
 FreeWAF uses Lua tables to define its rules. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic the functionality of the ModSecurity CRS. Each rule requires the following elements:

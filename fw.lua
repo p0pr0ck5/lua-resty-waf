@@ -11,11 +11,11 @@ local ffi = require("ffi")
 local _ac_dicts
 
 -- module-level options
-local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules, _debug, _score_threshold
+local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules, _debug, _log_level, _score_threshold
 
 local function _log(msg)
 	if (_debug == true) then
-		ngx.log(ngx.DEBUG, msg)
+		ngx.log(_log_level, msg)
 	end
 end
 
@@ -456,7 +456,7 @@ function _M.exec()
 		if (ngx.req.get_body_file() == nil) then
 			request_post_args = ngx.req.get_post_args()
 		else
-			ngx.log(ngx.INFO, "Skipping POST arguments because we buffered to disk")
+			_log("Skipping POST arguments because we buffered to disk")
 		end
 	end
 
@@ -533,6 +533,7 @@ function _M.init()
 	_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 }
 	_ignored_rules = {}
 	_debug = false
+	_log_level = ngx.INFO
 	_score_threshold = 5
 
 	_ac_dicts = {}
@@ -557,6 +558,9 @@ function _M.set_option(option, value)
 		end,
 		debug = function(value)
 			_debug = value
+		end,
+		log_level = function(value)
+			_log_level = value
 		end,
 		score_threshold = function(value)
 			_score_threshold = value
