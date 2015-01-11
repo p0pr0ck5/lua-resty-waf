@@ -143,6 +143,24 @@ Instructs the module to ignore a specified rule ID. Note that FreeWAF uses Lua t
 	}
 ```
 
+###ignore_ruleset
+
+*Default*: none
+
+Instructs the module to ignore an entire ruleset. This can be useful when some rulesets (such as the SQLi or XSS CRS rulesets) are too prone to false positives, or aren't applicable to your web app.
+
+*Example*:
+
+```lua
+	http {
+		init_by_lua '
+			fw = require "FreeWAF.fw"
+			fw.init()
+			fw.set_option("ignore_ruleset", 40000)
+		';
+	}
+```
+
 ###score_threshold
 
 *Default*: 5

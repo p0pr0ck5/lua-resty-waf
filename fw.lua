@@ -551,7 +551,15 @@ function _M.set_option(option, value)
 			_blacklist[value] = true
 		end,
 		ignore_ruleset = function(value)
-			_active_rulesets = value
+			local t = {}
+			local n = 1
+			for k, v in ipairs(_active_rulesets) do
+				if (v ~= value) then
+					t[n] = v
+				end
+				n = n + 1
+			end
+			_active_rulesets = t
 		end,
 		ignore_rule = function(value)
 			_ignored_rules[value] = true
