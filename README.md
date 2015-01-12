@@ -37,25 +37,22 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 ##Synopsis
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw" --global reference to the FreeWAF module
-			fw.init() --init sets up the module option defaults
+	server {
+		access_by_lua '
+			FreeWAF = require "FreeWAF.fw"
+
+			-- instantiate a new instance of the module
+			local fw = FreeWAF:new()
 
 			-- setup FreeWAF to deny requests that match a rule
-			fw.set_option("mode", "ACTIVE")
+			fw:set_option("mode", "ACTIVE")
 
-			-- each of these is optional
-			fw.set_option("whitelist", "127.0.0.1")
-			fw.set_option("blacklist", "1.2.3.4")
-			fw.set_option("ignore_rule", 42094)
-		';
-	}
+			-- each of these is optional, see the options documentation for more details
+			fw:set_option("whitelist", "127.0.0.1")
+			fw:set_option("blacklist", "1.2.3.4")
+			fw:set_option("ignore_rule", 42094)
 
-	server {
-		# FreeWAF works in Nginxs access phase, so any content delivery mechanism (e.g. HTTP proxy, fcgi proxy, direct static content) can be used
-
-		access_by_lua '
+			-- run the firewall
 			fw.exec()
 		';
 	}
@@ -239,6 +236,7 @@ A table that defines options specific to rule. The following options are current
 * **chainchild**: Defines a rule that is part of a rule chain.
 * **chainend**: Defines the last rule in the rule chain.
 * **nolog**: Do not create a log entry if a rule match occurs. This is most commonly used in rule chains, with rules that have the CHAIN action (to avoid unnecessarily large quantities of log entries).
+* **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **skipend**: Ends a skip chain. Note that the rule containing this option will be included as part of the skip chain, e.g. it will not be processed.
 
 ###var
