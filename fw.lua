@@ -1,29 +1,32 @@
 local _M = {}
 
-_M.version = "0.2"
+_M.version = "0.3"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
-local ffi = require("ffi")
 
--- cached aho-corasick dictionary objects
-local _ac_dicts
+local mt = { __index = _M }
 
--- module-level options
-local _mode, _whitelist, _blacklist, _active_rulesets, _ignored_rules, _debug, _log_level, _score_threshold
+-- module-level cache of aho-corasick dictionary objects
+local _ac_dicts = {}
 
-local function _log(msg)
-	if (_debug == true) then
-		ngx.log(_log_level, msg)
+local function _log(self, msg)
+	if (self._debug == true) then
+		ngx.log(self._log_level, msg)
 	end
 end
 
+local function _fatal_fail(msg)
+	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
+	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+end
+
 -- used for operators.EQUALS
-local function _equals(a, b)
+local function _equals(self, a, b)
 	local equals
 	if (type(a) == "table") then
-		_log("Needle is a table, so recursing!")
+		_log(self, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
 			equals = _equals(v, b)
 			if (equals) then
@@ -31,16 +34,11 @@ local function _equals(a, b)
 			end
 		end
 	else
-		_log("Comparing " .. a .. " and " .. b)
+		_log(self, "Comparing " .. a .. " and " .. b)
 		equals = a == b
 	end
 
 	return equals
-end
-
--- used for operators.NOT_EQUALS
-local function _not_equals(a, b)
-	return not _equals(a, b)
 end
 
 -- strips an ending newline
@@ -64,13 +62,13 @@ end
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table
-local function _table_copy(orig)
+local function _table_copy(self, orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[_table_copy(orig_key)] = _table_copy(orig_value)
+            copy[_table_copy(orig_key)] = _table_copy(self, orig_value)
         end
         setmetatable(copy, _table_copy(getmetatable(orig)))
     else -- number, string, boolean, etc
@@ -80,7 +78,7 @@ local function _table_copy(orig)
 end
 
 -- return a table containing the keys of the provided table
-local function _table_keys(table)
+local function _table_keys(self, table)
 	local t = {}
 	local n = 0
 
@@ -93,7 +91,7 @@ local function _table_keys(table)
 end
 
 -- return a table containing the values of the provided table
-local function _table_values(table)
+local function _table_values(self, table)
 	local t = {}
 	local n = 0
 
@@ -115,53 +113,48 @@ local function _table_values(table)
 end
 
 -- return true if the table key exists
-local function _table_has_key(needle, haystack)
+local function _table_has_key(self, needle, haystack)
 	if (type(haystack) ~= "table") then
 		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
-	_log("table key " .. needle .. " is " .. tostring(haystack[needle]))
+	_log(self, "table key " .. needle .. " is " .. tostring(haystack[needle]))
 	return haystack[needle] ~= nil
 end
 
 -- determine if the haystack table has a needle for a key
-local function _table_has_value(needle, haystack)
-	_log("Searching for " .. needle)
+local function _table_has_value(self, needle, haystack)
+	_log(self, "Searching for " .. needle)
 
 	if (type(haystack) ~= "table") then
 		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 
 	for _, value in pairs(haystack) do
-		_log("Checking " .. value)
+		_log(self, "Checking " .. value)
 		if (value == needle) then return true end
 	end
 end
 
--- inverse of fw.table_has_value
-local function _table_not_has_value(needle, value)
-	return not _table_has_value(needle, value)
-end
-
 -- regex matcher (uses POSIX patterns via ngx.re.match)
-local function _regex_match(subject, pattern, opts)
+local function _regex_match(self, subject, pattern, opts)
 	local opts = "oij"
 	local from, to, err
 	local match
 
 	if (type(subject) == "table") then
-		_log("subject is a table, so recursing!")
+		_log(self, "subject is a table, so recursing!")
 		for _, v in ipairs(subject) do
-			match = _regex_match(v, pattern, opts)
+			match = _regex_match(self, v, pattern, opts)
 			if (match) then
 				break
 			end
 		end
 	else
-		_log("matching " .. subject .. " against " .. pattern)
+		_log(self, "matching " .. subject .. " against " .. pattern)
 		from, to, err = ngx.re.find(subject, pattern, opts)
 		if err then ngx.log(ngx.WARN, "error in waf.regexmatch: " .. err) end
 		if from then
-			_log("regex match! " .. string.sub(subject, from, to))
+			_log(self, "regex match! " .. string.sub(subject, from, to))
 			match = string.sub(subject, from, to)
 		end
 	end
@@ -171,23 +164,25 @@ end
 
 -- efficient string search operator
 -- uses CF implementation of aho-corasick-lua
-local function _ac_lookup(needle, haystack, ctx)
+local function _ac_lookup(self, needle, haystack, ctx)
 	local id = ctx.id
 	local match, _ac
 
+	-- dictionary creation is expensive, so we use the id of
+	-- the rule as the key to cache the created dictionary 
 	if (not _ac_dicts[id]) then
-		_log("AC dict not found, calling libac.so")
+		_log(self, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
 		_ac_dicts[id] = _ac
 	else
-		_log("AC dict found, pulling from the module cache")
+		_log(self, "AC dict found, pulling from the module cache")
 		_ac = _ac_dicts[id]
 	end
 
 	if (type(needle) == "table") then
-		_log("needle is a table, so recursing!")
+		_log(self, "needle is a table, so recursing!")
 		for _, v in ipairs(needle) do
-			match = _ac_lookup(v, haystack, ctx)
+			match = _ac_lookup(self, v, haystack, ctx)
 			if (match) then
 				break
 			end
@@ -199,35 +194,35 @@ local function _ac_lookup(needle, haystack, ctx)
 	return match
 end
 
-local function _parse_collection(collection, opts)
+local function _parse_collection(self, collection, opts)
 	local lookup = {
-		specific = function(collection, value)
-			_log("_parse_collection is getting a specific value: " .. value)
+		specific = function(self, collection, value)
+			_log(self, "_parse_collection is getting a specific value: " .. value)
 			return collection[value]
 		end,
-		ignore = function(collection, value)
-			_log("_parse_collection is ignoring a value: " .. value)
+		ignore = function(self, collection, value)
+			_log(self, "_parse_collection is ignoring a value: " .. value)
 			local _collection = {}
-			_collection = _table_copy(collection)
+			_collection = _table_copy(self, collection)
 			_collection[value] = nil
 			return _collection
 		end,
-		keys = function(collection)
-			_log("_parse_collection is getting the keys")
-			return _table_keys(collection)
+		keys = function(self, collection)
+			_log(self, "_parse_collection is getting the keys")
+			return _table_keys(self, collection)
 		end,
-		values = function(collection)
-			_log("_parse_collection is getting the values")
-			return _table_values(collection)
+		values = function(self, collection)
+			_log(self, "_parse_collection is getting the values")
+			return _table_values(self, collection)
 		end,
-		all = function(collection)
+		all = function(self, collection)
 			local n = 0
 			local _collection = {}
-			for _, key in ipairs(_table_keys(collection)) do
+			for _, key in ipairs(_table_keys(self, collection)) do
 				n = n + 1
 				_collection[n] = key
 			end
-			for _, value in ipairs(_table_values(collection)) do
+			for _, value in ipairs(_table_values(self, collection)) do
 				n = n + 1
 				_collection[n] = value
 			end
@@ -243,10 +238,10 @@ local function _parse_collection(collection, opts)
 		return collection
 	end
 
-	return lookup[opts.key](collection, opts.value)
+	return lookup[opts.key](self, collection, opts.value)
 end
 
-local function _build_common_args(collections)
+local function _build_common_args(self, collections)
 	local t = {}
 
 	for _, collection in pairs(collections) do
@@ -262,17 +257,12 @@ local function _build_common_args(collections)
 						t[k] = { _v, v }
 					end
 				end
-				_log("t[" .. k .. "] contains " .. tostring(t[k]))
+				_log(self, "t[" .. k .. "] contains " .. tostring(t[k]))
 			end
 		end
 	end
 
 	return t
-end
-
-local function _fatal_fail(msg)
-	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
-	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
 local function _log_event(request_client, request_uri, rule, match)
@@ -289,63 +279,59 @@ end
 -- module-level table to define rule operators
 -- no need to recreated this with every request
 local operators = {
-	REGEX = function(subject, pattern, opts) return _regex_match(subject, pattern, opts) end,
-	NOT_REGEX = function(subject, pattern, opts) return not _regex_match(subject, pattern, opts) end,
-	EQUALS = function(a, b) return _equals(a, b) end,
-	NOT_EQUALS = function(a, b) return _not_equals(a, b) end,
-	EXISTS = function(haystack, needle) return _table_has_value(needle, haystack) end,
-	NOT_EXISTS = function(haystack, needle) return _table_not_has_value(needle, haystack) end,
-	PM = function(needle, haystack, ctx) return _ac_lookup(needle, haystack, ctx) end,
-	NOT_PM = function(needle, haystack, ctx) return not _ac_lookup(needle, haystack, ctx) end
+	REGEX = function(self, subject, pattern, opts) return _regex_match(self, subject, pattern, opts) end,
+	NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
+	EQUALS = function(self, a, b) return _equals(self, a, b) end,
+	NOT_EQUALS = function(self, a, b) return not _equals(self, a, b) end,
+	EXISTS = function(self, haystack, needle) return _table_has_value(self, needle, haystack) end,
+	NOT_EXISTS = function(self, haystack, needle) return not _table_has_value(self, needle, haystack) end,
+	PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
+	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
 }
 
 -- module-level table to define rule actions
 -- this may get changed if/when heuristics gets introduced
 local actions = {
-	LOG = function()
-		_log("rule.action was LOG, since we already called log_event this is relatively meaningless")
+	LOG = function(self)
+		_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
 	end,
-	ACCEPT = function(ctx)
-		_log("An explicit ACCEPT was sent, so ending this phase with ngx.OK")
-		if (ctx.mode == "ACTIVE") then
+	ACCEPT = function(self, ctx)
+		_log(self, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
+		if (self._mode == "ACTIVE") then
 			ngx.exit(ngx.OK)
 		end
 	end,
-	CHAIN = function(ctx)
-		_log("Setting the context chained flag to true")
+	CHAIN = function(self, ctx)
+		_log(self, "Setting the context chained flag to true")
 		ctx.chained = true
 	end,
-	SKIP = function(ctx)
-		_log("Setting the context skip flag to true")
+	SKIP = function(self, ctx)
+		_log(self, "Setting the context skip flag to true")
 		ctx.skip = true
 	end,
-	SKIPRS = function(ctx)
-		_log("Setting the skip ruleset flag")
-		ctx.skiprs = true
-	end,
-	SCORE = function(ctx)
+	SCORE = function(self, ctx)
 		local new_score = ctx.score + ctx.rule_score
-		_log("New score is " .. new_score)
+		_log(self, "New score is " .. new_score)
 		ctx.score = new_score
 	end,
-	DENY = function(ctx)
-		_log("rule.action was DENY, so telling nginx to quit!")
-		if (ctx.mode == "ACTIVE") then
+	DENY = function(self, ctx)
+		_log(self, "rule.action was DENY, so telling nginx to quit!")
+		if (self._mode == "ACTIVE") then
 			ngx.exit(ngx.HTTP_FORBIDDEN)
 		end
 	end,
-	IGNORE = function()
-		_log("Ingoring rule for now")
+	IGNORE = function(self)
+		_log(self, "Ingoring rule for now")
 	end
 }
 
 -- use the lookup table to figure out what to do
-local function _rule_action(action, start)
-	_log("Taking the following action: " .. action)
-	actions[action](start)
+local function _rule_action(self, action, ctx)
+	_log(self, "Taking the following action: " .. action)
+	actions[action](self, ctx)
 end
 
-local function _process_rule(rule, collections, ctx)
+local function _process_rule(self, rule, collections, ctx)
 	local id = rule.id
 	local var = rule.var
 	local opts = rule.opts
@@ -356,14 +342,14 @@ local function _process_rule(rule, collections, ctx)
 	ctx.rule_score = opts.score
 
 	if (opts.chainchild == true and ctx.chained == false) then
-		_log("This is a chained rule, but we don't have a previous match, so not processing")
+		_log(self, "This is a chained rule, but we don't have a previous match, so not processing")
 		return
 	end
 
 	if (ctx.skip == true) then
-		_log("Skipflag is set, not processing")
+		_log(self, "Skipflag is set, not processing")
 		if (opts.skipend == true) then
-			_log("End of the skipchain, unsetting flag")
+			_log(self, "End of the skipchain, unsetting flag")
 			ctx.skip = false
 		end
 		return
@@ -372,39 +358,39 @@ local function _process_rule(rule, collections, ctx)
 	local t
 	local memokey
 	if (var.opts ~= nil) then
-		_log("var opts is not nil")
+		_log(self, "var opts is not nil")
 		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
 	else
-		_log("var opts is nil, memo cache key is only the var type")
+		_log(self, "var opts is nil, memo cache key is only the var type")
 		memokey = var.type
 	end
 
-	_log("checking for memokey " .. memokey)
+	_log(self, "checking for memokey " .. memokey)
 
 	if (not ctx.collections_key[memokey]) then
-		_log("parsing collections for rule " .. id)
-		t = _parse_collection(collections[var.type], var.opts)
+		_log(self, "parsing collections for rule " .. id)
+		t = _parse_collection(self, collections[var.type], var.opts)
 		ctx.collections[memokey] = t
 		ctx.collections_key[memokey] = true
 	else
-		_log("parse collection cache hit!")
+		_log(self, "parse collection cache hit!")
 		t = ctx.collections[memokey]
 	end
 
 	if (not t) then
-		_log("parse_collection didnt return anything for " .. var.type)
+		_log(self, "parse_collection didnt return anything for " .. var.type)
 	else
-		local match = operators[var.operator](t, var.pattern, ctx)
+		local match = operators[var.operator](self, t, var.pattern, ctx)
 		if (match) then
-			_log("Match of rule " .. id .. "!")
+			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
 				_log_event(request_client, request_uri, rule, match)
 			else
-				_log("We had a match, but not logging because opts.nolog is set")
+				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
 
-			_rule_action(action, ctx)
+			_rule_action(self, action, ctx)
 		end
 	end
 
@@ -417,9 +403,9 @@ end
 -- data associated with a given request in kept local in scope to this function
 -- because the lua api only loads this module once, so module-level variables
 -- can be cross-polluted
-function _M.exec()
-	if (_mode == "INACTIVE") then
-		_log("Operational mode is INACTIVE, not running")
+function _M.exec(self)
+	if (self._mode == "INACTIVE") then
+		_log(self, "Operational mode is INACTIVE, not running")
 		return
 	end
 
@@ -431,14 +417,15 @@ function _M.exec()
 	local request_headers = ngx.req.get_headers()
 	local request_ua = ngx.var.http_user_agent
 	local request_request_line = _get_request_line()
+	local request_post_args
 
-	if (_table_has_key(request_client, _whitelist)) then
-		_log(request_client .. " is whitelisted")
+	if (_table_has_key(self, request_client, self._whitelist)) then
+		_log(self, request_client .. " is whitelisted")
 		ngx.exit(ngx.OK)
 	end
 
-	if (_table_has_key(request_client, _blacklist)) then
-		_log(request_client .. " is blacklisted")
+	if (_table_has_key(self, request_client, self._blacklist)) then
+		_log(self, request_client .. " is blacklisted")
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end
 
@@ -456,13 +443,13 @@ function _M.exec()
 		if (ngx.req.get_body_file() == nil) then
 			request_post_args = ngx.req.get_post_args()
 		else
-			_log("Skipping POST arguments because we buffered to disk")
+			_log(self, "Skipping POST arguments because we buffered to disk")
 		end
 	end
 
 	local cookies = cookiejar:new() -- resty.cookie
 	local request_cookies, cookie_err = cookies:get_all()
-	local request_common_args = _build_common_args({ request_uri_args, request_post_args, request_cookies })
+	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
 
 	-- link rule collections to request data
 	-- unlike the operators and actions lookup table,
@@ -475,7 +462,7 @@ function _M.exec()
 		URI = request_uri,
 		URI_ARGS = request_uri_args,
 		HEADERS = request_headers,
-		HEADER_NAMES = _table_keys(request_headers),
+		HEADER_NAMES = _table_keys(self, request_headers),
 		USER_AGENT = request_ua,
 		REQUEST_LINE = request_request_line,
 		COOKIES = request_cookies,
@@ -484,33 +471,25 @@ function _M.exec()
 	}
 
 	local ctx = {}
-	ctx.mode = _mode
 	ctx.start = start
 	ctx.collections = {}
 	ctx.collections_key = {}
 	ctx.chained = false
 	ctx.skip = false
-	ctx.skiprs = false
 	ctx.score = 0
 
-	for _, ruleset in ipairs(_active_rulesets) do
-		_log("Beginning ruleset " .. ruleset)
+	for _, ruleset in ipairs(self._active_rulesets) do
+		_log(self, "Beginning ruleset " .. ruleset)
 
-		_log("Requiring " .. ruleset)
+		_log(self, "Requiring " .. ruleset)
 		local rs = require("FreeWAF.rules." .. ruleset)
 
 		for __, rule in ipairs(rs.rules()) do
-			if (ctx.skiprs == true) then
-				_log("skiprs is set, so breaking!")
-				ctx.skiprs = false
-				break
-			end
-
-			if (not _table_has_key(rule.id, _ignored_rules)) then
-				_log("Beginning run of rule " .. rule.id)
-				_process_rule(rule, collections, ctx)
+			if (not _table_has_key(self, rule.id, self._ignored_rules)) then
+				_log(self, "Beginning run of rule " .. rule.id)
+				_process_rule(self, rule, collections, ctx)
 			else
-				_log("Ignoring rule " .. rule.id)
+				_log(self, "Ignoring rule " .. rule.id)
 			end
 		end
 	end
@@ -518,66 +497,66 @@ function _M.exec()
 	-- if we've made it this far, we haven't
 	-- explicitly DENY'd or ACCEPT'd the request,
 	-- so see if the score meets our threshold
-	if (ctx.score >= _score_threshold) then
+	if (ctx.score >= self._score_threshold) then
 		-- should we provide a threshold breach rule action, instead of defaulting to DENY?
-		_log("Transaction score of " .. ctx.score .. " met our threshold limit!")
-		_rule_action("DENY", ctx)
+		_log(self, "Transaction score of " .. ctx.score .. " met our threshold limit!")
+		_rule_action(self, "DENY", ctx)
 	end
 
 end -- fw.exec()
 
-function _M.init()
-	_mode = "SIMULATE"
-	_whitelist = {}
-	_blacklist = {}
-	_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 }
-	_ignored_rules = {}
-	_debug = false
-	_log_level = ngx.INFO
-	_score_threshold = 5
-
-	_ac_dicts = {}
+function _M.new(self)
+	return setmetatable({
+		_mode = "SIMULATE",
+		_whitelist = {},
+		_blacklist = {},
+		_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_ignored_rules = {},
+		_debug = false,
+		_log_level = ngx.INFO,
+		_score_threshold = 5,
+	}, mt)
 end
 
-function _M.set_option(option, value)
+function _M.set_option(self, option, value)
 	local lookup = {
 		mode = function(value)
-			_mode = value
+			self._mode = value
 		end,
 		whitelist = function(value)
-			_whitelist[value] = true
+			self._whitelist[value] = true
 		end,
 		blacklist = function(value)
-			_blacklist[value] = true
+			self._blacklist[value] = true
 		end,
 		ignore_ruleset = function(value)
 			local t = {}
 			local n = 1
-			for k, v in ipairs(_active_rulesets) do
+			for k, v in ipairs(self._active_rulesets) do
 				if (v ~= value) then
 					t[n] = v
 				end
 				n = n + 1
 			end
-			_active_rulesets = t
+			self._active_rulesets = t
 		end,
 		ignore_rule = function(value)
-			_ignored_rules[value] = true
+			self._ignored_rules[value] = true
 		end,
 		debug = function(value)
-			_debug = value
+			self._debug = value
 		end,
 		log_level = function(value)
-			_log_level = value
+			self._log_level = value
 		end,
 		score_threshold = function(value)
-			_score_threshold = value
+			self._score_threshold = value
 		end
 	}
 
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
-			_M.set_option(option, v)
+			_M:set_option(option, v)
 		end
 	else
 		lookup[option](value)

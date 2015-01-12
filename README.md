@@ -37,27 +37,26 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 ##Synopsis
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw" --global reference to the FreeWAF module
-			fw.init() --init sets up the module option defaults
-
-			-- setup FreeWAF to deny requests that match a rule
-			fw.set_option("mode", "ACTIVE")
-
-			-- each of these is optional
-			fw.set_option("whitelist", "127.0.0.1")
-			fw.set_option("blacklist", "1.2.3.4")
-			fw.set_option("ignore_rule", 42094)
-		';
-	}
-
 	server {
-		# FreeWAF works in Nginxs access phase, so any content delivery mechanism (e.g. HTTP proxy, fcgi proxy, direct static content) can be used
+		location / {
+			access_by_lua '
+				FreeWAF = require "FreeWAF.fw"
 
-		access_by_lua '
-			fw.exec()
-		';
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- setup FreeWAF to deny requests that match a rule
+				fw:set_option("mode", "ACTIVE")
+
+				-- each of these is optional, see the options documentation for more details
+				fw:set_option("whitelist", "127.0.0.1")
+				fw:set_option("blacklist", "1.2.3.4")
+				fw:set_option("ignore_rule", 42094)
+
+				-- run the firewall
+				fw:exec()
+			';
+		}
 	}
 ```
 
@@ -76,11 +75,9 @@ By default, SIMULATE is selected if mode is not explicitly set; this requires ne
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("mode", "ACTIVE")
+	location / {
+		access_by_lua '
+			fw:set_option("mode", "ACTIVE")
 		';
 	}
 ```
@@ -94,11 +91,9 @@ Adds an address to the module whitelist. Whitelisted addresses will not have any
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("whitelist", "1.2.3.4")
+	location / {
+		access_by_lua '
+			fw:set_option("whitlist", "127.0.0.1")
 		';
 	}
 ```
@@ -114,11 +109,9 @@ Adds an address to the module blacklist. Blacklisted addresses will not have any
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("blacklist", "5.6.7.8")
+	location / {
+		access_by_lua '
+			fw:set_option("blacklist", "5.6.7.8")
 		';
 	}
 ```
@@ -134,11 +127,9 @@ Instructs the module to ignore a specified rule ID. Note that FreeWAF uses Lua t
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("ignore_rule", 40294)
+	location / {
+		access_by_lua '
+			fw:set_option("ignore_rule", 40294)
 		';
 	}
 ```
@@ -152,11 +143,9 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("ignore_ruleset", 40000)
+	location / {
+		access_by_lua '
+			fw:set_option("ignore_ruleset", 40000)
 		';
 	}
 ```
@@ -170,11 +159,9 @@ Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF w
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("score_threshold", 10)
+	location / {
+		access_by_lua '
+			fw:set_option("score_threshold", 10)
 		';
 	}
 ```
@@ -188,11 +175,9 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("debug", true)
+	location / {
+		access_by_lua '
+			fw:set_option("debug", true)
 		';
 	}
 ```
@@ -206,11 +191,9 @@ Sets the nginx log level constant used for debug logging.
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			fw = require "FreeWAF.fw"
-			fw.init()
-			fw.set_option("log_level", ngx.DEBUG)
+	location / {
+		access_by_lua '
+			fw:set_option("log_level", ngx.DEBUG)
 		';
 	}
 ```
@@ -239,6 +222,7 @@ A table that defines options specific to rule. The following options are current
 * **chainchild**: Defines a rule that is part of a rule chain.
 * **chainend**: Defines the last rule in the rule chain.
 * **nolog**: Do not create a log entry if a rule match occurs. This is most commonly used in rule chains, with rules that have the CHAIN action (to avoid unnecessarily large quantities of log entries).
+* **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **skipend**: Ends a skip chain. Note that the rule containing this option will be included as part of the skip chain, e.g. it will not be processed.
 
 ###var
