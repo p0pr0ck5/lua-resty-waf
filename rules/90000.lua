@@ -235,6 +235,40 @@ local _rules = {
 		opts = {},
 		action = "DENY",
 		description = "Bash environmental variable injection (CVE-2014-6271)"
+	},
+	{
+		id = 90020,
+		var = {
+			type = "URI",
+			opts = nil,
+			pattern = "/wp-login.php",
+			operator = "EQUALS"
+		},
+		opts = {},
+		action = "CHAIN"
+	},
+	{
+		id = 90021,
+		var = {
+			type = "METHOD",
+			opts = nil,
+			pattern = "POST",
+			operator = "EQUALS"
+		},
+		opts = { chainchild = true },
+		action = "CHAIN"
+	},
+	{
+		id = 90022,
+		var = {
+			type = "USER_AGENT",
+			opts = nil,
+			pattern =  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+			operator = "EQUALS"
+		},
+		opts = { chainchild = true, chainend = true },
+		action = "DENY",
+		description = "Emerging fake Googlebot wp-login bruteforce"
 	}
 }
 
