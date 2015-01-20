@@ -276,18 +276,20 @@ local function _log_event(self, request_client, request_uri, rule, match)
 	ngx.log(self._event_log_level, cjson.encode(t))
 end
 
--- module-level table to define rule operators
--- no need to recreated this with every request
-local operators = {
-	REGEX = function(self, subject, pattern, opts) return _regex_match(self, subject, pattern, opts) end,
-	NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
-	EQUALS = function(self, a, b) return _equals(self, a, b) end,
-	NOT_EQUALS = function(self, a, b) return not _equals(self, a, b) end,
-	EXISTS = function(self, haystack, needle) return _table_has_value(self, needle, haystack) end,
-	NOT_EXISTS = function(self, haystack, needle) return not _table_has_value(self, needle, haystack) end,
-	PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
-	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
-}
+local function _do_match(self, operator, collection, pattern, ctx)
+	local operators = {
+		REGEX = function(self, subject, pattern, opts) return _regex_match(self, subject, pattern, opts) end,
+		NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
+		EQUALS = function(self, a, b) return _equals(self, a, b) end,
+		NOT_EQUALS = function(self, a, b) return not _equals(self, a, b) end,
+		EXISTS = function(self, haystack, needle) return _table_has_value(self, needle, haystack) end,
+		NOT_EXISTS = function(self, haystack, needle) return not _table_has_value(self, needle, haystack) end,
+		PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
+		NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
+	}
+
+	return operators[operator](self, collection, pattern, ctx)
+end
 
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx)
@@ -432,7 +434,7 @@ local function _process_rule(self, rule, collections, ctx)
 	if (not t) then
 		_log(self, "parse_collection didnt return anything for " .. var.type)
 	else
-		local match = operators[var.operator](self, t, var.pattern, ctx)
+		local match = _do_match(self, var.operator, t, var.pattern, ctx)
 		if (match) then
 			_log(self, "Match of rule " .. id .. "!")
 
