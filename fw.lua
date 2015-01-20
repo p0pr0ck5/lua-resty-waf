@@ -336,7 +336,7 @@ local function _do_transform(self, collection, transform)
 	local lookup = {
 		base64_decode = function(self, value)
 			_log(self, "Decoding from base64: " .. tostring(value))
-			local t_val = ngx.decode_base64(value)
+			local t_val = ngx.decode_base64(tostring(value))
 			if (t_val) then
 				_log(self, "decode successful, decoded value is " .. t_val)
 				return t_val
