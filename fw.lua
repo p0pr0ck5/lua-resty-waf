@@ -289,44 +289,42 @@ local operators = {
 	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
 }
 
--- module-level table to define rule actions
--- this may get changed if/when heuristics gets introduced
-local actions = {
-	LOG = function(self)
-		_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
-	end,
-	ACCEPT = function(self, ctx)
-		_log(self, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
-		if (self._mode == "ACTIVE") then
-			ngx.exit(ngx.OK)
-		end
-	end,
-	CHAIN = function(self, ctx)
-		_log(self, "Setting the context chained flag to true")
-		ctx.chained = true
-	end,
-	SKIP = function(self, ctx)
-		_log(self, "Setting the context skip flag to true")
-		ctx.skip = true
-	end,
-	SCORE = function(self, ctx)
-		local new_score = ctx.score + ctx.rule_score
-		_log(self, "New score is " .. new_score)
-		ctx.score = new_score
-	end,
-	DENY = function(self, ctx)
-		_log(self, "rule.action was DENY, so telling nginx to quit!")
-		if (self._mode == "ACTIVE") then
-			ngx.exit(ngx.HTTP_FORBIDDEN)
-		end
-	end,
-	IGNORE = function(self)
-		_log(self, "Ingoring rule for now")
-	end
-}
-
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx)
+	local actions = {
+		LOG = function(self)
+			_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
+		end,
+		ACCEPT = function(self, ctx)
+			_log(self, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
+			if (self._mode == "ACTIVE") then
+				ngx.exit(ngx.OK)
+			end
+		end,
+		CHAIN = function(self, ctx)
+			_log(self, "Setting the context chained flag to true")
+			ctx.chained = true
+		end,
+		SKIP = function(self, ctx)
+			_log(self, "Setting the context skip flag to true")
+			ctx.skip = true
+		end,
+		SCORE = function(self, ctx)
+			local new_score = ctx.score + ctx.rule_score
+			_log(self, "New score is " .. new_score)
+			ctx.score = new_score
+		end,
+		DENY = function(self, ctx)
+			_log(self, "rule.action was DENY, so telling nginx to quit!")
+			if (self._mode == "ACTIVE") then
+				ngx.exit(ngx.HTTP_FORBIDDEN)
+			end
+		end,
+		IGNORE = function(self)
+			_log(self, "Ingoring rule for now")
+		end
+	}
+
 	_log(self, "Taking the following action: " .. action)
 	actions[action](self, ctx)
 end
