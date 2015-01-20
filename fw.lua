@@ -34,7 +34,7 @@ local function _equals(self, a, b)
 			end
 		end
 	else
-		_log(self, "Comparing " .. a .. " and " .. b)
+		_log(self, "Comparing " .. tostring(a) .. " and " .. tostring(b))
 		equals = a == b
 	end
 
@@ -331,6 +331,56 @@ local function _rule_action(self, action, ctx)
 	actions[action](self, ctx)
 end
 
+-- transform collection values based on rule opts
+local function _do_transform(self, collection, transform)
+	local lookup = {
+		base64_decode = function(self, value)
+			_log(self, "Decoding from base64: " .. tostring(value))
+			local t_val = ngx.decode_base64(value)
+			if (t_val) then
+				_log(self, "decode successful, decoded value is " .. t_val)
+				return t_val
+			else
+				_log(self, "decode unsuccessful, returning original value " .. value)
+				return value
+			end
+		end,
+		base64_encode = function(self, value)
+			_log(self, "Encoding to base64: " .. tostring(value))
+			local t_val = ngx.encode_base64(value)
+			_log(self, "encoded value is " .. t_val)
+		end,
+		lowercase = function(self, value)
+			return string.lower(tostring(value))
+		end
+	}
+
+	-- create a new tmp table to hold the transformed values
+	local t = {}
+
+	if (type(transform) == "table") then
+		_log(self, "multiple transforms are defined, iterating through each one")
+		t = collection
+		for k, v in ipairs(transform) do
+			t = _do_transform(self, t, transform[k])
+		end
+	else
+		-- if the collection is a table, loop through it and add the values to the tmp table
+		-- otherwise, this returns directly to _process_rule or a recursed call from multiple transforms
+		if (type(collection) == "table") then
+			_log(self, "collection is a table, recursing its transform for each element")
+			for k, v in pairs(collection) do
+				t[k] = _do_transform(self, collection[k], transform)
+			end
+		else
+			_log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
+			return lookup[transform](self, collection)
+		end
+	end
+
+	return t
+end
+
 local function _process_rule(self, rule, collections, ctx)
 	local id = rule.id
 	local var = rule.var
@@ -375,6 +425,10 @@ local function _process_rule(self, rule, collections, ctx)
 	else
 		_log(self, "parse collection cache hit!")
 		t = ctx.collections[memokey]
+	end
+
+	if (opts.transform) then
+		t = _do_transform(self, t, opts.transform)
 	end
 
 	if (not t) then
