@@ -101,7 +101,7 @@ local _rules = {
 		id = 90008,
 		var = {
 			type = "HEADERS",
-			opts = { key = "specific", value = "User-Agent" },
+			opts = { key = "specific", value = "user-agent" },
 			pattern = [=[WinHttp\.WinHttpRequest\.5]=],
 			operator = "REGEX"
 		},
@@ -113,7 +113,7 @@ local _rules = {
 		id = 90009,
 		var = {
 			type = "HEADERS",
-			opts = { key = "specific", value = "User-Agent" },
+			opts = { key = "specific", value = "user-agent" },
 			pattern = [=[Mozilla/5\.0 \(compatible; Zollard; Linux\)]=],
 			operator = "REGEX"
 		},
