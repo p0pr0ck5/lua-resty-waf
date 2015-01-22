@@ -371,6 +371,10 @@ local function _do_transform(self, collection, transform)
 				t[k] = _do_transform(self, collection[k], transform)
 			end
 		else
+			if (not collection) then
+				return collection -- dont transform if the collection was nil, i.e. a specific arg key dne
+			end
+
 			_log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
 			return lookup[transform](self, collection)
 		end
