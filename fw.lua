@@ -13,7 +13,7 @@ local _ac_dicts = {}
 
 local function _log(self, msg)
 	if (self._debug == true) then
-		ngx.log(self._log_level, msg)
+		ngx.log(self._debug_log_level, msg)
 	end
 end
 
@@ -265,7 +265,7 @@ local function _build_common_args(self, collections)
 	return t
 end
 
-local function _log_event(request_client, request_uri, rule, match)
+local function _log_event(self, request_client, request_uri, rule, match)
 	local t = {
 		client = request_client,
 		uri = request_uri,
@@ -273,7 +273,7 @@ local function _log_event(request_client, request_uri, rule, match)
 		match = match
 	}
 
-	ngx.log(ngx.INFO, cjson.encode(t))
+	ngx.log(self._event_log_level, cjson.encode(t))
 end
 
 -- module-level table to define rule operators
@@ -385,7 +385,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(request_client, request_uri, rule, match)
+				_log_event(self, request_client, request_uri, rule, match)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
@@ -513,7 +513,8 @@ function _M.new(self)
 		_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
 		_ignored_rules = {},
 		_debug = false,
-		_log_level = ngx.INFO,
+		_debug_log_level = ngx.INFO,
+		_event_log_level = ngx.INFO,
 		_score_threshold = 5,
 	}, mt)
 end
@@ -546,8 +547,11 @@ function _M.set_option(self, option, value)
 		debug = function(value)
 			self._debug = value
 		end,
-		log_level = function(value)
-			self._log_level = value
+		debug_log_level = function(value)
+			self._debug_log_level = value
+		end,
+		event_log_level = function(value)
+			self._event_log_level = value
 		end,
 		score_threshold = function(value)
 			self._score_threshold = value
