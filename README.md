@@ -260,7 +260,6 @@ The following rule actions are currently supported:
 * **LOG**: A placeholder, as all rule matches that do not have the `nolog` opton set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SKIP**: Skips processing of all further rules until a rule with the `skipend` flag is specified.
-* **SKIPRS**: Skips processing of all further rules in the current ruleset.
 
 ##Operators
 
