@@ -329,6 +329,19 @@ local function _rule_action(self, action, ctx)
 	actions[action](self, ctx)
 end
 
+-- build the transform portion of the collection memoization key
+local function _transform_memokey(transform)
+	if (not transform) then
+		return 'nil'
+	end
+
+	if (type(transform) ~= 'table') then
+		return tostring(transform)
+	else
+		return table.concat(transform, ',')
+	end
+end
+
 -- transform collection values based on rule opts
 local function _do_transform(self, collection, transform)
 	local lookup = {
@@ -422,7 +435,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local memokey
 	if (var.opts ~= nil) then
 		_log(self, "var opts is not nil")
-		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
+		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
 	else
 		_log(self, "var opts is nil, memo cache key is only the var type")
 		memokey = var.type
@@ -433,15 +446,14 @@ local function _process_rule(self, rule, collections, ctx)
 	if (not ctx.collections_key[memokey]) then
 		_log(self, "parsing collections for rule " .. id)
 		t = _parse_collection(self, collections[var.type], var.opts)
+		if (opts.transform) then
+			t = _do_transform(self, t, opts.transform)
+		end
 		ctx.collections[memokey] = t
 		ctx.collections_key[memokey] = true
 	else
 		_log(self, "parse collection cache hit!")
 		t = ctx.collections[memokey]
-	end
-
-	if (opts.transform) then
-		t = _do_transform(self, t, opts.transform)
 	end
 
 	if (not t) then
