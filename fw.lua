@@ -28,7 +28,7 @@ local function _equals(self, a, b)
 	if (type(a) == "table") then
 		_log(self, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
-			equals = _equals(v, b)
+			equals = _equals(self, v, b)
 			if (equals) then
 				break
 			end
