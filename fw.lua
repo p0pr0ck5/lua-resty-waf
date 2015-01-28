@@ -348,6 +348,17 @@ local function _do_transform(self, collection, transform)
 			local t_val = ngx.encode_base64(value)
 			_log(self, "encoded value is " .. t_val)
 		end,
+		html_decode = function(self, value)
+			local str = string.gsub(value, '&lt;', '<')
+			str = string.gsub(str, '&gt;', '>')
+			str = string.gsub(str, '&quot;', '"')
+			str = string.gsub(str, '&apos;', "'")
+			str = string.gsub(str, '&#(%d+);', function(n) return string.char(n) end)
+			str = string.gsub(str, '&#x(%d+);', function(n) return string.char(tonumber(n,16)) end)
+			str = string.gsub(str, '&amp;', '&')
+			_log(self, "html decoded value is " .. str)
+			return str
+		end,
 		lowercase = function(self, value)
 			return string.lower(tostring(value))
 		end
