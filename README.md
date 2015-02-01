@@ -37,6 +37,11 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 ##Synopsis
 
 ```lua
+	http {
+		-- include FreeWAF in the lua_package_path
+		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+	}
+
 	server {
 		location / {
 			access_by_lua '
