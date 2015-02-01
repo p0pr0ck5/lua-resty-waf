@@ -269,9 +269,22 @@ local function _log_event(self, request_client, request_uri, rule, match)
 	local t = {
 		client = request_client,
 		uri = request_uri,
-		rule = rule,
-		match = match
+		match = match,
+		rule = { id = rule.id }
 	}
+
+	if (self._event_log_verbosity > 1) then
+		t.rule.description = rule.description
+	end
+
+	if (self._event_log_verbosity > 2) then
+		t.rule.opts = rule.opts
+		t.rule.action = rule.action
+	end
+
+	if (self._event_log_verbosity > 3) then
+		t.rule.var = rule.var
+	end
 
 	ngx.log(self._event_log_level, cjson.encode(t))
 end
@@ -594,6 +607,7 @@ function _M.new(self)
 		_debug = false,
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
+		_event_log_verbosity = 1,
 		_score_threshold = 5,
 	}, mt)
 end
@@ -631,6 +645,9 @@ function _M.set_option(self, option, value)
 		end,
 		event_log_level = function(value)
 			self._event_log_level = value
+		end,
+		event_log_verbosity = function(value)
+			self._event_log_verbosity = value
 		end,
 		score_threshold = function(value)
 			self._score_threshold = value

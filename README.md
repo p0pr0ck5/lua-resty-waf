@@ -213,6 +213,35 @@ Sets the nginx log level constant used for event logging.
 		';
 	}
 ```
+
+
+###event_log_verbosity
+
+*Default*: 1
+
+Sets the verbosity used in writing event log notification. The higher the verbosity, the more information will be included in the JSON blob generated for each notification.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- default verbosity. the client IP, request URI, rule match data, and rule ID will be logged
+			fw:set_option("event_log_verbosity", 1)
+
+			-- the rule description will be written in addition to existing data
+			fw:set_option("event_log_verbosity", 2)
+
+			-- the rule description, options and action will be written in addition to existing data
+			fw:set_option("event_log_verbosity", 3)
+
+			-- the entire rule definition, including the match pattern, will be written in addition to existing data
+			-- note that for some rule definitions, such as the XSS and SQLi rulesets, this pattern can be large
+			fw:set_option("event_log_verbosity", 4)
+		';
+	}
+```
+
 ##Rule Definitions
 
 FreeWAF uses Lua tables to define its rules. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic the functionality of the ModSecurity CRS. Each rule requires the following elements:
