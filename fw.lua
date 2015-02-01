@@ -269,6 +269,7 @@ end
 
 local function _log_event(self, request_client, request_uri, rule, match)
 	local t = {
+		timestamp = ngx.time(),
 		client = request_client,
 		uri = request_uri,
 		match = match,
