@@ -5,6 +5,8 @@ _M.version = "0.3"
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
+local file_logger = require("inc.resty.logger.file")
+local socket_logger = require("inc.resty.logger.socket")
 
 local mt = { __index = _M }
 
@@ -286,7 +288,34 @@ local function _log_event(self, request_client, request_uri, rule, match)
 		t.rule.var = rule.var
 	end
 
-	ngx.log(self._event_log_level, cjson.encode(t))
+	local lookup = {
+		error = function(t)
+			ngx.log(self._event_log_level, cjson.encode(t))
+		end,
+		file = function(t)
+			if (not file_logger.initted()) then
+				file_logger.init{
+					path = self._event_log_target_path,
+					flush_limit = self.event_log_buffer_size
+				}
+			end
+
+			file_logger.log(t)
+		end,
+		socket = function(t)
+			if (not socket_logger.initted()) then
+				socket_logger.init{
+					host = self._event_log_target_host,
+					port = self._event_log_target_path,
+					flush_limit = self.event_log_buffer_size
+				}
+			end
+
+			socket_logger.log(t)
+		end
+	}
+
+	lookup[self._event_log_target](cjson.encode(t) .. "\n")
 end
 
 -- module-level table to define rule operators
@@ -608,6 +637,11 @@ function _M.new(self)
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
 		_event_log_verbosity = 1,
+		_event_log_target = 'error',
+		_event_log_target_host = '',
+		_event_log_target_port = '',
+		_event_log_target_path = '',
+		_event_log_buffer_size = 4096,
 		_score_threshold = 5,
 	}, mt)
 end
@@ -648,6 +682,21 @@ function _M.set_option(self, option, value)
 		end,
 		event_log_verbosity = function(value)
 			self._event_log_verbosity = value
+		end,
+		event_log_target = function(value)
+			self._event_log_target = value
+		end,
+		event_log_target_host = function(value)
+			self._event_log_target_host = value
+		end,
+		event_log_target_port = function(value)
+			self._event_log_target_port = value
+		end,
+		event_log_target_path = function(value)
+			self._event_log_target_path = value
+		end,
+		event_log_buffer_size = function(value)
+			self.event_log_buffer_size = value
 		end,
 		score_threshold = function(value)
 			self._score_threshold = value
