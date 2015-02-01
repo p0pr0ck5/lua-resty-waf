@@ -235,7 +235,6 @@ local function _flush()
     end
 
 	local file = io.open(path, "a")
-	ngx.log(ngx.INFO, "send_buffer is " .. send_buffer)
 	file:write(send_buffer)
 	file:close()
 
