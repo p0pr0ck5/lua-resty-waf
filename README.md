@@ -257,6 +257,9 @@ Defines the destination for event logs. FreeWAF currently supports logging to th
 ```lua
 	location / {
 		access_by_lua '
+			-- send event logs to the server's error_log location (default)
+			fw:set_option("event_log_target", "error")
+
 			-- send event logs to a local file on disk
 			fw:set_option("event_log_target", "file")
 
@@ -354,7 +357,7 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 	}
 ```
 
-Multiple shared zones can be defined and used, though only one zone can be defined be configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
+Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
 
 `Could not add key to persistent storage, increase the size of the lua_shared_dict`
 
@@ -407,15 +410,16 @@ The following rule actions are currently supported:
 * **IGNORE**: No action is taken, rule processing continues.
 * **LOG**: A placeholder, as all rule matches that do not have the `nolog` opton set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
-* **SETVAR**: Set a persistent variable, using the `setvat` rule options table.
+* **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
 * **SKIP**: Skips processing of all further rules until a rule with the `skipend` flag is specified.
 
 ##Operators
 
 The following pattern operators are currently supported:
 
-* **EQUALS**: Matches using `==` operator; comparison values can be any Lua primitive that can be compared directly (most commonly this is strings or integers).
+* **EQUALS**: Matches using the `==` operator; comparison values can be any Lua primitive that can be compared directly (most commonly this is strings or integers).
 * **EXISTS**: Searches for the existence of a given key in a table.
+* **GREATER**: Matches using the `>` operator. Returns true if the collection data is greater than the pattern. Most commonly this is used for comparing running counters stored in persistent storage.
 * **PM**: Performs an efficient pattern match using Aho-Corasick searching.
 * **REGEX**: Matches using Perl compatible regular expressions.
 
@@ -437,6 +441,7 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings. 
 * **USER_AGENT**: The value of the `User-Agent` header.
+* **VAR**: The persistent storage variable collection.
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
@@ -448,7 +453,7 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 
 ##Persistent Storage
 
-FreeWAF supports storage of long-term (inter-request) data via the `lua_shared_dict` interface (under the hood this uses Nginx's red-black tree shared memory zone). This data will persist over the lifetime of the Nginx master process, meaning that data will survive a server reload, e.g. a HUP, but will not survive a restart.
+FreeWAF supports storage of long-term (inter-request) data via the `lua_shared_dict` interface. Under the hood this uses Nginx's shared memory zone pattern, which uses a red-black tree. This means that persistent data storage operations, including search, insertion, and deletion, run in `O(log n)` time, so be wary of performance degredation if the size of the memory zone grows to tens or hundreds of thousands of keys. This data will persist over the lifetime of the Nginx master process, meaning that data will survive a server reload, e.g. a HUP, but will not survive a restart.
 
 Persistent data is set with the `SETVAR` action. This requires the associated rule to return a positive match. Variable data is defined via the `setvar` rule option:
 
@@ -468,7 +473,7 @@ Storage keys can be dynamically defined based on several factors (currently the 
 		operator = 'EQUALS'
 	},
 	opts = {},
-	action = "SETVAR",
+	action = "CHAIN",
 	description = "WP-Login brute force detection"
 },
 {
@@ -477,7 +482,7 @@ Storage keys can be dynamically defined based on several factors (currently the 
 		type = "METHOD",
 		opts = nil,
 		pattern = "POST",
-		operator = "EQUALS
+		operator = "EQUALS"
 	},
 	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 } },
 	action = "SETVAR",
@@ -493,7 +498,7 @@ Storage keys can be dynamically defined based on several factors (currently the 
 	},
 	opts = {},
 	action = "DENY",
-	description = "Deny more than 5 requests to wp-login.php in 60 seconds"
+	description = "Deny more than 5 POST requests to wp-login.php in 60 seconds"
 }
 ```
 
