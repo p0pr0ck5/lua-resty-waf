@@ -332,6 +332,107 @@ local operators = {
 	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
 }
 
+
+-- pick out dynamic data from storage key definitions
+local function _parse_storage_key(self, key)
+	local lookup = function(m)
+		local t = {
+			IP = ngx.var.remote_addr,
+			URI = ngx.var.uri
+		}
+		return t[m[1]]
+	end
+
+	local str = ngx.re.sub(key, [=[%{(.*)}]=], lookup, 'oij')
+	_log(self, "parsed storage key is " .. str)
+	return str
+end
+
+-- handler to delete persistent storage data
+local function _delete_persistent_var(premature, self, key, expire)
+	if (premature) then
+		return
+	end
+
+	local shm = ngx.shared[self._storage_zone]
+	local var = shm:get(key)
+
+	if (not var) then
+		return
+	end
+
+	local t = cjson.decode(var)
+	if (t.expire == ngx.time()) then
+		_log(self, "expire times equal, so time to delete the data")
+		shm:delete(key)
+	else
+		_log(self, "expire time is not now! did we get updated again?")
+	end
+end
+
+-- retrieve a given key from persistent storage and decode it, returning the data and expire time separately
+local function _retrieve_persistent_var(self, key)
+	local shm = ngx.shared[self._storage_zone]
+	local var = shm:get(key)
+
+	if (not var) then
+		return
+	end
+
+	local t = cjson.decode(var)
+	return t.value, t.expire
+end
+
+-- wrapper to get persistent storage data
+local function _get_var(self, key)
+	-- silently bail from rules that require persistent storage if no shm was configured
+	if (not self._storage_zone) then
+		return
+	end
+
+	return _retrieve_persistent_var(self, _parse_storage_key(self, key))
+end
+
+-- add/update data to persistent storaage
+local function _set_var(self, ctx)
+	-- silently bail from rules that require persistent storage if no shm was configured
+	if (not self._storage_zone) then
+		return
+	end
+
+	local key = _parse_storage_key(self, ctx.rule_setvar_key)
+	local value = ctx.rule_setvar_value
+	local expire = ctx.rule_setvar_expire
+	_log(self, "setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	local shm = ngx.shared[self._storage_zone]
+
+	-- var values can be incremented by being defined as '+n'
+	local incr = ngx.re.match(value, [=[^\+(\d+)]=], 'oij')
+	if (incr) then
+		_log(self, "increment detected by " .. incr[1])
+		local oldval = _retrieve_persistent_var(self, key)
+		_log(self, "old val is " .. tostring(oldval))
+		if (not oldval) then oldval = 0 end
+		value = incr[1] + oldval
+	end
+
+	_log(self, "actually setting " .. key .. " to " .. value)
+
+	if (expire) then
+		_log(self, "expiring in " .. expire)
+		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = expire + ngx.time() }))
+		ngx.timer.at(expire, _delete_persistent_var, self, key, expire)
+		if (not ok) then
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict" .. self._storage_zone)
+		end
+	else
+		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = 0 }))
+		if (not ok) then
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict" .. self._storage_zone)
+		end
+	end
+end
+
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx)
 	local actions = {
@@ -365,12 +466,16 @@ local function _rule_action(self, action, ctx)
 		end,
 		IGNORE = function(self)
 			_log(self, "Ingoring rule for now")
+		end,
+		SETVAR = function(self, ctx)
+			_set_var(self, ctx)
 		end
 	}
 
 	_log(self, "Taking the following action: " .. action)
 	actions[action](self, ctx)
 end
+
 
 -- build the transform portion of the collection memoization key
 local function _transform_memokey(transform)
@@ -460,6 +565,12 @@ local function _process_rule(self, rule, collections, ctx)
 	ctx.id = id
 	ctx.rule_score = opts.score
 
+	if (opts.setvar) then
+		ctx.rule_setvar_key = opts.setvar.key
+		ctx.rule_setvar_value = opts.setvar.value
+		ctx.rule_setvar_expire = opts.setvar.expire
+	end
+
 	if (opts.chainchild == true and ctx.chained == false) then
 		_log(self, "This is a chained rule, but we don't have a previous match, so not processing")
 		return
@@ -475,28 +586,34 @@ local function _process_rule(self, rule, collections, ctx)
 	end
 
 	local t
-	local memokey
-	if (var.opts ~= nil) then
-		_log(self, "var opts is not nil")
-		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+
+	_log(self, type(collections[var.type]))
+	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
+		t = collections[var.type](self, var.opts)
 	else
-		_log(self, "var opts is nil, memo cache key is only the var type")
-		memokey = var.type
-	end
-
-	_log(self, "checking for memokey " .. memokey)
-
-	if (not ctx.collections_key[memokey]) then
-		_log(self, "parsing collections for rule " .. id)
-		t = _parse_collection(self, collections[var.type], var.opts)
-		if (opts.transform) then
-			t = _do_transform(self, t, opts.transform)
+		local memokey
+		if (var.opts ~= nil) then
+			_log(self, "var opts is not nil")
+			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+		else
+			_log(self, "var opts is nil, memo cache key is only the var type")
+			memokey = var.type
 		end
-		ctx.collections[memokey] = t
-		ctx.collections_key[memokey] = true
-	else
-		_log(self, "parse collection cache hit!")
-		t = ctx.collections[memokey]
+
+		_log(self, "checking for memokey " .. memokey)
+
+		if (not ctx.collections_key[memokey]) then
+			_log(self, "parsing collections for rule " .. id)
+			t = _parse_collection(self, collections[var.type], var.opts)
+			if (opts.transform) then
+				t = _do_transform(self, t, opts.transform)
+			end
+			ctx.collections[memokey] = t
+			ctx.collections_key[memokey] = true
+		else
+			_log(self, "parse collection cache hit!")
+			t = ctx.collections[memokey]
+		end
 	end
 
 	if (not t) then
@@ -589,7 +706,8 @@ function _M.exec(self)
 		REQUEST_LINE = request_request_line,
 		COOKIES = request_cookies,
 		REQUEST_BODY = request_post_args,
-		REQUEST_ARGS = request_common_args
+		REQUEST_ARGS = request_common_args,
+		VAR = function(self, opts) return _get_var(self, opts.value) end
 	}
 
 	local ctx = {}
@@ -644,6 +762,7 @@ function _M.new(self)
 		_event_log_target_path = '',
 		_event_log_buffer_size = 4096,
 		_score_threshold = 5,
+		_storage_zone = nil
 	}, mt)
 end
 
@@ -701,6 +820,12 @@ function _M.set_option(self, option, value)
 		end,
 		score_threshold = function(value)
 			self._score_threshold = value
+		end,
+		storage_zone = function(value)
+			if (not ngx.shared[value]) then
+				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
+			end
+			self._storage_zone = value
 		end
 	}
 
