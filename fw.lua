@@ -43,6 +43,25 @@ local function _equals(self, a, b)
 	return equals
 end
 
+-- used for operators.GREATER
+local function _greater(self, a, b)
+	local greater
+	if (type(a) == "table") then
+		_log(self, "Needle is a table, so recursing!")
+		for _, v in ipairs(a) do
+			greater = _greater(self, v, b)
+			if (greater) then
+				break
+			end
+		end
+	else
+		_log(self, "Comparing (greater) " .. tostring(a) .. " and " .. tostring(b))
+		greater = a > b
+	end
+
+	return greater
+end
+
 -- strips an ending newline
 local function _trim(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -326,6 +345,8 @@ local operators = {
 	NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
 	EQUALS = function(self, a, b) return _equals(self, a, b) end,
 	NOT_EQUALS = function(self, a, b) return not _equals(self, a, b) end,
+	GREATER = function(self, a, b) return _greater(self, a, b) end,
+	NOT_GREATER = function(self, a, b) return not _greater(self, a, b) end,
 	EXISTS = function(self, haystack, needle) return _table_has_value(self, needle, haystack) end,
 	NOT_EXISTS = function(self, haystack, needle) return not _table_has_value(self, needle, haystack) end,
 	PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
