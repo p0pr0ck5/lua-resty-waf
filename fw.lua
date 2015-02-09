@@ -771,7 +771,7 @@ function _M.new(self)
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_active_rulesets = { 10000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
 		_ignored_rules = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
