@@ -804,8 +804,8 @@ function _M.set_option(self, option, value)
 			for k, v in ipairs(self._active_rulesets) do
 				if (v ~= value) then
 					t[n] = v
+					n = n + 1
 				end
-				n = n + 1
 			end
 			self._active_rulesets = t
 		end,
@@ -852,7 +852,7 @@ function _M.set_option(self, option, value)
 
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
-			_M:set_option(option, v)
+			_M.set_option(self, option, v)
 		end
 	else
 		lookup[option](value)
