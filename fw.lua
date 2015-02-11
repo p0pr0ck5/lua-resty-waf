@@ -13,12 +13,14 @@ local mt = { __index = _M }
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
 
+-- debug logger
 local function _log(self, msg)
 	if (self._debug == true) then
 		ngx.log(self._debug_log_level, msg)
 	end
 end
 
+-- fatal failure logger
 local function _fatal_fail(msg)
 	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
 	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
@@ -215,6 +217,7 @@ local function _ac_lookup(self, needle, haystack, ctx)
 	return match
 end
 
+-- get a subset or superset of request data collection
 local function _parse_collection(self, collection, opts)
 	local lookup = {
 		specific = function(self, collection, value)
@@ -262,6 +265,7 @@ local function _parse_collection(self, collection, opts)
 	return lookup[opts.key](self, collection, opts.value)
 end
 
+-- return a single table from multiple tables containing request data
 local function _build_common_args(self, collections)
 	local t = {}
 
@@ -286,6 +290,8 @@ local function _build_common_args(self, collections)
 	return t
 end
 
+-- push log data regarding a matching rule to the configured target
+-- in the case of socket or file logging, this data will be buffered
 local function _log_event(self, request_client, request_uri, rule, match)
 	local t = {
 		timestamp = ngx.time(),
@@ -339,7 +345,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 end
 
 -- module-level table to define rule operators
--- no need to recreated this with every request
+-- no need to recreate this with every request
 local operators = {
 	REGEX = function(self, subject, pattern, opts) return _regex_match(self, subject, pattern, opts) end,
 	NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
@@ -352,7 +358,6 @@ local operators = {
 	PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
 	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
 }
-
 
 -- pick out dynamic data from storage key definitions
 local function _parse_storage_key(self, key)
@@ -444,12 +449,12 @@ local function _set_var(self, ctx)
 		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = expire + ngx.time() }))
 		ngx.timer.at(expire, _delete_persistent_var, self, key, expire)
 		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict" .. self._storage_zone)
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
 		end
 	else
 		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = 0 }))
 		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict" .. self._storage_zone)
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
 		end
 	end
 end
@@ -496,7 +501,6 @@ local function _rule_action(self, action, ctx)
 	_log(self, "Taking the following action: " .. action)
 	actions[action](self, ctx)
 end
-
 
 -- build the transform portion of the collection memoization key
 local function _transform_memokey(transform)
@@ -576,6 +580,9 @@ local function _do_transform(self, collection, transform)
 	return t
 end
 
+-- process an individual rule
+-- note that using a local per-request table to pass transient data
+-- is more efficient than using ngx.ctx
 local function _process_rule(self, rule, collections, ctx)
 	local id = rule.id
 	local var = rule.var
@@ -766,6 +773,7 @@ function _M.exec(self)
 
 end -- fw.exec()
 
+-- instantiate a new instance of the module
 function _M.new(self)
 	return setmetatable({
 		_mode = "SIMULATE",
@@ -787,6 +795,7 @@ function _M.new(self)
 	}, mt)
 end
 
+-- configuraton wrapper
 function _M.set_option(self, option, value)
 	local lookup = {
 		mode = function(value)
