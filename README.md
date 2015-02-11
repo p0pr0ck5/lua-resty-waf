@@ -472,7 +472,7 @@ Storage keys can be dynamically defined based on several factors (currently the 
 		pattern = '/wp-login.php',
 		operator = 'EQUALS'
 	},
-	opts = {},
+	opts = { nolog = true },
 	action = "CHAIN",
 	description = "WP-Login brute force detection"
 },
@@ -484,7 +484,7 @@ Storage keys can be dynamically defined based on several factors (currently the 
 		pattern = "POST",
 		operator = "EQUALS"
 	},
-	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 } },
+	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 }, chainchild = true, chainend = true, nolog = true },
 	action = "SETVAR",
 	description = "WP-Login brute force detection"
 },
