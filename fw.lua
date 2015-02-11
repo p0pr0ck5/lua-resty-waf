@@ -1,22 +1,26 @@
 local _M = {}
 
-_M.version = "0.3"
+_M.version = "0.4"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
+local file_logger = require("inc.resty.logger.file")
+local socket_logger = require("inc.resty.logger.socket")
 
 local mt = { __index = _M }
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
 
+-- debug logger
 local function _log(self, msg)
 	if (self._debug == true) then
 		ngx.log(self._debug_log_level, msg)
 	end
 end
 
+-- fatal failure logger
 local function _fatal_fail(msg)
 	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
 	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
@@ -28,17 +32,36 @@ local function _equals(self, a, b)
 	if (type(a) == "table") then
 		_log(self, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
-			equals = _equals(v, b)
+			equals = _equals(self, v, b)
 			if (equals) then
 				break
 			end
 		end
 	else
-		_log(self, "Comparing " .. a .. " and " .. b)
+		_log(self, "Comparing " .. tostring(a) .. " and " .. tostring(b))
 		equals = a == b
 	end
 
 	return equals
+end
+
+-- used for operators.GREATER
+local function _greater(self, a, b)
+	local greater
+	if (type(a) == "table") then
+		_log(self, "Needle is a table, so recursing!")
+		for _, v in ipairs(a) do
+			greater = _greater(self, v, b)
+			if (greater) then
+				break
+			end
+		end
+	else
+		_log(self, "Comparing (greater) " .. tostring(a) .. " and " .. tostring(b))
+		greater = a > b
+	end
+
+	return greater
 end
 
 -- strips an ending newline
@@ -194,6 +217,7 @@ local function _ac_lookup(self, needle, haystack, ctx)
 	return match
 end
 
+-- get a subset or superset of request data collection
 local function _parse_collection(self, collection, opts)
 	local lookup = {
 		specific = function(self, collection, value)
@@ -241,6 +265,7 @@ local function _parse_collection(self, collection, opts)
 	return lookup[opts.key](self, collection, opts.value)
 end
 
+-- return a single table from multiple tables containing request data
 local function _build_common_args(self, collections)
 	local t = {}
 
@@ -265,72 +290,299 @@ local function _build_common_args(self, collections)
 	return t
 end
 
+-- push log data regarding a matching rule to the configured target
+-- in the case of socket or file logging, this data will be buffered
 local function _log_event(self, request_client, request_uri, rule, match)
 	local t = {
+		timestamp = ngx.time(),
 		client = request_client,
 		uri = request_uri,
-		rule = rule,
-		match = match
+		match = match,
+		rule = { id = rule.id }
 	}
 
-	ngx.log(self._event_log_level, cjson.encode(t))
+	if (self._event_log_verbosity > 1) then
+		t.rule.description = rule.description
+	end
+
+	if (self._event_log_verbosity > 2) then
+		t.rule.opts = rule.opts
+		t.rule.action = rule.action
+	end
+
+	if (self._event_log_verbosity > 3) then
+		t.rule.var = rule.var
+	end
+
+	local lookup = {
+		error = function(t)
+			ngx.log(self._event_log_level, cjson.encode(t))
+		end,
+		file = function(t)
+			if (not file_logger.initted()) then
+				file_logger.init{
+					path = self._event_log_target_path,
+					flush_limit = self.event_log_buffer_size
+				}
+			end
+
+			file_logger.log(t)
+		end,
+		socket = function(t)
+			if (not socket_logger.initted()) then
+				socket_logger.init{
+					host = self._event_log_target_host,
+					port = self._event_log_target_path,
+					flush_limit = self.event_log_buffer_size
+				}
+			end
+
+			socket_logger.log(t)
+		end
+	}
+
+	lookup[self._event_log_target](cjson.encode(t) .. "\n")
 end
 
 -- module-level table to define rule operators
--- no need to recreated this with every request
+-- no need to recreate this with every request
 local operators = {
 	REGEX = function(self, subject, pattern, opts) return _regex_match(self, subject, pattern, opts) end,
 	NOT_REGEX = function(self, subject, pattern, opts) return not _regex_match(self, subject, pattern, opts) end,
 	EQUALS = function(self, a, b) return _equals(self, a, b) end,
 	NOT_EQUALS = function(self, a, b) return not _equals(self, a, b) end,
+	GREATER = function(self, a, b) return _greater(self, a, b) end,
+	NOT_GREATER = function(self, a, b) return not _greater(self, a, b) end,
 	EXISTS = function(self, haystack, needle) return _table_has_value(self, needle, haystack) end,
 	NOT_EXISTS = function(self, haystack, needle) return not _table_has_value(self, needle, haystack) end,
 	PM = function(self, needle, haystack, ctx) return _ac_lookup(self, needle, haystack, ctx) end,
 	NOT_PM = function(self, needle, haystack, ctx) return not _ac_lookup(self, needle, haystack, ctx) end
 }
 
--- module-level table to define rule actions
--- this may get changed if/when heuristics gets introduced
-local actions = {
-	LOG = function(self)
-		_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
-	end,
-	ACCEPT = function(self, ctx)
-		_log(self, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
-		if (self._mode == "ACTIVE") then
-			ngx.exit(ngx.OK)
-		end
-	end,
-	CHAIN = function(self, ctx)
-		_log(self, "Setting the context chained flag to true")
-		ctx.chained = true
-	end,
-	SKIP = function(self, ctx)
-		_log(self, "Setting the context skip flag to true")
-		ctx.skip = true
-	end,
-	SCORE = function(self, ctx)
-		local new_score = ctx.score + ctx.rule_score
-		_log(self, "New score is " .. new_score)
-		ctx.score = new_score
-	end,
-	DENY = function(self, ctx)
-		_log(self, "rule.action was DENY, so telling nginx to quit!")
-		if (self._mode == "ACTIVE") then
-			ngx.exit(ngx.HTTP_FORBIDDEN)
-		end
-	end,
-	IGNORE = function(self)
-		_log(self, "Ingoring rule for now")
+-- pick out dynamic data from storage key definitions
+local function _parse_storage_key(self, key)
+	local lookup = function(m)
+		local t = {
+			IP = ngx.var.remote_addr,
+			URI = ngx.var.uri
+		}
+		return t[m[1]]
 	end
-}
+
+	local str = ngx.re.sub(key, [=[%{(.*)}]=], lookup, 'oij')
+	_log(self, "parsed storage key is " .. str)
+	return str
+end
+
+-- handler to delete persistent storage data
+local function _delete_persistent_var(premature, self, key, expire)
+	if (premature) then
+		return
+	end
+
+	local shm = ngx.shared[self._storage_zone]
+	local var = shm:get(key)
+
+	if (not var) then
+		return
+	end
+
+	local t = cjson.decode(var)
+	if (t.expire == ngx.time()) then
+		_log(self, "expire times equal, so time to delete the data")
+		shm:delete(key)
+	else
+		_log(self, "expire time is not now! did we get updated again?")
+	end
+end
+
+-- retrieve a given key from persistent storage and decode it, returning the data and expire time separately
+local function _retrieve_persistent_var(self, key)
+	local shm = ngx.shared[self._storage_zone]
+	local var = shm:get(key)
+
+	if (not var) then
+		return
+	end
+
+	local t = cjson.decode(var)
+	return t.value, t.expire
+end
+
+-- wrapper to get persistent storage data
+local function _get_var(self, key)
+	-- silently bail from rules that require persistent storage if no shm was configured
+	if (not self._storage_zone) then
+		return
+	end
+
+	return _retrieve_persistent_var(self, _parse_storage_key(self, key))
+end
+
+-- add/update data to persistent storaage
+local function _set_var(self, ctx)
+	-- silently bail from rules that require persistent storage if no shm was configured
+	if (not self._storage_zone) then
+		return
+	end
+
+	local key = _parse_storage_key(self, ctx.rule_setvar_key)
+	local value = ctx.rule_setvar_value
+	local expire = ctx.rule_setvar_expire
+	_log(self, "setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	local shm = ngx.shared[self._storage_zone]
+
+	-- var values can be incremented by being defined as '+n'
+	local incr = ngx.re.match(value, [=[^\+(\d+)]=], 'oij')
+	if (incr) then
+		_log(self, "increment detected by " .. incr[1])
+		local oldval = _retrieve_persistent_var(self, key)
+		_log(self, "old val is " .. tostring(oldval))
+		if (not oldval) then oldval = 0 end
+		value = incr[1] + oldval
+	end
+
+	_log(self, "actually setting " .. key .. " to " .. value)
+
+	if (expire) then
+		_log(self, "expiring in " .. expire)
+		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = expire + ngx.time() }))
+		ngx.timer.at(expire, _delete_persistent_var, self, key, expire)
+		if (not ok) then
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
+		end
+	else
+		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = 0 }))
+		if (not ok) then
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
+		end
+	end
+end
 
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx)
+	local actions = {
+		LOG = function(self)
+			_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
+		end,
+		ACCEPT = function(self, ctx)
+			_log(self, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
+			if (self._mode == "ACTIVE") then
+				ngx.exit(ngx.OK)
+			end
+		end,
+		CHAIN = function(self, ctx)
+			_log(self, "Setting the context chained flag to true")
+			ctx.chained = true
+		end,
+		SKIP = function(self, ctx)
+			_log(self, "Setting the context skip flag to true")
+			ctx.skip = true
+		end,
+		SCORE = function(self, ctx)
+			local new_score = ctx.score + ctx.rule_score
+			_log(self, "New score is " .. new_score)
+			ctx.score = new_score
+		end,
+		DENY = function(self, ctx)
+			_log(self, "rule.action was DENY, so telling nginx to quit!")
+			if (self._mode == "ACTIVE") then
+				ngx.exit(ngx.HTTP_FORBIDDEN)
+			end
+		end,
+		IGNORE = function(self)
+			_log(self, "Ingoring rule for now")
+		end,
+		SETVAR = function(self, ctx)
+			_set_var(self, ctx)
+		end
+	}
+
 	_log(self, "Taking the following action: " .. action)
 	actions[action](self, ctx)
 end
 
+-- build the transform portion of the collection memoization key
+local function _transform_memokey(transform)
+	if (not transform) then
+		return 'nil'
+	end
+
+	if (type(transform) ~= 'table') then
+		return tostring(transform)
+	else
+		return table.concat(transform, ',')
+	end
+end
+
+-- transform collection values based on rule opts
+local function _do_transform(self, collection, transform)
+	local lookup = {
+		base64_decode = function(self, value)
+			_log(self, "Decoding from base64: " .. tostring(value))
+			local t_val = ngx.decode_base64(tostring(value))
+			if (t_val) then
+				_log(self, "decode successful, decoded value is " .. t_val)
+				return t_val
+			else
+				_log(self, "decode unsuccessful, returning original value " .. value)
+				return value
+			end
+		end,
+		base64_encode = function(self, value)
+			_log(self, "Encoding to base64: " .. tostring(value))
+			local t_val = ngx.encode_base64(value)
+			_log(self, "encoded value is " .. t_val)
+		end,
+		html_decode = function(self, value)
+			local str = string.gsub(value, '&lt;', '<')
+			str = string.gsub(str, '&gt;', '>')
+			str = string.gsub(str, '&quot;', '"')
+			str = string.gsub(str, '&apos;', "'")
+			str = string.gsub(str, '&#(%d+);', function(n) return string.char(n) end)
+			str = string.gsub(str, '&#x(%d+);', function(n) return string.char(tonumber(n,16)) end)
+			str = string.gsub(str, '&amp;', '&')
+			_log(self, "html decoded value is " .. str)
+			return str
+		end,
+		lowercase = function(self, value)
+			return string.lower(tostring(value))
+		end
+	}
+
+	-- create a new tmp table to hold the transformed values
+	local t = {}
+
+	if (type(transform) == "table") then
+		_log(self, "multiple transforms are defined, iterating through each one")
+		t = collection
+		for k, v in ipairs(transform) do
+			t = _do_transform(self, t, transform[k])
+		end
+	else
+		-- if the collection is a table, loop through it and add the values to the tmp table
+		-- otherwise, this returns directly to _process_rule or a recursed call from multiple transforms
+		if (type(collection) == "table") then
+			_log(self, "collection is a table, recursing its transform for each element")
+			for k, v in pairs(collection) do
+				t[k] = _do_transform(self, collection[k], transform)
+			end
+		else
+			if (not collection) then
+				return collection -- dont transform if the collection was nil, i.e. a specific arg key dne
+			end
+
+			_log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
+			return lookup[transform](self, collection)
+		end
+	end
+
+	return t
+end
+
+-- process an individual rule
+-- note that using a local per-request table to pass transient data
+-- is more efficient than using ngx.ctx
 local function _process_rule(self, rule, collections, ctx)
 	local id = rule.id
 	local var = rule.var
@@ -340,6 +592,12 @@ local function _process_rule(self, rule, collections, ctx)
 
 	ctx.id = id
 	ctx.rule_score = opts.score
+
+	if (opts.setvar) then
+		ctx.rule_setvar_key = opts.setvar.key
+		ctx.rule_setvar_value = opts.setvar.value
+		ctx.rule_setvar_expire = opts.setvar.expire
+	end
 
 	if (opts.chainchild == true and ctx.chained == false) then
 		_log(self, "This is a chained rule, but we don't have a previous match, so not processing")
@@ -356,25 +614,34 @@ local function _process_rule(self, rule, collections, ctx)
 	end
 
 	local t
-	local memokey
-	if (var.opts ~= nil) then
-		_log(self, "var opts is not nil")
-		memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
-	else
-		_log(self, "var opts is nil, memo cache key is only the var type")
-		memokey = var.type
-	end
 
-	_log(self, "checking for memokey " .. memokey)
-
-	if (not ctx.collections_key[memokey]) then
-		_log(self, "parsing collections for rule " .. id)
-		t = _parse_collection(self, collections[var.type], var.opts)
-		ctx.collections[memokey] = t
-		ctx.collections_key[memokey] = true
+	_log(self, type(collections[var.type]))
+	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
+		t = collections[var.type](self, var.opts)
 	else
-		_log(self, "parse collection cache hit!")
-		t = ctx.collections[memokey]
+		local memokey
+		if (var.opts ~= nil) then
+			_log(self, "var opts is not nil")
+			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+		else
+			_log(self, "var opts is nil, memo cache key is only the var type")
+			memokey = var.type
+		end
+
+		_log(self, "checking for memokey " .. memokey)
+
+		if (not ctx.collections_key[memokey]) then
+			_log(self, "parsing collections for rule " .. id)
+			t = _parse_collection(self, collections[var.type], var.opts)
+			if (opts.transform) then
+				t = _do_transform(self, t, opts.transform)
+			end
+			ctx.collections[memokey] = t
+			ctx.collections_key[memokey] = true
+		else
+			_log(self, "parse collection cache hit!")
+			t = ctx.collections[memokey]
+		end
 	end
 
 	if (not t) then
@@ -385,7 +652,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, request_client, request_uri, rule, match)
+				_log_event(self, collections["CLIENT"], collections["URI"], rule, match)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
@@ -467,7 +734,8 @@ function _M.exec(self)
 		REQUEST_LINE = request_request_line,
 		COOKIES = request_cookies,
 		REQUEST_BODY = request_post_args,
-		REQUEST_ARGS = request_common_args
+		REQUEST_ARGS = request_common_args,
+		VAR = function(self, opts) return _get_var(self, opts.value) end
 	}
 
 	local ctx = {}
@@ -505,20 +773,29 @@ function _M.exec(self)
 
 end -- fw.exec()
 
+-- instantiate a new instance of the module
 function _M.new(self)
 	return setmetatable({
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_active_rulesets = { 10000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
 		_ignored_rules = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
+		_event_log_verbosity = 1,
+		_event_log_target = 'error',
+		_event_log_target_host = '',
+		_event_log_target_port = '',
+		_event_log_target_path = '',
+		_event_log_buffer_size = 4096,
 		_score_threshold = 5,
+		_storage_zone = nil
 	}, mt)
 end
 
+-- configuraton wrapper
 function _M.set_option(self, option, value)
 	local lookup = {
 		mode = function(value)
@@ -536,8 +813,8 @@ function _M.set_option(self, option, value)
 			for k, v in ipairs(self._active_rulesets) do
 				if (v ~= value) then
 					t[n] = v
+					n = n + 1
 				end
-				n = n + 1
 			end
 			self._active_rulesets = t
 		end,
@@ -553,14 +830,38 @@ function _M.set_option(self, option, value)
 		event_log_level = function(value)
 			self._event_log_level = value
 		end,
+		event_log_verbosity = function(value)
+			self._event_log_verbosity = value
+		end,
+		event_log_target = function(value)
+			self._event_log_target = value
+		end,
+		event_log_target_host = function(value)
+			self._event_log_target_host = value
+		end,
+		event_log_target_port = function(value)
+			self._event_log_target_port = value
+		end,
+		event_log_target_path = function(value)
+			self._event_log_target_path = value
+		end,
+		event_log_buffer_size = function(value)
+			self.event_log_buffer_size = value
+		end,
 		score_threshold = function(value)
 			self._score_threshold = value
+		end,
+		storage_zone = function(value)
+			if (not ngx.shared[value]) then
+				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
+			end
+			self._storage_zone = value
 		end
 	}
 
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
-			_M:set_option(option, v)
+			_M.set_option(self, option, v)
 		end
 	else
 		lookup[option](value)
