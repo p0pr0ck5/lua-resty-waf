@@ -244,7 +244,7 @@ local _rules = {
 			pattern = "/wp-login.php",
 			operator = "EQUALS"
 		},
-		opts = {},
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -255,7 +255,7 @@ local _rules = {
 			pattern = "POST",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true },
+		opts = { nolog = true, chainchild = true },
 		action = "CHAIN"
 	},
 	{
@@ -269,6 +269,60 @@ local _rules = {
 		opts = { chainchild = true, chainend = true },
 		action = "DENY",
 		description = "Emerging fake Googlebot wp-login bruteforce"
+	},
+	{
+		id = 90023,
+		var = {
+			type = "REQUEST_BODY",
+			opts = { key = 'keys' },
+			pattern = "mfbfw",
+			operator = "EXISTS"
+		},
+		opts = { nolog = true, transform = 'lowercase' },
+		action = "CHAIN",
+	},
+	{
+		id = 90024,
+		var = {
+			type = "REQUEST_BODY",
+			opts = { key = 'specific', value = 'action' },
+			pattern = 'update',
+			operator = "EQUALS"
+		},
+		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		action = "CHAIN"
+	},
+	{
+		id = 90025,
+		var = {
+			type = "URI_ARGS",
+			opts = { key = 'specific', value = 'page' },
+			pattern = 'fancybox-for-wordpress',
+			operator = "EQUALS"
+		},
+		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		action = "CHAIN"
+	},
+	{
+		id = 90026,
+		var = {
+			type = "URI",
+			pattern = '/wp-admin/admin-post.php',
+			operator = "EQUALS"
+		},
+		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		action = "CHAIN"
+	},
+	{
+		id = 90027,
+		var = {
+			type = "METHOD",
+			pattern = "POST",
+			operator = "EQUALS"
+		},
+		opts = { chainchild = true, chainend = true },
+		action = "DENY",
+		description = "FancyBox for Wordpress access control vulnerability (https://www.cryptobells.com/fancybox-for-wordpress-zero-day-and-broken-patch/)"
 	}
 }
 
