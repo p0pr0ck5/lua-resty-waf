@@ -369,7 +369,10 @@ local function _parse_storage_key(self, key)
 		return t[m[1]]
 	end
 
-	local str = ngx.re.sub(key, [=[%{(.*)}]=], lookup, 'oij')
+	-- use a negated character (instead of a lazy regex) to grab something that looks like
+	-- %{VAL}
+	-- and find it in the lookup table
+	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, 'oij')
 	_log(self, "parsed storage key is " .. str)
 	return str
 end
@@ -696,21 +699,18 @@ function _M.exec(self)
 		ngx.exit(ngx.HTTP_FORBIDDEN)
 	end
 
-	-- if we were POSTed to, read the body in, otherwise trash it (don't ignore it!)
-	-- we'll have a rule about body content with a GET, which brings up 2 questions:
-	-- 1. should we make this explicitly POST only, or just non-GET
-	-- 2. should we allow GETs with body, if it's going to be in the ruleset (GET w/ body doesn't violate rfc2616)
-	if (request_method ~= "POST") then
+	if (request_method ~= "POST" and request_method ~= "PUT") then
 		ngx.req.discard_body()
 		request_post_args = nil
 	else
 		ngx.req.read_body()
 
 		-- workaround for now. if we buffered to disk, skip it
-		if (ngx.req.get_body_file() == nil) then
+		-- also avoid parsing form upload as boundaries will result in false positives
+		if (ngx.req.get_body_file() == nil and not ngx.re.match(request_headers["content-type"], [=[^multipart/form-data; boundary=]=])) then
 			request_post_args = ngx.req.get_post_args()
 		else
-			_log(self, "Skipping POST arguments because we buffered to disk")
+			_log(self, "Skipping POST arguments because we buffered to disk or receieved a form upload")
 		end
 	end
 
