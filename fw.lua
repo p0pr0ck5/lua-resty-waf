@@ -322,7 +322,8 @@ local function _log_event(self, request_client, request_uri, rule, match)
 			if (not file_logger.initted()) then
 				file_logger.init{
 					path = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size
+					flush_limit = self.event_log_buffer_size,
+					periodic_flush = self._event_log_periodic_flush
 				}
 			end
 
@@ -333,7 +334,8 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				socket_logger.init{
 					host = self._event_log_target_host,
 					port = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size
+					flush_limit = self.event_log_buffer_size,
+					period_flush = self._event_log_periodic_flush
 				}
 			end
 
@@ -790,6 +792,7 @@ function _M.new(self)
 		_event_log_target_port = '',
 		_event_log_target_path = '',
 		_event_log_buffer_size = 4096,
+		_event_log_periodic_flush = nil,
 		_score_threshold = 5,
 		_storage_zone = nil
 	}, mt)
@@ -847,6 +850,9 @@ function _M.set_option(self, option, value)
 		end,
 		event_log_buffer_size = function(value)
 			self.event_log_buffer_size = value
+		end,
+		event_log_periodic_flush = function(value)
+			self._event_log_periodic_flush = value
 		end,
 		score_threshold = function(value)
 			self._score_threshold = value

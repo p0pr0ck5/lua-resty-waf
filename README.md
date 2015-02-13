@@ -336,6 +336,22 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 	}
 ```
 
+###event_log_periodic_flush
+
+*Default*: none
+
+Defines an interval, in seconds, at which the event log buffer will periodically flush. If no value is configured, the buffer will not flush periodically, and will only flush when the `event_log_buffer_size` threshold is reached. Configure this option for very low traffic sites that may not receive any event log data in a long period of time, to prevent stale data from sitting in the buffer.
+
+
+```lua
+	location / {
+		access_by_lua '
+			-- flush the event log buffer every 30 seconds
+			fw:set_option("event_log_periodic_flush", 30)
+		';
+	}
+```
+
 ###storage_zone
 
 *Default*: none
