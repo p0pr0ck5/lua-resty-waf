@@ -260,18 +260,6 @@ local _rules = {
 	{
 		id = 40022,
 		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))(?:%(?:2(?:(?:52)?e|%45)|(?:e0%8|c)0%ae|u(?:002e|2024)|%32(?:%45|E))|\.){2}(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))]=],
-			operator = "REGEX"
-		},
-		opts = { score = 4 },
-		action = "SCORE",
-		description = "Directory traversal (volatile match)"
-	},
-	{
-		id = 40023,
-		var = {
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 			pattern = [=[(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))(?:%(?:2(?:(?:52)?e|%45)|(?:e0%8|c)0%ae|u(?:002e|2024)|%32(?:%45|E))|\.){2}(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))]=],
@@ -282,7 +270,7 @@ local _rules = {
 		description = "Directory traversal (volatile match)"
 	},
 	{
-		id = 40024,
+		id = 40023,
 		var = {
 			type = "URI",
 			opts = nil,
