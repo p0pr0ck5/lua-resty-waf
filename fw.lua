@@ -22,7 +22,7 @@ end
 
 -- fatal failure logger
 local function _fatal_fail(msg)
-	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
+	ngx.log(ngx.ERR, error(msg))
 	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
