@@ -709,7 +709,7 @@ function _M.exec(self)
 
 		-- workaround for now. if we buffered to disk, skip it
 		-- also avoid parsing form upload as boundaries will result in false positives
-		if (ngx.req.get_body_file() == nil and not ngx.re.match(request_headers["content-type"], [=[^multipart/form-data; boundary=]=])) then
+		if (ngx.req.get_body_file() == nil and not ngx.re.find(request_headers["content-type"], [=[^multipart/form-data; boundary=]=])) then
 			request_post_args = ngx.req.get_post_args()
 		else
 			_log(self, "Skipping POST arguments because we buffered to disk or receieved a form upload")
