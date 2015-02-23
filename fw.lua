@@ -362,21 +362,33 @@ local operators = {
 }
 
 -- pick out dynamic data from storage key definitions
-local function _parse_storage_key(self, key)
+local function _parse_dynamic_value(self, key, collections)
 	local lookup = function(m)
-		local t = {
-			IP = ngx.var.remote_addr,
-			URI = ngx.var.uri
-		}
-		return t[m[1]]
+		local val = collections[m[1]]
+
+		if (not val) then
+			_fatal_fail("Bad dynamic parse, no collection key " .. m[1])
+		end
+
+		if (type(val) == "table") then
+			return m[1]
+		elseif (type(val) == "function") then
+			return val()
+		else
+			return val
+		end
 	end
 
 	-- use a negated character (instead of a lazy regex) to grab something that looks like
 	-- %{VAL}
 	-- and find it in the lookup table
 	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, 'oij')
-	_log(self, "parsed storage key is " .. str)
-	return str
+	_log(self, "parsed dynamic value is " .. str)
+	if (ngx.re.find(str, [=[^\d+$]=], 'oij')) then
+		return tonumber(str)
+	else
+		return str
+	end
 end
 
 -- handler to delete persistent storage data
@@ -415,26 +427,26 @@ local function _retrieve_persistent_var(self, key)
 end
 
 -- wrapper to get persistent storage data
-local function _get_var(self, key)
+local function _get_var(self, key, collections)
 	-- silently bail from rules that require persistent storage if no shm was configured
 	if (not self._storage_zone) then
 		return
 	end
 
-	return _retrieve_persistent_var(self, _parse_storage_key(self, key))
+	return _retrieve_persistent_var(self, _parse_dynamic_value(self, key, collections))
 end
 
 -- add/update data to persistent storaage
-local function _set_var(self, ctx)
+local function _set_var(self, ctx, collections)
 	-- silently bail from rules that require persistent storage if no shm was configured
 	if (not self._storage_zone) then
 		return
 	end
 
-	local key = _parse_storage_key(self, ctx.rule_setvar_key)
-	local value = ctx.rule_setvar_value
+	local key = _parse_dynamic_value(self, ctx.rule_setvar_key, collections)
+	local value = _parse_dynamic_value(self, ctx.rule_setvar_value, collections)
 	local expire = ctx.rule_setvar_expire
-	_log(self, "setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	_log(self, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 	local shm = ngx.shared[self._storage_zone]
 
 	-- var values can be incremented by being defined as '+n'
@@ -465,7 +477,7 @@ local function _set_var(self, ctx)
 end
 
 -- use the lookup table to figure out what to do
-local function _rule_action(self, action, ctx)
+local function _rule_action(self, action, ctx, collections)
 	local actions = {
 		LOG = function(self)
 			_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
@@ -499,12 +511,12 @@ local function _rule_action(self, action, ctx)
 			_log(self, "Ingoring rule for now")
 		end,
 		SETVAR = function(self, ctx)
-			_set_var(self, ctx)
+			_set_var(self, ctx, collections)
 		end
 	}
 
 	_log(self, "Taking the following action: " .. action)
-	actions[action](self, ctx)
+	actions[action](self, ctx, collections)
 end
 
 -- build the transform portion of the collection memoization key
@@ -594,6 +606,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local opts = rule.opts
 	local action = rule.action
 	local description = rule.description
+	local pattern = var.pattern
 
 	ctx.id = id
 	ctx.rule_score = opts.score
@@ -622,7 +635,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 	_log(self, type(collections[var.type]))
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
-		t = collections[var.type](self, var.opts)
+		t = collections[var.type](self, var.opts, collections)
 	else
 		local memokey
 		if (var.opts ~= nil) then
@@ -652,7 +665,11 @@ local function _process_rule(self, rule, collections, ctx)
 	if (not t) then
 		_log(self, "parse_collection didnt return anything for " .. var.type)
 	else
-		local match = operators[var.operator](self, t, var.pattern, ctx)
+		if (opts.parse_pattern) then
+			_log(self, "parsing dynamic pattern: " .. pattern)
+			pattern = _parse_dynamic_value(self, pattern, collections)
+		end
+		local match = operators[var.operator](self, t, pattern, ctx)
 		if (match) then
 			_log(self, "Match of rule " .. id .. "!")
 
@@ -662,7 +679,7 @@ local function _process_rule(self, rule, collections, ctx)
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
 
-			_rule_action(self, action, ctx)
+			_rule_action(self, action, ctx, collections)
 		end
 	end
 
@@ -720,12 +737,20 @@ function _M.exec(self)
 	local request_cookies, cookie_err = cookies:get_all()
 	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
 
+	local ctx = {}
+	ctx.start = start
+	ctx.collections = {}
+	ctx.collections_key = {}
+	ctx.chained = false
+	ctx.skip = false
+	ctx.score = 0
+
 	-- link rule collections to request data
 	-- unlike the operators and actions lookup table,
 	-- this needs data specific to each individual request
 	-- so we have to instantiate it here
 	local collections = {
-		CLIENT = request_client,
+		IP = request_client,
 		HTTP_VERSION = request_http_version,
 		METHOD = request_method,
 		URI = request_uri,
@@ -737,16 +762,8 @@ function _M.exec(self)
 		COOKIES = request_cookies,
 		REQUEST_BODY = request_post_args,
 		REQUEST_ARGS = request_common_args,
-		VAR = function(self, opts) return _get_var(self, opts.value) end
+		VAR = function(self, opts, collections) return _get_var(self, opts.value, collections) end,
 	}
-
-	local ctx = {}
-	ctx.start = start
-	ctx.collections = {}
-	ctx.collections_key = {}
-	ctx.chained = false
-	ctx.skip = false
-	ctx.score = 0
 
 	for _, ruleset in ipairs(self._active_rulesets) do
 		_log(self, "Beginning ruleset " .. ruleset)
