@@ -763,6 +763,8 @@ function _M.exec(self)
 		REQUEST_BODY = request_post_args,
 		REQUEST_ARGS = request_common_args,
 		VAR = function(self, opts, collections) return _get_var(self, opts.value, collections) end,
+		SCORE = function() return ctx.score end,
+		SCORE_THRESHOLD = function(self) return self._score_threshold end
 	}
 
 	for _, ruleset in ipairs(self._active_rulesets) do
