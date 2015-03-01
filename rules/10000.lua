@@ -82,7 +82,7 @@ local _rules = {
 		var = {
 			type = "URI",
 			opts = nil,
-			pattern = [=[\.(?:mp(?:e?g|3)|avi|flv|swf|wma)$]=],
+			pattern = [=[\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$]=],
 			operator = "REGEX"
 		},
 		opts = { skipend = true, nolog = true },
