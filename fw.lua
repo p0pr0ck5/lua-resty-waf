@@ -373,7 +373,7 @@ local function _parse_dynamic_value(self, key, collections)
 		if (type(val) == "table") then
 			return m[1]
 		elseif (type(val) == "function") then
-			return val()
+			return val(self)
 		else
 			return val
 		end
