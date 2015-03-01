@@ -322,7 +322,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 			if (not file_logger.initted()) then
 				file_logger.init{
 					path = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size,
+					flush_limit = self._event_log_buffer_size,
 					periodic_flush = self._event_log_periodic_flush
 				}
 			end
@@ -334,7 +334,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				socket_logger.init{
 					host = self._event_log_target_host,
 					port = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size,
+					flush_limit = self._event_log_buffer_size,
 					period_flush = self._event_log_periodic_flush
 				}
 			end
