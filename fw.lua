@@ -820,9 +820,6 @@ end
 -- configuraton wrapper
 function _M.set_option(self, option, value)
 	local lookup = {
-		mode = function(value)
-			self._mode = value
-		end,
 		whitelist = function(value)
 			self._whitelist[value] = true
 		end,
@@ -843,39 +840,6 @@ function _M.set_option(self, option, value)
 		ignore_rule = function(value)
 			self._ignored_rules[value] = true
 		end,
-		debug = function(value)
-			self._debug = value
-		end,
-		debug_log_level = function(value)
-			self._debug_log_level = value
-		end,
-		event_log_level = function(value)
-			self._event_log_level = value
-		end,
-		event_log_verbosity = function(value)
-			self._event_log_verbosity = value
-		end,
-		event_log_target = function(value)
-			self._event_log_target = value
-		end,
-		event_log_target_host = function(value)
-			self._event_log_target_host = value
-		end,
-		event_log_target_port = function(value)
-			self._event_log_target_port = value
-		end,
-		event_log_target_path = function(value)
-			self._event_log_target_path = value
-		end,
-		event_log_buffer_size = function(value)
-			self.event_log_buffer_size = value
-		end,
-		event_log_periodic_flush = function(value)
-			self._event_log_periodic_flush = value
-		end,
-		score_threshold = function(value)
-			self._score_threshold = value
-		end,
 		storage_zone = function(value)
 			if (not ngx.shared[value]) then
 				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
@@ -889,7 +853,12 @@ function _M.set_option(self, option, value)
 			_M.set_option(self, option, v)
 		end
 	else
-		lookup[option](value)
+		if (lookup[option]) then
+			lookup[option](value)
+		else
+			local _option = "_" .. option
+			self[_option] = value
+		end
 	end
 
 end
