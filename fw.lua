@@ -372,39 +372,11 @@ local function _parse_dynamic_value(self, key, collections)
 	end
 end
 
--- handler to delete persistent storage data
-local function _delete_persistent_var(premature, self, key, expire)
-	if (premature) then
-		return
-	end
-
-	local shm = ngx.shared[self._storage_zone]
-	local var = shm:get(key)
-
-	if (not var) then
-		return
-	end
-
-	local t = cjson.decode(var)
-	if (t.expire == ngx.time()) then
-		_log(self, "expire times equal, so time to delete the data")
-		shm:delete(key)
-	else
-		_log(self, "expire time is not now! did we get updated again?")
-	end
-end
-
--- retrieve a given key from persistent storage and decode it, returning the data and expire time separately
+-- retrieve a given key from persistent storage
 local function _retrieve_persistent_var(self, key)
 	local shm = ngx.shared[self._storage_zone]
 	local var = shm:get(key)
-
-	if (not var) then
-		return
-	end
-
-	local t = cjson.decode(var)
-	return t.value, t.expire
+	return var
 end
 
 -- wrapper to get persistent storage data
@@ -426,7 +398,7 @@ local function _set_var(self, ctx, collections)
 
 	local key = _parse_dynamic_value(self, ctx.rule_setvar_key, collections)
 	local value = _parse_dynamic_value(self, ctx.rule_setvar_value, collections)
-	local expire = ctx.rule_setvar_expire
+	local expire = ctx.rule_setvar_expire or 0
 	_log(self, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 	local shm = ngx.shared[self._storage_zone]
 
@@ -442,18 +414,10 @@ local function _set_var(self, ctx, collections)
 
 	_log(self, "actually setting " .. key .. " to " .. value)
 
-	if (expire) then
-		_log(self, "expiring in " .. expire)
-		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = expire + ngx.time() }))
-		ngx.timer.at(expire, _delete_persistent_var, self, key, expire)
-		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
-		end
-	else
-		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = 0 }))
-		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
-		end
+	_log(self, "expiring in " .. expire)
+	local ok = shm:safe_set(key, value, expire)
+	if (not ok) then
+		ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
 	end
 end
 
