@@ -453,7 +453,6 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **METHOD**: The HTTP method specified in the request.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
-* **REQUEST_LINE**: A string representation of the HTTP request line. This includes the request method, URI, and HTTP version. The collection is retrieved by splitting the HTTP request headers by newline, and returning the first element.
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings. 
 * **USER_AGENT**: The value of the `User-Agent` header.

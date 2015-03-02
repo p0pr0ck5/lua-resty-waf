@@ -64,25 +64,6 @@ local function _greater(self, a, b)
 	return greater
 end
 
--- strips an ending newline
-local function _trim(s)
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
--- ngx.req.raw_header() gets us the raw HTTP header with newlines included
--- so we need to get the first line and trim it down
-local function _get_request_line()
-	local raw_header = ngx.req.raw_header()
-	local t = {}
-	local n = 0
-	for token in string.gmatch(raw_header, "[^\n]+") do -- look into switching to string.match instead
-		n = n + 1
-		t[n] = token
-	end
-
-	return _trim(t[1])
-end
-
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table
 local function _table_copy(self, orig)
@@ -705,7 +686,6 @@ function _M.exec(self)
 	local request_uri_args = ngx.req.get_uri_args()
 	local request_headers = ngx.req.get_headers()
 	local request_ua = ngx.var.http_user_agent
-	local request_request_line = _get_request_line()
 	local request_post_args
 
 	if (_table_has_key(self, request_client, self._whitelist)) then
@@ -758,7 +738,6 @@ function _M.exec(self)
 		HEADERS = request_headers,
 		HEADER_NAMES = _table_keys(self, request_headers),
 		USER_AGENT = request_ua,
-		REQUEST_LINE = request_request_line,
 		COOKIES = request_cookies,
 		REQUEST_BODY = request_post_args,
 		REQUEST_ARGS = request_common_args,
