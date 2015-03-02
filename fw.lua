@@ -160,7 +160,7 @@ end
 
 -- regex matcher (uses POSIX patterns via ngx.re.match)
 local function _regex_match(self, subject, pattern, opts)
-	local opts = "oij"
+	local opts = self._pcre_flags
 	local from, to, err
 	local match
 
@@ -384,7 +384,7 @@ local function _parse_dynamic_value(self, key, collections)
 	-- and find it in the lookup table
 	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, 'oij')
 	_log(self, "parsed dynamic value is " .. str)
-	if (ngx.re.find(str, [=[^\d+$]=], 'oij')) then
+	if (ngx.re.find(str, [=[^\d+$]=], self._pcre_flags)) then
 		return tonumber(str)
 	else
 		return str
@@ -450,7 +450,7 @@ local function _set_var(self, ctx, collections)
 	local shm = ngx.shared[self._storage_zone]
 
 	-- var values can be incremented by being defined as '+n'
-	local incr = ngx.re.match(value, [=[^\+(\d+)]=], 'oij')
+	local incr = ngx.re.match(value, [=[^\+(\d+)]=], self._pcre_flags)
 	if (incr) then
 		_log(self, "increment detected by " .. incr[1])
 		local oldval = _retrieve_persistent_var(self, key)
@@ -726,7 +726,7 @@ function _M.exec(self)
 
 		-- workaround for now. if we buffered to disk, skip it
 		-- also avoid parsing form upload as boundaries will result in false positives
-		if (ngx.req.get_body_file() == nil and not ngx.re.find(request_headers["content-type"], [=[^multipart/form-data; boundary=]=])) then
+		if (ngx.req.get_body_file() == nil and not ngx.re.find(request_headers["content-type"], [=[^multipart/form-data; boundary=]=], self._pcre_flags)) then
 			request_post_args = ngx.req.get_post_args()
 		else
 			_log(self, "Skipping POST arguments because we buffered to disk or receieved a form upload")
@@ -812,6 +812,7 @@ function _M.new(self)
 		_event_log_target_path = '',
 		_event_log_buffer_size = 4096,
 		_event_log_periodic_flush = nil,
+		_pcre_flags = 'oij',
 		_score_threshold = 5,
 		_storage_zone = nil
 	}, mt)
@@ -839,6 +840,11 @@ function _M.set_option(self, option, value)
 		end,
 		ignore_rule = function(value)
 			self._ignored_rules[value] = true
+		end,
+		disable_pcre_optimization = function(value)
+			if (value == true) then
+				self._pcre_flags = 'i'
+			end
 		end,
 		storage_zone = function(value)
 			if (not ngx.shared[value]) then
