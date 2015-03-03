@@ -707,7 +707,9 @@ function _M.exec(self)
 		REQUEST_ARGS = request_common_args,
 		VAR = function(self, opts, collections) return _get_var(self, opts.value, collections) end,
 		SCORE = function() return ctx.score end,
-		SCORE_THRESHOLD = function(self) return self._score_threshold end
+		SCORE_THRESHOLD = function(self) return self._score_threshold end,
+		WHITELIST = function(self) return self._whitelist end,
+		BLACKLIST = function(self) return self._blacklist end,
 	}
 
 	for _, ruleset in ipairs(self._active_rulesets) do
@@ -765,10 +767,12 @@ end
 function _M.set_option(self, option, value)
 	local lookup = {
 		whitelist = function(value)
-			self._whitelist[value] = true
+			local t = self._whitelist
+			self._whitelist[#t + 1] = value
 		end,
 		blacklist = function(value)
-			self._blacklist[value] = true
+			local t = self._blacklist
+			self._blacklist[#t + 1] = value
 		end,
 		ignore_ruleset = function(value)
 			local t = {}
