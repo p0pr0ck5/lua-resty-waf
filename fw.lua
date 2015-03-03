@@ -652,16 +652,6 @@ function _M.exec(self)
 	local request_ua = ngx.var.http_user_agent
 	local request_post_args
 
-	if (_table_has_key(self, request_client, self._whitelist)) then
-		_log(self, request_client .. " is whitelisted")
-		ngx.exit(ngx.OK)
-	end
-
-	if (_table_has_key(self, request_client, self._blacklist)) then
-		_log(self, request_client .. " is blacklisted")
-		ngx.exit(ngx.HTTP_FORBIDDEN)
-	end
-
 	if (request_method ~= "POST" and request_method ~= "PUT") then
 		ngx.req.discard_body()
 		request_post_args = nil
@@ -745,7 +735,7 @@ function _M.new(self)
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 10000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
 		_ignored_rules = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
