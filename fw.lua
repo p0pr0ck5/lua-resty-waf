@@ -619,7 +619,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["CLIENT"], collections["URI"], rule, match)
+				_log_event(self, collections["IP"], collections["URI"], rule, match)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
