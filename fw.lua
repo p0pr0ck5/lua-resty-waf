@@ -717,16 +717,6 @@ function _M.exec(self)
 			end
 		end
 	end
-
-	-- if we've made it this far, we haven't
-	-- explicitly DENY'd or ACCEPT'd the request,
-	-- so see if the score meets our threshold
-	if (ctx.score >= self._score_threshold) then
-		-- should we provide a threshold breach rule action, instead of defaulting to DENY?
-		_log(self, "Transaction score of " .. ctx.score .. " met our threshold limit!")
-		_rule_action(self, "DENY", ctx)
-	end
-
 end -- fw.exec()
 
 -- instantiate a new instance of the module
@@ -735,7 +725,7 @@ function _M.new(self)
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 },
 		_ignored_rules = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
