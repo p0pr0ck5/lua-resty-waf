@@ -498,7 +498,7 @@ local _rules = {
 		},
 	},
 	{
-		id = 42043,
+		id = 42042,
 		action = "SCORE",
 		description = "XSS (Cross-Site Scripting)",
 		opts = { score = 4, transform = { 'html_decode', 'compress_whitespace' } },
