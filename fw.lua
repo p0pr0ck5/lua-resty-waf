@@ -403,14 +403,25 @@ local function _set_var(self, ctx, collections)
 	_log(self, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 	local shm = ngx.shared[self._storage_zone]
 
-	-- var values can be incremented by being defined as '+n'
-	local incr = ngx.re.match(value, [=[^\+(\d+)]=], self._pcre_flags)
+	-- values can have arithmetic operations performed on them
+	local incr = ngx.re.match(value, [=[^([\+\-\*\/])(\d+)]=], self._pcre_flags)
 	if (incr) then
-		_log(self, "increment detected by " .. incr[1])
+		local operator = incr[1]
+		local newval = incr[2]
 		local oldval = _retrieve_persistent_var(self, key)
-		_log(self, "old val is " .. tostring(oldval))
-		if (not oldval) then oldval = 0 end
-		value = incr[1] + oldval
+		if (not oldval) then
+			oldval = 0
+		end
+
+		if (operator == "+") then
+			value = oldval + newval
+		elseif (operator == "-") then
+			value = oldval - newval
+		elseif (operator == "*") then
+			value = oldval * newval
+		elseif (operator == "/") then
+			value = oldval / newval
+		end
 	end
 
 	_log(self, "actually setting " .. key .. " to " .. value)
