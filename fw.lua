@@ -7,6 +7,7 @@ local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
 local file_logger = require("inc.resty.logger.file")
 local socket_logger = require("inc.resty.logger.socket")
+local upload = require("resty.upload")
 
 local mt = { __index = _M }
 
@@ -464,6 +465,101 @@ local function _rule_action(self, action, ctx, collections)
 	actions[action](self, ctx, collections)
 end
 
+-- handle request bodies
+local function _parse_request_body(self, request_headers)
+	local content_type_header = request_headers["content-type"]
+
+	-- multiple content-type headers are likely an evasion tactic
+	-- or result from misconfigured proxies. may consider relaxing
+	-- this or adding an option to disable this checking in the future
+	if (type(content_type_header) == "table") then
+		_log(self, "request contained multiple content-type headers, bailing!")
+		ngx.exit(400)
+	end
+
+	-- ignore the request body if no Content-Type header is sent
+	-- this does technically violate the RFC
+	-- but its necessary for us to properly handle the request
+	-- and its likely a sign of nogoodnickery anyway
+	if (not content_type_header) then
+		_log(self, "request has no content type, ignoring the body")
+		ngx.req.discard_body()
+		return
+	end
+
+	-- handle the request body based on the Content-Type header
+	-- multipart/form-data requests will be streamed in via lua-resty-upload,
+	-- which provides some basic sanity checking as far as form and protocol goes
+	-- (but its much less strict that ModSecurity's strict checking)
+	if (ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], self._pcre_flags)) then
+		local form, err = upload:new()
+		if not form then
+			ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
+			ngx.exit(400) -- may move this into a ruleset along with other strict checking
+		end
+
+		ngx.req.init_body()
+		form:set_timeout(1000)
+
+		-- initial boundary
+		ngx.req.append_body("--" .. form.boundary)
+
+		-- this is gonna need some tlc, but it seems to work for now
+		local lasttype, chunk
+		while true do
+			local typ, res, err = form:read()
+			if not typ then
+				_fatal_fail("failed to stream request body: " .. err)
+			end
+
+			if (typ == "header") then
+				chunk = res[3] -- form:read() returns { key, value, line } here
+				ngx.req.append_body("\n" .. chunk)
+			elseif (typ == "body") then
+				chunk = res
+				if (lasttype == "header") then
+					ngx.req.append_body("\n\n")
+				end
+				ngx.req.append_body(chunk)
+			elseif (typ == "part_end") then
+				ngx.req.append_body("\n--" .. form.boundary)
+			elseif (typ == "eof") then
+				ngx.req.append_body("--\n")
+				break
+			end
+
+			lasttype = typ
+		end
+
+		-- lua-resty-upload docs use one final read, i think it's needed to get
+		-- the last part of the data off the socket
+		form:read()
+		ngx.req.finish_body()
+
+		return nil
+	elseif (content_type_header == "application/x-www-form-urlencoded") then
+		-- use the underlying ngx API to read the request body
+		-- deny the request if the content length is larger than client_body_buffer_size
+		-- to avoid wasting resources on ruleset matching of very large data sets
+		ngx.req.read_body()
+		if (ngx.req.get_body_file() == nil) then
+			return ngx.req.get_post_args()
+		else
+			_log(self, "very large form upload, not parsing")
+			_rule_action(self, "DENY")
+		end
+	elseif (_table_has_value(self, content_type_header, self._allowed_content_types)) then
+		-- users can whitelist specific content types that will be passed in but not parsed
+		-- read the request in, but don't set collections[REQUEST_BODY]
+		-- as we have no way to know what kind of data we're getting (i.e xml/json/octet stream)
+		ngx.req.read_body()
+		return nil
+	else
+		_log(self, tostring(content_type_header) .. " not a valid content type!")
+		_rule_action(self, "DENY")
+	end
+end
+
 -- build the transform portion of the collection memoization key
 local function _transform_memokey(transform)
 	if (not transform) then
@@ -650,24 +746,8 @@ function _M.exec(self)
 	local request_uri_args = ngx.req.get_uri_args()
 	local request_headers = ngx.req.get_headers()
 	local request_ua = ngx.var.http_user_agent
-	local request_post_args
-
-	if (request_method ~= "POST" and request_method ~= "PUT") then
-		ngx.req.discard_body()
-		request_post_args = nil
-	else
-		ngx.req.read_body()
-
-		-- workaround for now. if we buffered to disk, skip it
-		-- also avoid parsing form upload as boundaries will result in false positives
-		if (ngx.req.get_body_file() == nil and not ngx.re.find(request_headers["content-type"], [=[^multipart/form-data; boundary=]=], self._pcre_flags)) then
-			request_post_args = ngx.req.get_post_args()
-		else
-			_log(self, "Skipping POST arguments because we buffered to disk or receieved a form upload")
-		end
-	end
-
-	local cookies = cookiejar:new() -- resty.cookie
+	local request_post_args = _parse_request_body(self, request_headers)
+	local cookies = cookiejar:new()
 	local request_cookies, cookie_err = cookies:get_all()
 	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
 
@@ -727,6 +807,7 @@ function _M.new(self)
 		_blacklist = {},
 		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 },
 		_ignored_rules = {},
+		_allowed_content_types = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
