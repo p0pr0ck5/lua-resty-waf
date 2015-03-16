@@ -171,7 +171,7 @@ local _rules = {
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
-			pattern = "Referer",
+			pattern = "referer",
 			operator = "NOT_EXISTS"
 		},
 		opts = { chainchild = true, chainend = true },
