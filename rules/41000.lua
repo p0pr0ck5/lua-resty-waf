@@ -164,23 +164,23 @@ local _rules = {
 	{
 		id = 41014,
 		action = "SCORE",
-		description = "SQL Injection character anomaly",
 		opts = { score = 4, transform = 'uri_decode' },
+		description = "SQL Injection character anomaly - COOKIES",
 		var = {
 			operator = "REGEX",
 			pattern = [=[([\~\!\@\#\$\%\^\&\*\(\)\-\+\=\{\}\[\]\|\:\;\"\'\´\’\‘\`\<\>].*?){8,}]=],
-			type = "REQUEST_ARGS",
+			type = "COOKIES",
 			opts = { key = "all" },
 		},
 	},
 	{
 		id = 41015,
 		action = "SCORE",
-		description = "SQL Benchmark Injection",
 		opts = { score = 4, transform = 'uri_decode' },
+		description = "SQL Injection character anomaly - ARGS",
 		var = {
 			operator = "REGEX",
-			pattern = [=[([\~\!\@\#\$\%\^\&\*\(\)\-\+\=\{\}\[\]\|\:\;\"\'\´\’\‘\`\<\>].*?){4,}]=],
+			pattern = [=[([\~\!\@\#\$\%\^\&\*\(\)\-\+\=\{\}\[\]\|\:\;\"\'\´\’\‘\`\<\>].*?){6,}]=],
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 		},
