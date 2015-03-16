@@ -12,7 +12,7 @@ local _rules = {
 			pattern = "%{SCORE_THRESHOLD}",
 			operator = "GREATER"
 		},
-		opts = { parse_pattern = true },
+		opts = { parsepattern = true },
 		action = "DENY",
 		description = "Request score greater than score threshold"
 	}

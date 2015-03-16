@@ -732,7 +732,7 @@ local function _process_rule(self, rule, collections, ctx)
 	if (not t) then
 		_log(self, "parse_collection didnt return anything for " .. var.type)
 	else
-		if (opts.parse_pattern) then
+		if (opts.parsepattern) then
 			_log(self, "parsing dynamic pattern: " .. pattern)
 			pattern = _parse_dynamic_value(self, pattern, collections)
 		end

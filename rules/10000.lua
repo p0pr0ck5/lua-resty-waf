@@ -12,7 +12,7 @@ local _rules = {
 			pattern = "%{IP}",
 			operator = "EXISTS"
 		},
-		opts = { parse_pattern = true, nolog = true },
+		opts = { parsepattern = true, nolog = true },
 		action = "ACCEPT",
 		description = "User-defined whitelist"
 	},
@@ -23,7 +23,7 @@ local _rules = {
 			pattern = "%{IP}",
 			operator = "EXISTS"
 		},
-		opts = { parse_pattern = true, nolog = true },
+		opts = { parsepattern = true, nolog = true },
 		action = "DENY",
 		description = "User-defined blacklist"
 	}
