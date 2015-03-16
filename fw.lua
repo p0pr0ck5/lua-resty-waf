@@ -309,7 +309,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				}
 			end
 
-			file_logger.log(t)
+			file_logger.log(cjson.encode(t) .. "\n")
 		end,
 		socket = function(t)
 			if (not socket_logger.initted()) then
@@ -321,11 +321,11 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				}
 			end
 
-			socket_logger.log(t)
+			socket_logger.log(cjson_encode(t) .. "\n")
 		end
 	}
 
-	lookup[self._event_log_target](cjson.encode(t) .. "\n")
+	lookup[self._event_log_target](t)
 end
 
 -- module-level table to define rule operators
