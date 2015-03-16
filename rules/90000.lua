@@ -22,7 +22,7 @@ local _rules = {
 		var = {
 			type = "URI",
 			opts = nil,
-			pattern = [=[(?:(?:(?:id(?:_(?:dsa(?:.old)?|rsa(?:.old)?)|entify)|key(?:.priv)?$|[dr]sa)))]=],
+			pattern = [=[^\/(?:(?:id_)?[dr]sa(?:\.old)?|key(?:\.priv)?)$]=],
 			operator = "REGEX"
 		},
 		opts = {},
