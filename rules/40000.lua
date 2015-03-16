@@ -25,7 +25,7 @@ local _rules = {
 			pattern = [=[[^\w\r\n]{4,}]=],
 			operator = "REGEX",
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Repetative non-word characters anomaly detected"
 	},
@@ -157,7 +157,7 @@ local _rules = {
 			pattern = [=[(?:(\binclude\s*\([^)]*|mosConfig_absolute_path|_CONF\[path\]|_SERVER\[DOCUMENT_ROOT\]|GALLERY_BASEDIR|path\[docroot\]|appserv_root|config\[root_dir\])=(ht|f)tps?:\/\/)]=],
 			operator = "REGEX"
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Remote File Inclusion - PHP include() function"
 	},
@@ -181,7 +181,7 @@ local _rules = {
 			pattern = [=[(?:\.cookie\b.*?;\W*?(?:expires|domain)\W*?=|\bhttp-equiv\W+set-cookie\b)]=],
 			operator = "REGEX",
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Session fixation attack detected"
 	},
@@ -253,7 +253,7 @@ local _rules = {
 			pattern = [=[(?:(?:(?:(?:a(?:llow_url_includ|uto_prepend_fil)e|s(?:uhosin.simulation|afe_mode)|disable_functions|open_basedir)=|php://input)))]=],
 			operator = "REGEX"
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "PHP Injection"
 	},

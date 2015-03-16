@@ -592,6 +592,9 @@ local function _do_transform(self, collection, transform)
 			local t_val = ngx.encode_base64(value)
 			_log(self, "encoded value is " .. t_val)
 		end,
+		compress_whitespace = function(self, value)
+			return ngx.re.gsub(value, [=[\s+]=], ' ', self._pcre_flags)
+		end,
 		html_decode = function(self, value)
 			local str = string.gsub(value, '&lt;', '<')
 			str = string.gsub(str, '&gt;', '>')
@@ -605,7 +608,19 @@ local function _do_transform(self, collection, transform)
 		end,
 		lowercase = function(self, value)
 			return string.lower(tostring(value))
-		end
+		end,
+		remove_comments = function(self, value)
+			return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', self._pcre_flags)
+		end,
+		remove_whitespace = function(self, value)
+			return ngx.re.gsub(value, [=[\s+]=], '', self._pcre_flags)
+		end,
+		replace_comments = function(self, value)
+			return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], ' ', self._pcre_flags)
+		end,
+		uri_decode = function(self, value)
+			return ngx.unescape_uri(value)
+		end,
 	}
 
 	-- create a new tmp table to hold the transformed values

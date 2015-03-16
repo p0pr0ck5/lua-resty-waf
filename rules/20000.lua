@@ -58,10 +58,10 @@ local _rules = {
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "content-encoding" },
-			pattern = "Identity",
+			pattern = "identity",
 			operator = "EQUALS"
 		},
-		opts = { score = 2 },
+		opts = { score = 2, transform = 'lowercase' },
 		action = "SCORE",
 		description = "Identity should not be used in Content-Encoding, only in Accept-Encoding"
 	},
@@ -108,7 +108,7 @@ local _rules = {
 			pattern = "no-cache",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, nolog = true },
+		opts = { chainchild = true, nolog = true, transform = 'lowercase' },
 		action = "CHAIN"
 	},
 	{
