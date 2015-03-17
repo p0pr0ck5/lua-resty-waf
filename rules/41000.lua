@@ -2,7 +2,7 @@
 
 local _M = {}
 
-_M.version = "0.4"
+_M.version = "0.5"
 
 local _rules = {
 	{
