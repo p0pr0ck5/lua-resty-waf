@@ -22,7 +22,7 @@ For optimal regex compilation performance, it is recommended to build Nginx/Open
 	# ./configure --with-pcre=/path/to/pcre/source --with-pcre-jit
 ```
 
-You can download the PCRE source from the [PCRE website](http://www.pcre.org/).
+You can download the PCRE source from the [PCRE website](http://www.pcre.org/). See also my [blog post](https://www.cryptobells.com/building-openresty-with-pcre-jit/) for a step-by-step walkthrough on building OpenResty with a JIT-enabled PCRE library.
 
 ##Performance
 
@@ -53,11 +53,6 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 				-- setup FreeWAF to deny requests that match a rule
 				fw:set_option("mode", "ACTIVE")
 
-				-- each of these is optional, see the options documentation for more details
-				fw:set_option("whitelist", "127.0.0.1")
-				fw:set_option("blacklist", "1.2.3.4")
-				fw:set_option("ignore_rule", 42094)
-
 				-- run the firewall
 				fw:exec()
 			';
@@ -67,7 +62,7 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 ##Options
 
-Several options can be configured during the init phase using the `set_option` function, including setting the operational mode, configuring white and blacklists, ignoring specific rules, and configuring custom rulesets (though this feature currently needs work, as we refine the ruleset language and build a more human-readable syntax).
+Module options can be configured using the `set_option` function. Details for available options are provided below.
 
 ###mode
 
@@ -75,7 +70,7 @@ Several options can be configured during the init phase using the `set_option` f
 
 Sets the operational mode of the module. Options are ACTIVE, INACTIVE, and SIMULATE. In ACTIVE mode, rule matches are logged and actions are run. In SIMULATE mode, FreeWAF loops through each enabled rule and logs rule matches, but does not complete the action specified in a given run. INACTIVE mode prevents the module from running.
 
-By default, SIMULATE is selected if mode is not explicitly set; this requires new users to actively implement blocking by setting the mode to ACTIVE.
+By default, SIMULATE is selected if a mode is not explicitly set; this requires new users to actively implement blocking by setting the mode to ACTIVE.
 
 *Example*:
 
@@ -127,7 +122,7 @@ Multiple addresses can be whitelisted by passing a table of addresses to `set_op
 
 *Default*: none
 
-Instructs the module to ignore a specified rule ID. Note that FreeWAF uses Lua table to track values, and for efficiency stores the configured value as a table key, so it is not recommended to directly edit the `_ignored_rules` table in the module, and instead use this function interface.
+Instructs the module to ignore a specified rule ID. Note that ignoring rules in a chain will likely cause many headaches, so it's best to ignore all rules in a given chain if one rule is causing problems.
 
 *Example*:
 
@@ -159,7 +154,7 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 
 *Default*: 5
 
-Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF will deny the transaction.
+Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF will deny the request.
 
 *Example*:
 
@@ -170,6 +165,29 @@ Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF w
 		';
 	}
 ```
+
+###allowed_content_types
+
+*Default*: none
+
+Defines one or more Content-Type headers that will be allowed. Requests that do not contain a Content-Type matching one of these values, or `application/x-www-form-urlencoded` or `multipart/form-data`, will be rejected.
+
+*Example*:
+
+
+```lua
+	location / {
+		access_by_lua '
+			-- define a single allowed Content-Type value
+			fw:set_option("allowed_content_types", "text/xml")
+
+			-- defines multiple allowed Content-Type values
+			fw:set_option("allowed_content_types", { "text/html", "text/json", "application/json" })
+		';
+	}
+```
+
+Note that mutiple `set_option` calls with a parameter of `allowed_content_types` will simply override the existing options table, so if you want to define multiple allowed content types, you must define them as a Lua table as shown above.
 
 ###debug
 
@@ -268,6 +286,8 @@ Defines the destination for event logs. FreeWAF currently supports logging to th
 		';
 	}
 ```
+
+Note that, due to a limition in the logging library used, only a single target socket (and separate file target) can be defined. This is to say, you may elect to use both socket and file logging in different locations, but you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged. Similarly, you may only define one file path if using a `file` logging target; writes to a second path location will be lost.
 
 ###event_log_target_host
 
@@ -377,6 +397,36 @@ Multiple shared zones can be defined and used, though only one zone can be defin
 
 `Could not add key to persistent storage, increase the size of the lua_shared_dict`
 
+###disable_pcre_optimization
+
+*Default*: false
+
+Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` calls. This may be useful in some cases where older PCRE libraries are used, but will cause severe performance degradation, so its use is strongly discouraged; users are instead encouraged to build OpenResty with a modern, JIT-capable PCRE library.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("disable_pcre_optimization", 30)
+		';
+	}
+```
+
+##Included Rulesets
+
+FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
+
+* **10000**: Whitelist/blacklis handling
+* **11000**: Local policty whitelisting
+* **20000**: HTTP protocol violation
+* **21000**: HTTP protocol anomalies
+* **35000**: Malicious/suspect user agents
+* **40000**: Generic attacks
+* **41000**: SQLi
+* **42000**: XSS
+* **90000**: Custom rules/virtual patching
+* **99000**: Anomaly score handling
 
 ##Rule Definitions
 
@@ -402,10 +452,11 @@ A table that defines options specific to rule. The following options are current
 * **chainchild**: Defines a rule that is part of a rule chain.
 * **chainend**: Defines the last rule in the rule chain.
 * **nolog**: Do not create a log entry if a rule match occurs. This is most commonly used in rule chains, with rules that have the CHAIN action (to avoid unnecessarily large quantities of log entries).
+* **parsepattern**: Activate dynamic string parsing of the rule's `var.pattern` field; see the section on dynamic string parsing for more details.
 * **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **setvar**: Defines persistent storage data key, value and optional expiry time.
 * **skipend**: Ends a skip chain. Note that the rule containing this option will be included as part of the skip chain, e.g. it will not be processed.
-* **transform**: Defines how collection data is altered as an anti-evasion technique. Transform types include `base64_decode`, `base64_encode`, `html_decode`, and `lowercase`. Multiple transforms for a single collection can be specified by defining the `transform` option value as a table itself.
+* **transform**: Defines how collection data is altered as an anti-evasion technique. Multiple transforms for a single collection can be specified by defining the `transform` option value as a table itself. See the section on data transformation for more detail.
 
 ###var
 
@@ -445,18 +496,22 @@ All operators have a corresponding negated option, e.g., `NOT_EQUALS`, `NOT_EXIS
 
 FreeWAF's rule processor works on a basic principle of matching a `pattern` against a given `collection`. The following collections are currently supported:
 
+* **BLACKLIST**: A table containing user-defined blacklisted IPs.
 * **COOKIES**: A table containing the values of the cookies sent in the request.
-* **CLIENT**: The IP address of client.
 * **HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
 * **HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **HTTP_VERSION**: An integer representation of the HTTP version used in the request.
+* **IP**: The IP address of client.
 * **METHOD**: The HTTP method specified in the request.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
+* **SCORE**: An integer representing the currently anomaly score for the request.
+* **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings. 
 * **USER_AGENT**: The value of the `User-Agent` header.
-* **VAR**: The persistent storage variable collection.
+* **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
+* **WHITELIST**: A table containing user-defined whitelisted IPs.
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
@@ -466,17 +521,37 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 * **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 
+##Data Transformation
+
+FreeWAF has the ability to modify request data, similar to ModSecurity's transformation pipeline, as an anti-evasion tactic. Request data is not permanently modified before being sent upstream; local copies of data collections are used as the basis for transformation. The following data transforms are available:
+
+* **base64_decode**: Decode a Base64-encoded value.
+* **base64_encode**: Encode data into a Base64 representation.
+* **compress_whitespace**: Globally replace all sequential whitespace characters with a single `' '` space character.
+* **html_decode**: Decode an HTML-encoded string.
+* **lowercase**: Convert all uppercase alphabetic characters to their lowercase varients.
+* **remove_comments**: Globally remove all C-style comment characters and their enclosed data. For example, the string `UNI/*xxx*/ON SELECT` would be transformed to `UNION SELECT`.
+* **remove_whitespace**: Globally remove all whitespace characters.
+* **replace_comments**: Globally replace all C-style comment characters and their enclosed data with a single `' '` space character. For example, the string `UNION/*xxxx*/SELECT` would be transformed to `UNION SELECT`.
+* **uri_decode**: Decode a string based on URI encoding rules.
+
+##Dynamic Parsing in Rule Definitions
+
+Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST an` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
+
+Currently, both persistent storage keys and values can be dynamically defined, as well as the rule's `var.pattern` if a separate option was set to explicitly parse the rule pattern definition. See the included 99000 ruleset for an example of dynamic parsing rule patterns and persistent storage data.
+
 ##Persistent Storage
 
 FreeWAF supports storage of long-term (inter-request) data via the `lua_shared_dict` interface. Under the hood this uses Nginx's shared memory zone pattern, which uses a red-black tree. This means that persistent data storage operations, including search, insertion, and deletion, run in `O(log n)` time, so be wary of performance degredation if the size of the memory zone grows to tens or hundreds of thousands of keys. This data will persist over the lifetime of the Nginx master process, meaning that data will survive a server reload, e.g. a HUP, but will not survive a restart.
 
 Persistent data is set with the `SETVAR` action. This requires the associated rule to return a positive match. Variable data is defined via the `setvar` rule option:
 
-* **key**: String value to define the variable key. Portions of the key value can be dynamically defined using the syntax %{VAL}, where value is one of the dynamic options (currently, IP or URI).
-* **value**: String, boolean, or integer value. If a key already exists, the value of the key will be overwritten with the given value. Integer values can be incremented by prepending a '+' (see the example below).
+* **key**: String value to define the variable key. Portions of the key value can be dynamically defined using the syntax `%{VAL}`, where `VAL` is a key in the `collections` table.
+* **value**: String, boolean, or integer value. If a key already exists, the value of the key will be overwritten with the given value. Integer values can have arithmetic operations performed on them by prepending an arithmetic operator (any of `+-*/`).
 * **expire**: Optional integer to determine how long, in seconds, the key will live in persistent storage.
 
-Storage keys can be dynamically defined based on several factors (currently the client IP and request URI) using a special syntax; this mimics the functionality of ModSecurity's `initcol` and `setvar` options. For example, a rule group to set a storage variable designed to track requests to a specific resource might look like this:
+Storage keys can be dynamically defined using dynamic parse syntax; this mimics the functionality of ModSecurity's `initcol` and `setvar` options. For example, a rule group to set a storage variable designed to track requests to a specific resource might look like this:
 
 ```lua
 {   
