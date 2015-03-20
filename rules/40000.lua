@@ -2,7 +2,7 @@
 
 local _M = {}
 
-_M.version = "0.4"
+_M.version = "0.5"
 
 local _rules = {
 	{
@@ -25,7 +25,7 @@ local _rules = {
 			pattern = [=[[^\w\r\n]{4,}]=],
 			operator = "REGEX",
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Repetative non-word characters anomaly detected"
 	},
@@ -157,7 +157,7 @@ local _rules = {
 			pattern = [=[(?:(\binclude\s*\([^)]*|mosConfig_absolute_path|_CONF\[path\]|_SERVER\[DOCUMENT_ROOT\]|GALLERY_BASEDIR|path\[docroot\]|appserv_root|config\[root_dir\])=(ht|f)tps?:\/\/)]=],
 			operator = "REGEX"
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Remote File Inclusion - PHP include() function"
 	},
@@ -181,7 +181,7 @@ local _rules = {
 			pattern = [=[(?:\.cookie\b.*?;\W*?(?:expires|domain)\W*?=|\bhttp-equiv\W+set-cookie\b)]=],
 			operator = "REGEX",
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "Session fixation attack detected"
 	},
@@ -253,24 +253,12 @@ local _rules = {
 			pattern = [=[(?:(?:(?:(?:a(?:llow_url_includ|uto_prepend_fil)e|s(?:uhosin.simulation|afe_mode)|disable_functions|open_basedir)=|php://input)))]=],
 			operator = "REGEX"
 		},
-		opts = { score = 4 },
+		opts = { score = 4, transform = 'uri_decode' },
 		action = "SCORE",
 		description = "PHP Injection"
 	},
 	{
 		id = 40022,
-		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))(?:%(?:2(?:(?:52)?e|%45)|(?:e0%8|c)0%ae|u(?:002e|2024)|%32(?:%45|E))|\.){2}(?:\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\/))]=],
-			operator = "REGEX"
-		},
-		opts = { score = 4 },
-		action = "SCORE",
-		description = "Directory traversal (volatile match)"
-	},
-	{
-		id = 40023,
 		var = {
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
@@ -282,7 +270,7 @@ local _rules = {
 		description = "Directory traversal (volatile match)"
 	},
 	{
-		id = 40024,
+		id = 40023,
 		var = {
 			type = "URI",
 			opts = nil,

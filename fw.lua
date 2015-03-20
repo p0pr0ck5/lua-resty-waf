@@ -1,12 +1,13 @@
 local _M = {}
 
-_M.version = "0.4"
+_M.version = "0.5"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
 local file_logger = require("inc.resty.logger.file")
 local socket_logger = require("inc.resty.logger.socket")
+local upload = require("resty.upload")
 
 local mt = { __index = _M }
 
@@ -22,7 +23,7 @@ end
 
 -- fatal failure logger
 local function _fatal_fail(msg)
-	ngx.log(ngx.ERR, "_fatal_fail called with the following: " .. msg)
+	ngx.log(ngx.ERR, error(msg))
 	ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
@@ -62,25 +63,6 @@ local function _greater(self, a, b)
 	end
 
 	return greater
-end
-
--- strips an ending newline
-local function _trim(s)
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
--- ngx.req.raw_header() gets us the raw HTTP header with newlines included
--- so we need to get the first line and trim it down
-local function _get_request_line()
-	local raw_header = ngx.req.raw_header()
-	local t = {}
-	local n = 0
-	for token in string.gmatch(raw_header, "[^\n]+") do -- look into switching to string.match instead
-		n = n + 1
-		t[n] = token
-	end
-
-	return _trim(t[1])
 end
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
@@ -160,7 +142,7 @@ end
 
 -- regex matcher (uses POSIX patterns via ngx.re.match)
 local function _regex_match(self, subject, pattern, opts)
-	local opts = "oij"
+	local opts = self._pcre_flags
 	local from, to, err
 	local match
 
@@ -322,26 +304,28 @@ local function _log_event(self, request_client, request_uri, rule, match)
 			if (not file_logger.initted()) then
 				file_logger.init{
 					path = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size
+					flush_limit = self._event_log_buffer_size,
+					periodic_flush = self._event_log_periodic_flush
 				}
 			end
 
-			file_logger.log(t)
+			file_logger.log(cjson.encode(t) .. "\n")
 		end,
 		socket = function(t)
 			if (not socket_logger.initted()) then
 				socket_logger.init{
 					host = self._event_log_target_host,
 					port = self._event_log_target_path,
-					flush_limit = self.event_log_buffer_size
+					flush_limit = self._event_log_buffer_size,
+					period_flush = self._event_log_periodic_flush
 				}
 			end
 
-			socket_logger.log(t)
+			socket_logger.log(cjson_encode(t) .. "\n")
 		end
 	}
 
-	lookup[self._event_log_target](cjson.encode(t) .. "\n")
+	lookup[self._event_log_target](t)
 end
 
 -- module-level table to define rule operators
@@ -360,110 +344,97 @@ local operators = {
 }
 
 -- pick out dynamic data from storage key definitions
-local function _parse_storage_key(self, key)
+local function _parse_dynamic_value(self, key, collections)
 	local lookup = function(m)
-		local t = {
-			IP = ngx.var.remote_addr,
-			URI = ngx.var.uri
-		}
-		return t[m[1]]
+		local val = collections[m[1]]
+
+		if (not val) then
+			_fatal_fail("Bad dynamic parse, no collection key " .. m[1])
+		end
+
+		if (type(val) == "table") then
+			return m[1]
+		elseif (type(val) == "function") then
+			return val(self)
+		else
+			return val
+		end
 	end
 
 	-- use a negated character (instead of a lazy regex) to grab something that looks like
 	-- %{VAL}
 	-- and find it in the lookup table
 	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, 'oij')
-	_log(self, "parsed storage key is " .. str)
-	return str
-end
-
--- handler to delete persistent storage data
-local function _delete_persistent_var(premature, self, key, expire)
-	if (premature) then
-		return
-	end
-
-	local shm = ngx.shared[self._storage_zone]
-	local var = shm:get(key)
-
-	if (not var) then
-		return
-	end
-
-	local t = cjson.decode(var)
-	if (t.expire == ngx.time()) then
-		_log(self, "expire times equal, so time to delete the data")
-		shm:delete(key)
+	_log(self, "parsed dynamic value is " .. str)
+	if (ngx.re.find(str, [=[^\d+$]=], self._pcre_flags)) then
+		return tonumber(str)
 	else
-		_log(self, "expire time is not now! did we get updated again?")
+		return str
 	end
 end
 
--- retrieve a given key from persistent storage and decode it, returning the data and expire time separately
+-- retrieve a given key from persistent storage
 local function _retrieve_persistent_var(self, key)
 	local shm = ngx.shared[self._storage_zone]
 	local var = shm:get(key)
-
-	if (not var) then
-		return
-	end
-
-	local t = cjson.decode(var)
-	return t.value, t.expire
+	return var
 end
 
 -- wrapper to get persistent storage data
-local function _get_var(self, key)
+local function _get_var(self, key, collections)
 	-- silently bail from rules that require persistent storage if no shm was configured
 	if (not self._storage_zone) then
 		return
 	end
 
-	return _retrieve_persistent_var(self, _parse_storage_key(self, key))
+	return _retrieve_persistent_var(self, _parse_dynamic_value(self, key, collections))
 end
 
 -- add/update data to persistent storaage
-local function _set_var(self, ctx)
+local function _set_var(self, ctx, collections)
 	-- silently bail from rules that require persistent storage if no shm was configured
 	if (not self._storage_zone) then
 		return
 	end
 
-	local key = _parse_storage_key(self, ctx.rule_setvar_key)
-	local value = ctx.rule_setvar_value
-	local expire = ctx.rule_setvar_expire
-	_log(self, "setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	local key = _parse_dynamic_value(self, ctx.rule_setvar_key, collections)
+	local value = _parse_dynamic_value(self, ctx.rule_setvar_value, collections)
+	local expire = ctx.rule_setvar_expire or 0
+	_log(self, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 	local shm = ngx.shared[self._storage_zone]
 
-	-- var values can be incremented by being defined as '+n'
-	local incr = ngx.re.match(value, [=[^\+(\d+)]=], 'oij')
+	-- values can have arithmetic operations performed on them
+	local incr = ngx.re.match(value, [=[^([\+\-\*\/])(\d+)]=], self._pcre_flags)
 	if (incr) then
-		_log(self, "increment detected by " .. incr[1])
+		local operator = incr[1]
+		local newval = incr[2]
 		local oldval = _retrieve_persistent_var(self, key)
-		_log(self, "old val is " .. tostring(oldval))
-		if (not oldval) then oldval = 0 end
-		value = incr[1] + oldval
+		if (not oldval) then
+			oldval = 0
+		end
+
+		if (operator == "+") then
+			value = oldval + newval
+		elseif (operator == "-") then
+			value = oldval - newval
+		elseif (operator == "*") then
+			value = oldval * newval
+		elseif (operator == "/") then
+			value = oldval / newval
+		end
 	end
 
 	_log(self, "actually setting " .. key .. " to " .. value)
 
-	if (expire) then
-		_log(self, "expiring in " .. expire)
-		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = expire + ngx.time() }))
-		ngx.timer.at(expire, _delete_persistent_var, self, key, expire)
-		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
-		end
-	else
-		local ok = shm:safe_set(key, cjson.encode({ value = value, expire = 0 }))
-		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
-		end
+	_log(self, "expiring in " .. expire)
+	local ok = shm:safe_set(key, value, expire)
+	if (not ok) then
+		ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. self._storage_zone)
 	end
 end
 
 -- use the lookup table to figure out what to do
-local function _rule_action(self, action, ctx)
+local function _rule_action(self, action, ctx, collections)
 	local actions = {
 		LOG = function(self)
 			_log(self, "rule.action was LOG, since we already called log_event this is relatively meaningless")
@@ -497,12 +468,107 @@ local function _rule_action(self, action, ctx)
 			_log(self, "Ingoring rule for now")
 		end,
 		SETVAR = function(self, ctx)
-			_set_var(self, ctx)
+			_set_var(self, ctx, collections)
 		end
 	}
 
 	_log(self, "Taking the following action: " .. action)
-	actions[action](self, ctx)
+	actions[action](self, ctx, collections)
+end
+
+-- handle request bodies
+local function _parse_request_body(self, request_headers)
+	local content_type_header = request_headers["content-type"]
+
+	-- multiple content-type headers are likely an evasion tactic
+	-- or result from misconfigured proxies. may consider relaxing
+	-- this or adding an option to disable this checking in the future
+	if (type(content_type_header) == "table") then
+		_log(self, "request contained multiple content-type headers, bailing!")
+		ngx.exit(400)
+	end
+
+	-- ignore the request body if no Content-Type header is sent
+	-- this does technically violate the RFC
+	-- but its necessary for us to properly handle the request
+	-- and its likely a sign of nogoodnickery anyway
+	if (not content_type_header) then
+		_log(self, "request has no content type, ignoring the body")
+		ngx.req.discard_body()
+		return
+	end
+
+	-- handle the request body based on the Content-Type header
+	-- multipart/form-data requests will be streamed in via lua-resty-upload,
+	-- which provides some basic sanity checking as far as form and protocol goes
+	-- (but its much less strict that ModSecurity's strict checking)
+	if (ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], self._pcre_flags)) then
+		local form, err = upload:new()
+		if not form then
+			ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
+			ngx.exit(400) -- may move this into a ruleset along with other strict checking
+		end
+
+		ngx.req.init_body()
+		form:set_timeout(1000)
+
+		-- initial boundary
+		ngx.req.append_body("--" .. form.boundary)
+
+		-- this is gonna need some tlc, but it seems to work for now
+		local lasttype, chunk
+		while true do
+			local typ, res, err = form:read()
+			if not typ then
+				_fatal_fail("failed to stream request body: " .. err)
+			end
+
+			if (typ == "header") then
+				chunk = res[3] -- form:read() returns { key, value, line } here
+				ngx.req.append_body("\n" .. chunk)
+			elseif (typ == "body") then
+				chunk = res
+				if (lasttype == "header") then
+					ngx.req.append_body("\n\n")
+				end
+				ngx.req.append_body(chunk)
+			elseif (typ == "part_end") then
+				ngx.req.append_body("\n--" .. form.boundary)
+			elseif (typ == "eof") then
+				ngx.req.append_body("--\n")
+				break
+			end
+
+			lasttype = typ
+		end
+
+		-- lua-resty-upload docs use one final read, i think it's needed to get
+		-- the last part of the data off the socket
+		form:read()
+		ngx.req.finish_body()
+
+		return nil
+	elseif (content_type_header == "application/x-www-form-urlencoded") then
+		-- use the underlying ngx API to read the request body
+		-- deny the request if the content length is larger than client_body_buffer_size
+		-- to avoid wasting resources on ruleset matching of very large data sets
+		ngx.req.read_body()
+		if (ngx.req.get_body_file() == nil) then
+			return ngx.req.get_post_args()
+		else
+			_log(self, "very large form upload, not parsing")
+			_rule_action(self, "DENY")
+		end
+	elseif (_table_has_value(self, content_type_header, self._allowed_content_types)) then
+		-- users can whitelist specific content types that will be passed in but not parsed
+		-- read the request in, but don't set collections[REQUEST_BODY]
+		-- as we have no way to know what kind of data we're getting (i.e xml/json/octet stream)
+		ngx.req.read_body()
+		return nil
+	else
+		_log(self, tostring(content_type_header) .. " not a valid content type!")
+		_rule_action(self, "DENY")
+	end
 end
 
 -- build the transform portion of the collection memoization key
@@ -537,6 +603,9 @@ local function _do_transform(self, collection, transform)
 			local t_val = ngx.encode_base64(value)
 			_log(self, "encoded value is " .. t_val)
 		end,
+		compress_whitespace = function(self, value)
+			return ngx.re.gsub(value, [=[\s+]=], ' ', self._pcre_flags)
+		end,
 		html_decode = function(self, value)
 			local str = string.gsub(value, '&lt;', '<')
 			str = string.gsub(str, '&gt;', '>')
@@ -550,7 +619,19 @@ local function _do_transform(self, collection, transform)
 		end,
 		lowercase = function(self, value)
 			return string.lower(tostring(value))
-		end
+		end,
+		remove_comments = function(self, value)
+			return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', self._pcre_flags)
+		end,
+		remove_whitespace = function(self, value)
+			return ngx.re.gsub(value, [=[\s+]=], '', self._pcre_flags)
+		end,
+		replace_comments = function(self, value)
+			return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], ' ', self._pcre_flags)
+		end,
+		uri_decode = function(self, value)
+			return ngx.unescape_uri(value)
+		end,
 	}
 
 	-- create a new tmp table to hold the transformed values
@@ -592,6 +673,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local opts = rule.opts
 	local action = rule.action
 	local description = rule.description
+	local pattern = var.pattern
 
 	ctx.id = id
 	ctx.rule_score = opts.score
@@ -620,7 +702,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 	_log(self, type(collections[var.type]))
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
-		t = collections[var.type](self, var.opts)
+		t = collections[var.type](self, var.opts, collections)
 	else
 		local memokey
 		if (var.opts ~= nil) then
@@ -650,17 +732,21 @@ local function _process_rule(self, rule, collections, ctx)
 	if (not t) then
 		_log(self, "parse_collection didnt return anything for " .. var.type)
 	else
-		local match = operators[var.operator](self, t, var.pattern, ctx)
+		if (opts.parsepattern) then
+			_log(self, "parsing dynamic pattern: " .. pattern)
+			pattern = _parse_dynamic_value(self, pattern, collections)
+		end
+		local match = operators[var.operator](self, t, pattern, ctx)
 		if (match) then
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["CLIENT"], collections["URI"], rule, match)
+				_log_event(self, collections["IP"], collections["URI"], rule, match)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
 
-			_rule_action(self, action, ctx)
+			_rule_action(self, action, ctx, collections)
 		end
 	end
 
@@ -686,57 +772,10 @@ function _M.exec(self)
 	local request_uri_args = ngx.req.get_uri_args()
 	local request_headers = ngx.req.get_headers()
 	local request_ua = ngx.var.http_user_agent
-	local request_request_line = _get_request_line()
-	local request_post_args
-
-	if (_table_has_key(self, request_client, self._whitelist)) then
-		_log(self, request_client .. " is whitelisted")
-		ngx.exit(ngx.OK)
-	end
-
-	if (_table_has_key(self, request_client, self._blacklist)) then
-		_log(self, request_client .. " is blacklisted")
-		ngx.exit(ngx.HTTP_FORBIDDEN)
-	end
-
-	if (request_method ~= "POST" and request_method ~= "PUT") then
-		ngx.req.discard_body()
-		request_post_args = nil
-	else
-		ngx.req.read_body()
-
-		-- workaround for now. if we buffered to disk, skip it
-		-- also avoid parsing form upload as boundaries will result in false positives
-		if (ngx.req.get_body_file() == nil and not ngx.re.match(request_headers["content-type"], [=[^multipart/form-data; boundary=]=])) then
-			request_post_args = ngx.req.get_post_args()
-		else
-			_log(self, "Skipping POST arguments because we buffered to disk or receieved a form upload")
-		end
-	end
-
-	local cookies = cookiejar:new() -- resty.cookie
+	local request_post_args = _parse_request_body(self, request_headers)
+	local cookies = cookiejar:new()
 	local request_cookies, cookie_err = cookies:get_all()
 	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
-
-	-- link rule collections to request data
-	-- unlike the operators and actions lookup table,
-	-- this needs data specific to each individual request
-	-- so we have to instantiate it here
-	local collections = {
-		CLIENT = request_client,
-		HTTP_VERSION = request_http_version,
-		METHOD = request_method,
-		URI = request_uri,
-		URI_ARGS = request_uri_args,
-		HEADERS = request_headers,
-		HEADER_NAMES = _table_keys(self, request_headers),
-		USER_AGENT = request_ua,
-		REQUEST_LINE = request_request_line,
-		COOKIES = request_cookies,
-		REQUEST_BODY = request_post_args,
-		REQUEST_ARGS = request_common_args,
-		VAR = function(self, opts) return _get_var(self, opts.value) end
-	}
 
 	local ctx = {}
 	ctx.start = start
@@ -745,6 +784,29 @@ function _M.exec(self)
 	ctx.chained = false
 	ctx.skip = false
 	ctx.score = 0
+
+	-- link rule collections to request data
+	-- unlike the operators and actions lookup table,
+	-- this needs data specific to each individual request
+	-- so we have to instantiate it here
+	local collections = {
+		IP = request_client,
+		HTTP_VERSION = request_http_version,
+		METHOD = request_method,
+		URI = request_uri,
+		URI_ARGS = request_uri_args,
+		HEADERS = request_headers,
+		HEADER_NAMES = _table_keys(self, request_headers),
+		USER_AGENT = request_ua,
+		COOKIES = request_cookies,
+		REQUEST_BODY = request_post_args,
+		REQUEST_ARGS = request_common_args,
+		VAR = function(self, opts, collections) return _get_var(self, opts.value, collections) end,
+		SCORE = function() return ctx.score end,
+		SCORE_THRESHOLD = function(self) return self._score_threshold end,
+		WHITELIST = function(self) return self._whitelist end,
+		BLACKLIST = function(self) return self._blacklist end,
+	}
 
 	for _, ruleset in ipairs(self._active_rulesets) do
 		_log(self, "Beginning ruleset " .. ruleset)
@@ -761,16 +823,6 @@ function _M.exec(self)
 			end
 		end
 	end
-
-	-- if we've made it this far, we haven't
-	-- explicitly DENY'd or ACCEPT'd the request,
-	-- so see if the score meets our threshold
-	if (ctx.score >= self._score_threshold) then
-		-- should we provide a threshold breach rule action, instead of defaulting to DENY?
-		_log(self, "Transaction score of " .. ctx.score .. " met our threshold limit!")
-		_rule_action(self, "DENY", ctx)
-	end
-
 end -- fw.exec()
 
 -- instantiate a new instance of the module
@@ -779,8 +831,9 @@ function _M.new(self)
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 10000, 20000, 21000, 35000, 40000, 41000, 42000, 90000 },
+		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 },
 		_ignored_rules = {},
+		_allowed_content_types = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
@@ -790,6 +843,8 @@ function _M.new(self)
 		_event_log_target_port = '',
 		_event_log_target_path = '',
 		_event_log_buffer_size = 4096,
+		_event_log_periodic_flush = nil,
+		_pcre_flags = 'oij',
 		_score_threshold = 5,
 		_storage_zone = nil
 	}, mt)
@@ -798,14 +853,13 @@ end
 -- configuraton wrapper
 function _M.set_option(self, option, value)
 	local lookup = {
-		mode = function(value)
-			self._mode = value
-		end,
 		whitelist = function(value)
-			self._whitelist[value] = true
+			local t = self._whitelist
+			self._whitelist[#t + 1] = value
 		end,
 		blacklist = function(value)
-			self._blacklist[value] = true
+			local t = self._blacklist
+			self._blacklist[#t + 1] = value
 		end,
 		ignore_ruleset = function(value)
 			local t = {}
@@ -821,35 +875,10 @@ function _M.set_option(self, option, value)
 		ignore_rule = function(value)
 			self._ignored_rules[value] = true
 		end,
-		debug = function(value)
-			self._debug = value
-		end,
-		debug_log_level = function(value)
-			self._debug_log_level = value
-		end,
-		event_log_level = function(value)
-			self._event_log_level = value
-		end,
-		event_log_verbosity = function(value)
-			self._event_log_verbosity = value
-		end,
-		event_log_target = function(value)
-			self._event_log_target = value
-		end,
-		event_log_target_host = function(value)
-			self._event_log_target_host = value
-		end,
-		event_log_target_port = function(value)
-			self._event_log_target_port = value
-		end,
-		event_log_target_path = function(value)
-			self._event_log_target_path = value
-		end,
-		event_log_buffer_size = function(value)
-			self.event_log_buffer_size = value
-		end,
-		score_threshold = function(value)
-			self._score_threshold = value
+		disable_pcre_optimization = function(value)
+			if (value == true) then
+				self._pcre_flags = 'i'
+			end
 		end,
 		storage_zone = function(value)
 			if (not ngx.shared[value]) then
@@ -864,7 +893,12 @@ function _M.set_option(self, option, value)
 			_M.set_option(self, option, v)
 		end
 	else
-		lookup[option](value)
+		if (lookup[option]) then
+			lookup[option](value)
+		else
+			local _option = "_" .. option
+			self[_option] = value
+		end
 	end
 
 end

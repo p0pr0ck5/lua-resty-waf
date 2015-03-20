@@ -2,7 +2,7 @@
 
 local _M = {}
 
-_M.version = "0.4"
+_M.version = "0.5"
 
 local _rules = {
 	{
@@ -22,7 +22,7 @@ local _rules = {
 		var = {
 			type = "URI",
 			opts = nil,
-			pattern = [=[(?:(?:(?:id(?:_(?:dsa(?:.old)?|rsa(?:.old)?)|entify)|key(?:.priv)?$|[dr]sa)))]=],
+			pattern = [=[^\/(?:(?:id_)?[dr]sa(?:\.old)?|key(?:\.priv)?)$]=],
 			operator = "REGEX"
 		},
 		opts = {},
@@ -171,7 +171,7 @@ local _rules = {
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
-			pattern = "Referer",
+			pattern = "referer",
 			operator = "NOT_EXISTS"
 		},
 		opts = { chainchild = true, chainend = true },
