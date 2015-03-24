@@ -892,9 +892,9 @@ function _M.set_option(self, option, value)
 			end
 			self._storage_zone = value
 		end,
-        event_log_target = function(value)
-            self._event_log_target = self.loggers[value]
-        end
+	        event_log_target = function(value)
+	            self._event_log_target = value
+	        end
 	}
 
 	if (type(value) == "table") then
