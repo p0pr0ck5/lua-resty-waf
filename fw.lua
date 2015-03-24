@@ -296,7 +296,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 		t.rule.var = rule.var
 	end
 
-    self._event_log_target(t);
+    self._event_log_target(t)
 end
 
 -- module-level table to define rule operators
@@ -893,7 +893,7 @@ function _M.set_option(self, option, value)
 			self._storage_zone = value
 		end,
         event_log_target = function(value)
-            self._event_log_target = lookup[value];
+            self._event_log_target = self.loggers[value]
         end
 	}
 
