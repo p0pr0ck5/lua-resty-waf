@@ -174,7 +174,7 @@ local function _ac_lookup(self, needle, haystack, ctx)
 	local match, _ac
 
 	-- dictionary creation is expensive, so we use the id of
-	-- the rule as the key to cache the created dictionary 
+	-- the rule as the key to cache the created dictionary
 	if (not _ac_dicts[id]) then
 		_log(self, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
@@ -233,23 +233,31 @@ local function _parse_collection(self, collection, opts)
 				_collection[n] = value
 			end
 			return _collection
-		end
-	}
+		end,
+        multi = function(self, collection, value)
+            _log(self, "_parse_collection is getting multi values: " .. table.concat(value, ','))
+			local _collection = {}
+            for _, val in ipairs(value) do
+                _collection[val] = collection[val]
+            end
+            return _collection
+        end
+    }
 
-	if (type(collection) ~= "table") then
-		return collection
-	end
+    if (type(collection) ~= "table") then
+        return collection
+    end
 
-	if (opts == nil) then
-		return collection
-	end
+    if (opts == nil) then
+        return collection
+    end
 
-	return lookup[opts.key](self, collection, opts.value)
+    return lookup[opts.key](self, collection, opts.value)
 end
 
 -- return a single table from multiple tables containing request data
 local function _build_common_args(self, collections)
-	local t = {}
+    local t = {}
 
 	for _, collection in pairs(collections) do
 		if (collection ~= nil) then
@@ -707,7 +715,12 @@ local function _process_rule(self, rule, collections, ctx)
 		local memokey
 		if (var.opts ~= nil) then
 			_log(self, "var opts is not nil")
-			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+			memokey = var.type .. tostring(var.opts.key)
+            if type(var.opts.value) == "table" then
+                memokey = memokey .. table.concat(var.opts.value, ',') .. _transform_memokey(opts.transform)
+            else
+                memokey = memokey .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+            end
 		else
 			_log(self, "var opts is nil, memo cache key is only the var type")
 			memokey = var.type
