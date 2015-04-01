@@ -233,6 +233,14 @@ local function _parse_collection(self, collection, opts)
 				_collection[n] = value
 			end
 			return _collection
+		end,
+		multi = function(self, collection, value)
+			_log(self, "_parse_collection is getting multi values: " .. table.concat(value, ','))
+			local _collection = {}
+			for _, val in ipairs(value) do
+				_collection[val] = collection[val]
+			end
+			return _collection
 		end
 	}
 
