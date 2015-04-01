@@ -174,7 +174,7 @@ local function _ac_lookup(self, needle, haystack, ctx)
 	local match, _ac
 
 	-- dictionary creation is expensive, so we use the id of
-	-- the rule as the key to cache the created dictionary 
+	-- the rule as the key to cache the created dictionary
 	if (not _ac_dicts[id]) then
 		_log(self, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
