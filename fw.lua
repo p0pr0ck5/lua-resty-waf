@@ -321,7 +321,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				}
 			end
 
-			socket_logger.log(cjson_encode(t) .. "\n")
+			socket_logger.log(cjson.encode(t) .. "\n")
 		end
 	}
 
