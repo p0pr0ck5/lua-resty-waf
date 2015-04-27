@@ -7,7 +7,7 @@ local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
 local file_logger = require("inc.resty.logger.file")
 local socket_logger = require("inc.resty.logger.socket")
-local upload = require("resty.upload")
+local upload = require("inc.resty.upload")
 
 local mt = { __index = _M }
 
