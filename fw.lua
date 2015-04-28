@@ -246,11 +246,7 @@ local function _parse_collection(self, collection, opts)
 		end
 	}
 
-	if (type(collection) ~= "table") then
-		return collection
-	end
-
-	if (opts == nil) then
+	if (type(collection) ~= "table" or opts == nil) then
 		return collection
 	end
 
