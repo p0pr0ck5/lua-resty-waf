@@ -174,7 +174,7 @@ local function _ac_lookup(self, needle, haystack, ctx)
 	local match, _ac
 
 	-- dictionary creation is expensive, so we use the id of
-	-- the rule as the key to cache the created dictionary 
+	-- the rule as the key to cache the created dictionary
 	if (not _ac_dicts[id]) then
 		_log(self, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
@@ -233,14 +233,20 @@ local function _parse_collection(self, collection, opts)
 				_collection[n] = value
 			end
 			return _collection
+		end,
+		multi = function(self, collection, value)
+			_log(self, "_parse_collection is getting multi values: " .. table.concat(value, ','))
+			local n = 0
+			local _collection = {}
+			for _, val in ipairs(value) do
+				n = n + 1
+				_collection[n] = collection[val]
+			end
+			return _collection
 		end
 	}
 
-	if (type(collection) ~= "table") then
-		return collection
-	end
-
-	if (opts == nil) then
+	if (type(collection) ~= "table" or opts == nil) then
 		return collection
 	end
 
