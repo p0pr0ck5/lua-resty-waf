@@ -108,7 +108,7 @@ local _rules = {
 		opts = { score = 4, transform = { 'html_decode', 'compress_whitespace' } },
 		var = {
 			operator = "REGEX",
-			pattern = "\\bstyle\\b\\W*\\=.*bexpression\\b\\W*\\(",
+			pattern = "\\bstyle\\b\\W*\\=.*\\bexpression\\b\\W*\\(",
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 		},
