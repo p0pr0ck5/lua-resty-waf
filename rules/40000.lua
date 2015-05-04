@@ -176,7 +176,7 @@ local _rules = {
 	{
 		id = 40015,
 		var = {
-			type = "REQUST_ARGS",
+			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 			pattern = [=[(?:\.cookie\b.*?;\W*?(?:expires|domain)\W*?=|\bhttp-equiv\W+set-cookie\b)]=],
 			operator = "REGEX",
