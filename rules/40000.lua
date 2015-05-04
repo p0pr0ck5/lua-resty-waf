@@ -200,7 +200,7 @@ local _rules = {
 	{
 		id = 40017,
 		var = {
-				type = "REQEST_ARGS",
+				type = "REQUEST_ARGS",
 				opts = { key = "all" },
 				pattern = [=[\b(?:(?:n(?:map|et|c)|w(?:guest|sh)|telnet|rcmd|ftp)\.exe\b|cmd(?:(?:32)?\.exe\b|\b\W*?\/c))]=],
 				operator = "REGEX"
