@@ -239,8 +239,10 @@ local function _parse_collection(self, collection, opts)
 			local n = 0
 			local _collection = {}
 			for _, val in ipairs(value) do
-				n = n + 1
-				_collection[n] = collection[val]
+				if collection[val] ~= nil then
+					n = n + 1
+					_collection[n] = collection[val]
+				end
 			end
 			return _collection
 		end
