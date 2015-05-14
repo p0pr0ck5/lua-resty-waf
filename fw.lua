@@ -296,36 +296,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 		t.rule.var = rule.var
 	end
 
-	local lookup = {
-		error = function(t)
-			ngx.log(self._event_log_level, cjson.encode(t))
-		end,
-		file = function(t)
-			if (not file_logger.initted()) then
-				file_logger.init{
-					path = self._event_log_target_path,
-					flush_limit = self._event_log_buffer_size,
-					periodic_flush = self._event_log_periodic_flush
-				}
-			end
-
-			file_logger.log(cjson.encode(t) .. "\n")
-		end,
-		socket = function(t)
-			if (not socket_logger.initted()) then
-				socket_logger.init{
-					host = self._event_log_target_host,
-					port = self._event_log_target_path,
-					flush_limit = self._event_log_buffer_size,
-					period_flush = self._event_log_periodic_flush
-				}
-			end
-
-			socket_logger.log(cjson_encode(t) .. "\n")
-		end
-	}
-
-	lookup[self._event_log_target](t)
+    self._event_log_target(t)
 end
 
 -- module-level table to define rule operators
@@ -825,6 +796,47 @@ function _M.exec(self)
 	end
 end -- fw.exec()
 
+_M.loggers = {
+    null = function ()
+        return function() end
+    end,
+    error = function(error_log_level)
+        error_log_level = error_log_level or ngx.INFO
+        return function(t)
+            ngx.log(error_log_level, cjson.encode(t))
+        end
+    end,
+    file = function(event_log_target_path, event_log_buffer_size, event_log_periodic_flush)
+        event_log_buffer_size = event_log_buffer_size or 4096
+        return function(t)
+            if (not file_logger.initted()) then
+                file_logger.init{
+                    path = event_log_target_path,
+                    flush_limit = event_log_buffer_size,
+                    periodic_flush = event_log_periodic_flush
+                }
+            end
+
+            file_logger.log(cjson.encode(t) .. "\n")
+        end
+    end,
+    socket = function(event_log_target_host, event_log_target_path, event_log_buffer_size, event_log_periodic_flush)
+        event_log_buffer_size = event_log_buffer_size or 4096
+        return function(t)
+            if (not socket_logger.initted()) then
+                socket_logger.init{
+                    host = event_log_target_host,
+                    port = event_log_target_path,
+                    flush_limit = event_log_buffer_size,
+                    period_flush = event_log_periodic_flush
+                }
+            end
+
+            socket_logger.log(cjson_encode(t) .. "\n")
+        end
+    end
+}
+
 -- instantiate a new instance of the module
 function _M.new(self)
 	return setmetatable({
@@ -836,14 +848,8 @@ function _M.new(self)
 		_allowed_content_types = {},
 		_debug = false,
 		_debug_log_level = ngx.INFO,
-		_event_log_level = ngx.INFO,
 		_event_log_verbosity = 1,
-		_event_log_target = 'error',
-		_event_log_target_host = '',
-		_event_log_target_port = '',
-		_event_log_target_path = '',
-		_event_log_buffer_size = 4096,
-		_event_log_periodic_flush = nil,
+		_event_log_target = _M.loggers["error"],
 		_pcre_flags = 'oij',
 		_score_threshold = 5,
 		_storage_zone = nil
@@ -885,7 +891,10 @@ function _M.set_option(self, option, value)
 				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 			end
 			self._storage_zone = value
-		end
+		end,
+	        event_log_target = function(value)
+	            self._event_log_target = value
+	        end
 	}
 
 	if (type(value) == "table") then
