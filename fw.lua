@@ -140,7 +140,7 @@ local function _table_has_value(self, needle, haystack)
 	end
 end
 
--- regex matcher (uses POSIX patterns via ngx.re.match)
+-- regex matcher (uses PCRE patterns via ngx.re.match)
 local function _regex_match(self, subject, pattern)
 	local opts = self._pcre_flags
 	local from, to, err
