@@ -698,7 +698,7 @@ local function _process_rule(self, rule, collections, ctx)
 		return
 	end
 
-	local t
+	local t, match
 
 	_log(self, type(collections[var.type]))
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
@@ -735,7 +735,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "parsing dynamic pattern: " .. pattern)
 			pattern = _parse_dynamic_value(self, pattern, collections)
 		end
-		local match = operators[var.operator](self, t, pattern, ctx)
+		match = operators[var.operator](self, t, pattern, ctx)
 		if (match) then
 			_log(self, "Match of rule " .. id .. "!")
 
@@ -747,6 +747,12 @@ local function _process_rule(self, rule, collections, ctx)
 
 			_rule_action(self, action, ctx, collections)
 		end
+	end
+
+	-- unset the chained flag if we didnt encounter a match
+	if (ctx.chained == true and not match) then
+		_log(self, "No match in the middle of a chain, unsetting the chained flag")
+		ctx.chained = false
 	end
 
 	if (opts.chainend == true) then
