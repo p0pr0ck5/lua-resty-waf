@@ -706,12 +706,11 @@ local function _process_rule(self, rule, collections, ctx)
 	else
 		local memokey
 		if (var.opts ~= nil) then
-			_log(self, "var opts is not nil")
-			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
 		else
-			_log(self, "var opts is nil, memo cache key is only the var type")
 			memokey = var.type
 		end
+		memokey = memokey .. _transform_memokey(opts.transform)
 
 		_log(self, "checking for memokey " .. memokey)
 
