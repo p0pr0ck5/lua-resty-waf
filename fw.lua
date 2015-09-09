@@ -1,13 +1,13 @@
 local _M = {}
 
-_M.version = "0.5"
+_M.version = "0.5.1"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
 local cookiejar = require("inc.resty.cookie")
 local file_logger = require("inc.resty.logger.file")
 local socket_logger = require("inc.resty.logger.socket")
-local upload = require("resty.upload")
+local upload = require("inc.resty.upload")
 
 local mt = { __index = _M }
 
@@ -140,8 +140,8 @@ local function _table_has_value(self, needle, haystack)
 	end
 end
 
--- regex matcher (uses POSIX patterns via ngx.re.match)
-local function _regex_match(self, subject, pattern, opts)
+-- regex matcher (uses PCRE patterns via ngx.re.match)
+local function _regex_match(self, subject, pattern)
 	local opts = self._pcre_flags
 	local from, to, err
 	local match
@@ -321,7 +321,7 @@ local function _log_event(self, request_client, request_uri, rule, match)
 				}
 			end
 
-			socket_logger.log(cjson_encode(t) .. "\n")
+			socket_logger.log(cjson.encode(t) .. "\n")
 		end
 	}
 
@@ -607,13 +607,13 @@ local function _do_transform(self, collection, transform)
 			return ngx.re.gsub(value, [=[\s+]=], ' ', self._pcre_flags)
 		end,
 		html_decode = function(self, value)
-			local str = string.gsub(value, '&lt;', '<')
-			str = string.gsub(str, '&gt;', '>')
-			str = string.gsub(str, '&quot;', '"')
-			str = string.gsub(str, '&apos;', "'")
-			str = string.gsub(str, '&#(%d+);', function(n) return string.char(n) end)
-			str = string.gsub(str, '&#x(%d+);', function(n) return string.char(tonumber(n,16)) end)
-			str = string.gsub(str, '&amp;', '&')
+			local str = ngx.re.gsub(value, [=[&lt;]=], '<', self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&gt;]=], '>', self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&quot;]=], '"', self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&apos;]=], "'", self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&#(\d+);]=], function(n) return string.char(n[1]) end, self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&#x(\d+);]=], function(n) return string.char(tonumber(n[1],16)) end, self._pcre_flags)
+			str = ngx.re.gsub(str, [=[&amp;]=], '&', self._pcre_flags)
 			_log(self, "html decoded value is " .. str)
 			return str
 		end,
@@ -698,7 +698,7 @@ local function _process_rule(self, rule, collections, ctx)
 		return
 	end
 
-	local t
+	local t, match
 
 	_log(self, type(collections[var.type]))
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
@@ -706,12 +706,11 @@ local function _process_rule(self, rule, collections, ctx)
 	else
 		local memokey
 		if (var.opts ~= nil) then
-			_log(self, "var opts is not nil")
-			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value) .. _transform_memokey(opts.transform)
+			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
 		else
-			_log(self, "var opts is nil, memo cache key is only the var type")
 			memokey = var.type
 		end
+		memokey = memokey .. _transform_memokey(opts.transform)
 
 		_log(self, "checking for memokey " .. memokey)
 
@@ -736,7 +735,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "parsing dynamic pattern: " .. pattern)
 			pattern = _parse_dynamic_value(self, pattern, collections)
 		end
-		local match = operators[var.operator](self, t, pattern, ctx)
+		match = operators[var.operator](self, t, pattern, ctx)
 		if (match) then
 			_log(self, "Match of rule " .. id .. "!")
 
@@ -748,6 +747,12 @@ local function _process_rule(self, rule, collections, ctx)
 
 			_rule_action(self, action, ctx, collections)
 		end
+	end
+
+	-- unset the chained flag if we didnt encounter a match
+	if (ctx.chained == true and not match) then
+		_log(self, "No match in the middle of a chain, unsetting the chained flag")
+		ctx.chained = false
 	end
 
 	if (opts.chainend == true) then

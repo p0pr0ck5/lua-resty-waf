@@ -4,11 +4,11 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 ##Status
 
-Development of new features is currently on hiatus. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be continue to be patched.
+Development of new features is currently on psuedo-hiatus. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will continue to be patched. Larger feature sets will be added in the future, but at a slower pace (see the [Roadmap](#roadmap) section for an outline of planned features).
 
 ##Description
 
-FreeWAF is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. FreeWAF is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing.
+FreeWAF is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. FreeWAF is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing, and a small virtual patchset for emerging threats.
 
 FreeWAF was initially developed by Robert Paprocki for his Master's thesis at Western Governor's University.
 
@@ -104,7 +104,7 @@ Multiple addresses can be whitelisted by passing a table of addresses to `set_op
 
 *Default*: none
 
-Adds an address to the module blacklist. Blacklisted addresses will not have any rules appled to their requests, and will be immediately rejected by the module (Nginx will return a 403 to the client)
+Adds an address to the module blacklist. Blacklisted addresses will not have any rules appled to their requests, and will be immediately rejected by the module (Nginx will return a 403 to the client).
 
 *Example*:
 
@@ -134,11 +134,13 @@ Instructs the module to ignore a specified rule ID. Note that ignoring rules in 
 	}
 ```
 
+Multiple rules can be ignored by passing a table of rule IDs to `set_option`.
+
 ###ignore_ruleset
 
 *Default*: none
 
-Instructs the module to ignore an entire ruleset. This can be useful when some rulesets (such as the SQLi or XSS CRS rulesets) are too prone to false positives, or aren't applicable to your web app.
+Instructs the module to ignore an entire ruleset. This can be useful when some rulesets (such as the SQLi or XSS CRS rulesets) are too prone to false positives, or aren't applicable to your application.
 
 *Example*:
 
@@ -170,7 +172,7 @@ Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF w
 
 *Default*: none
 
-Defines one or more Content-Type headers that will be allowed. Requests that do not contain a Content-Type matching one of these values, or `application/x-www-form-urlencoded` or `multipart/form-data`, will be rejected.
+Defines one or more Content-Type headers that will be allowed, in addition to the default Content-Types `application/x-www-form-urlencoded` and `multipart/form-data`. A request whose Content-Type matches one of `allowed_content_types` will not have its body content parsed during rule execution; a request whose Content-Type does not match one of these values, or `application/x-www-form-urlencoded` or `multipart/form-data`, will be rejected.
 
 *Example*:
 
@@ -475,7 +477,7 @@ The following rule actions are currently supported:
 * **CHAIN**: Sets a flag in the rule processor to proceed to the next rule in the rule chain. Rule chaining allows the rule processor to mimic logical AND operations; multiple rules can be chained together to define very specific signatures. If a rule in a rule chain does not match, all further rules in the chain are skipped.
 * **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN).
 * **IGNORE**: No action is taken, rule processing continues.
-* **LOG**: A placeholder, as all rule matches that do not have the `nolog` opton set will be logged.
+* **LOG**: A placeholder, as all rule matches that do not have the `nolog` option set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
 * **SKIP**: Skips processing of all further rules until a rule with the `skipend` flag is specified.
@@ -537,7 +539,7 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 
 ##Dynamic Parsing in Rule Definitions
 
-Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST an` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
+Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
 
 Currently, both persistent storage keys and values can be dynamically defined, as well as the rule's `var.pattern` if a separate option was set to explicitly parse the rule pattern definition. See the included 99000 ruleset for an example of dynamic parsing rule patterns and persistent storage data.
 
@@ -592,6 +594,15 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 }
 ```
 
+##Roadmap
+
+* **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
+* **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
+* **Multiple phase handling**: Ties in with response collections. The biggest challange will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
+* **Rule flow optimization**: Pre-calculating rule flow, as [suggested by @splitice](https://github.com/p0pr0ck5/FreeWAF/issues/39).
+* **Improve (debug) logging**: Log levels?
+* **Unit tests**: Testing function, collection, transform, chain, and rule behavior.
+
 ##Limitations
 
 FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo. 
@@ -617,5 +628,5 @@ Please report bugs by creating a ticket with the GitHub issue tracker.
 
 ##See Also
 
-- The OpenResty project <http://openresty.org/>
-- My personal blog for updates and notes on FreeWAF development <http://www.cryptobells.com/>
+- The OpenResty project: <http://openresty.org/>
+- My personal blog for updates and notes on FreeWAF development: <http://www.cryptobells.com/tag/freewaf/>

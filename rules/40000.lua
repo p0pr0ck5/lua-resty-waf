@@ -2,7 +2,7 @@
 
 local _M = {}
 
-_M.version = "0.5"
+_M.version = "0.5.1"
 
 local _rules = {
 	{
@@ -176,7 +176,7 @@ local _rules = {
 	{
 		id = 40015,
 		var = {
-			type = "REQUST_ARGS",
+			type = "REQUEST_ARGS",
 			opts = { key = "all" },
 			pattern = [=[(?:\.cookie\b.*?;\W*?(?:expires|domain)\W*?=|\bhttp-equiv\W+set-cookie\b)]=],
 			operator = "REGEX",
@@ -200,7 +200,7 @@ local _rules = {
 	{
 		id = 40017,
 		var = {
-				type = "REQEST_ARGS",
+				type = "REQUEST_ARGS",
 				opts = { key = "all" },
 				pattern = [=[\b(?:(?:n(?:map|et|c)|w(?:guest|sh)|telnet|rcmd|ftp)\.exe\b|cmd(?:(?:32)?\.exe\b|\b\W*?\/c))]=],
 				operator = "REGEX"

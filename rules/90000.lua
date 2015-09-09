@@ -2,7 +2,7 @@
 
 local _M = {}
 
-_M.version = "0.5"
+_M.version = "0.5.1"
 
 local _rules = {
 	{
@@ -87,7 +87,7 @@ local _rules = {
 		description = "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)"
 	},
 	{
-		id = 90007,
+		id = 90008,
 		var = {
 			type = "URI",
 			opts = nil,
@@ -98,7 +98,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90008,
+		id = 90009,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "user-agent" },
@@ -110,7 +110,7 @@ local _rules = {
 		description = "Brute force botnet affecting Wordpress domains"
 	},
 	{
-		id = 90009,
+		id = 90010,
 		var = {
 			type = "HEADERS",
 			opts = { key = "specific", value = "user-agent" },
@@ -122,7 +122,7 @@ local _rules = {
 		description = "Known *Coin miner worm (https://isc.sans.edu/forums/diary/Multi+Platform+Coin+Miner+Attacking+Routers+on+Port+32764/18353)"
 	},
 	{
-		id = 90010,
+		id = 90011,
 		var = {
 			type = "URI",
 			opts = nil,
@@ -133,7 +133,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90011,
+		id = 90012,
 		var = {
 			type = "URI_ARGS",
 			opts = { key = "specific", value = "registration" },
@@ -145,7 +145,7 @@ local _rules = {
 		description = "Client attempted to register a Wordpress user, but user registration is disabled."
 	},
 	{
-		id = 90012,
+		id = 90013,
 		var = {
 			type = "URI",
 			opts = nil,
@@ -156,7 +156,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90013,
+		id = 90014,
 		var = {
 			type = "METHOD",
 			opts = nil,
@@ -167,7 +167,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90014,
+		id = 90015,
 		var = {
 			type = "HEADER_NAMES",
 			opts = nil,
@@ -179,7 +179,7 @@ local _rules = {
 		description = "Wordpress login attempted with no Referer"
 	},
 	{
-		id = 90015,
+		id = 90016,
 		var = {
 			type = "URI",
 			opts = nil,
@@ -190,7 +190,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90016,
+		id = 90017,
 		var = {
 			type = "URI_ARGS",
 			opts = { key = "specific", value = "action" },
@@ -201,7 +201,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90017,
+		id = 90018,
 		var = {
 			type = "URI_ARGS",
 			opts = { key = "specific", value = "img" },
@@ -213,7 +213,7 @@ local _rules = {
 		description = "Slider Revolution WordPress Plugin LFI Vulnerability"
 	},
 	{
-		id = 90018,
+		id = 90019,
 		var = {
 			type = "REQUEST_ARGS",
 			opts = { key = "all" },
@@ -225,7 +225,7 @@ local _rules = {
 		description = "Bash environmental variable injection (CVE-2014-6271)",
 	},
 	{
-		id = 90019,
+		id = 90020,
 		var = {
 			type = "HEADERS",
 			opts = { key = "all" },
@@ -237,7 +237,7 @@ local _rules = {
 		description = "Bash environmental variable injection (CVE-2014-6271)"
 	},
 	{
-		id = 90020,
+		id = 90021,
 		var = {
 			type = "URI",
 			opts = nil,
@@ -248,7 +248,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90021,
+		id = 90022,
 		var = {
 			type = "METHOD",
 			opts = nil,
@@ -259,7 +259,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90022,
+		id = 90023,
 		var = {
 			type = "USER_AGENT",
 			opts = nil,
@@ -271,7 +271,7 @@ local _rules = {
 		description = "Emerging fake Googlebot wp-login bruteforce"
 	},
 	{
-		id = 90023,
+		id = 90024,
 		var = {
 			type = "REQUEST_BODY",
 			opts = { key = 'keys' },
@@ -282,7 +282,7 @@ local _rules = {
 		action = "CHAIN",
 	},
 	{
-		id = 90024,
+		id = 90025,
 		var = {
 			type = "REQUEST_BODY",
 			opts = { key = 'specific', value = 'action' },
@@ -293,7 +293,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90025,
+		id = 90026,
 		var = {
 			type = "URI_ARGS",
 			opts = { key = 'specific', value = 'page' },
@@ -304,7 +304,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90026,
+		id = 90027,
 		var = {
 			type = "URI",
 			pattern = '/wp-admin/admin-post.php',
@@ -314,7 +314,7 @@ local _rules = {
 		action = "CHAIN"
 	},
 	{
-		id = 90027,
+		id = 90028,
 		var = {
 			type = "METHOD",
 			pattern = "POST",

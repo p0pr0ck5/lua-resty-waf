@@ -8,6 +8,7 @@ local sub           = string.sub
 local format        = string.format
 local log           = ngx.log
 local ERR           = ngx.ERR
+local ngx_header    = ngx.header
 
 local EQUAL         = byte("=")
 local SEMICOLON     = byte(";")
@@ -18,6 +19,11 @@ local HTAB          = byte("\t")
 local ok, new_tab = pcall(require, "table.new")
 if not ok then
     new_tab = function (narr, nrec) return {} end
+end
+
+local ok, clear_tab = pcall(require, "table.clear")
+if not ok then
+    clear_tab = function(tab) for k, _ in pairs(tab) do tab[k] = nil end end
 end
 
 local _M = new_tab(0, 2)
@@ -98,7 +104,8 @@ function _M.new(self)
     --if not _cookie then
         --return nil, "no cookie found in current request"
     --end
-    return setmetatable({ _cookie = _cookie }, mt)
+    return setmetatable({ _cookie = _cookie, set_cookie_table = new_tab(4, 0) },
+        mt)
 end
 
 function _M.get(self, key)
@@ -150,8 +157,38 @@ function _M.set(self, cookie)
     if not cookie_str then
         return nil, err
     end
-    print(cookie_str)
-    ngx.header['Set-Cookie'] = cookie_str
+
+    local set_cookie = ngx_header['Set-Cookie']
+    local set_cookie_type = type(set_cookie)
+    local t = self.set_cookie_table
+    clear_tab(t)
+
+    if set_cookie_type == "string" then
+        -- only one cookie has been setted
+        if set_cookie ~= cookie_str then
+            t[1] = set_cookie
+            t[2] = cookie_str
+            ngx_header['Set-Cookie'] = t
+        end
+    elseif set_cookie_type == "table" then
+        -- more than one cookies has been setted
+        local size = #set_cookie
+
+        -- we can not set cookie like ngx.header['Set-Cookie'][3] = val
+        -- so create a new table, copy all the values, and then set it back
+        for i=1, size do
+            t[i] = ngx_header['Set-Cookie'][i]
+            if t[i] == cookie_str then
+                -- new cookie is duplicated
+                return true
+            end
+        end
+        t[size + 1] = cookie_str
+        ngx_header['Set-Cookie'] = t
+    else
+        -- no cookie has been setted
+        ngx_header['Set-Cookie'] = cookie_str
+    end
     return true
 end
 
