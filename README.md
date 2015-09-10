@@ -419,8 +419,8 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 
 FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
 
-* **10000**: Whitelist/blacklis handling
-* **11000**: Local policty whitelisting
+* **10000**: Whitelist/blacklist handling
+* **11000**: Local policy whitelisting
 * **20000**: HTTP protocol violation
 * **21000**: HTTP protocol anomalies
 * **35000**: Malicious/suspect user agents
