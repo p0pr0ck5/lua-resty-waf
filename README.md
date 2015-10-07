@@ -519,7 +519,7 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.
-* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collecton parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
+* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collection parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
 * **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 
