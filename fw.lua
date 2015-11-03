@@ -274,13 +274,18 @@ end
 
 -- push log data regarding a matching rule to the configured target
 -- in the case of socket or file logging, this data will be buffered
-local function _log_event(self, request_client, request_uri, rule, match)
+local function _log_event(self, collections, rule, match)
 	local t = {
 		timestamp = ngx.time(),
-		client = request_client,
-		uri = request_uri,
+		client = collections["IP"],
+		host = ngx.var.host,
+		method = collections["METHOD"],
+		uri = collections["URI"],
+		args = collections["URI_ARGS"],
 		match = match,
-		rule = { id = rule.id }
+		rule = { id = rule.id },
+		score = collections["SCORE"](),
+		headers = collections["HEADERS"]
 	}
 
 	if (self._event_log_verbosity > 1) then
@@ -294,6 +299,16 @@ local function _log_event(self, request_client, request_uri, rule, match)
 
 	if (self._event_log_verbosity > 3) then
 		t.rule.var = rule.var
+	end
+
+	if self._event_log_save_post_data then
+		t.post_body = collections["REQUEST_BODY"]
+	end
+
+	if (table.getn(self._event_log_ngx_vars) ~= 0) then
+		for _, k in ipairs(self._event_log_ngx_vars) do
+			t[k] = ngx.var[k]
+		end
 	end
 
 	local lookup = {
@@ -740,7 +755,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["IP"], collections["URI"], rule, match)
+				_log_event(self, collections, rule, match)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
@@ -843,6 +858,8 @@ function _M.new(self)
 		_debug_log_level = ngx.INFO,
 		_event_log_level = ngx.INFO,
 		_event_log_verbosity = 1,
+		_event_log_save_post_data = false,
+		_event_log_ngx_vars = {},
 		_event_log_target = 'error',
 		_event_log_target_host = '',
 		_event_log_target_port = '',
@@ -890,6 +907,10 @@ function _M.set_option(self, option, value)
 				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 			end
 			self._storage_zone = value
+		end,
+		event_log_ngx_vars = function(value)
+			local t = self._event_log_ngx_vars
+			self._event_log_ngx_vars[#t + 1] = value
 		end
 	}
 
