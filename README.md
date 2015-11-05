@@ -404,7 +404,7 @@ Defines what extra variables from ```ngx.var``` are put to the log event. This i
 	location / {
 		access_by_lua '
 			-- save the POST data with the alerts
-			fw:set_option("event_log_ngx_vars", "remote_user")
+			fw:set_option("event_log_ngx_vars", "host")
 			fw:set_option("event_log_ngx_vars", "request_id")
 		';
 	}
@@ -415,8 +415,8 @@ The resulting event has these extra items:
 ```json
 {
 	...
-	"remote_user":"username",
-	"rule":{"id":21011},
+	"host": "example.com",
+	"rule": {"id": 21011},
 	"request_id": "373bcce584e3c18a"
 	...
 }

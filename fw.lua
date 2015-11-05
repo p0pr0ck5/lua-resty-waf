@@ -278,7 +278,6 @@ local function _log_event(self, collections, rule, match)
 	local t = {
 		timestamp = ngx.time(),
 		client = collections["IP"],
-		host = ngx.var.host,
 		method = collections["METHOD"],
 		uri = collections["URI"],
 		args = collections["URI_ARGS"],
