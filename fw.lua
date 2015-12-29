@@ -891,10 +891,10 @@ function _M.set_option(self, option, value)
 			end
 			self._storage_zone = value
 		end,
-                allowed_content_types = function(value)
-                        local t = self._allowed_content_types
-                        self._allowed_content_types[#t + 1] = value
-                end
+		allowed_content_types = function(value)
+			local t = self._allowed_content_types
+			self._allowed_content_types[#t + 1] = value
+		end
 	}
 
 	if (type(value) == "table") then
