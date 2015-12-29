@@ -1,4 +1,4 @@
--- SQLi Signatures
+-- XSS Signatures
 
 local _M = {}
 
