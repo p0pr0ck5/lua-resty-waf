@@ -866,6 +866,12 @@ function _M.set_option(self, option, value)
 			local t = self._blacklist
 			self._blacklist[#t + 1] = value
 		end,
+                add_ruleset = function(value)
+                        if (not _table_has_value(self, value, self._active_rulesets)) then
+                                local t = self._active_rulesets
+                                self._active_rulesets[#t + 1] = value
+                        end
+                end,
 		ignore_ruleset = function(value)
 			local t = {}
 			local n = 1
