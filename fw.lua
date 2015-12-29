@@ -890,6 +890,10 @@ function _M.set_option(self, option, value)
 				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 			end
 			self._storage_zone = value
+		end,
+		allowed_content_types = function(value)
+			local t = self._allowed_content_types
+			self._allowed_content_types[#t + 1] = value
 		end
 	}
 
