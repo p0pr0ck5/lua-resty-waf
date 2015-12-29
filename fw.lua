@@ -866,6 +866,12 @@ function _M.set_option(self, option, value)
 			local t = self._blacklist
 			self._blacklist[#t + 1] = value
 		end,
+                add_ruleset = function(value)
+                        if (not _table_has_value(self, value, self._active_rulesets)) then
+                                local t = self._active_rulesets
+                                self._active_rulesets[#t + 1] = value
+                        end
+                end,
 		ignore_ruleset = function(value)
 			local t = {}
 			local n = 1
@@ -890,6 +896,10 @@ function _M.set_option(self, option, value)
 				_fatal_fail("Attempted to set FreeWAF storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 			end
 			self._storage_zone = value
+		end,
+		allowed_content_types = function(value)
+			local t = self._allowed_content_types
+			self._allowed_content_types[#t + 1] = value
 		end
 	}
 
