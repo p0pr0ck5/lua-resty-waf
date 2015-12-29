@@ -519,7 +519,7 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.
-* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collecton parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
+* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collection parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
 * **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 
@@ -598,7 +598,7 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 
 * **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
 * **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
-* **Multiple phase handling**: Ties in with response collections. The biggest challange will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
+* **Multiple phase handling**: Ties in with response collections. The biggest challenge will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
 * **Rule flow optimization**: Pre-calculating rule flow, as [suggested by @splitice](https://github.com/p0pr0ck5/FreeWAF/issues/39).
 * **Improve (debug) logging**: Log levels?
 * **Unit tests**: Testing function, collection, transform, chain, and rule behavior.
