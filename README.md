@@ -136,6 +136,24 @@ Instructs the module to ignore a specified rule ID. Note that ignoring rules in 
 
 Multiple rules can be ignored by passing a table of rule IDs to `set_option`.
 
+###add_ruleset
+
+*Default*: none
+
+Instructs the module to include a custom ruleset. This can be useful when system-specific rules are required. The ruleset will be included from the appropriate .lua file in the rules/ directory.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("add_ruleset", 97000)
+		';
+	}
+```
+
+Multiple rulesets can be added by passing a table of ruleset ids to `set_option`.
+
 ###ignore_ruleset
 
 *Default*: none
