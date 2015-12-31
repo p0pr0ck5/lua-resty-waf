@@ -272,9 +272,11 @@ local function _build_common_args(self, collections)
 	return t
 end
 
--- push log data regarding a matching rule to the configured target
--- in the case of socket or file logging, this data will be buffered
-local function _log_event(self, request_client, request_uri, rule, match)
+-- buffer a single log event into the per-request ctx table
+-- all event logs will be written out at the completion of the transaction if either:
+-- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
+-- 2. the event_log_altered_only option is unset
+local function _log_event(self, request_client, request_uri, rule, match, ctx)
 	local t = {
 		timestamp = ngx.time(),
 		client = request_client,
@@ -296,6 +298,12 @@ local function _log_event(self, request_client, request_uri, rule, match)
 		t.rule.var = rule.var
 	end
 
+	ctx.log_entries[#ctx.log_entries + 1] = t
+end
+
+-- push log data regarding matching rule(s) to the configured target
+-- in the case of socket or file logging, this data will be buffered
+local function _write_log_events(self, ctx)
 	local lookup = {
 		error = function(t)
 			ngx.log(self._event_log_level, cjson.encode(t))
@@ -325,7 +333,23 @@ local function _log_event(self, request_client, request_uri, rule, match)
 		end
 	}
 
-	lookup[self._event_log_target](t)
+	if (not ctx.altered and self._event_log_altered_only) then
+		_log(self, "Not logging a request that wasn't altered")
+		return
+	end
+
+	for _, entry in ipairs(ctx.log_entries) do
+		lookup[self._event_log_target](entry)
+	end
+
+	-- clear log entries so we don't write duplicates
+	ctx.log_entries = {}
+end
+
+-- cleanup
+local function _finalize(self, ctx)
+	-- write out any log events from this transaction
+	_write_log_events(self, ctx)
 end
 
 -- module-level table to define rule operators
@@ -433,6 +457,8 @@ local function _set_var(self, ctx, collections)
 	end
 end
 
+local _alter_actions = { "ACCEPT", "DENY" }
+
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
 	local actions = {
@@ -471,6 +497,11 @@ local function _rule_action(self, action, ctx, collections)
 			_set_var(self, ctx, collections)
 		end
 	}
+
+	if (_table_has_value(self, action, _alter_actions)) then
+		ctx.altered = true
+		_finalize(self, ctx)
+	end
 
 	_log(self, "Taking the following action: " .. action)
 	actions[action](self, ctx, collections)
@@ -740,7 +771,7 @@ local function _process_rule(self, rule, collections, ctx)
 			_log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["IP"], collections["URI"], rule, match)
+				_log_event(self, collections["IP"], collections["URI"], rule, match, ctx)
 			else
 				_log(self, "We had a match, but not logging because opts.nolog is set")
 			end
@@ -784,6 +815,8 @@ function _M.exec(self)
 
 	local ctx = {}
 	ctx.start = start
+	ctx.altered = false
+	ctx.log_entries = {}
 	ctx.collections = {}
 	ctx.collections_key = {}
 	ctx.chained = false
@@ -828,6 +861,8 @@ function _M.exec(self)
 			end
 		end
 	end
+
+	_finalize(self, ctx)
 end -- fw.exec()
 
 -- instantiate a new instance of the module
@@ -849,6 +884,7 @@ function _M.new(self)
 		_event_log_target_path = '',
 		_event_log_buffer_size = 4096,
 		_event_log_periodic_flush = nil,
+		_event_log_altered_only = true,
 		_pcre_flags = 'oij',
 		_score_threshold = 5,
 		_storage_zone = nil

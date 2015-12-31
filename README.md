@@ -374,6 +374,22 @@ Defines an interval, in seconds, at which the event log buffer will periodically
 	}
 ```
 
+###event_log_altered_only
+
+*Default*: true
+
+Determines whether to write log entries for rule matches in a transaction that was not altered by FreeWAF. "Altered" is defined as FreeWAF acting on a rule whose action is `ACCEPT` or `DENY`. When this option is unset, FreeWAF will log rule matches even if the transaction was not altered. By default, FreeWAF will only write log entries for matches if the transaction was altered.
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_altered_only", false)
+		';
+	}
+```
+
+Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but FreeWAF is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
+
 ###storage_zone
 
 *Default*: none
