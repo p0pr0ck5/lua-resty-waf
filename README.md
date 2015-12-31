@@ -93,7 +93,7 @@ Adds an address to the module whitelist. Whitelisted addresses will not have any
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("whitlist", "127.0.0.1")
+			fw:set_option("whitelist", "127.0.0.1")
 		';
 	}
 ```
