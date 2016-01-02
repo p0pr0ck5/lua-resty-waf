@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 20001,
 		var = {
@@ -25,7 +25,7 @@ local _rules = {
 			pattern = "0",
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "GET/HEAD request with a body"
 	},
@@ -49,7 +49,7 @@ local _rules = {
 			pattern = "content-length",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainend = true, chainchild = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "POST request does not have a Content-Length Header"
 	},
@@ -85,7 +85,7 @@ local _rules = {
 			pattern = 1.1,
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "Expect header sent in non-HTTP/1.1 request"
 	},
@@ -108,7 +108,7 @@ local _rules = {
 			pattern = "no-cache",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, nolog = true, transform = 'lowercase' },
+		opts = { transform = 'lowercase' },
 		action = "CHAIN"
 	},
 	{
@@ -119,7 +119,7 @@ local _rules = {
 			pattern = "cache-control",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainchild = true, nolog = true },
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -130,7 +130,7 @@ local _rules = {
 			pattern = 1.1,
 			operator = "NOT_EQUALS"
 		},
-		opts = { chainend = true, chainchild = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "HTTP/1.1 request sent with a Pragma:no-cache header, but no corresponding Cache-Control header"
 	},
@@ -183,9 +183,5 @@ local _rules = {
 		description = "Duplicate/broken connection header"
 	}
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

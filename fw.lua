@@ -14,6 +14,9 @@ local mt = { __index = _M }
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
 
+-- default list of rulesets (global here to have offsets precomputed)
+_global_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
+
 -- debug logger
 local function _log(self, msg)
 	if (self._debug == true) then
@@ -472,12 +475,10 @@ local function _rule_action(self, action, ctx, collections)
 			end
 		end,
 		CHAIN = function(self, ctx)
-			_log(self, "Setting the context chained flag to true")
-			ctx.chained = true
+			_log(self, "Chaining (pre-processed)")
 		end,
 		SKIP = function(self, ctx)
-			_log(self, "Setting the context skip flag to true")
-			ctx.skip = true
+			_log(self, "Skipping (pre-processed)")
 		end,
 		SCORE = function(self, ctx)
 			local new_score = ctx.score + ctx.rule_score
@@ -715,20 +716,6 @@ local function _process_rule(self, rule, collections, ctx)
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
-	if (opts.chainchild == true and ctx.chained == false) then
-		_log(self, "This is a chained rule, but we don't have a previous match, so not processing")
-		return
-	end
-
-	if (ctx.skip == true) then
-		_log(self, "Skipflag is set, not processing")
-		if (opts.skipend == true) then
-			_log(self, "End of the skipchain, unsetting flag")
-			ctx.skip = false
-		end
-		return
-	end
-
 	local t, match
 
 	_log(self, type(collections[var.type]))
@@ -761,6 +748,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 	if (not t) then
 		_log(self, "parse_collection didnt return anything for " .. var.type)
+		return rule.offset_nomatch
 	else
 		if (opts.parsepattern) then
 			_log(self, "parsing dynamic pattern: " .. pattern)
@@ -777,17 +765,10 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			_rule_action(self, action, ctx, collections)
+			return rule.offset_match
+		else
+			return rule.offset_nomatch
 		end
-	end
-
-	-- unset the chained flag if we didnt encounter a match
-	if (ctx.chained == true and not match) then
-		_log(self, "No match in the middle of a chain, unsetting the chained flag")
-		ctx.chained = false
-	end
-
-	if (opts.chainend == true) then
-		ctx.chained = false
 	end
 end
 
@@ -819,8 +800,6 @@ function _M.exec(self)
 	ctx.log_entries = {}
 	ctx.collections = {}
 	ctx.collections_key = {}
-	ctx.chained = false
-	ctx.skip = false
 	ctx.score = 0
 
 	-- link rule collections to request data
@@ -852,12 +831,19 @@ function _M.exec(self)
 		_log(self, "Requiring " .. ruleset)
 		local rs = require("FreeWAF.rules." .. ruleset)
 
-		for __, rule in ipairs(rs.rules()) do
+		local offset = 1
+		while offset do
+			local rule = rs.rules[offset]
 			if (not _table_has_key(self, rule.id, self._ignored_rules)) then
-				_log(self, "Beginning run of rule " .. rule.id)
-				_process_rule(self, rule, collections, ctx)
+				local ret = _process_rule(self, rule, collections, ctx)
+				if (ret) then
+					offset = offset + ret
+				else
+					offset = nil
+				end
 			else
 				_log(self, "Ignoring rule " .. rule.id)
+				offset = offset + rule.offset_nomatch
 			end
 		end
 	end
@@ -871,7 +857,7 @@ function _M.new(self)
 		_mode = "SIMULATE",
 		_whitelist = {},
 		_blacklist = {},
-		_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 },
+		_active_rulesets = _global_active_rulesets,
 		_ignored_rules = {},
 		_allowed_content_types = {},
 		_debug = false,
@@ -946,6 +932,17 @@ function _M.set_option(self, option, value)
 		end
 	end
 
+end
+
+-- preload rulesets and calculate offsets
+function _M.init()
+	local calc = require "FreeWAF.lib.rule_calc"
+
+	for _, ruleset in ipairs(_global_active_rulesets) do
+		ngx.log(ngx.WARN, "calculating " .. ruleset)
+		local r = require("FreeWAF.rules." .. ruleset)
+		calc.calculate(r.rules)
+	end
 end
 
 return _M

@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 40001,
 		var = {
@@ -282,9 +282,5 @@ local _rules = {
 		description = "Null byte at end of URI"
 	},
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

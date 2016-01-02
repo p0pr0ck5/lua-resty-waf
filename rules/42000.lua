@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 42001,
 		var = {
@@ -13,7 +13,7 @@ local _rules = {
 			pattern = { "jscript", "onsubmit", "copyparentfolder", "document", "javascript", "meta", "onchange", "onmove", "onkeydown", "onkeyup", "activexobject", "onerror", "onmouseup", "ecmascript", "bexpression", "onmouseover", "vbscript:", "<![cdata[", "http:", ".innerhtml", "settimeout", "shell:", "onabort", "asfunction:", "onkeypress", "onmousedown", "onclick", ".fromcharcode", "background-image:", "x-javascript", "ondragdrop", "onblur", "mocha:", "javascript:", "onfocus", "lowsrc", "getparentfolder", "onresize", "@import", "alert", "script", "onselect", "onmouseout", "application", "onmousemove", "background", ".execscript", "livescript:", "vbscript", "getspecialfolder", ".addimport", "iframe", "onunload", "createtextrange", "<input", "onload" },
 			operator = "NOT_PM"
 		},
-		opts = { nolog = true },
+		opts = { skip = 67, nolog = true },
 		action = "SKIP",
 		description = "Preliminary XSS check"
 	},
@@ -813,7 +813,7 @@ local _rules = {
 		id = 42068,
 		action = "SCORE",
 		description = "XSS (Cross-Site Scripting)",
-		opts = { skipend = true, score = 4 },
+		opts = { score = 4 },
 		var = {
 			operator = "REGEX",
 			pattern = "\\.fromcharcode\\b",
@@ -1170,9 +1170,5 @@ local _rules = {
 		},
 	},
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

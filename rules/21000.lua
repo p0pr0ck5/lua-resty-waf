@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 21001,
 		var = {
@@ -48,7 +48,7 @@ local _rules = {
 			pattern = "accept",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainchild = true, chainend = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "No valid Accept header"
 	},
@@ -71,7 +71,7 @@ local _rules = {
 			pattern = [=[^$]=],
 			operator = "REGEX"
 		},
-		opts = { chainchild = true, chainend = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "Accept header has no value"
 	},
@@ -118,7 +118,7 @@ local _rules = {
 			pattern = [=[^0$]=],
 			operator = "NOT_REGEX"
 		},
-		opts = { chainchild = true, chainend = true, score = 2 },
+		opts = { score = 2 },
 		action = "SCORE",
 		description = "Request contains content, but missing Content-Type header"
 	},
@@ -135,9 +135,5 @@ local _rules = {
 		description = "Host header contains an IP address"
 	}
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

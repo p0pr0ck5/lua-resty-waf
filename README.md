@@ -40,6 +40,12 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 	http {
 		-- include FreeWAF in the lua_package_path
 		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+
+		init_by_lua '
+			-- preload rulesets and calculate jump offsets
+			local FW = require "FreeWAF.fw"
+			FW.init()
+		';
 	}
 
 	server {
@@ -122,7 +128,7 @@ Multiple addresses can be whitelisted by passing a table of addresses to `set_op
 
 *Default*: none
 
-Instructs the module to ignore a specified rule ID. Note that ignoring rules in a chain will likely cause many headaches, so it's best to ignore all rules in a given chain if one rule is causing problems.
+Instructs the module to ignore a specified rule ID. Note that ignoring a rule in a chain will result in the entire chain being ignored, and processing will continue to the next rule following the chain.
 
 *Example*:
 
@@ -467,13 +473,10 @@ An enum (currently implemented as a string) that defines how the rule processor 
 
 A table that defines options specific to rule. The following options are currently supported:
 
-* **chainchild**: Defines a rule that is part of a rule chain.
-* **chainend**: Defines the last rule in the rule chain.
 * **nolog**: Do not create a log entry if a rule match occurs. This is most commonly used in rule chains, with rules that have the CHAIN action (to avoid unnecessarily large quantities of log entries).
 * **parsepattern**: Activate dynamic string parsing of the rule's `var.pattern` field; see the section on dynamic string parsing for more details.
 * **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **setvar**: Defines persistent storage data key, value and optional expiry time.
-* **skipend**: Ends a skip chain. Note that the rule containing this option will be included as part of the skip chain, e.g. it will not be processed.
 * **transform**: Defines how collection data is altered as an anti-evasion technique. Multiple transforms for a single collection can be specified by defining the `transform` option value as a table itself. See the section on data transformation for more detail.
 
 ###var
@@ -526,7 +529,7 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **URI**: The request URI.
-* **URI_ARGS**: A table containing the request query strings. 
+* **URI_ARGS**: A table containing the request query strings.
 * **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **WHITELIST**: A table containing user-defined whitelisted IPs.
@@ -552,6 +555,10 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 * **remove_whitespace**: Globally remove all whitespace characters.
 * **replace_comments**: Globally replace all C-style comment characters and their enclosed data with a single `' '` space character. For example, the string `UNION/*xxxx*/SELECT` would be transformed to `UNION SELECT`.
 * **uri_decode**: Decode a string based on URI encoding rules.
+
+##Rule Flow Precalculation
+
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop. It does, however, _require_ that users call `FW:init()` in an `init_by_lua` handler to perform the offset calculation. Failure to do so will result in broken behavior.
 
 ##Dynamic Parsing in Rule Definitions
 
@@ -592,7 +599,7 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 		pattern = "POST",
 		operator = "EQUALS"
 	},
-	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 }, chainchild = true, chainend = true, nolog = true },
+	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 }, nolog = true },
 	action = "SETVAR",
 	description = "WP-Login brute force detection"
 },
@@ -615,7 +622,6 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 * **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
 * **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
 * **Multiple phase handling**: Ties in with response collections. The biggest challenge will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
-* **Rule flow optimization**: Pre-calculating rule flow, as [suggested by @splitice](https://github.com/p0pr0ck5/FreeWAF/issues/39).
 * **Improve (debug) logging**: Log levels?
 * **Unit tests**: Testing function, collection, transform, chain, and rule behavior.
 

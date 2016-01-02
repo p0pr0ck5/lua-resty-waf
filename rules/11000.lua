@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 11001,
 		var  = {
@@ -25,7 +25,7 @@ local _rules = {
 			pattern = [=[.*]=],
 			operator = "NOT_REGEX",
 		},
-		opts = { chainchild = true, chainend = true, nolog = true },
+		opts = { nolog = true },
 		action = "ACCEPT",
 		description = "Ignore passive requests with no arguments"
 	},
@@ -37,7 +37,7 @@ local _rules = {
 			pattern = [=[^(?:GET|HEAD)$]=],
 			operator = "NOT_REGEX"
 		},
-		opts = { nolog = true },
+		opts = { skip = 4, nolog = true },
 		action = "SKIP",
 		description = "Skip whitelisting of some extensions for non-passive requests"
 	},
@@ -85,14 +85,10 @@ local _rules = {
 			pattern = [=[\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$]=],
 			operator = "REGEX"
 		},
-		opts = { skipend = true, nolog = true },
+		opts = { nolog = true },
 		action = "ACCEPT",
 		description = "Whitelisting extensions - media"
 	},
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

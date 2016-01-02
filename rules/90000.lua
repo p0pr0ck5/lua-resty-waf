@@ -4,7 +4,7 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
+_M.rules = {
 	{
 		id = 90001,
 		var = {
@@ -48,7 +48,7 @@ local _rules = {
 			pattern = "HEAD",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, chainend = true},
+		opts = {},
 		action = "DENY",
 		description = "SSH key scan signature (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)"
 	},
@@ -71,7 +71,7 @@ local _rules = {
 			pattern = "webshot",
 			operator = "EXISTS"
 		},
-		opts = { nolog = true, chainchild = true },
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -82,7 +82,7 @@ local _rules = {
 			pattern = [=[\$\(.*\)]=],
 			operator = "REGEX"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)"
 	},
@@ -105,7 +105,7 @@ local _rules = {
 			pattern = [=[WinHttp\.WinHttpRequest\.5]=],
 			operator = "REGEX"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "Brute force botnet affecting Wordpress domains"
 	},
@@ -140,7 +140,7 @@ local _rules = {
 			pattern = "disabled",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, chainend = true, score = 5 },
+		opts = { score = 5 },
 		action = "SCORE",
 		description = "Client attempted to register a Wordpress user, but user registration is disabled."
 	},
@@ -163,7 +163,7 @@ local _rules = {
 			pattern = "POST",
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, chainchild = true },
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -174,7 +174,7 @@ local _rules = {
 			pattern = "referer",
 			operator = "NOT_EXISTS"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "Wordpress login attempted with no Referer"
 	},
@@ -197,7 +197,7 @@ local _rules = {
 			pattern = "revslider_show_image",
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, chainchild = true },
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -208,7 +208,7 @@ local _rules = {
 			pattern = [=[^\.\./wp-*|\.php$]=],
 			operator = "REGEX"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "Slider Revolution WordPress Plugin LFI Vulnerability"
 	},
@@ -255,7 +255,7 @@ local _rules = {
 			pattern = "POST",
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, chainchild = true },
+		opts = { nolog = true },
 		action = "CHAIN"
 	},
 	{
@@ -266,7 +266,7 @@ local _rules = {
 			pattern =  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "Emerging fake Googlebot wp-login bruteforce"
 	},
@@ -289,7 +289,7 @@ local _rules = {
 			pattern = 'update',
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		opts = { nolog = true, transform = 'lowercase' },
 		action = "CHAIN"
 	},
 	{
@@ -300,7 +300,7 @@ local _rules = {
 			pattern = 'fancybox-for-wordpress',
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		opts = { nolog = true, transform = 'lowercase' },
 		action = "CHAIN"
 	},
 	{
@@ -310,7 +310,7 @@ local _rules = {
 			pattern = '/wp-admin/admin-post.php',
 			operator = "EQUALS"
 		},
-		opts = { nolog = true, transform = 'lowercase', chainchild = true },
+		opts = { nolog = true, transform = 'lowercase' },
 		action = "CHAIN"
 	},
 	{
@@ -320,14 +320,10 @@ local _rules = {
 			pattern = "POST",
 			operator = "EQUALS"
 		},
-		opts = { chainchild = true, chainend = true },
+		opts = {},
 		action = "DENY",
 		description = "FancyBox for Wordpress access control vulnerability (https://www.cryptobells.com/fancybox-for-wordpress-zero-day-and-broken-patch/)"
 	}
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M
