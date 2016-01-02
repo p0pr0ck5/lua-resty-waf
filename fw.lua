@@ -795,7 +795,6 @@ function _M.exec(self)
 	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
 
 	local ctx = {}
-	ctx.start = start
 	ctx.altered = false
 	ctx.log_entries = {}
 	ctx.collections = {}
@@ -939,7 +938,6 @@ function _M.init()
 	local calc = require "FreeWAF.lib.rule_calc"
 
 	for _, ruleset in ipairs(_global_active_rulesets) do
-		ngx.log(ngx.WARN, "calculating " .. ruleset)
 		local r = require("FreeWAF.rules." .. ruleset)
 		calc.calculate(r.rules)
 	end
