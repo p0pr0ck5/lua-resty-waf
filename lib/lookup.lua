@@ -99,6 +99,7 @@ _M.transform = {
 		logger.log(FW, "Encoding to base64: " .. tostring(value))
 		local t_val = ngx.encode_base64(value)
 		logger.log(FW, "encoded value is " .. t_val)
+		return t_val
 	end,
 	compress_whitespace = function(FW, value)
 		return ngx.re.gsub(value, [=[\s+]=], ' ', FW._pcre_flags)
