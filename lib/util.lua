@@ -12,9 +12,9 @@ function _M.table_copy(FW, orig)
 	if (orig_type == 'table') then
 		copy = {}
 		for orig_key, orig_value in next, orig, nil do
-			copy[_table_copy(orig_key)] = _M.table_copy(orig_value)
+			copy[_M.table_copy(FW, orig_key)] = _M.table_copy(FW, orig_value)
 		end
-		setmetatable(copy, _table_copy(getmetatable(orig)))
+		setmetatable(copy, _M.table_copy(FW, getmetatable(orig)))
 	else -- number, string, boolean, etc
 		copy = orig
 	end
