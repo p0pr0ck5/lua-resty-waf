@@ -100,7 +100,7 @@ function _M.parse_dynamic_value(FW, key, collections)
 	-- use a negated character (instead of a lazy regex) to grab something that looks like
 	-- %{VAL}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, 'oij')
+	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, FW._pcre_flags)
 	logger.log(FW, "parsed dynamic value is " .. str)
 	if (ngx.re.find(str, [=[^\d+$]=], FW._pcre_flags)) then
 		return tonumber(str)
