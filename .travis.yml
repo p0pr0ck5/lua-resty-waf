@@ -4,6 +4,8 @@ perl:
 cache:
     - apt
     - ccache
+notifications:
+  irc: "chat.freenode.net#freewaf"
 env:
     - V_OPENRESTY=1.9.7.1
 install:
