@@ -1,0 +1,370 @@
+2016/01/06 20:16:16 [debug] 25669#0: bind() 0.0.0.0:1984 #6 
+2016/01/06 20:16:16 [notice] 25669#0: using the "epoll" event method
+2016/01/06 20:16:16 [notice] 25669#0: openresty/1.9.3.1
+2016/01/06 20:16:16 [notice] 25669#0: built by gcc 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04) 
+2016/01/06 20:16:16 [notice] 25669#0: OS: Linux 3.16.0-33-generic
+2016/01/06 20:16:16 [notice] 25669#0: getrlimit(RLIMIT_NOFILE): 1024:4096
+2016/01/06 20:16:16 [debug] 25670#0: write: 7, 00007FFF6F165200, 6, 0
+2016/01/06 20:16:16 [debug] 25670#0: notify eventfd: 7
+2016/01/06 20:16:16 [debug] 25670#0: malloc: 0000000002650020:6144
+2016/01/06 20:16:16 [debug] 25670#0: malloc: 0000000002646FF0:13824
+2016/01/06 20:16:16 [debug] 25670#0: malloc: 000000000264A600:6144
+2016/01/06 20:16:16 [debug] 25670#0: malloc: 0000000002651830:6144
+2016/01/06 20:16:16 [debug] 25670#0: epoll add event: fd:6 op:1 ev:00002001
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: -1
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:6 ev:0001 d:0000000002646FF0
+2016/01/06 20:16:16 [debug] 25670#0: accept on 0.0.0.0:1984, ready: 0
+2016/01/06 20:16:16 [debug] 25670#0: posix_memalign: 000000000264BE10:256 @16
+2016/01/06 20:16:16 [debug] 25670#0: *1 accept: 127.0.0.1:41145 fd:8
+2016/01/06 20:16:16 [debug] 25670#0: posix_memalign: 0000000002653040:256 @16
+2016/01/06 20:16:16 [debug] 25670#0: *1 event timer add: 8: 60000:1452140236721
+2016/01/06 20:16:16 [debug] 25670#0: *1 reusable connection: 1
+2016/01/06 20:16:16 [debug] 25670#0: *1 epoll add event: fd:8 op:1 ev:80002001
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 52
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: 60000
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:8 ev:0001 d:00000000026470C8
+2016/01/06 20:16:16 [debug] 25670#0: *1 http wait request handler
+2016/01/06 20:16:16 [debug] 25670#0: *1 malloc: 0000000002641EB0:1024
+2016/01/06 20:16:16 [debug] 25670#0: *1 recv: fd:8 55 of 1024
+2016/01/06 20:16:16 [debug] 25670#0: *1 reusable connection: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 posix_memalign: 0000000002668F90:4096 @16
+2016/01/06 20:16:16 [debug] 25670#0: *1 http process request line
+2016/01/06 20:16:16 [debug] 25670#0: *1 http request line: "GET /t HTTP/1.1"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http uri: "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http args: ""
+2016/01/06 20:16:16 [debug] 25670#0: *1 http exten: ""
+2016/01/06 20:16:16 [debug] 25670#0: *1 http process request header line
+2016/01/06 20:16:16 [debug] 25670#0: *1 http header: "Host: localhost"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http header: "Connection: close"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http header done
+2016/01/06 20:16:16 [debug] 25670#0: *1 event timer del: 8: 1452140236721
+2016/01/06 20:16:16 [debug] 25670#0: *1 rewrite phase: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 rewrite phase: 1
+2016/01/06 20:16:16 [debug] 25670#0: *1 test location: "/"
+2016/01/06 20:16:16 [debug] 25670#0: *1 test location: "t"
+2016/01/06 20:16:16 [debug] 25670#0: *1 using configuration "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http cl:-1 max:31457280
+2016/01/06 20:16:16 [debug] 25670#0: *1 rewrite phase: 3
+2016/01/06 20:16:16 [debug] 25670#0: *1 rewrite phase: 4
+2016/01/06 20:16:16 [debug] 25670#0: *1 post rewrite phase: 5
+2016/01/06 20:16:16 [debug] 25670#0: *1 generic phase: 6
+2016/01/06 20:16:16 [debug] 25670#0: *1 generic phase: 7
+2016/01/06 20:16:16 [debug] 25670#0: *1 access phase: 8
+2016/01/06 20:16:16 [debug] 25670#0: *1 access phase: 9
+2016/01/06 20:16:16 [debug] 25670#0: *1 post access phase: 10
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua content handler, uri:"/t" c:1
+2016/01/06 20:16:16 [debug] 25670#0: *1 posix_memalign: 0000000002669FA0:4096 @16
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua reset ctx
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua creating new thread
+2016/01/06 20:16:16 [debug] 25670#0: *1 http cleanup add: 0000000002669F00
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua run thread, top:0 c:1
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua compiling gsub regex "%{([^{]*)}" with options "" (compile once: 0) (dfa mode: 0) (jit mode: 0)
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua resume returned 2
+2016/01/06 20:16:16 [error] 25670#0: *1 lua entry thread aborted: runtime error: ./lib/log.lua:14: Bad dynamic parse, no collection key IPP
+stack traceback:
+coroutine 0:
+	[C]: in function 'gsub'
+	/usr/local/openresty/lualib/FreeWAF/lib/util.lua:112: in function 'parse_dynamic_value'
+	content_by_lua(nginx.conf:45):5: in function <content_by_lua(nginx.conf:45):1>, client: 127.0.0.1, server: localhost, request: "GET /t HTTP/1.1", host: "localhost"
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua request cleanup: forcible=0
+2016/01/06 20:16:16 [debug] 25670#0: *1 http finalize request: 500, "/t?" a:1, c:1
+2016/01/06 20:16:16 [debug] 25670#0: *1 http special response: 500, "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http set discard body
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua capture header filter, uri "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *1 HTTP/1.1 500 Internal Server Error
+Server: openresty/1.9.3.1
+Date: Thu, 07 Jan 2016 04:16:16 GMT
+Content-Type: text/html
+Content-Length: 198
+Connection: close
+
+2016/01/06 20:16:16 [debug] 25670#0: *1 write new buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 http write filter: l:0 f:0 s:167
+2016/01/06 20:16:16 [debug] 25670#0: *1 http output filter "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http copy filter: "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *1 lua capture body filter, uri "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http postpone filter "/t?" 000000000266A3D0
+2016/01/06 20:16:16 [debug] 25670#0: *1 write old buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 write new buf t:0 f:0 0000000000000000, pos 000000000077E720, size: 140 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 write new buf t:0 f:0 0000000000000000, pos 000000000077F8E0, size: 58 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 http write filter: l:1 f:0 s:365
+2016/01/06 20:16:16 [debug] 25670#0: *1 http write filter limit 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 writev: 365 of 365
+2016/01/06 20:16:16 [debug] 25670#0: *1 http write filter 0000000000000000
+2016/01/06 20:16:16 [debug] 25670#0: *1 http copy filter: 0 "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *1 http finalize request: 0, "/t?" a:1, c:1
+2016/01/06 20:16:16 [debug] 25670#0: *1 event timer add: 8: 5000:1452140181721
+2016/01/06 20:16:16 [debug] 25670#0: *1 http lingering close handler
+2016/01/06 20:16:16 [debug] 25670#0: *1 recv: fd:8 -1 of 4096
+2016/01/06 20:16:16 [debug] 25670#0: *1 recv() not ready (11: Resource temporarily unavailable)
+2016/01/06 20:16:16 [debug] 25670#0: *1 lingering read: -2
+2016/01/06 20:16:16 [debug] 25670#0: *1 event timer: 8, old: 1452140181721, new: 1452140181721
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 0
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: 5000
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:8 ev:2011 d:00000000026470C8
+2016/01/06 20:16:16 [debug] 25670#0: epoll_wait() error on fd:8 ev:2011
+2016/01/06 20:16:16 [debug] 25670#0: *1 http lingering close handler
+2016/01/06 20:16:16 [debug] 25670#0: *1 recv: fd:8 0 of 4096
+2016/01/06 20:16:16 [debug] 25670#0: *1 lingering read: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 http request count:1 blk:0
+2016/01/06 20:16:16 [debug] 25670#0: *1 http close request
+2016/01/06 20:16:16 [debug] 25670#0: *1 http log handler
+2016/01/06 20:16:16 [debug] 25670#0: *1 free: 0000000002668F90, unused: 8
+2016/01/06 20:16:16 [debug] 25670#0: *1 free: 0000000002669FA0, unused: 2849
+2016/01/06 20:16:16 [debug] 25670#0: *1 close http connection: 8
+2016/01/06 20:16:16 [debug] 25670#0: *1 event timer del: 8: 1452140181721
+2016/01/06 20:16:16 [debug] 25670#0: *1 reusable connection: 0
+2016/01/06 20:16:16 [debug] 25670#0: *1 free: 0000000002641EB0
+2016/01/06 20:16:16 [debug] 25670#0: *1 free: 000000000264BE10, unused: 24
+2016/01/06 20:16:16 [debug] 25670#0: *1 free: 0000000002653040, unused: 72
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 1
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: -1
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:6 ev:0001 d:0000000002646FF0
+2016/01/06 20:16:16 [debug] 25670#0: accept on 0.0.0.0:1984, ready: 0
+2016/01/06 20:16:16 [debug] 25670#0: posix_memalign: 000000000264BE10:256 @16
+2016/01/06 20:16:16 [debug] 25670#0: *2 accept: 127.0.0.1:41146 fd:8
+2016/01/06 20:16:16 [debug] 25670#0: posix_memalign: 0000000002653040:256 @16
+2016/01/06 20:16:16 [debug] 25670#0: *2 event timer add: 8: 60000:1452140236874
+2016/01/06 20:16:16 [debug] 25670#0: *2 reusable connection: 1
+2016/01/06 20:16:16 [debug] 25670#0: *2 epoll add event: fd:8 op:1 ev:80002001
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 152
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: 60000
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:8 ev:0001 d:00000000026470C9
+2016/01/06 20:16:16 [debug] 25670#0: *2 http wait request handler
+2016/01/06 20:16:16 [debug] 25670#0: *2 malloc: 0000000002641EB0:1024
+2016/01/06 20:16:16 [debug] 25670#0: *2 recv: fd:8 55 of 1024
+2016/01/06 20:16:16 [debug] 25670#0: *2 reusable connection: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 posix_memalign: 0000000002668F90:4096 @16
+2016/01/06 20:16:16 [debug] 25670#0: *2 http process request line
+2016/01/06 20:16:16 [debug] 25670#0: *2 http request line: "GET /t HTTP/1.1"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http uri: "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http args: ""
+2016/01/06 20:16:16 [debug] 25670#0: *2 http exten: ""
+2016/01/06 20:16:16 [debug] 25670#0: *2 http process request header line
+2016/01/06 20:16:16 [debug] 25670#0: *2 http header: "Host: localhost"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http header: "Connection: close"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http header done
+2016/01/06 20:16:16 [debug] 25670#0: *2 event timer del: 8: 1452140236874
+2016/01/06 20:16:16 [debug] 25670#0: *2 rewrite phase: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 rewrite phase: 1
+2016/01/06 20:16:16 [debug] 25670#0: *2 test location: "/"
+2016/01/06 20:16:16 [debug] 25670#0: *2 test location: "t"
+2016/01/06 20:16:16 [debug] 25670#0: *2 using configuration "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http cl:-1 max:31457280
+2016/01/06 20:16:16 [debug] 25670#0: *2 rewrite phase: 3
+2016/01/06 20:16:16 [debug] 25670#0: *2 rewrite phase: 4
+2016/01/06 20:16:16 [debug] 25670#0: *2 post rewrite phase: 5
+2016/01/06 20:16:16 [debug] 25670#0: *2 generic phase: 6
+2016/01/06 20:16:16 [debug] 25670#0: *2 generic phase: 7
+2016/01/06 20:16:16 [debug] 25670#0: *2 access phase: 8
+2016/01/06 20:16:16 [debug] 25670#0: *2 access phase: 9
+2016/01/06 20:16:16 [debug] 25670#0: *2 post access phase: 10
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua content handler, uri:"/t" c:1
+2016/01/06 20:16:16 [debug] 25670#0: *2 posix_memalign: 0000000002669FA0:4096 @16
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua reset ctx
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua creating new thread
+2016/01/06 20:16:16 [debug] 25670#0: *2 http cleanup add: 0000000002669F00
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua run thread, top:0 c:1
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua compiling gsub regex "%{([^{]*)}" with options "" (compile once: 0) (dfa mode: 0) (jit mode: 0)
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua resume returned 2
+2016/01/06 20:16:16 [error] 25670#0: *2 lua entry thread aborted: runtime error: ./lib/log.lua:14: Bad dynamic parse, no collection key IPP
+stack traceback:
+coroutine 0:
+	[C]: in function 'gsub'
+	/usr/local/openresty/lualib/FreeWAF/lib/util.lua:112: in function 'parse_dynamic_value'
+	content_by_lua(nginx.conf:45):5: in function <content_by_lua(nginx.conf:45):1>, client: 127.0.0.1, server: localhost, request: "GET /t HTTP/1.1", host: "localhost"
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua request cleanup: forcible=0
+2016/01/06 20:16:16 [debug] 25670#0: *2 http finalize request: 500, "/t?" a:1, c:1
+2016/01/06 20:16:16 [debug] 25670#0: *2 http special response: 500, "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http set discard body
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua capture header filter, uri "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *2 HTTP/1.1 500 Internal Server Error
+Server: openresty/1.9.3.1
+Date: Thu, 07 Jan 2016 04:16:16 GMT
+Content-Type: text/html
+Content-Length: 198
+Connection: close
+
+2016/01/06 20:16:16 [debug] 25670#0: *2 write new buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 http write filter: l:0 f:0 s:167
+2016/01/06 20:16:16 [debug] 25670#0: *2 http output filter "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http copy filter: "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *2 lua capture body filter, uri "/t"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http postpone filter "/t?" 000000000266A3D0
+2016/01/06 20:16:16 [debug] 25670#0: *2 write old buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 write new buf t:0 f:0 0000000000000000, pos 000000000077E720, size: 140 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 write new buf t:0 f:0 0000000000000000, pos 000000000077F8E0, size: 58 file: 0, size: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 http write filter: l:1 f:0 s:365
+2016/01/06 20:16:16 [debug] 25670#0: *2 http write filter limit 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 writev: 365 of 365
+2016/01/06 20:16:16 [debug] 25670#0: *2 http write filter 0000000000000000
+2016/01/06 20:16:16 [debug] 25670#0: *2 http copy filter: 0 "/t?"
+2016/01/06 20:16:16 [debug] 25670#0: *2 http finalize request: 0, "/t?" a:1, c:1
+2016/01/06 20:16:16 [debug] 25670#0: *2 event timer add: 8: 5000:1452140181874
+2016/01/06 20:16:16 [debug] 25670#0: *2 http lingering close handler
+2016/01/06 20:16:16 [debug] 25670#0: *2 recv: fd:8 -1 of 4096
+2016/01/06 20:16:16 [debug] 25670#0: *2 recv() not ready (11: Resource temporarily unavailable)
+2016/01/06 20:16:16 [debug] 25670#0: *2 lingering read: -2
+2016/01/06 20:16:16 [debug] 25670#0: *2 event timer: 8, old: 1452140181874, new: 1452140181874
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 0
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: 5000
+2016/01/06 20:16:16 [debug] 25670#0: epoll: fd:8 ev:2011 d:00000000026470C9
+2016/01/06 20:16:16 [debug] 25670#0: epoll_wait() error on fd:8 ev:2011
+2016/01/06 20:16:16 [debug] 25670#0: *2 http lingering close handler
+2016/01/06 20:16:16 [debug] 25670#0: *2 recv: fd:8 0 of 4096
+2016/01/06 20:16:16 [debug] 25670#0: *2 lingering read: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 http request count:1 blk:0
+2016/01/06 20:16:16 [debug] 25670#0: *2 http close request
+2016/01/06 20:16:16 [debug] 25670#0: *2 http log handler
+2016/01/06 20:16:16 [debug] 25670#0: *2 free: 0000000002668F90, unused: 8
+2016/01/06 20:16:16 [debug] 25670#0: *2 free: 0000000002669FA0, unused: 2849
+2016/01/06 20:16:16 [debug] 25670#0: *2 close http connection: 8
+2016/01/06 20:16:16 [debug] 25670#0: *2 event timer del: 8: 1452140181874
+2016/01/06 20:16:16 [debug] 25670#0: *2 reusable connection: 0
+2016/01/06 20:16:16 [debug] 25670#0: *2 free: 0000000002641EB0
+2016/01/06 20:16:16 [debug] 25670#0: *2 free: 000000000264BE10, unused: 24
+2016/01/06 20:16:16 [debug] 25670#0: *2 free: 0000000002653040, unused: 72
+2016/01/06 20:16:16 [debug] 25670#0: timer delta: 1
+2016/01/06 20:16:16 [debug] 25670#0: worker cycle
+2016/01/06 20:16:16 [debug] 25670#0: epoll timer: -1
+2016/01/06 20:16:17 [debug] 25670#0: epoll: fd:6 ev:0001 d:0000000002646FF0
+2016/01/06 20:16:17 [debug] 25670#0: accept on 0.0.0.0:1984, ready: 0
+2016/01/06 20:16:17 [debug] 25670#0: posix_memalign: 000000000264BE10:256 @16
+2016/01/06 20:16:17 [debug] 25670#0: *3 accept: 127.0.0.1:41147 fd:8
+2016/01/06 20:16:17 [debug] 25670#0: posix_memalign: 0000000002653040:256 @16
+2016/01/06 20:16:17 [debug] 25670#0: *3 event timer add: 8: 60000:1452140237027
+2016/01/06 20:16:17 [debug] 25670#0: *3 reusable connection: 1
+2016/01/06 20:16:17 [debug] 25670#0: *3 epoll add event: fd:8 op:1 ev:80002001
+2016/01/06 20:16:17 [debug] 25670#0: timer delta: 152
+2016/01/06 20:16:17 [debug] 25670#0: worker cycle
+2016/01/06 20:16:17 [debug] 25670#0: epoll timer: 60000
+2016/01/06 20:16:17 [debug] 25670#0: epoll: fd:8 ev:0001 d:00000000026470C8
+2016/01/06 20:16:17 [debug] 25670#0: *3 http wait request handler
+2016/01/06 20:16:17 [debug] 25670#0: *3 malloc: 0000000002641EB0:1024
+2016/01/06 20:16:17 [debug] 25670#0: *3 recv: fd:8 55 of 1024
+2016/01/06 20:16:17 [debug] 25670#0: *3 reusable connection: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 posix_memalign: 0000000002668F90:4096 @16
+2016/01/06 20:16:17 [debug] 25670#0: *3 http process request line
+2016/01/06 20:16:17 [debug] 25670#0: *3 http request line: "GET /t HTTP/1.1"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http uri: "/t"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http args: ""
+2016/01/06 20:16:17 [debug] 25670#0: *3 http exten: ""
+2016/01/06 20:16:17 [debug] 25670#0: *3 http process request header line
+2016/01/06 20:16:17 [debug] 25670#0: *3 http header: "Host: localhost"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http header: "Connection: close"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http header done
+2016/01/06 20:16:17 [debug] 25670#0: *3 event timer del: 8: 1452140237027
+2016/01/06 20:16:17 [debug] 25670#0: *3 rewrite phase: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 rewrite phase: 1
+2016/01/06 20:16:17 [debug] 25670#0: *3 test location: "/"
+2016/01/06 20:16:17 [debug] 25670#0: *3 test location: "t"
+2016/01/06 20:16:17 [debug] 25670#0: *3 using configuration "/t"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http cl:-1 max:31457280
+2016/01/06 20:16:17 [debug] 25670#0: *3 rewrite phase: 3
+2016/01/06 20:16:17 [debug] 25670#0: *3 rewrite phase: 4
+2016/01/06 20:16:17 [debug] 25670#0: *3 post rewrite phase: 5
+2016/01/06 20:16:17 [debug] 25670#0: *3 generic phase: 6
+2016/01/06 20:16:17 [debug] 25670#0: *3 generic phase: 7
+2016/01/06 20:16:17 [debug] 25670#0: *3 access phase: 8
+2016/01/06 20:16:17 [debug] 25670#0: *3 access phase: 9
+2016/01/06 20:16:17 [debug] 25670#0: *3 post access phase: 10
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua content handler, uri:"/t" c:1
+2016/01/06 20:16:17 [debug] 25670#0: *3 posix_memalign: 0000000002669FA0:4096 @16
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua reset ctx
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua creating new thread
+2016/01/06 20:16:17 [debug] 25670#0: *3 http cleanup add: 0000000002669F00
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua run thread, top:0 c:1
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua compiling gsub regex "%{([^{]*)}" with options "" (compile once: 0) (dfa mode: 0) (jit mode: 0)
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua resume returned 2
+2016/01/06 20:16:17 [error] 25670#0: *3 lua entry thread aborted: runtime error: ./lib/log.lua:14: Bad dynamic parse, no collection key IPP
+stack traceback:
+coroutine 0:
+	[C]: in function 'gsub'
+	/usr/local/openresty/lualib/FreeWAF/lib/util.lua:112: in function 'parse_dynamic_value'
+	content_by_lua(nginx.conf:45):5: in function <content_by_lua(nginx.conf:45):1>, client: 127.0.0.1, server: localhost, request: "GET /t HTTP/1.1", host: "localhost"
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua request cleanup: forcible=0
+2016/01/06 20:16:17 [debug] 25670#0: *3 http finalize request: 500, "/t?" a:1, c:1
+2016/01/06 20:16:17 [debug] 25670#0: *3 http special response: 500, "/t?"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http set discard body
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua capture header filter, uri "/t"
+2016/01/06 20:16:17 [debug] 25670#0: *3 HTTP/1.1 500 Internal Server Error
+Server: openresty/1.9.3.1
+Date: Thu, 07 Jan 2016 04:16:17 GMT
+Content-Type: text/html
+Content-Length: 198
+Connection: close
+
+2016/01/06 20:16:17 [debug] 25670#0: *3 write new buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 http write filter: l:0 f:0 s:167
+2016/01/06 20:16:17 [debug] 25670#0: *3 http output filter "/t?"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http copy filter: "/t?"
+2016/01/06 20:16:17 [debug] 25670#0: *3 lua capture body filter, uri "/t"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http postpone filter "/t?" 000000000266A3D0
+2016/01/06 20:16:17 [debug] 25670#0: *3 write old buf t:1 f:0 000000000266A200, pos 000000000266A200, size: 167 file: 0, size: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 write new buf t:0 f:0 0000000000000000, pos 000000000077E720, size: 140 file: 0, size: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 write new buf t:0 f:0 0000000000000000, pos 000000000077F8E0, size: 58 file: 0, size: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 http write filter: l:1 f:0 s:365
+2016/01/06 20:16:17 [debug] 25670#0: *3 http write filter limit 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 writev: 365 of 365
+2016/01/06 20:16:17 [debug] 25670#0: *3 http write filter 0000000000000000
+2016/01/06 20:16:17 [debug] 25670#0: *3 http copy filter: 0 "/t?"
+2016/01/06 20:16:17 [debug] 25670#0: *3 http finalize request: 0, "/t?" a:1, c:1
+2016/01/06 20:16:17 [debug] 25670#0: *3 event timer add: 8: 5000:1452140182027
+2016/01/06 20:16:17 [debug] 25670#0: *3 http lingering close handler
+2016/01/06 20:16:17 [debug] 25670#0: *3 recv: fd:8 -1 of 4096
+2016/01/06 20:16:17 [debug] 25670#0: *3 recv() not ready (11: Resource temporarily unavailable)
+2016/01/06 20:16:17 [debug] 25670#0: *3 lingering read: -2
+2016/01/06 20:16:17 [debug] 25670#0: *3 event timer: 8, old: 1452140182027, new: 1452140182027
+2016/01/06 20:16:17 [debug] 25670#0: timer delta: 0
+2016/01/06 20:16:17 [debug] 25670#0: worker cycle
+2016/01/06 20:16:17 [debug] 25670#0: epoll timer: 5000
+2016/01/06 20:16:17 [debug] 25670#0: epoll: fd:8 ev:2011 d:00000000026470C8
+2016/01/06 20:16:17 [debug] 25670#0: epoll_wait() error on fd:8 ev:2011
+2016/01/06 20:16:17 [debug] 25670#0: *3 http lingering close handler
+2016/01/06 20:16:17 [debug] 25670#0: *3 recv: fd:8 0 of 4096
+2016/01/06 20:16:17 [debug] 25670#0: *3 lingering read: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 http request count:1 blk:0
+2016/01/06 20:16:17 [debug] 25670#0: *3 http close request
+2016/01/06 20:16:17 [debug] 25670#0: *3 http log handler
+2016/01/06 20:16:17 [debug] 25670#0: *3 free: 0000000002668F90, unused: 8
+2016/01/06 20:16:17 [debug] 25670#0: *3 free: 0000000002669FA0, unused: 2849
+2016/01/06 20:16:17 [debug] 25670#0: *3 close http connection: 8
+2016/01/06 20:16:17 [debug] 25670#0: *3 event timer del: 8: 1452140182027
+2016/01/06 20:16:17 [debug] 25670#0: *3 reusable connection: 0
+2016/01/06 20:16:17 [debug] 25670#0: *3 free: 0000000002641EB0
+2016/01/06 20:16:17 [debug] 25670#0: *3 free: 000000000264BE10, unused: 24
+2016/01/06 20:16:17 [debug] 25670#0: *3 free: 0000000002653040, unused: 72
+2016/01/06 20:16:17 [debug] 25670#0: timer delta: 0
+2016/01/06 20:16:17 [debug] 25670#0: worker cycle
+2016/01/06 20:16:17 [debug] 25670#0: epoll timer: -1
+2016/01/06 20:16:17 [notice] 25670#0: signal 3 (SIGQUIT) received, shutting down
+2016/01/06 20:16:17 [info] 25670#0: epoll_wait() failed (4: Interrupted system call)
+2016/01/06 20:16:17 [debug] 25670#0: timer delta: 152
+2016/01/06 20:16:17 [debug] 25670#0: flush files
+2016/01/06 20:16:17 [notice] 25670#0: exit
+2016/01/06 20:16:17 [debug] 25670#0: epoll del event: fd:6 op:2 ev:00000000
+2016/01/06 20:16:17 [debug] 25670#0: close listening 0.0.0.0:1984 #6 
+2016/01/06 20:16:17 [debug] 25670#0: run cleanup: 0000000002662148
+2016/01/06 20:16:17 [debug] 25670#0: decrementing the reference count for Lua VM: 1
+2016/01/06 20:16:17 [debug] 25670#0: lua close the global Lua VM 000000004181A378
+2016/01/06 20:16:17 [debug] 25670#0: run cleanup: 0000000002661110
+2016/01/06 20:16:17 [debug] 25670#0: run cleanup: 00000000026610E0
+2016/01/06 20:16:17 [debug] 25670#0: run cleanup: 00000000026610B0
+2016/01/06 20:16:17 [debug] 25670#0: run cleanup: 000000000265E8F8
+2016/01/06 20:16:17 [debug] 25670#0: cleanup resolver
+2016/01/06 20:16:17 [debug] 25670#0: free: 0000000002667740
+2016/01/06 20:16:17 [debug] 25670#0: free: 00000000026564A0
+2016/01/06 20:16:17 [debug] 25670#0: free: 00000000026553E0
+2016/01/06 20:16:17 [debug] 25670#0: free: 0000000002654320
+2016/01/06 20:16:17 [debug] 25670#0: free: 0000000002653260
+2016/01/06 20:16:17 [debug] 25670#0: free: 0000000002642FE0, unused: 0
+2016/01/06 20:16:17 [debug] 25670#0: free: 000000000264C010, unused: 0
+2016/01/06 20:16:17 [debug] 25670#0: free: 00000000026574B0, unused: 0
+2016/01/06 20:16:17 [debug] 25670#0: free: 000000000265B4C0, unused: 0
+2016/01/06 20:16:17 [debug] 25670#0: free: 000000000265F680, unused: 1648
