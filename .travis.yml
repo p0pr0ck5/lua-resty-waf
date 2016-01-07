@@ -1,0 +1,19 @@
+language: perl
+perl:
+    - 5.10
+cache:
+    - apt
+    - ccache
+env:
+    - V_OPENRESTY=1.9.7.1
+install:
+    - cpanm -v --notest Test::Nginx
+before_script:
+    - sudo apt-get update -q
+    - sudo apt-get install libreadline-dev libncurses5-dev libpcre3-dev libssl-dev -y
+    - sudo apt-get install make build-essential lua5.1 -y
+    - wget https://openresty.org/download/ngx_openresty-$V_OPENRESTY.tar.gz
+    - tar xzf ngx_openresty-$V_OPENRESTY.tar.gz
+    - cd ngx_openresty-$V_OPENRESTY && ./configure && make && sudo make install && cd ..
+script:
+  - make test
