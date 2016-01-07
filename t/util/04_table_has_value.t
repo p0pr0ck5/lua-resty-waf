@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_value({}, "frob", t)
 			ngx.say(val)
@@ -30,7 +30,7 @@ true
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local t    = { 4, 10, 7.2, 1, 99, "foo", "bar" }
 			local val  = util.table_has_value({}, 1, t)
 			ngx.say(val)
@@ -48,7 +48,7 @@ true
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_value({}, "baz", t)
 			ngx.say(val)
@@ -66,7 +66,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local t    = { 4, 10, 7.2, 1, 99, "foo", "bar" }
 			local val  = util.table_has_value({}, 0, t)
 			ngx.say(val)
@@ -84,7 +84,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local t    = "foo, bar"
 			local val  = util.table_has_value({}, "foo", t)
 			ngx.say(val)

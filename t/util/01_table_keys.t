@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local a = { foo = "bar" }
 			local b = util.table_keys({}, a)
 			table.sort(b)
@@ -33,7 +33,7 @@ foo
 --- config
     location = /t {
         content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local a = { foo = "bar", baz = "bat", qux = "frob" }
 			local b = util.table_keys({}, a)
 			table.sort(b)
@@ -56,7 +56,7 @@ qux
 --- config
     location = /t {
         content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local a = { foo = { "bar", "baz", "bat" }, qux = { "frob" } }
 			local b = util.table_keys({}, a)
 			table.sort(b)
@@ -78,7 +78,7 @@ qux
 --- config
     location = /t {
         content_by_lua '
-            local util = require "FreeWAF.lib.util"
+            local util = require "lib.util"
             local a = { foo = "bar", foo = "baz" }
             local b = util.table_keys({}, a)
 			table.sort(b)
@@ -99,7 +99,7 @@ foo
 --- config
     location = /t {
         content_by_lua '
-			local util = require "FreeWAF.lib.util"
+			local util = require "lib.util"
 			local a = "foo, bar"
 			local b = util.table_keys({}, a)
 			table.sort(b)

@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "aGVsbG8gd29ybGQ="
 			local transform = lookup.transform["base64_decode"]({}, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "goodbye world"
 			local transform = lookup.transform["base64_encode"]({}, value)
 			ngx.say(transform)
@@ -48,7 +48,7 @@ Z29vZGJ5ZSB3b3JsZA==
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "how  	are	you    doing?"
 			local transform = lookup.transform["compress_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -66,7 +66,7 @@ how are you doing?
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = [=[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#41;&quot;]=]
 			local transform = lookup.transform["html_decode"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -84,7 +84,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "HELLO WORLD"
 			local transform = lookup.transform["lowercase"]({}, value)
 			ngx.say(transform)
@@ -102,7 +102,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "UNI/*1*/ON SELECT"
 			local transform = lookup.transform["remove_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -120,7 +120,7 @@ UNION SELECT
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "how  	are	you    doing?"
 			local transform = lookup.transform["remove_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -138,7 +138,7 @@ howareyoudoing?
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "UNION/***/SELECT"
 			local transform = lookup.transform["replace_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -156,7 +156,7 @@ UNION SELECT
 --- config
 	location /t {
 		content_by_lua '
-			local lookup = require "FreeWAF.lib.lookup"
+			local lookup = require "lib.lookup"
 			local value  = "%22%3E%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 			local transform = lookup.transform["uri_decode"]({}, value)
 			ngx.say(transform)

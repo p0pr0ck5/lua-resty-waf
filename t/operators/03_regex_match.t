@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "FreeWAF.lib.operators"
+			local op    = require "lib.operators"
 			local match = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ hello
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "FreeWAF.lib.operators"
+			local op    = require "lib.operators"
 			local match = op.regex_match({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "hello, 1234"}, "([a-z])[a-z]+")
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ hello
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "FreeWAF.lib.operators"
+			local op    = require "lib.operators"
 			local match = op.regex_match({ _pcre_flags = "" }, "HELLO, 1234", "([a-z])[a-z]+")
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "FreeWAF.lib.operators"
+			local op    = require "lib.operators"
 			local match = op.regex_match({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "HELLO, 1234"}, "([a-z])[a-z]+")
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "FreeWAF.lib.operators"
+			local op    = require "lib.operators"
 			local match = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "+([a-z])[a-z]+")
 			ngx.say(match)
 		';

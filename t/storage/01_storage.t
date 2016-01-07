@@ -12,7 +12,7 @@ __DATA__
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
@@ -32,7 +32,7 @@ GET /t
 === TEST 2: Set invalid storage zone
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
@@ -54,13 +54,13 @@ GET /t
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         access_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "bar" }, {})
 		';
@@ -78,13 +78,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "bar" }, {})
 			local value = storage.get_var(fw, "foo", {})
@@ -104,13 +104,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			local value = storage.get_var(fw, "foo", {})
 			ngx.say(value)
@@ -128,13 +128,13 @@ nil
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = 1 }, {})
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "+1" }, {})
@@ -154,13 +154,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = 1 }, {})
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "-1" }, {})
@@ -180,13 +180,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = 2 }, {})
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "*5" }, {})
@@ -206,13 +206,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			fw:set_option("storage_zone", "storage")
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = 9 }, {})
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "/3" }, {})
@@ -231,13 +231,13 @@ Could not add key to persistent storage, increase the size of the lua_shared_dic
 === TEST 10: Silent return if no shm is configured
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
+		FreeWAF = require "fw"
 	';
 --- config
     location = /t {
         content_by_lua '
 			local fw      = FreeWAF:new()
-			local storage = require "FreeWAF.lib.storage"
+			local storage = require "lib.storage"
 			storage.set_var(fw, { rule_setvar_key = "foo", rule_setvar_value = "bar" }, {})
 			local value = storage.get_var(fw, "foo", {})
 			ngx.say(value)

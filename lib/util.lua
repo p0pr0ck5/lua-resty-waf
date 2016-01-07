@@ -23,6 +23,10 @@ end
 
 -- return a table containing the keys of the provided table
 function _M.table_keys(FW, table)
+	if (type(table) ~= "table") then
+		logger.fatal_fail(type(table) .. " was given to table_keys!")
+	end
+
 	local t = {}
 	local n = 0
 
@@ -37,6 +41,10 @@ end
 -- return a table containing the values of the provided table
 function _M.table_values(FW, table)
 	local t = {}
+	if (type(table) ~= "table") then
+		logger.fatal_fail(type(table) .. " was given to table_values!")
+	end
+
 	local n = 0
 
 	for _, value in pairs(table) do
@@ -77,6 +85,7 @@ function _M.table_has_value(FW, needle, haystack)
 		logger.log(FW, "Checking " .. value)
 		if (value == needle) then return true end
 	end
+	return false
 end
 
 -- pick out dynamic data from storage key definitions

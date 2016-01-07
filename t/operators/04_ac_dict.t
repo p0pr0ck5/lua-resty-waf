@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			local match = op.ac_lookup({}, "foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ GET /t
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			local match = op.ac_lookup({}, { "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ GET /t
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			local match = op.ac_lookup({}, "far", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			local match = op.ac_lookup({}, { "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';

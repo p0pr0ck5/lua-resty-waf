@@ -11,8 +11,8 @@ __DATA__
 === TEST 1: Log a string
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {
@@ -35,8 +35,8 @@ We have logged a string!
 === TEST 2: Log a string at ngx.INFO log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {
@@ -62,8 +62,8 @@ We have logged a string!
 === TEST 3: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {
@@ -87,8 +87,8 @@ qr/[warn].*We have logged a string!/
 === TEST 4: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {
@@ -112,8 +112,8 @@ qr/[warn].*We have logged a string!/
 === TEST 5: Do not log a string if debug disabled
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {
@@ -135,8 +135,8 @@ We have logged a string!
 === TEST 6: Do not log a string if insufficient log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "FreeWAF.fw"
-		logger  = require "FreeWAF.lib.log"
+		FreeWAF = require "fw"
+		logger  = require "lib.log"
 	';
 --- config
 	location /t {

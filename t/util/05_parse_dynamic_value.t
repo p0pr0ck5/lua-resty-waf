@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "foo"
 			local coll   = {}
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -31,7 +31,7 @@ foo
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "%{IP}"
 			local coll   = { IP = ngx.var.remote_addr }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -50,7 +50,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "%{URI}"
 			local coll   = { URI = ngx.var.uri }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -69,7 +69,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "%{SCORE}"
 			local coll   = { SCORE = 5 }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -88,7 +88,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "%{SCORE_THRESHOLD}"
 			local coll   = { SCORE_THRESHOLD = 10 }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -107,7 +107,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "FreeWAF.lib.util"
+			local util   = require "lib.util"
 			local key    = "%{IPP}"
 			local coll   = { IP = "127.0.0.1" }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)

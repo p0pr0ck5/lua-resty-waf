@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local greater = require "FreeWAF.lib.operators"
+			local greater = require "lib.operators"
         ';
     }
 --- request
@@ -26,7 +26,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, 2, 1))
         ';
     }
@@ -42,7 +42,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, 1, 1))
         ';
     }
@@ -58,7 +58,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, 1, 2))
         ';
     }
@@ -74,7 +74,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, {0, 1, 2}, 1))
         ';
     }
@@ -90,7 +90,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, {-1, 0, 1}, 1))
         ';
     }
@@ -106,7 +106,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.greater({}, {-1, 0, 1}, 2))
         ';
     }

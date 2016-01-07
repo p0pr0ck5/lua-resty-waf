@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			FreeWAF = require "FreeWAF.fw"
+			FreeWAF = require "fw"
         ';
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
     }
@@ -27,7 +27,7 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			FreeWAF = require "FreeWAF.fw"
+			FreeWAF = require "fw"
 			local fw = FreeWAF:new()
         ';
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -43,7 +43,7 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			FreeWAF = require "FreeWAF.fw2"
+			FreeWAF = require "fw2"
         ';
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
     }

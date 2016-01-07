@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local equals = require "FreeWAF.lib.operators"
+			local equals = require "lib.operators"
         ';
     }
 --- request
@@ -26,7 +26,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, 1, 1))
         ';
     }
@@ -42,7 +42,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, 1, 2))
         ';
     }
@@ -58,7 +58,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, "foo", "foo"))
         ';
     }
@@ -74,7 +74,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, "foo", "bar"))
         ';
     }
@@ -90,7 +90,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, {3, 2, 1}, 1))
         ';
     }
@@ -106,7 +106,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, {3, 2, 0}, 1))
         ';
     }
@@ -122,7 +122,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, {"bar", "foo"}, "foo"))
         ';
     }
@@ -138,7 +138,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, {"bar", "baz"}, "foo"))
         ';
     }
@@ -154,7 +154,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, "nil", nil))
         ';
     }
@@ -170,7 +170,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "FreeWAF.lib.operators"
+			local op = require "lib.operators"
 			ngx.say(op.equals({}, "7", 7))
         ';
     }
