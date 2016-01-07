@@ -59,7 +59,7 @@ end
 -- return true if the table key exists
 function _M.table_has_key(FW, needle, haystack)
 	if (type(haystack) ~= "table") then
-		_fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
+		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 	logger.log(FW, "table key " .. needle .. " is " .. tostring(haystack[needle]))
 	return haystack[needle] ~= nil
