@@ -6,13 +6,13 @@ local logger = require("lib.log")
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table
-function _M.table_copy(FW, orig)
+function _M.table_copy(orig)
 	local orig_type = type(orig)
 	local copy
 	if (orig_type == 'table') then
 		copy = {}
 		for orig_key, orig_value in next, orig, nil do
-			copy[_M.table_copy(FW, orig_key)] = _M.table_copy(FW, orig_value)
+			copy[_M.table_copy(orig_key)] = _M.table_copy(orig_value)
 		end
 		setmetatable(copy, _M.table_copy(FW, getmetatable(orig)))
 	else -- number, string, boolean, etc
@@ -22,7 +22,7 @@ function _M.table_copy(FW, orig)
 end
 
 -- return a table containing the keys of the provided table
-function _M.table_keys(FW, table)
+function _M.table_keys(table)
 	if (type(table) ~= "table") then
 		logger.fatal_fail(type(table) .. " was given to table_keys!")
 	end
@@ -39,7 +39,7 @@ function _M.table_keys(FW, table)
 end
 
 -- return a table containing the values of the provided table
-function _M.table_values(FW, table)
+function _M.table_values(table)
 	local t = {}
 	if (type(table) ~= "table") then
 		logger.fatal_fail(type(table) .. " was given to table_values!")

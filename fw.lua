@@ -369,7 +369,7 @@ function _M.exec(self)
 		URI = request_uri,
 		URI_ARGS = request_uri_args,
 		HEADERS = request_headers,
-		HEADER_NAMES = util.table_keys(self, request_headers),
+		HEADER_NAMES = util.table_keys(request_headers),
 		USER_AGENT = request_ua,
 		COOKIES = request_cookies,
 		REQUEST_BODY = request_post_args,

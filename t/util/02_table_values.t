@@ -14,7 +14,7 @@ __DATA__
         content_by_lua '
 			local util = require "lib.util"
 			local a = { foo = "bar" }
-			local b = util.table_values({}, a)
+			local b = util.table_values(a)
 			table.sort(b)
 			for i in ipairs(b) do
 				ngx.say(b[i])
@@ -35,7 +35,7 @@ bar
         content_by_lua '
 			local util = require "lib.util"
 			local a = { foo = "bar", baz = "bat", qux = "frob" }
-			local b = util.table_values({}, a)
+			local b = util.table_values(a)
 			table.sort(b)
 			for i in ipairs(b) do
 				ngx.say(b[i])
@@ -58,7 +58,7 @@ frob
         content_by_lua '
 			local util = require "lib.util"
 			local a = { foo = { "bar", "baz", "bat" }, qux = { "frob" } }
-			local b = util.table_values({}, a)
+			local b = util.table_values(a)
 			table.sort(b)
 			for i in ipairs(b) do
 				ngx.say(b[i])
@@ -83,7 +83,7 @@ frob
         content_by_lua '
             local util = require "lib.util"
             local a = { foo = "bar", foo = "baz" }
-            local b = util.table_values({}, a)
+            local b = util.table_values(a)
 			table.sort(b)
             for i in ipairs(b) do
                 ngx.say(b[i])
@@ -104,7 +104,7 @@ baz
         content_by_lua '
 			local util = require "lib.util"
 			local a = "foo, bar"
-			local b = util.table_values({}, a)
+			local b = util.table_values(a)
 			table.sort(b)
 			for i in ipairs(b) do
 				ngx.say(b[i])

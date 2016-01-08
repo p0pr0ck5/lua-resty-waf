@@ -21,26 +21,26 @@ _M.parse_collection = {
 	ignore = function(FW, collection, value)
 		logger.log(FW, "_parse_collection is ignoring a value: " .. value)
 		local _collection = {}
-		_collection = util.table_copy(FW, collection)
+		_collection = util.table_copy(collection)
 		_collection[value] = nil
 		return _collection
 	end,
 	keys = function(FW, collection)
 		logger.log(FW, "_parse_collection is getting the keys")
-		return util.table_keys(FW, collection)
+		return util.table_keys(collection)
 	end,
 	values = function(FW, collection)
 		logger.log(FW, "_parse_collection is getting the values")
-		return util.table_values(FW, collection)
+		return util.table_values(collection)
 	end,
 	all = function(FW, collection)
 		local n = 0
 		local _collection = {}
-		for _, key in ipairs(util.table_keys(FW, collection)) do
+		for _, key in ipairs(util.table_keys(collection)) do
 			n = n + 1
 			_collection[n] = key
 		end
-		for _, value in ipairs(util.table_values(FW, collection)) do
+		for _, value in ipairs(util.table_values(collection)) do
 			n = n + 1
 			_collection[n] = value
 		end
