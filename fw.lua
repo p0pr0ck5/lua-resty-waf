@@ -113,7 +113,6 @@ local function _rule_action(self, action, ctx, collections)
 		_finalize(self, ctx)
 	end
 
-	logger.log(self, "Taking the following action: " .. action)
 	lookup.actions[action](self, ctx, collections)
 end
 
@@ -231,7 +230,6 @@ local function _do_transform(self, collection, transform)
 	local t = {}
 
 	if (type(transform) == "table") then
-		logger.log(self, "multiple transforms are defined, iterating through each one")
 		t = collection
 		for k, v in ipairs(transform) do
 			t = _do_transform(self, t, transform[k])
@@ -240,7 +238,6 @@ local function _do_transform(self, collection, transform)
 		-- if the collection is a table, loop through it and add the values to the tmp table
 		-- otherwise, this returns directly to _process_rule or a recursed call from multiple transforms
 		if (type(collection) == "table") then
-			logger.log(self, "collection is a table, recursing its transform for each element")
 			for k, v in pairs(collection) do
 				t[k] = _do_transform(self, collection[k], transform)
 			end
@@ -279,7 +276,6 @@ local function _process_rule(self, rule, collections, ctx)
 
 	local t, match
 
-	logger.log(self, type(collections[var.type]))
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
 		t = collections[var.type](self, var.opts, collections)
 	else

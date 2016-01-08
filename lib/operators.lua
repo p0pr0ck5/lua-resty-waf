@@ -11,7 +11,6 @@ local _ac_dicts = {}
 function _M.equals(FW, a, b)
 	local equals
 	if (type(a) == "table") then
-		logger.log(FW, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
 			equals = _M.equals(FW, v, b)
 			if (equals) then
@@ -29,7 +28,6 @@ end
 function _M.greater(FW, a, b)
 	local greater
 	if (type(a) == "table") then
-		logger.log(FW, "Needle is a table, so recursing!")
 		for _, v in ipairs(a) do
 			greater = _M.greater(FW, v, b)
 			if (greater) then
@@ -50,7 +48,6 @@ function _M.regex_match(FW, subject, pattern)
 	local match
 
 	if (type(subject) == "table") then
-		logger.log(FW, "subject is a table, so recursing!")
 		for _, v in ipairs(subject) do
 			match = _M.regex_match(FW, v, pattern, opts)
 			if (match) then
@@ -86,7 +83,6 @@ function _M.ac_lookup(FW, needle, haystack, ctx)
 	end
 
 	if (type(needle) == "table") then
-		logger.log(FW, "needle is a table, so recursing!")
 		for _, v in ipairs(needle) do
 			match = _M.ac_lookup(FW, v, haystack, ctx)
 			if (match) then
