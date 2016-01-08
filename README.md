@@ -40,8 +40,9 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 ```lua
 	http {
-		-- include FreeWAF in the lua_package_path
+		-- include FreeWAF in the appropriate paths
 		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+		lua_package_cpath '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
 
 		init_by_lua '
 			-- preload rulesets and calculate jump offsets
