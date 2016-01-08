@@ -617,6 +617,12 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 }
 ```
 
+##Notes
+
+###Pull Requests
+
+Please target all pull requests towards the development branch, or a feature branch if the PR is a significant change. Commits to master should only come in the form of documentation updates or other changes that have no impact of the module itself (and can be cleanly merged into development).
+
 ##Roadmap
 
 * **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
