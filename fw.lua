@@ -388,8 +388,7 @@ function _M.exec(self)
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
-		logger.log(self, "Requiring " .. ruleset)
-		local rs = require("FreeWAF.rules." .. ruleset)
+		local rs = require("rules." .. ruleset)
 
 		local offset = 1
 		while offset do
@@ -456,10 +455,10 @@ end
 
 -- preload rulesets and calculate offsets
 function _M.init()
-	local calc = require "FreeWAF.lib.rule_calc"
+	local calc = require "lib.rule_calc"
 
 	for _, ruleset in ipairs(_global_active_rulesets) do
-		local r = require("FreeWAF.rules." .. ruleset)
+		local r = require("rules." .. ruleset)
 		calc.calculate(r.rules)
 	end
 end
