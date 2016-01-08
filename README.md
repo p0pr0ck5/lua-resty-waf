@@ -4,6 +4,8 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 ##Status
 
+[![Build Status](https://travis-ci.org/p0pr0ck5/FreeWAF.svg?branch=development)](https://travis-ci.org/p0pr0ck5/FreeWAF)
+
 Development of new features is currently on psuedo-hiatus. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will continue to be patched. Larger feature sets will be added in the future, but at a slower pace (see the [Roadmap](#roadmap) section for an outline of planned features).
 
 ##Description
@@ -629,7 +631,6 @@ Please target all pull requests towards the development branch, or a feature bra
 * **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
 * **Multiple phase handling**: Ties in with response collections. The biggest challenge will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
 * **Improve (debug) logging**: Log levels?
-* **Unit tests**: Testing function, collection, transform, chain, and rule behavior.
 
 ##Limitations
 
