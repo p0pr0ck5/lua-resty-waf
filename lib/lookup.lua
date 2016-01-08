@@ -2,14 +2,14 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local cjson = require("cjson")
-local file_logger = require("inc.resty.logger.file")
+local cjson         = require("cjson")
+local file_logger   = require("inc.resty.logger.file")
 local socket_logger = require("inc.resty.logger.socket")
 
-local logger	= require("lib.log")
+local logger    = require("lib.log")
 local operators = require("lib.operators")
 local storage   = require("lib.storage")
-local util	  = require("lib.util")
+local util      = require("lib.util")
 
 _M.alter_actions = { ACCEPT = true, DENY = true }
 
@@ -162,16 +162,16 @@ _M.write_log_events = {
 }
 
 _M.operators = {
-	REGEX = function(FW, subject, pattern, opts) return operators.regex_match(FW, subject, pattern, opts) end,
-	NOT_REGEX = function(FW, subject, pattern, opts) return not operators.regex_match(FW, subject, pattern, opts) end,
-	EQUALS = function(FW, a, b) return operators.equals(FW, a, b) end,
-	NOT_EQUALS = function(FW, a, b) return not operators.equals(FW, a, b) end,
-	GREATER = function(FW, a, b) return operators.greater(FW, a, b) end,
+	REGEX       = function(FW, subject, pattern, opts) return operators.regex_match(FW, subject, pattern, opts) end,
+	NOT_REGEX   = function(FW, subject, pattern, opts) return not operators.regex_match(FW, subject, pattern, opts) end,
+	EQUALS      = function(FW, a, b) return operators.equals(FW, a, b) end,
+	NOT_EQUALS  = function(FW, a, b) return not operators.equals(FW, a, b) end,
+	GREATER     = function(FW, a, b) return operators.greater(FW, a, b) end,
 	NOT_GREATER = function(FW, a, b) return not operators.greater(FW, a, b) end,
-	EXISTS = function(FW, haystack, needle) return util.table_has_value(FW, needle, haystack) end,
-	NOT_EXISTS = function(FW, haystack, needle) return not util.table_has_value(FW, needle, haystack) end,
-	PM = function(FW, needle, haystack, ctx) return operators.ac_lookup(FW, needle, haystack, ctx) end,
-	NOT_PM = function(FW, needle, haystack, ctx) return not operators.ac_lookup(FW, needle, haystack, ctx) end
+	EXISTS      = function(FW, haystack, needle) return util.table_has_value(FW, needle, haystack) end,
+	NOT_EXISTS  = function(FW, haystack, needle) return not util.table_has_value(FW, needle, haystack) end,
+	PM          = function(FW, needle, haystack, ctx) return operators.ac_lookup(FW, needle, haystack, ctx) end,
+	NOT_PM      = function(FW, needle, haystack, ctx) return not operators.ac_lookup(FW, needle, haystack, ctx) end
 }
 
 
