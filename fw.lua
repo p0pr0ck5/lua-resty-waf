@@ -339,6 +339,7 @@ function _M.exec(self)
 		return
 	end
 
+	local phase = ngx.get_phase()
 	local request_client = ngx.var.remote_addr
 	local request_http_version = ngx.req.http_version()
 	local request_method = ngx.req.get_method()
@@ -387,8 +388,8 @@ function _M.exec(self)
 		local rs = require("rules." .. ruleset)
 
 		local offset = 1
-		while offset do
-			local rule = rs.rules[offset]
+		local rule = rs.rules[phase][offset]
+		while rule do
 			if (not util.table_has_key(self, rule.id, self._ignored_rules)) then
 				local ret = _process_rule(self, rule, collections, ctx)
 				if (ret) then
@@ -400,6 +401,7 @@ function _M.exec(self)
 				logger.log(self, "Ignoring rule " .. rule.id)
 				offset = offset + rule.offset_nomatch
 			end
+			rule = rs.rules[phase][offset]
 		end
 	end
 
@@ -451,11 +453,19 @@ end
 
 -- preload rulesets and calculate offsets
 function _M.init()
-	local calc = require "lib.rule_calc"
+	local calc  = require "lib.rule_calc"
+	local phase = require "lib.phase"
 
 	for _, ruleset in ipairs(_global_active_rulesets) do
 		local r = require("rules." .. ruleset)
-		calc.calculate(r.rules)
+
+		for phase, i in pairs(phase.phases) do
+			if (r.rules[phase]) then
+				calc.calculate(r.rules[phase])
+			else
+				r.rules[phase] = {}
+			end
+		end
 	end
 end
 
