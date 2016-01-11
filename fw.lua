@@ -104,6 +104,9 @@ end
 local function _finalize(self, ctx)
 	-- write out any log events from this transaction
 	_write_log_events(self, ctx)
+
+	-- store the local copy of the ctx table
+	ngx.ctx = ctx
 end
 
 -- use the lookup table to figure out what to do
@@ -340,6 +343,7 @@ function _M.exec(self)
 	end
 
 	local phase = ngx.get_phase()
+
 	local request_client = ngx.var.remote_addr
 	local request_http_version = ngx.req.http_version()
 	local request_method = ngx.req.get_method()
@@ -352,12 +356,12 @@ function _M.exec(self)
 	local request_cookies, cookie_err = cookies:get_all()
 	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
 
-	local ctx = {}
-	ctx.altered = false
-	ctx.log_entries = {}
-	ctx.collections = {}
-	ctx.collections_key = {}
-	ctx.score = 0
+	local ctx = ngx.ctx
+	ctx.altered = ctx.altered or false
+	ctx.log_entries = ctx.log_entries or {}
+	ctx.collections = ctx.collections or {}
+	ctx.collections_key = ctx.collections_key or {}
+	ctx.score = ctx.score or 0
 
 	-- link rule collections to request data
 	-- unlike the operators and actions lookup table,
