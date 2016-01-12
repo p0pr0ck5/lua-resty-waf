@@ -4,8 +4,6 @@ _M.version = "0.5.2"
 
 local ac = require("inc.load_ac")
 local cjson = require("cjson")
-local cookiejar = require("inc.resty.cookie")
-local upload = require("inc.resty.upload")
 
 local logger  = require("lib.log")
 local lookup  = require("lib.lookup")
@@ -28,31 +26,6 @@ local function _parse_collection(self, collection, opts)
 	end
 
 	return lookup.parse_collection[opts.key](self, collection, opts.value)
-end
-
--- return a single table from multiple tables containing request data
-local function _build_common_args(self, collections)
-	local t = {}
-
-	for _, collection in pairs(collections) do
-		if (collection ~= nil) then
-			for k, v in pairs(collection) do
-				if (t[k] == nil) then
-					t[k] = v
-				else
-					if (type(t[k]) == "table") then
-						table.insert(t[k], v)
-					else
-						local _v = t[k]
-						t[k] = { _v, v }
-					end
-				end
-				logger.log(self, "t[" .. k .. "] contains " .. tostring(t[k]))
-			end
-		end
-	end
-
-	return t
 end
 
 -- buffer a single log event into the per-request ctx table
@@ -117,101 +90,6 @@ local function _rule_action(self, action, ctx, collections)
 	end
 
 	lookup.actions[action](self, ctx, collections)
-end
-
--- handle request bodies
-local function _parse_request_body(self, request_headers)
-	local content_type_header = request_headers["content-type"]
-
-	-- multiple content-type headers are likely an evasion tactic
-	-- or result from misconfigured proxies. may consider relaxing
-	-- this or adding an option to disable this checking in the future
-	if (type(content_type_header) == "table") then
-		logger.log(self, "request contained multiple content-type headers, bailing!")
-		ngx.exit(400)
-	end
-
-	-- ignore the request body if no Content-Type header is sent
-	-- this does technically violate the RFC
-	-- but its necessary for us to properly handle the request
-	-- and its likely a sign of nogoodnickery anyway
-	if (not content_type_header) then
-		logger.log(self, "request has no content type, ignoring the body")
-		ngx.req.discard_body()
-		return
-	end
-
-	-- handle the request body based on the Content-Type header
-	-- multipart/form-data requests will be streamed in via lua-resty-upload,
-	-- which provides some basic sanity checking as far as form and protocol goes
-	-- (but its much less strict that ModSecurity's strict checking)
-	if (ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], self._pcre_flags)) then
-		local form, err = upload:new()
-		if not form then
-			ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
-			ngx.exit(400) -- may move this into a ruleset along with other strict checking
-		end
-
-		ngx.req.init_body()
-		form:set_timeout(1000)
-
-		-- initial boundary
-		ngx.req.append_body("--" .. form.boundary)
-
-		-- this is gonna need some tlc, but it seems to work for now
-		local lasttype, chunk
-		while true do
-			local typ, res, err = form:read()
-			if not typ then
-				logger.fatal_fail("failed to stream request body: " .. err)
-			end
-
-			if (typ == "header") then
-				chunk = res[3] -- form:read() returns { key, value, line } here
-				ngx.req.append_body("\n" .. chunk)
-			elseif (typ == "body") then
-				chunk = res
-				if (lasttype == "header") then
-					ngx.req.append_body("\n\n")
-				end
-				ngx.req.append_body(chunk)
-			elseif (typ == "part_end") then
-				ngx.req.append_body("\n--" .. form.boundary)
-			elseif (typ == "eof") then
-				ngx.req.append_body("--\n")
-				break
-			end
-
-			lasttype = typ
-		end
-
-		-- lua-resty-upload docs use one final read, i think it's needed to get
-		-- the last part of the data off the socket
-		form:read()
-		ngx.req.finish_body()
-
-		return nil
-	elseif (content_type_header == "application/x-www-form-urlencoded") then
-		-- use the underlying ngx API to read the request body
-		-- deny the request if the content length is larger than client_body_buffer_size
-		-- to avoid wasting resources on ruleset matching of very large data sets
-		ngx.req.read_body()
-		if (ngx.req.get_body_file() == nil) then
-			return ngx.req.get_post_args()
-		else
-			logger.log(self, "very large form upload, not parsing")
-			_rule_action(self, "DENY")
-		end
-	elseif (util.table_has_value(self, content_type_header, self._allowed_content_types)) then
-		-- users can whitelist specific content types that will be passed in but not parsed
-		-- read the request in, but don't set collections[REQUEST_BODY]
-		-- as we have no way to know what kind of data we're getting (i.e xml/json/octet stream)
-		ngx.req.read_body()
-		return nil
-	else
-		logger.log(self, tostring(content_type_header) .. " not a valid content type!")
-		_rule_action(self, "DENY")
-	end
 end
 
 -- build the transform portion of the collection memoization key
@@ -292,17 +170,17 @@ local function _process_rule(self, rule, collections, ctx)
 
 		logger.log(self, "checking for memokey " .. memokey)
 
-		if (not ctx.collections_key[memokey]) then
+		if (not ctx.transform_key[memokey]) then
 			logger.log(self, "parsing collections for rule " .. id)
 			t = _parse_collection(self, collections[var.type], var.opts)
 			if (opts.transform) then
 				t = _do_transform(self, t, opts.transform)
 			end
-			ctx.collections[memokey] = t
-			ctx.collections_key[memokey] = true
+			ctx.transform[memokey] = t
+			ctx.transform_key[memokey] = true
 		else
 			logger.log(self, "parse collection cache hit!")
-			t = ctx.collections[memokey]
+			t = ctx.transform[memokey]
 		end
 	end
 
@@ -342,49 +220,27 @@ function _M.exec(self)
 		return
 	end
 
-	local phase = ngx.get_phase()
+	local phase       = ngx.get_phase()
+	local ctx         = ngx.ctx
+	local collections = ctx.collections or {}
 
-	local request_client = ngx.var.remote_addr
-	local request_http_version = ngx.req.http_version()
-	local request_method = ngx.req.get_method()
-	local request_uri = ngx.var.uri
-	local request_uri_args = ngx.req.get_uri_args()
-	local request_headers = ngx.req.get_headers()
-	local request_ua = ngx.var.http_user_agent
-	local request_post_args = _parse_request_body(self, request_headers)
-	local cookies = cookiejar:new()
-	local request_cookies, cookie_err = cookies:get_all()
-	local request_common_args = _build_common_args(self, { request_uri_args, request_post_args, request_cookies })
+	ctx.altered       = ctx.altered or false
+	ctx.log_entries   = ctx.log_entries or {}
+	ctx.transform     = ctx.transform or {}
+	ctx.transform_key = ctx.transform_key or {}
+	ctx.score         = ctx.score or 0
 
-	local ctx = ngx.ctx
-	ctx.altered = ctx.altered or false
-	ctx.log_entries = ctx.log_entries or {}
-	ctx.collections = ctx.collections or {}
-	ctx.collections_key = ctx.collections_key or {}
-	ctx.score = ctx.score or 0
+	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
+	if (ctx.altered) then
+		logger.log(self, "Transaction was already altered, not running!")
+		return
+	end
 
-	-- link rule collections to request data
-	-- unlike the operators and actions lookup table,
-	-- this needs data specific to each individual request
-	-- so we have to instantiate it here
-	local collections = {
-		IP = request_client,
-		HTTP_VERSION = request_http_version,
-		METHOD = request_method,
-		URI = request_uri,
-		URI_ARGS = request_uri_args,
-		HEADERS = request_headers,
-		HEADER_NAMES = util.table_keys(request_headers),
-		USER_AGENT = request_ua,
-		COOKIES = request_cookies,
-		REQUEST_BODY = request_post_args,
-		REQUEST_ARGS = request_common_args,
-		VAR = function(self, opts, collections) return storage.get_var(self, opts.value, collections) end,
-		SCORE = function() return ctx.score end,
-		SCORE_THRESHOLD = function(self) return self._score_threshold end,
-		WHITELIST = function(self) return self._whitelist end,
-		BLACKLIST = function(self) return self._blacklist end,
-	}
+	-- populate the collections table
+	lookup.collections[phase](self, collections, ctx)
+
+	-- store the collections table in ctx, which will get saved to ngx.ctx
+	ctx.collections = collections
 
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)

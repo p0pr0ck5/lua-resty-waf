@@ -8,10 +8,45 @@ local socket_logger = require("inc.resty.logger.socket")
 
 local logger    = require("lib.log")
 local operators = require("lib.operators")
+local request   = require("lib.request")
 local storage   = require("lib.storage")
 local util      = require("lib.util")
 
 _M.alter_actions = { ACCEPT = true, DENY = true }
+
+_M.collections = {
+	access = function(FW, collections, ctx)
+		local request_headers       = ngx.req.get_headers()
+		local request_post_args     = request.parse_request_body(FW, request_headers)
+		local request_cookies       = request.cookies()
+		local request_common_args   = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
+
+		collections.IP              = ngx.var.remote_addr
+		collections.HTTP_VERSION    = ngx.req.http_version()
+		collections.METHOD          = ngx.req.get_method()
+		collections.URI             = ngx.var.uri
+		collections.URI_ARGS        = ngx.req.get_uri_args()
+		collections.HEADERS         = request_headers
+		collections.HEADER_NAMES    = util.table_keys(request_headers)
+		collections.USER_AGENT      = ngx.var.http_user_agent
+		collections.COOKIES         = request_cookies
+		collections.REQUEST_BODY    = request_post_args
+		collections.REQUEST_ARGS    = request_common_args
+		collections.VAR             = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections) end
+		collections.SCORE           = function() return ctx.score end
+		collections.SCORE_THRESHOLD = function(FW) return FW._score_threshold end
+		collections.WHITELIST       = function(FW) return FW._whitelist end
+		collections.BLACKLIST       = function(FW) return FW._blacklist end
+	end,
+	header_filter = function(FW, collections)
+		local response_headers = ngx.resp.get_headers()
+
+		collections.RESPONSE_HEADERS      = response_headers
+		collections.RESPONSE_HEADER_NAMES = util.table_keys(response_headers)
+		collections.STATUS                = ngx.status
+	end,
+	body_filter = function() end
+}
 
 _M.parse_collection = {
 	specific = function(FW, collection, value)
