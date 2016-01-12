@@ -17,6 +17,7 @@ _M.alter_actions = { ACCEPT = true, DENY = true }
 _M.collections = {
 	access = function(FW, collections, ctx)
 		local request_headers       = ngx.req.get_headers()
+		local request_uri_args      = ngx.req.get_uri_args()
 		local request_post_args     = request.parse_request_body(FW, request_headers)
 		local request_cookies       = request.cookies()
 		local request_common_args   = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
@@ -25,7 +26,7 @@ _M.collections = {
 		collections.HTTP_VERSION    = ngx.req.http_version()
 		collections.METHOD          = ngx.req.get_method()
 		collections.URI             = ngx.var.uri
-		collections.URI_ARGS        = ngx.req.get_uri_args()
+		collections.URI_ARGS        = request_uri_args
 		collections.HEADERS         = request_headers
 		collections.HEADER_NAMES    = util.table_keys(request_headers)
 		collections.USER_AGENT      = ngx.var.http_user_agent
