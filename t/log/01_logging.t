@@ -80,7 +80,7 @@ We have logged a string!
 GET /t
 --- reponse_body
 --- error_log eval
-qr/[warn].*We have logged a string!/
+qr/\[warn\].*We have logged a string!/
 --- no_error_log
 [error]
 
@@ -95,7 +95,7 @@ qr/[warn].*We have logged a string!/
 		access_by_lua '
 			local fw = FreeWAF:new()
 			fw:set_option("debug", true)
-			fw:set_option("debug_log_level", ngx.WARN)
+			fw:set_option("debug_log_level", ngx.DEBUG)
 			logger.log(fw, "We have logged a string!")
 		';
 
@@ -105,7 +105,7 @@ qr/[warn].*We have logged a string!/
 GET /t
 --- reponse_body
 --- error_log eval
-qr/[warn].*We have logged a string!/
+qr/\[debug\].*We have logged a string!/
 --- no_error_log
 [error]
 
