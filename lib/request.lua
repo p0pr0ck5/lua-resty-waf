@@ -106,11 +106,6 @@ function _M.cookies()
 	local cookies = cookiejar:new()
 	local request_cookies, cookie_err = cookies:get_all()
 
-	if (cookie_err) then
-		ngx.log(ngx.WARN, "Error getting request cookies: " .. cookie_err)
-		return
-	end
-
 	return request_cookies
 end
 
