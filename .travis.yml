@@ -20,4 +20,5 @@ before_script:
     - tar xzf ngx_openresty-$V_OPENRESTY.tar.gz
     - cd ngx_openresty-$V_OPENRESTY && ./configure --with-pcre=../pcre-$V_PCRE --with-pcre-jit --with-pcre-opt=-g --with-debug && make && sudo make install && cd ..
 script:
-  - make test
+  - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/unit
+  - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/acceptance
