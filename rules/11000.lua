@@ -5,90 +5,92 @@ local _M = {}
 _M.version = "0.5.2"
 
 _M.rules = {
-	{
-		id = 11001,
-		var  = {
-			type = "METHOD",
-			opts = nil,
-			pattern = [=[^(?:GET|HEAD)$]=],
-			operator = "REGEX"
+	access = {
+		{
+			id = 11001,
+			var  = {
+				type = "METHOD",
+				opts = nil,
+				pattern = [=[^(?:GET|HEAD)$]=],
+				operator = "REGEX"
+			},
+			opts = { nolog = true },
+			action = "CHAIN",
+			description = "Ignore passive requests with no arguments"
 		},
-		opts = { nolog = true },
-		action = "CHAIN",
-		description = "Ignore passive requests with no arguments"
-	},
-	{
-		id = 11002,
-		var = {
-			type = "REQUEST_ARGS",
-			opts = { key = "all" },
-			pattern = [=[.*]=],
-			operator = "NOT_REGEX",
+		{
+			id = 11002,
+			var = {
+				type = "REQUEST_ARGS",
+				opts = { key = "all" },
+				pattern = [=[.*]=],
+				operator = "NOT_REGEX",
+			},
+			opts = { nolog = true },
+			action = "ACCEPT",
+			description = "Ignore passive requests with no arguments"
 		},
-		opts = { nolog = true },
-		action = "ACCEPT",
-		description = "Ignore passive requests with no arguments"
-	},
-	{
-		id = 11003,
-		var = {
-			type = "METHOD",
-			opts = nil,
-			pattern = [=[^(?:GET|HEAD)$]=],
-			operator = "NOT_REGEX"
+		{
+			id = 11003,
+			var = {
+				type = "METHOD",
+				opts = nil,
+				pattern = [=[^(?:GET|HEAD)$]=],
+				operator = "NOT_REGEX"
+			},
+			opts = { skip = 4, nolog = true },
+			action = "SKIP",
+			description = "Skip whitelisting of some extensions for non-passive requests"
 		},
-		opts = { skip = 4, nolog = true },
-		action = "SKIP",
-		description = "Skip whitelisting of some extensions for non-passive requests"
-	},
-	{
-		id = 11004,
-		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[\.(?:(?:jpe?|pn)g|gif|ico)$]=],
-			operator = "REGEX"
+		{
+			id = 11004,
+			var = {
+				type = "URI",
+				opts = nil,
+				pattern = [=[\.(?:(?:jpe?|pn)g|gif|ico)$]=],
+				operator = "REGEX"
+			},
+			opts = { nolog = true },
+			action = "ACCEPT",
+			description = "Whitelisting extensions - images"
 		},
-		opts = { nolog = true },
-		action = "ACCEPT",
-		description = "Whitelisting extensions - images"
-	},
-	{
-		id = 11005,
-		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[\.(?:doc|pdf|txt|xls)$]=],
-			operator = "REGEX"
+		{
+			id = 11005,
+			var = {
+				type = "URI",
+				opts = nil,
+				pattern = [=[\.(?:doc|pdf|txt|xls)$]=],
+				operator = "REGEX"
+			},
+			opts = { nolog = true },
+			action = "ACCEPT",
+			description = "Whitelisting extensions - documents"
 		},
-		opts = { nolog = true },
-		action = "ACCEPT",
-		description = "Whitelisting extensions - documents"
-	},
-	{
-		id = 11006,
-		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[\.(?:(?:cs|j)s|html?)$]=],
-			operator = "REGEX"
+		{
+			id = 11006,
+			var = {
+				type = "URI",
+				opts = nil,
+				pattern = [=[\.(?:(?:cs|j)s|html?)$]=],
+				operator = "REGEX"
+			},
+			opts = { nolog = true },
+			action = "ACCEPT",
+			description = "Whitelisting extensions - HTML"
 		},
-		opts = { nolog = true },
-		action = "ACCEPT",
-		description = "Whitelisting extensions - HTML"
-	},
-	{
-		id = 11007,
-		var = {
-			type = "URI",
-			opts = nil,
-			pattern = [=[\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$]=],
-			operator = "REGEX"
+		{
+			id = 11007,
+			var = {
+				type = "URI",
+				opts = nil,
+				pattern = [=[\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$]=],
+				operator = "REGEX"
+			},
+			opts = { nolog = true },
+			action = "ACCEPT",
+			description = "Whitelisting extensions - media"
 		},
-		opts = { nolog = true },
-		action = "ACCEPT",
-		description = "Whitelisting extensions - media"
-	},
+	}
 }
 
 return _M

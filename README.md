@@ -373,6 +373,7 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 
 Defines an interval, in seconds, at which the event log buffer will periodically flush. If no value is configured, the buffer will not flush periodically, and will only flush when the `event_log_buffer_size` threshold is reached. Configure this option for very low traffic sites that may not receive any event log data in a long period of time, to prevent stale data from sitting in the buffer.
 
+*Example*:
 
 ```lua
 	location / {
@@ -389,6 +390,8 @@ Defines an interval, in seconds, at which the event log buffer will periodically
 
 Determines whether to write log entries for rule matches in a transaction that was not altered by FreeWAF. "Altered" is defined as FreeWAF acting on a rule whose action is `ACCEPT` or `DENY`. When this option is unset, FreeWAF will log rule matches even if the transaction was not altered. By default, FreeWAF will only write log entries for matches if the transaction was altered.
 
+*Example*:
+
 ```lua
 	location / {
 		access_by_lua '
@@ -398,6 +401,41 @@ Determines whether to write log entries for rule matches in a transaction that w
 ```
 
 Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but FreeWAF is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
+
+###res_body_max_size
+
+*Default*: 1048576 (1 MB)
+
+Defines the content length threshold beyond which response bodies will not be processed. This size of the response body is determined by the Content-Length response header. If this header does not exist in the response, the response body will never be processed.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- increase the max response size to 2 MB
+			fw:set_option("res_body_max_size", 1024 * 1024 * 2)
+		';
+	}
+```
+Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
+
+###res_body_mime_types
+
+*Default*: "text/plain", "text/html"
+
+Defines the MIME types with which FreeWAF will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
+
+```lua
+	location / {
+		access_by_lua '
+			-- mime types that will be processed are now text/plain, text/html, and text/json
+			fw:set_option("res_body_mime_types", "text/json")
+		';
+	}
+```
+
+Multiple MIME types can be added by passing a table of types to `set_option`.
 
 ###storage_zone
 
@@ -527,6 +565,9 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **HTTP_VERSION**: An integer representation of the HTTP version used in the request.
 * **IP**: The IP address of client.
 * **METHOD**: The HTTP method specified in the request.
+* **RESPONSE_BODY**: The response body. This collection will not be populated if response body is too large, or the content type is not in the list of valid MIME types. Available only in the `body_filter` phase.
+* **RESPONSE_HEADERS**: A table containing the response headers. Available only in `header_filter` and later phases.
+* **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
 * **SCORE**: An integer representing the currently anomaly score for the request.
@@ -629,8 +670,6 @@ Please target all pull requests towards the development branch, or a feature bra
 ##Roadmap
 
 * **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
-* **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
-* **Multiple phase handling**: Ties in with response collections. The biggest challenge will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
 * **Improve (debug) logging**: Log levels?
 
 ##Limitations
