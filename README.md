@@ -93,7 +93,7 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 ##Options
 
-Module options can be configured using the `set_option` function. Details for available options are provided below.
+Module options can be configured using the `set_option` function. Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
 
 ###mode
 
@@ -500,6 +500,16 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 	}
 ```
 
+##Phase Handling
+
+FreeWAF is designed to run in multiple phases of the request lifecycle. Rules can be processed in the following phases:
+
+* **access**: Request information, such as URI, request headers, URI args, and request body are available in this phase.
+* **header_filter**: Response headers and HTTP status are available in this phase.
+* **body_filter**: Response body is available in this phase.
+
+These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running FreeWAF in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
+
 ##Included Rulesets
 
 FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
@@ -530,7 +540,6 @@ A string that describes the purpose of the rule. This is purely descriptive.
 ###action
 
 An enum (currently implemented as a string) that defines how the rule processor will act if a rule is a positive match. See the section on rule actions for available options.
-
 
 ###opts
 
@@ -645,9 +654,9 @@ Persistent data is set with the `SETVAR` action. This requires the associated ru
 Storage keys can be dynamically defined using dynamic parse syntax; this mimics the functionality of ModSecurity's `initcol` and `setvar` options. For example, a rule group to set a storage variable designed to track requests to a specific resource might look like this:
 
 ```lua
-{   
+{
 	id = 12345,
-	var = { 
+	var = {
 		type = "URI",
 		opts = nil,
 		pattern = '/wp-login.php',
