@@ -2,9 +2,6 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local ac = require("inc.load_ac")
-local cjson = require("cjson")
-
 local logger  = require("lib.log")
 local lookup  = require("lib.lookup")
 local storage = require("lib.storage")
