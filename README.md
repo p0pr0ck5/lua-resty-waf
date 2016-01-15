@@ -54,7 +54,33 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 	server {
 		location / {
 			access_by_lua '
-				FreeWAF = require "FreeWAF.fw"
+				local FreeWAF = require "FreeWAF.fw"
+
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- setup FreeWAF to deny requests that match a rule
+				fw:set_option("mode", "ACTIVE")
+
+				-- run the firewall
+				fw:exec()
+			';
+
+			header_filter_by_lua '
+				local FreeWAF = require "FreeWAF.fw"
+
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- setup FreeWAF to deny requests that match a rule
+				fw:set_option("mode", "ACTIVE")
+
+				-- run the firewall
+				fw:exec()
+			';
+
+			body_filter_by_lua '
+				local FreeWAF = require "FreeWAF.fw"
 
 				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
@@ -663,6 +689,10 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 
 ##Notes
 
+###Communication
+
+There is a Freenode IRC channel `#freewaf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
+
 ###Pull Requests
 
 Please target all pull requests towards the development branch, or a feature branch if the PR is a significant change. Commits to master should only come in the form of documentation updates or other changes that have no impact of the module itself (and can be cleanly merged into development).
@@ -670,11 +700,14 @@ Please target all pull requests towards the development branch, or a feature bra
 ##Roadmap
 
 * **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
-* **Improve (debug) logging**: Log levels?
+* **Expanded Integration/Acceptance Testing**: Increase coverage of common threats and usage scenarios.
+* **Support for different/multiple persistent storage engines**: Memcached, redis, etc (in addition to ngx.shared).
+* **Common application profiles**: Tuned rulesets for common CMS/applications.
+* **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project
 
 ##Limitations
 
-FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo. 
+FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo.
 
 ##License
 

@@ -10,11 +10,10 @@ install:
     - cpanm -v --notest Test::Nginx
 before_script:
     - sudo apt-get update -q
-    - sudo apt-get install libreadline-dev libncurses5-dev libpcre3-dev libssl-dev -y
-    - sudo apt-get install make build-essential -y
+    - sudo apt-get install libssl-dev -y
     - wget https://openresty.org/download/ngx_openresty-$V_OPENRESTY.tar.gz
     - wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$V_PCRE.tar.bz2
-    - tar xjf pcre-8.38.tar.bz2
+    - tar xjf pcre-$V_PCRE.tar.bz2
     - tar xzf ngx_openresty-$V_OPENRESTY.tar.gz
     - cd ngx_openresty-$V_OPENRESTY && ./configure --with-pcre=../pcre-$V_PCRE --with-pcre-jit --with-pcre-opt=-g --with-debug && make && sudo make install && cd ..
 script:

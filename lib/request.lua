@@ -81,7 +81,7 @@ function _M.parse_request_body(FW, request_headers)
 		return nil
     elseif (content_type_header == "application/x-www-form-urlencoded") then
         -- use the underlying ngx API to read the request body
-        -- deny the request if the content length is larger than client_body_buffer_size
+        -- ignore processing the request body if the content length is larger than client_body_buffer_size
         -- to avoid wasting resources on ruleset matching of very large data sets
         ngx.req.read_body()
         if (ngx.req.get_body_file() == nil) then
