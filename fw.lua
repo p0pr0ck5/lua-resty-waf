@@ -57,7 +57,7 @@ end
 -- push log data regarding matching rule(s) to the configured target
 -- in the case of socket or file logging, this data will be buffered
 local function _write_log_events(self, ctx)
-	if (not ctx.altered and self._event_log_altered_only) then
+	if (not ctx.altered[ctx.phase] and self._event_log_altered_only) then
 		logger.log(self, "Not logging a request that wasn't altered")
 		return
 	end
@@ -103,7 +103,7 @@ end
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
 	if (util.table_has_key(self, action, lookup.alter_actions)) then
-		ctx.altered = true
+		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
 	end
 
@@ -247,14 +247,15 @@ function _M.exec(self)
 		_load(self, ctx.opts)
 	end
 
-	ctx.altered       = ctx.altered or false
+	ctx.altered       = ctx.altered or {}
 	ctx.log_entries   = ctx.log_entries or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
 	ctx.score         = ctx.score or 0
+	ctx.phase         = phase
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
-	if (ctx.altered) then
+	if (ctx.altered[phase]) then
 		logger.log(self, "Transaction was already altered, not running!")
 		return
 	end
