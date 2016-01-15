@@ -70,10 +70,9 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 				local FreeWAF = require "FreeWAF.fw"
 
 				-- instantiate a new instance of the module
+				-- note that options set in previous handlers
+				-- do not need to be set again
 				local fw = FreeWAF:new()
-
-				-- setup FreeWAF to deny requests that match a rule
-				fw:set_option("mode", "ACTIVE")
 
 				-- run the firewall
 				fw:exec()
@@ -84,9 +83,6 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
-
-				-- setup FreeWAF to deny requests that match a rule
-				fw:set_option("mode", "ACTIVE")
 
 				-- run the firewall
 				fw:exec()

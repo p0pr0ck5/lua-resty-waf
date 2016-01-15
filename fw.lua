@@ -70,10 +70,31 @@ local function _write_log_events(self, ctx)
 	ctx.log_entries = {}
 end
 
+-- restore options from a previous phase
+local function _load(self, opts)
+	for k, v in pairs(opts) do
+		self[k] = v
+	end
+end
+
+-- save options to the ctx table to be used in another phase
+local function _save(self, ctx)
+	local opts = {}
+
+	for k, v in pairs(self) do
+		opts[k] = v
+	end
+
+	ctx.opts = opts
+end
+
 -- cleanup
 local function _finalize(self, ctx)
 	-- write out any log events from this transaction
 	_write_log_events(self, ctx)
+
+	-- save our options for the next phase
+	_save(self, ctx)
 
 	-- store the local copy of the ctx table
 	ngx.ctx = ctx
@@ -220,6 +241,11 @@ function _M.exec(self)
 	local phase       = ngx.get_phase()
 	local ctx         = ngx.ctx
 	local collections = ctx.collections or {}
+
+	-- restore options from a previous phase
+	if (ctx.opts) then
+		_load(self, ctx.opts)
+	end
 
 	ctx.altered       = ctx.altered or false
 	ctx.log_entries   = ctx.log_entries or {}
