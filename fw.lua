@@ -104,7 +104,6 @@ end
 
 -- transform collection values based on rule opts
 local function _do_transform(self, collection, transform)
-	-- create a new tmp table to hold the transformed values
 	local t = {}
 
 	if (type(transform) == "table") then
@@ -134,8 +133,6 @@ local function _do_transform(self, collection, transform)
 end
 
 -- process an individual rule
--- note that using a local per-request table to pass transient data
--- is more efficient than using ngx.ctx
 local function _process_rule(self, rule, collections, ctx)
 	local id      = rule.id
 	local var     = rule.var
@@ -214,9 +211,6 @@ local function _process_rule(self, rule, collections, ctx)
 end
 
 -- main entry point
--- data associated with a given request in kept local in scope to this function
--- because the lua api only loads this module once, so module-level variables
--- can be cross-polluted
 function _M.exec(self)
 	if (self._mode == "INACTIVE") then
 		logger.log(self, "Operational mode is INACTIVE, not running")
@@ -273,7 +267,7 @@ function _M.exec(self)
 	end
 
 	_finalize(self, ctx)
-end -- fw.exec()
+end
 
 -- instantiate a new instance of the module
 function _M.new(self)
