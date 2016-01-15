@@ -32,15 +32,19 @@ function _M.set_var(FW, ctx, collections)
 	local key = util.parse_dynamic_value(FW, ctx.rule_setvar_key, collections)
 	local value = util.parse_dynamic_value(FW, ctx.rule_setvar_value, collections)
 	local expire = ctx.rule_setvar_expire or 0
+
 	logger.log(FW, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+
 	local shm = ngx.shared[FW._storage_zone]
 
 	-- values can have arithmetic operations performed on them
 	local incr = ngx.re.match(value, [=[^([\+\-\*\/])(\d+)]=], FW._pcre_flags)
+
 	if (incr) then
 		local operator = incr[1]
 		local newval = incr[2]
 		local oldval = _M.retrieve_persistent_var(FW, key)
+
 		if (not oldval) then
 			oldval = 0
 		end
@@ -58,8 +62,8 @@ function _M.set_var(FW, ctx, collections)
 
 	logger.log(FW, "actually setting " .. key .. " to " .. value)
 
-	logger.log(FW, "expiring in " .. expire)
 	local ok = shm:safe_set(key, value, expire)
+
 	if (not ok) then
 		ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. FW._storage_zone)
 	end

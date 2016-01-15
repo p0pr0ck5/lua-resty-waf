@@ -10,6 +10,7 @@ local _ac_dicts = {}
 
 function _M.equals(FW, a, b)
 	local equals
+
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
 			equals = _M.equals(FW, v, b)
@@ -27,6 +28,7 @@ end
 
 function _M.greater(FW, a, b)
 	local greater
+
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
 			greater = _M.greater(FW, v, b)
@@ -50,14 +52,20 @@ function _M.regex_match(FW, subject, pattern)
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
 			match = _M.regex_match(FW, v, pattern, opts)
+
 			if (match) then
 				break
 			end
 		end
 	else
 		logger.log(FW, "matching " .. subject .. " against " .. pattern)
+
 		from, to, err = ngx.re.find(subject, pattern, opts)
-		if err then ngx.log(ngx.WARN, "error in regex_match: " .. err) end
+
+		if err then
+			ngx.log(ngx.WARN, "error in regex_match: " .. err)
+		end
+
 		if from then
 			logger.log(FW, "regex match! " .. string.sub(subject, from, to))
 			match = string.sub(subject, from, to)
@@ -85,6 +93,7 @@ function _M.ac_lookup(FW, needle, haystack, ctx)
 	if (type(needle) == "table") then
 		for _, v in ipairs(needle) do
 			match = _M.ac_lookup(FW, v, haystack, ctx)
+
 			if (match) then
 				break
 			end

@@ -112,6 +112,7 @@ local function _do_transform(self, collection, transform)
 
 	if (type(transform) == "table") then
 		t = collection
+
 		for k, v in ipairs(transform) do
 			t = _do_transform(self, t, transform[k])
 		end
@@ -139,11 +140,10 @@ end
 -- note that using a local per-request table to pass transient data
 -- is more efficient than using ngx.ctx
 local function _process_rule(self, rule, collections, ctx)
-	local id = rule.id
-	local var = rule.var
-	local opts = rule.opts
-	local action = rule.action
-	local description = rule.description
+	local id      = rule.id
+	local var     = rule.var
+	local opts    = rule.opts
+	local action  = rule.action
 	local pattern = var.pattern
 
 	ctx.id = id
@@ -161,6 +161,7 @@ local function _process_rule(self, rule, collections, ctx)
 		t = collections[var.type](self, var.opts, collections)
 	else
 		local memokey
+
 		if (var.opts ~= nil) then
 			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
 		else
@@ -173,9 +174,11 @@ local function _process_rule(self, rule, collections, ctx)
 		if (not ctx.transform_key[memokey]) then
 			logger.log(self, "parsing collections for rule " .. id)
 			t = _parse_collection(self, collections[var.type], var.opts)
+
 			if (opts.transform) then
 				t = _do_transform(self, t, opts.transform)
 			end
+
 			ctx.transform[memokey] = t
 			ctx.transform_key[memokey] = true
 		else
@@ -192,7 +195,9 @@ local function _process_rule(self, rule, collections, ctx)
 			logger.log(self, "parsing dynamic pattern: " .. pattern)
 			pattern = util.parse_dynamic_value(self, pattern, collections)
 		end
+
 		match = lookup.operators[var.operator](self, t, pattern, ctx)
+
 		if (match) then
 			logger.log(self, "Match of rule " .. id .. "!")
 
@@ -203,6 +208,7 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			_rule_action(self, action, ctx, collections)
+
 			return rule.offset_match
 		else
 			return rule.offset_nomatch
@@ -275,28 +281,28 @@ end -- fw.exec()
 -- instantiate a new instance of the module
 function _M.new(self)
 	return setmetatable({
-		_mode = "SIMULATE",
-		_whitelist = {},
-		_blacklist = {},
-		_active_rulesets = _global_active_rulesets,
-		_ignored_rules = {},
-		_allowed_content_types = {},
-		_debug = false,
-		_debug_log_level = ngx.INFO,
-		_event_log_level = ngx.INFO,
-		_event_log_verbosity = 1,
-		_event_log_target = 'error',
-		_event_log_target_host = '',
-		_event_log_target_port = '',
-		_event_log_target_path = '',
-		_event_log_buffer_size = 4096,
+		_mode                     = "SIMULATE",
+		_whitelist                = {},
+		_blacklist                = {},
+		_active_rulesets          = _global_active_rulesets,
+		_ignored_rules            = {},
+		_allowed_content_types    = {},
+		_debug                    = false,
+		_debug_log_level          = ngx.INFO,
+		_event_log_level          = ngx.INFO,
+		_event_log_verbosity      = 1,
+		_event_log_target         = 'error',
+		_event_log_target_host    = '',
+		_event_log_target_port    = '',
+		_event_log_target_path    = '',
+		_event_log_buffer_size    = 4096,
 		_event_log_periodic_flush = nil,
-		_event_log_altered_only = true,
-		_res_body_max_size = (1024 * 1024),
-		_res_body_mime_types = { "text/plain", "text/html" },
-		_pcre_flags = 'oij',
-		_score_threshold = 5,
-		_storage_zone = nil
+		_event_log_altered_only   = true,
+		_res_body_max_size        = (1024 * 1024),
+		_res_body_mime_types      = { "text/plain", "text/html" },
+		_pcre_flags               = 'oij',
+		_score_threshold          = 5,
+		_storage_zone             = nil
 	}, mt)
 end
 

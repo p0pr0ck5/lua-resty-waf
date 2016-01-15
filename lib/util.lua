@@ -9,13 +9,16 @@ local logger = require("lib.log")
 function _M.table_copy(orig)
 	local orig_type = type(orig)
 	local copy
+
 	if (orig_type == 'table') then
 		copy = {}
+
 		for orig_key, orig_value in next, orig, nil do
 			copy[_M.table_copy(orig_key)] = _M.table_copy(orig_value)
 		end
+
 		setmetatable(copy, _M.table_copy(FW, getmetatable(orig)))
-	else -- number, string, boolean, etc
+	else
 		copy = orig
 	end
 	return copy
@@ -32,7 +35,7 @@ function _M.table_keys(table)
 
 	for key, _ in pairs(table) do
 		n = n + 1
-		t[n] = tostring(key) -- tostring is probably too large a hammer
+		t[n] = tostring(key)
 	end
 
 	return t
@@ -40,11 +43,11 @@ end
 
 -- return a table containing the values of the provided table
 function _M.table_values(table)
-	local t = {}
 	if (type(table) ~= "table") then
 		logger.fatal_fail(type(table) .. " was given to table_values!")
 	end
 
+	local t = {}
 	local n = 0
 
 	for _, value in pairs(table) do
@@ -69,7 +72,9 @@ function _M.table_has_key(FW, needle, haystack)
 	if (type(haystack) ~= "table") then
 		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
+
 	logger.log(FW, "table key " .. needle .. " is " .. tostring(haystack[needle]))
+
 	return haystack[needle] ~= nil
 end
 
@@ -83,8 +88,12 @@ function _M.table_has_value(FW, needle, haystack)
 
 	for _, value in pairs(haystack) do
 		logger.log(FW, "Checking " .. value)
-		if (value == needle) then return true end
+
+		if (value == needle) then
+			return true
+		end
 	end
+
 	return false
 end
 
@@ -110,7 +119,9 @@ function _M.parse_dynamic_value(FW, key, collections)
 	-- %{VAL}
 	-- and find it in the lookup table
 	local str = ngx.re.gsub(key, [=[%{([^{]*)}]=], lookup, FW._pcre_flags)
+
 	logger.log(FW, "parsed dynamic value is " .. str)
+
 	if (ngx.re.find(str, [=[^\d+$]=], FW._pcre_flags)) then
 		return tonumber(str)
 	else
