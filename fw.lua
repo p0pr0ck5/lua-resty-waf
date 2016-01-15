@@ -237,7 +237,11 @@ function _M.exec(self)
 	end
 
 	-- populate the collections table
-	lookup.collections[phase](self, collections, ctx)
+	local short_circuit = lookup.collections[phase](self, collections, ctx)
+
+	-- don't run through the rulesets if we're going to be here again
+	-- (e.g. multiple chunks are going through body_filter)
+	if short_circuit then return end
 
 	-- store the collections table in ctx, which will get saved to ngx.ctx
 	ctx.collections = collections
@@ -288,6 +292,8 @@ function _M.new(self)
 		_event_log_buffer_size = 4096,
 		_event_log_periodic_flush = nil,
 		_event_log_altered_only = true,
+		_res_body_max_size = (1024 * 1024),
+		_res_body_mime_types = { "text/plain", "text/html" },
 		_pcre_flags = 'oij',
 		_score_threshold = 5,
 		_storage_zone = nil

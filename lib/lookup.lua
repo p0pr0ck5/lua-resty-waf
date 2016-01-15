@@ -46,7 +46,41 @@ _M.collections = {
 		collections.RESPONSE_HEADER_NAMES = util.table_keys(response_headers)
 		collections.STATUS                = ngx.status
 	end,
-	body_filter = function() end
+	body_filter = function(FW, collections, ctx)
+		if ctx.buffers == nil then
+			ctx.buffers = {}
+			ctx.nbuffers = 0
+		end
+
+		local data  = ngx.arg[1]
+		local eof   = ngx.arg[2]
+		local index = ctx.nbuffers + 1
+
+		local res_length = tonumber(collections.RESPONSE_HEADERS["content-length"])
+		local res_type   = collections.RESPONSE_HEADERS["content-type"]
+
+		if (not res_length or res_length > FW._res_body_max_size) then
+			return not eof
+		end
+
+		if (not res_type or not util.table_has_value(FW, res_type, FW._res_body_mime_types)) then
+			return not eof
+		end
+
+		if data then
+			ctx.buffers[index] = data
+			ctx.nbuffers = index
+		end
+
+		if not eof then
+			-- Send nothing to the client yet.
+			ngx.arg[1] = nil
+			return 1
+		else
+			collections.RESPONSE_BODY = table.concat(ctx.buffers, '')
+			ngx.arg[1] = collections.RESPONSE_BODY
+		end
+	end
 }
 
 _M.parse_collection = {
@@ -249,6 +283,10 @@ _M.set_option = {
 		local t = FW._allowed_content_types
 		FW._allowed_content_types[#t + 1] = value
 	end,
+	res_body_mime_types = function(FW, value)
+		local t = FW._res_body_mime_types
+		FW._res_body_mime_types[#t + 1] = value
+	end
 }
 
 return _M
