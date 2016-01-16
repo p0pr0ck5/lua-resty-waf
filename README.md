@@ -591,8 +591,6 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 
 * **BLACKLIST**: A table containing user-defined blacklisted IPs.
 * **COOKIES**: A table containing the values of the cookies sent in the request.
-* **HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
-* **HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **HTTP_VERSION**: An integer representation of the HTTP version used in the request.
 * **IP**: The IP address of client.
 * **METHOD**: The HTTP method specified in the request.
@@ -601,6 +599,8 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
+* **REQUEST_HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
+* **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **URI**: The request URI.

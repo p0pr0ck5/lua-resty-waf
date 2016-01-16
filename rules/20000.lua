@@ -21,7 +21,7 @@ _M.rules = {
 		{
 			id = 20002,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "content-length" },
 				pattern = "0",
 				operator = "NOT_EQUALS"
@@ -45,7 +45,7 @@ _M.rules = {
 		{
 			id = 20004,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "content-length",
 				operator = "NOT_EXISTS"
@@ -57,7 +57,7 @@ _M.rules = {
 		{
 			id = 20005,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "content-encoding" },
 				pattern = "identity",
 				operator = "EQUALS"
@@ -69,7 +69,7 @@ _M.rules = {
 		{
 			id = 20006,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "expect" },
 				pattern = [=[100-continue]=],
 				operator = "REGEX"
@@ -93,7 +93,7 @@ _M.rules = {
 		{
 			id = 20008,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "pragma",
 				operator = "EXISTS"
@@ -104,7 +104,7 @@ _M.rules = {
 		{
 			id = 20009,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "pragma" },
 				pattern = "no-cache",
 				operator = "EQUALS"
@@ -115,7 +115,7 @@ _M.rules = {
 		{
 			id = 20010,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "cache-control",
 				operator = "NOT_EXISTS"
@@ -138,7 +138,7 @@ _M.rules = {
 		{
 			id = 20012,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "range" },
 				pattern = [=[^bytes=0-]=],
 				operator = "REGEX"
@@ -150,7 +150,7 @@ _M.rules = {
 		{
 			id = 20013,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "range" },
 				pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 				operator = "REGEX"
@@ -162,7 +162,7 @@ _M.rules = {
 		{
 			id = 20014,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "request-range" },
 				pattern = [=[^bytes=(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,\s?(\d+)?\-(\d+)?\,]=],
 				operator = "REGEX"
@@ -174,7 +174,7 @@ _M.rules = {
 		{
 			id = 20015,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "connection" },
 				pattern = [=[\b(keep-alive|close),\s?(keep-alive|close)\b]=],
 				operator = "REGEX"

@@ -9,7 +9,7 @@ _M.rules = {
 		{
 			id = 21001,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "host",
 				operator = "NOT_EXISTS"
@@ -21,7 +21,7 @@ _M.rules = {
 		{
 			id = 21002,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "host" },
 				pattern = [=[^$]=],
 				operator = "REGEX"
@@ -44,7 +44,7 @@ _M.rules = {
 		{
 			id = 21004,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "accept",
 				operator = "NOT_EXISTS"
@@ -67,7 +67,7 @@ _M.rules = {
 		{
 			id = 21006,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "accept" },
 				pattern = [=[^$]=],
 				operator = "REGEX"
@@ -79,7 +79,7 @@ _M.rules = {
 		{
 			id = 21007,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "user-agent",
 				operator = "NOT_EXISTS"
@@ -91,7 +91,7 @@ _M.rules = {
 		{
 			id = 21008,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "user-agent" },
 				pattern = [=[^$]=],
 				operator = "REGEX"
@@ -103,7 +103,7 @@ _M.rules = {
 		{
 			id = 21009,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "content-type",
 				operator = "NOT_EXISTS"
@@ -114,7 +114,7 @@ _M.rules = {
 		{
 			id = 21010,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "content-length" },
 				pattern = [=[^0$]=],
 				operator = "NOT_REGEX"
@@ -126,7 +126,7 @@ _M.rules = {
 		{
 			id = 21011,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "host" },
 				pattern = [=[^[\d.:]+$]=],
 				operator = "REGEX"

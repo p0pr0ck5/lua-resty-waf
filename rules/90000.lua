@@ -9,7 +9,7 @@ _M.rules = {
 		{
 			id = 90001,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "user-agent" },
 				pattern = "FreeWAF Dummy",
 				operator = "EQUALS"
@@ -101,7 +101,7 @@ _M.rules = {
 		{
 			id = 90009,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "user-agent" },
 				pattern = [=[WinHttp\.WinHttpRequest\.5]=],
 				operator = "REGEX"
@@ -113,7 +113,7 @@ _M.rules = {
 		{
 			id = 90010,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "user-agent" },
 				pattern = [=[Mozilla/5\.0 \(compatible; Zollard; Linux\)]=],
 				operator = "REGEX"
@@ -170,7 +170,7 @@ _M.rules = {
 		{
 			id = 90015,
 			var = {
-				type = "HEADER_NAMES",
+				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "referer",
 				operator = "NOT_EXISTS"
@@ -228,7 +228,7 @@ _M.rules = {
 		{
 			id = 90020,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "all" },
 				pattern = [=[^\(\)]=],
 				operator = "REGEX"

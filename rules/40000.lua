@@ -93,7 +93,7 @@ _M.rules = {
 		{
 			id = 40008,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "content-length" },
 				pattern = [=[,]=],
 				operator = "REGEX"
@@ -105,7 +105,7 @@ _M.rules = {
 		{
 			id = 40009,
 			var = {
-				type = "HEADERS",
+				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "transfer-encoding" },
 				pattern = [=[,]=],
 				operator = "REGEX"
