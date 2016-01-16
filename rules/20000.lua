@@ -109,7 +109,7 @@ _M.rules = {
 				pattern = "no-cache",
 				operator = "EQUALS"
 			},
-			opts = { transform = 'lowercase' },
+			opts = { transform = 'lowercase', nolog = true },
 			action = "CHAIN"
 		},
 		{
@@ -128,7 +128,7 @@ _M.rules = {
 			var = {
 				type = "HTTP_VERSION",
 				opts = nil,
-				pattern = 1.1,
+				pattern = "1.1",
 				operator = "NOT_EQUALS"
 			},
 			opts = { score = 2 },
