@@ -165,8 +165,8 @@ local function _process_rule(self, rule, collections, ctx)
 	ctx.rule_score = opts.score
 
 	if (opts.setvar) then
-		ctx.rule_setvar_key = opts.setvar.key
-		ctx.rule_setvar_value = opts.setvar.value
+		ctx.rule_setvar_key    = opts.setvar.key
+		ctx.rule_setvar_value  = opts.setvar.value
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
@@ -273,10 +273,10 @@ function _M.exec(self)
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
-		local rs = require("rules." .. ruleset)
-
+		local rs     = require("rules." .. ruleset)
 		local offset = 1
-		local rule = rs.rules[phase][offset]
+		local rule   = rs.rules[phase][offset]
+
 		while rule do
 			if (not util.table_has_key(self, rule.id, self._ignored_rules)) then
 				local ret = _process_rule(self, rule, collections, ctx)
@@ -289,6 +289,7 @@ function _M.exec(self)
 				logger.log(self, "Ignoring rule " .. rule.id)
 				offset = offset + rule.offset_nomatch
 			end
+
 			rule = rs.rules[phase][offset]
 		end
 	end
