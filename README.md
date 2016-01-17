@@ -46,15 +46,15 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 		init_by_lua '
 			-- preload rulesets and calculate jump offsets
-			local FW = require "FreeWAF.fw"
-			FW.init()
+			local FreeWAF = require "fw"
+			FreeWAF.init()
 		';
 	}
 
 	server {
 		location / {
 			access_by_lua '
-				local FreeWAF = require "FreeWAF.fw"
+				local FreeWAF = require "fw"
 
 				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
@@ -67,7 +67,7 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 			';
 
 			header_filter_by_lua '
-				local FreeWAF = require "FreeWAF.fw"
+				local FreeWAF = require "fw"
 
 				-- instantiate a new instance of the module
 				-- note that options set in previous handlers
@@ -79,7 +79,7 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 			';
 
 			body_filter_by_lua '
-				local FreeWAF = require "FreeWAF.fw"
+				local FreeWAF = require "fw"
 
 				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
@@ -549,6 +549,7 @@ A table that defines options specific to rule. The following options are current
 * **parsepattern**: Activate dynamic string parsing of the rule's `var.pattern` field; see the section on dynamic string parsing for more details.
 * **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **setvar**: Defines persistent storage data key, value and optional expiry time.
+* **skip**: Defines the number of proceeding rules to skip, if the rule matches.
 * **transform**: Defines how collection data is altered as an anti-evasion technique. Multiple transforms for a single collection can be specified by defining the `transform` option value as a table itself. See the section on data transformation for more detail.
 
 ###var
@@ -564,14 +565,14 @@ A table that defines the rule's signature. Each var table must contain the follo
 
 The following rule actions are currently supported:
 
-* **ACCEPT**: Explicitly accepts the request, stopping all further rule processing and passing the request to the next phase handler.
+* **ACCEPT**: Explicitly accepts the request in the given phase, stopping all further rule processing and passing the request to the next phase handler. This action cannot be used in `body_filter` rules.
 * **CHAIN**: Sets a flag in the rule processor to proceed to the next rule in the rule chain. Rule chaining allows the rule processor to mimic logical AND operations; multiple rules can be chained together to define very specific signatures. If a rule in a rule chain does not match, all further rules in the chain are skipped.
-* **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN).
+* **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN). This action cannot be used in `body_filter` rules.
 * **IGNORE**: No action is taken, rule processing continues.
 * **LOG**: A placeholder, as all rule matches that do not have the `nolog` option set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
-* **SKIP**: Skips processing of all further rules until a rule with the `skipend` flag is specified.
+* **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).
 
 ##Operators
 
@@ -633,7 +634,7 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 
 ##Rule Flow Precalculation
 
-FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop. It does, however, _require_ that users call `FW:init()` in an `init_by_lua` handler to perform the offset calculation. Failure to do so will result in broken behavior.
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop. It does, however, _require_ that users call `FreeWAF.init()` in an `init_by_lua` handler to perform the offset calculation. Failure to do so will result in broken behavior.
 
 ##Dynamic Parsing in Rule Definitions
 
@@ -704,8 +705,8 @@ Please target all pull requests towards the development branch, or a feature bra
 
 ##Roadmap
 
-* **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
-* **Expanded Integration/Acceptance Testing**: Increase coverage of common threats and usage scenarios.
+* **Expanded virtual patch ruleset**: Increase coverage of emerging threats.
+* **Expanded integration/acceptance Testing**: Increase coverage of common threats and usage scenarios.
 * **Support for different/multiple persistent storage engines**: Memcached, redis, etc (in addition to ngx.shared).
 * **Common application profiles**: Tuned rulesets for common CMS/applications.
 * **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project
