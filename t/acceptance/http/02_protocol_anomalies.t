@@ -67,7 +67,7 @@ GET /t
 User-Agent: Acceptless
 --- error_code: 200
 --- error_log
-"rule":{"id":21004}}
+"rule":{"id":21003}}
 --- no_error_log
 [error]
 
@@ -98,7 +98,7 @@ GET /t
 Accept:
 --- error_code: 200
 --- error_log
-"rule":{"id":21006}}
+"rule":{"id":21005}}
 --- no_error_log
 [error]
 
@@ -127,7 +127,7 @@ Accept:
 GET /t
 --- error_code: 200
 --- error_log
-"rule":{"id":21007}}
+"rule":{"id":21006}}
 --- no_error_log
 [error]
 
@@ -158,7 +158,7 @@ GET /t
 User-Agent:
 --- error_code: 200
 --- error_log
-"rule":{"id":21008}}
+"rule":{"id":21007}}
 --- no_error_log
 [error]
 
@@ -191,7 +191,7 @@ Accept: */*
 User-Agent: Typeless
 --- error_code: 200
 --- error_log
-"rule":{"id":21010}}
+"rule":{"id":21009}}
 --- no_error_log
 [error]
 
@@ -223,7 +223,7 @@ Accept: */*
 \r\n\n"
 --- error_code: 200
 --- error_log
-"rule":{"id":21011}}
+"rule":{"id":21010}}
 --- no_error_log
 [error]
 

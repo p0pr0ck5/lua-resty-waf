@@ -21,18 +21,6 @@ _M.rules = {
 		{
 			id = 21002,
 			var = {
-				type = "REQUEST_HEADERS",
-				opts = { key = "specific", value = "host" },
-				pattern = [=[^$]=],
-				operator = "REGEX"
-			},
-			opts = { score = 2 },
-			action = "SCORE",
-			description = "Host header has no value"
-		},
-		{
-			id = 21003,
-			var = {
 				type = "METHOD",
 				opts = nil,
 				pattern = "OPTIONS",
@@ -42,7 +30,7 @@ _M.rules = {
 			action = "CHAIN",
 		},
 		{
-			id = 21004,
+			id = 21003,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
@@ -54,7 +42,7 @@ _M.rules = {
 			description = "No valid Accept header"
 		},
 		{
-			id = 21005,
+			id = 21004,
 			var = {
 				type = "METHOD",
 				opts = nil,
@@ -65,7 +53,7 @@ _M.rules = {
 			action = "CHAIN",
 		},
 		{
-			id = 21006,
+			id = 21005,
 			var = {
 				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "accept" },
@@ -77,7 +65,7 @@ _M.rules = {
 			description = "Accept header has no value"
 		},
 		{
-			id = 21007,
+			id = 21006,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
@@ -89,7 +77,7 @@ _M.rules = {
 			description = "No valid User-Agent header"
 		},
 		{
-			id = 21008,
+			id = 21007,
 			var = {
 				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "user-agent" },
@@ -101,7 +89,7 @@ _M.rules = {
 			description = "User-Agent header has no value"
 		},
 		{
-			id = 21009,
+			id = 21008,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
@@ -112,7 +100,7 @@ _M.rules = {
 			action = "CHAIN",
 		},
 		{
-			id = 21010,
+			id = 21009,
 			var = {
 				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "content-length" },
@@ -124,7 +112,7 @@ _M.rules = {
 			description = "Request contains content, but missing Content-Type header"
 		},
 		{
-			id = 21011,
+			id = 21010,
 			var = {
 				type = "REQUEST_HEADERS",
 				opts = { key = "specific", value = "host" },
