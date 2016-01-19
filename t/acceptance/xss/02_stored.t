@@ -87,7 +87,7 @@ __DATA__
 --- response_body eval
 ["Set key 'foo'!\n", "shm:foo is set as: 'bar'\n"]
 --- no_error_log
-"rule":{"id":99001}}
+"id":99001
 
 === TEST 3: Benign request is not caught in ACTIVE mode
 --- http_config
@@ -140,7 +140,7 @@ __DATA__
 --- response_body eval
 ["Set key 'foo'!\n", "shm:foo is set as: 'bar'\n"]
 --- no_error_log
-"rule":{"id":99001}}
+"id":99001
 
 === TEST 4: Malicious request exploits stored XSS vulnerability
 --- http_config
@@ -171,7 +171,7 @@ __DATA__
 --- response_body eval
 ["Set key 'foo'!\n", "shm:foo is set as: '<script>alert(1)</script>'\n"]
 --- no_error_log
-"rule":{"id":99001}}
+"id":99001
 
 === TEST 5: Malicious request is logged in SIMULATE mode
 --- http_config
@@ -222,7 +222,7 @@ __DATA__
 --- response_body eval
 ["Set key 'foo'!\n", "shm:foo is set as: '<script>alert(1)</script>'\n"]
 --- error_log
-"rule":{"id":99001}}
+"id":99001
 
 === TEST 6: Malicious request is blocked in ACTIVE mode
 --- http_config
@@ -277,5 +277,5 @@ __DATA__
 --- response_body_unlike
 ["Set key 'foo'!", <script>alert\(1\)</script>]
 --- error_log
-"rule":{"id":99001}}
+"id":99001
 

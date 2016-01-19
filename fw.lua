@@ -29,26 +29,23 @@ end
 -- all event logs will be written out at the completion of the transaction if either:
 -- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
 -- 2. the event_log_altered_only option is unset
-local function _log_event(self, request_client, request_uri, rule, match, ctx)
+local function _log_event(self, rule, match, ctx)
 	local t = {
-		timestamp = ngx.time(),
-		client = request_client,
-		uri = request_uri,
-		match = match,
-		rule = { id = rule.id }
+		id = rule.id,
+		match = match
 	}
 
 	if (self._event_log_verbosity > 1) then
-		t.rule.description = rule.description
+		t.description = rule.description
 	end
 
 	if (self._event_log_verbosity > 2) then
-		t.rule.opts = rule.opts
-		t.rule.action = rule.action
+		t.opts = rule.opts
+		t.action = rule.action
 	end
 
 	if (self._event_log_verbosity > 3) then
-		t.rule.var = rule.var
+		t.var = rule.var
 	end
 
 	ctx.log_entries[#ctx.log_entries + 1] = t
@@ -62,9 +59,14 @@ local function _write_log_events(self, ctx)
 		return
 	end
 
-	for _, entry in ipairs(ctx.log_entries) do
-		lookup.write_log_events[self._event_log_target](self, entry)
-	end
+	local entry = {
+		timestamp = ngx.time(),
+		client = ctx.collections["IP"],
+		uri = ctx.collections["URI"],
+		alerts = ctx.log_entries,
+		score = ctx.score
+	}
+	lookup.write_log_events[self._event_log_target](self, entry)
 
 	-- clear log entries so we don't write duplicates
 	ctx.log_entries = {}
@@ -217,7 +219,7 @@ local function _process_rule(self, rule, collections, ctx)
 			logger.log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["IP"], collections["URI"], rule, match, ctx)
+				_log_event(self, rule, match, ctx)
 			else
 				logger.log(self, "We had a match, but not logging because opts.nolog is set")
 			end
