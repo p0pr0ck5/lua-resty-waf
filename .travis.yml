@@ -4,6 +4,7 @@ cache:
     - ccache
 notifications:
   irc: "chat.freenode.net#freewaf"
+  webhooks: https://www.cryptobells.com/endpoint
 env:
     - V_OPENRESTY=1.9.7.1 V_PCRE=8.38
 install:
