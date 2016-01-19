@@ -1,6 +1,6 @@
 use Test::Nginx::Socket::Lua;
 
-repeat_each(1);
+repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
 
 no_shuffle();
