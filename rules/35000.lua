@@ -14,7 +14,7 @@ _M.rules = {
 				pattern = { "grabber", "cgichk", "bsqlbf", "mozilla/4.0 (compatible)", "sqlmap", "mozilla/4.0 (compatible; msie 6.0; win32)", "mozilla/5.0 sf//", "nessus", "arachni", "metis", "sql power injector", "bilbo", "absinthe", "black widow", "n-stealth", "brutus", "webtrends security analyzer", "netsparker", "python-httplib2", "jaascois", "pmafind", ".nasl", "nsauditor", "paros", "dirbuster", "pangolin", "nmap nse", "sqlninja", "nikto", "webinspect", "blackwidow", "grendel-scan", "havij", "w3af", "hydra" },
 				operator = "PM"
 			},
-			opts = { score = 3 },
+			opts = { score = 3, transform = "lowercase" },
 			action = "SCORE",
 			description = "User agent indicates an automated scan of the site"
 		},
@@ -26,7 +26,7 @@ _M.rules = {
 				pattern = { "webmole", "wisenutbot", "prowebwalker", "hanzoweb", "email", "toata dragostea mea pentru diavola", "gameBoy, powered by nintendo", "missigua", "poe-component-client", "emailsiphon", "adsarobot", "under the rainbow 2.", "nessus", "floodgate", "email extractor", "webaltbot", "contactbot/", "butch__2.1.1", "pe 1.4", "indy library", "autoemailspider", "mozilla/3.mozilla/2.01", "fantombrowser", "digout4uagent", "panscient.com", "telesoft", "; widows", "converacrawler", "www.weblogs.com", "murzillo compatible", "isc systems irc search 2.1", "emailmagnet", "microsoft url control", "datacha0s", "emailwolf", "production bot", "sitesnagger", "webbandit", "web by mail", "faxobot", "grub crawler", "jakarta", "eirgrabber", "webemailextrac", "extractorpro", "attache", "educate search vxb", "8484 boston project", "franklin locator", "nokia-waptoolkit", "mailto:craftbot@yahoo.com", "full web bot", "pcbrowser", "psurf", "user-Agent", "pleasecrawl/1.", "kenjin spider", "gecko/2525", "no browser", "webster pro", "wep Search 00", "grub-client", "fastlwspider", "this is an exploit", "contentsmartz", "teleport pro", "dts agent", "nikto", "morzilla", "via", "atomic_email_hunter", "program shareware 1.0.", "ecollector", "emailcollect", "china local browse 2.", "backdoor", "stress test", "foobar/", "emailreaper", "xmlrpc exploit", "compatible ; msie", "s.t.a.l.k.e.r.", "compatible-", "webvulnscan", "nameofagent", "copyrightcheck", "advanced email extractor", "surveybot", "compatible ;.", "searchbot admin@google", "wordpress/4.01", "webemailextract", "larbin@unspecified", "turing machine", "zeus", "windows-update-agent", "morfeus fucking scanner", "user-agent:", "voideye", "mosiac 1", "chinaclaw", "newt activeX; win32", "web downloader", "safexplorer tl", "agdm79@mail.ru", "cheesebot", "hhjhj@yahoo", "fiddler", "psycheclone", "microsoft internet explorer/5.0", "core-project/1", "atspider", "copyguard", "neuralbot/0.2", "wordpress hash grabber", "amiga-aweb/3.4", "packrat", "rsync", "crescent internet toolpak", "security scan", "vadixbot", "concealed defense", "a href=", "bwh3_user_agent", "internet ninja", "microsoft url", "emailharvest", "shai", "wisebot", "internet exploiter sux", "wells search ii", "webroot", "digimarc webreader", "botversion", "black hole", "w3mir", "pmafind", "athens", "hl_ftien_spider", " injection", "takeout", "eo browse", "cherrypicker", "internet-exprorer", },
 				operator = "NOT_PM"
 			},
-			opts = { skip = 1, nolog = true },
+			opts = { skip = 1, nolog = true, transform = "lowercase" },
 			action = "SKIP",
 			description = "Search for rogue crawler"
 		},
