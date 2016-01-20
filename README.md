@@ -498,7 +498,6 @@ When set to true, the log entries contain the request arguments under the `uri_a
 ```lua
 	location / {
 		access_by_lua '
-			-- save the POST data with the alerts
 			fw:set_option("event_log_request_arguments", true)
 		';
 	}
@@ -515,7 +514,6 @@ The headers of the HTTP request is copied to the log event, under the `request_h
 ```lua
 	location / {
 		access_by_lua '
-			-- save the POST data with the alerts
 			fw:set_option("event_log_request_headers", true)
 		';
 	}
