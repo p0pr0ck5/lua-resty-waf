@@ -53,12 +53,12 @@ GET /t?foo=bar
 --- response_body
 You've entered the following: 'bar'
 --- no_error_log
-"rule":{"id":42043}}
-"rule":{"id":42059}}
-"rule":{"id":42069}}
-"rule":{"id":42076}}
-"rule":{"id":42083}}
-"rule":{"id":99001}}
+"id":42043
+"id":42059
+"id":42069
+"id":42076
+"id":42083
+"id":99001
 
 === TEST 3: Benign request is not caught in ACTIVE mode
 --- http_config
@@ -89,12 +89,12 @@ GET /t?foo=bar
 --- response_body
 You've entered the following: 'bar'
 --- no_error_log
-"rule":{"id":42043}}
-"rule":{"id":42059}}
-"rule":{"id":42069}}
-"rule":{"id":42076}}
-"rule":{"id":42083}}
-"rule":{"id":99001}}
+"id":42043
+"id":42059
+"id":42069
+"id":42076
+"id":42083
+"id":99001
 
 === TEST 4: Malicious request exploits reflected XSS vulnerability
 --- config
@@ -141,12 +141,12 @@ GET /t?foo=<script>alert(1)</script>
 --- response_body
 You've entered the following: '<script>alert(1)</script>'
 --- error_log
-"rule":{"id":42043}}
-"rule":{"id":42059}}
-"rule":{"id":42069}}
-"rule":{"id":42076}}
-"rule":{"id":42083}}
-"rule":{"id":99001}}
+"id":42043
+"id":42059
+"id":42069
+"id":42076
+"id":42083
+"id":99001
 --- no_error_log
 [error]
 
@@ -179,12 +179,12 @@ GET /t?foo=<script>alert(1)</script>
 --- response_body_unlike
 You've entered the following: '<script>alert\(1\)</script>'
 --- error_log
-"rule":{"id":42043}}
-"rule":{"id":42059}}
-"rule":{"id":42069}}
-"rule":{"id":42076}}
-"rule":{"id":42083}}
-"rule":{"id":99001}}
+"id":42043
+"id":42059
+"id":42069
+"id":42076
+"id":42083
+"id":99001
 --- no_error_log
 [error]
 

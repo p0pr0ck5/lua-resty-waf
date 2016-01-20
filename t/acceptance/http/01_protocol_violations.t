@@ -38,7 +38,7 @@ Content-Type: application/x-www-form-urlencoded
 --- error_code: 200
 --- error_log
 http header: "Content-Length: 7"
-"rule":{"id":20002}}
+"id":20002
 
 === TEST 2: POST request with a body
 --- http_config
@@ -71,7 +71,7 @@ Content-Type: application/x-www-form-urlencoded
 --- error_log
 http header: "Content-Length: 7"
 --- no_error_log
-"rule":{"id":20002}}
+"id":20002
 
 === TEST 3: POST request does not have a Content-Length header
 --- http_config
@@ -103,7 +103,7 @@ Accept: */*\r
 --- no_error_log
 http header: "Content-Length: 7"
 --- error_log
-"rule":{"id":20004}}
+"id":20004
 
 === TEST 4: POST request with a body
 --- http_config
@@ -136,7 +136,7 @@ Content-Type: application/x-www-form-urlencoded
 --- error_log
 http header: "Content-Length: 7"
 --- no_error_log
-"rule":{"id":20004}}
+"id":20004
 
 === TEST 5: Content-Encoding header contains 'identity'
 --- http_config
@@ -166,7 +166,7 @@ Accept: */*
 Content-Encoding: Identity
 --- error_code: 200
 --- error_log
-"rule":{"id":20005}}
+"id":20005
 --- no_error_log
 [error]
 
@@ -198,7 +198,7 @@ Pragma: no-cache
 Accept: */*
 --- error_code: 200
 --- error_log
-"rule":{"id":20011}}
+"id":20011
 --- no_error_log
 [error]
 
@@ -230,7 +230,7 @@ Accept: */*
 Range: bytes=0-9999
 --- error_code: 200
 --- error_log
-"rule":{"id":20012}}
+"id":20012
 --- no_error_log
 [error]
 
@@ -263,7 +263,7 @@ Range: bytes=0-1,2-3,4-5,6-7,8-9,10-
 User-Agent: test
 --- error_code: 200
 --- error_log
-"rule":{"id":20013}}
+"id":20013
 --- no_error_log
 [error]
 
@@ -295,7 +295,7 @@ Accept: */*
 Request-Range: bytes=0-1,2-3,4-5,6-7,8-9,10-
 --- error_code: 200
 --- error_log
-"rule":{"id":20014}}
+"id":20014
 --- no_error_log
 [error]
 
@@ -327,7 +327,7 @@ Accept: */*
 Connection: keep-alive, close
 --- error_code: 200
 --- error_log
-"rule":{"id":20015}}
+"id":20015
 --- no_error_log
 [error]
 

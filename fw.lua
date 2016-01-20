@@ -29,26 +29,23 @@ end
 -- all event logs will be written out at the completion of the transaction if either:
 -- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
 -- 2. the event_log_altered_only option is unset
-local function _log_event(self, request_client, request_uri, rule, match, ctx)
+local function _log_event(self, rule, match, ctx)
 	local t = {
-		timestamp = ngx.time(),
-		client = request_client,
-		uri = request_uri,
-		match = match,
-		rule = { id = rule.id }
+		id = rule.id,
+		match = match
 	}
 
 	if (self._event_log_verbosity > 1) then
-		t.rule.description = rule.description
+		t.description = rule.description
 	end
 
 	if (self._event_log_verbosity > 2) then
-		t.rule.opts = rule.opts
-		t.rule.action = rule.action
+		t.opts = rule.opts
+		t.action = rule.action
 	end
 
 	if (self._event_log_verbosity > 3) then
-		t.rule.var = rule.var
+		t.var = rule.var
 	end
 
 	ctx.log_entries[#ctx.log_entries + 1] = t
@@ -62,9 +59,31 @@ local function _write_log_events(self, ctx)
 		return
 	end
 
-	for _, entry in ipairs(ctx.log_entries) do
-		lookup.write_log_events[self._event_log_target](self, entry)
+	local entry = {
+		timestamp = ngx.time(),
+		client = ctx.collections["IP"],
+		uri = ctx.collections["METHOD"],
+		uri = ctx.collections["URI"],
+		alerts = ctx.log_entries,
+		score = ctx.score
+	}
+
+	if self._event_log_request_arguments then
+		entry.uri_args = ctx.collections["URI_ARGS"]
 	end
+
+	if self._event_log_request_headers then
+		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
+	end
+
+	if (table.getn(self._event_log_ngx_vars) ~= 0) then
+		entry.ngx = {}
+		for _, k in ipairs(self._event_log_ngx_vars) do
+			entry.ngx[k] = ngx.var[k]
+		end
+	end
+
+	lookup.write_log_events[self._event_log_target](self, entry)
 
 	-- clear log entries so we don't write duplicates
 	ctx.log_entries = {}
@@ -217,7 +236,7 @@ local function _process_rule(self, rule, collections, ctx)
 			logger.log(self, "Match of rule " .. id .. "!")
 
 			if (not opts.nolog) then
-				_log_event(self, collections["IP"], collections["URI"], rule, match, ctx)
+				_log_event(self, rule, match, ctx)
 			else
 				logger.log(self, "We had a match, but not logging because opts.nolog is set")
 			end
@@ -310,6 +329,9 @@ function _M.new(self)
 		_debug_log_level          = ngx.INFO,
 		_event_log_level          = ngx.INFO,
 		_event_log_verbosity      = 1,
+		_event_log_request_arguments = false,
+		_event_log_request_headers = false,
+		_event_log_ngx_vars       = {},
 		_event_log_target         = 'error',
 		_event_log_target_host    = '',
 		_event_log_target_port    = '',
