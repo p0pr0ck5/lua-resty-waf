@@ -4,7 +4,7 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 ##Status
 
-Development of new features is currently on psuedo-hiatus. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will continue to be patched. Larger feature sets will be added in the future, but at a slower pace (see the [Roadmap](#roadmap) section for an outline of planned features).
+FreeWAF is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
 
 ##Description
 
