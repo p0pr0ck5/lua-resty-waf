@@ -62,10 +62,27 @@ local function _write_log_events(self, ctx)
 	local entry = {
 		timestamp = ngx.time(),
 		client = ctx.collections["IP"],
+		uri = ctx.collections["METHOD"],
 		uri = ctx.collections["URI"],
 		alerts = ctx.log_entries,
 		score = ctx.score
 	}
+
+	if self._event_log_request_arguments then
+		entry.uri_args = ctx.collections["URI_ARGS"]
+	end
+
+	if self._event_log_request_headers then
+		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
+	end
+
+	if (table.getn(self._event_log_ngx_vars) ~= 0) then
+		entry.ngx = {}
+		for _, k in ipairs(self._event_log_ngx_vars) do
+			entry.ngx[k] = ngx.var[k]
+		end
+	end
+
 	lookup.write_log_events[self._event_log_target](self, entry)
 
 	-- clear log entries so we don't write duplicates
@@ -312,6 +329,9 @@ function _M.new(self)
 		_debug_log_level          = ngx.INFO,
 		_event_log_level          = ngx.INFO,
 		_event_log_verbosity      = 1,
+		_event_log_request_arguments = false,
+		_event_log_request_headers = false,
+		_event_log_ngx_vars       = {},
 		_event_log_target         = 'error',
 		_event_log_target_host    = '',
 		_event_log_target_port    = '',

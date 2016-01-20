@@ -459,6 +459,79 @@ Defines the MIME types with which FreeWAF will process the response body. This v
 
 Multiple MIME types can be added by passing a table of types to `set_option`.
 
+###event_log_ngx_vars
+
+*Default*: empty
+
+Defines what extra variables from `ngx.var` are put to the log event. This is a generic way to extend the alert with extra context. The variable name will be the key of the entry under an `ngx` key in the log entry. If the variable is not present as an nginx variable, no item is added to the event.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_ngx_vars", "host")
+			fw:set_option("event_log_ngx_vars", "request_id")
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"ngx": {
+		"host": "example.com",
+		"request_id": "373bcce584e3c18a"
+	}
+}
+```
+
+###event_log_request_arguments
+
+*Default*: false
+
+When set to true, the log entries contain the request arguments under the `uri_args` key.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- save the POST data with the alerts
+			fw:set_option("event_log_request_arguments", true)
+		';
+	}
+```
+
+###event_log_request_headers
+
+*Default*: false
+
+The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- save the POST data with the alerts
+			fw:set_option("event_log_request_headers", true)
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"request_headers": {
+		"accept": "*/*",
+		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
+	}
+}
+```
+
 ###storage_zone
 
 *Default*: none

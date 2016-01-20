@@ -286,6 +286,10 @@ _M.set_option = {
 	res_body_mime_types = function(FW, value)
 		local t = FW._res_body_mime_types
 		FW._res_body_mime_types[#t + 1] = value
+	end,
+	event_log_ngx_vars = function(FW, value)
+		local t = FW._event_log_ngx_vars
+		FW._event_log_ngx_vars[#t + 1] = value
 	end
 }
 
