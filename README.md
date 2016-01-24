@@ -297,6 +297,77 @@ Sets the verbosity used in writing event log notification. The higher the verbos
 	}
 ```
 
+###event_log_ngx_vars
+
+*Default*: empty
+
+Defines what extra variables from `ngx.var` are put to the log event. This is a generic way to extend the alert with extra context. The variable name will be the key of the entry under an `ngx` key in the log entry. If the variable is not present as an nginx variable, no item is added to the event.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_ngx_vars", "host")
+			fw:set_option("event_log_ngx_vars", "request_id")
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"ngx": {
+		"host": "example.com",
+		"request_id": "373bcce584e3c18a"
+	}
+}
+```
+
+###event_log_request_arguments
+
+*Default*: false
+
+When set to true, the log entries contain the request arguments under the `uri_args` key.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_request_arguments", true)
+		';
+	}
+```
+
+###event_log_request_headers
+
+*Default*: false
+
+The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_request_headers", true)
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"request_headers": {
+		"accept": "*/*",
+		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
+	}
+}
+```
+
 ###event_log_target
 
 *Default*: error
@@ -448,6 +519,8 @@ Note that by nature, it is required to buffer the entire response body in order 
 
 Defines the MIME types with which FreeWAF will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
 
+*Example*:
+
 ```lua
 	location / {
 		access_by_lua '
@@ -459,75 +532,54 @@ Defines the MIME types with which FreeWAF will process the response body. This v
 
 Multiple MIME types can be added by passing a table of types to `set_option`.
 
-###event_log_ngx_vars
+###process_multipart_body
 
-*Default*: empty
+*Default* true
 
-Defines what extra variables from `ngx.var` are put to the log event. This is a generic way to extend the alert with extra context. The variable name will be the key of the entry under an `ngx` key in the log entry. If the variable is not present as an nginx variable, no item is added to the event.
+Enable processing of multipart/form-data request bodies (when present), using the `lua-resty-upload` module. In the future, FreeWAF may use this processing to perform stricter checking of upload bodies; for now this module performs only minimal sanity checks on the request body, and will not log an event if the request body is invalid. Disable this option if you do not need this checking, or if bugs in the upstream module are causing problems with HTTP uploads.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_ngx_vars", "host")
-			fw:set_option("event_log_ngx_vars", "request_id")
+			-- disable processing of multipart/form-data requests
+			-- note that the request body will still be sent to the upstream
+			fw:set_option("process_multipart_body", false)
 		';
 	}
 ```
 
-The resulting event has these extra items:
-
-```json
-{
-	"ngx": {
-		"host": "example.com",
-		"request_id": "373bcce584e3c18a"
-	}
-}
-```
-
-###event_log_request_arguments
+###req_tid_header
 
 *Default*: false
 
-When set to true, the log entries contain the request arguments under the `uri_args` key.
+Set an HTTP header `X-FreeWAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_request_arguments", true)
+			fw:set_option("req_tid_header", true)
 		';
 	}
 ```
 
-###event_log_request_headers
+###res_tid_header
 
 *Default*: false
 
-The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+Set an HTTP header `X-FreeWAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_request_headers", true)
+			fw:set_option("res_tid_header", true)
 		';
 	}
-```
-
-The resulting event has these extra items:
-
-```json
-{
-	"request_headers": {
-		"accept": "*/*",
-		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
-	}
-}
 ```
 
 ###storage_zone
