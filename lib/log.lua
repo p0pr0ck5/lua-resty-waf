@@ -5,7 +5,7 @@ _M.version = "0.5.2"
 -- debug logger
 function _M.log(FW, msg)
 	if (FW._debug == true) then
-		ngx.log(FW._debug_log_level, msg)
+		ngx.log(FW._debug_log_level, '[', FW.transaction_id, '] ', msg)
 	end
 end
 

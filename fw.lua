@@ -4,6 +4,7 @@ _M.version = "0.5.2"
 
 local logger  = require("lib.log")
 local lookup  = require("lib.lookup")
+local random  = require("lib.random")
 local storage = require("lib.storage")
 local util    = require("lib.util")
 
@@ -59,6 +60,10 @@ local function _write_log_events(self, ctx)
 		return
 	end
 
+	if (#ctx.log_entries == 0) then
+		logger.log(self, "No log entries, no writing out")
+	end
+
 	local entry = {
 		timestamp = ngx.time(),
 		client = ctx.collections["IP"],
@@ -107,10 +112,31 @@ local function _save(self, ctx)
 	ctx.opts = opts
 end
 
+local function _transaction_id_header(self, ctx)
+	local phase = ctx.phase
+
+	-- upstream request header
+	if (self._req_tid_header) then
+		ngx.req.set_header("X-FreeWAF-ID", self.transaction_id)
+	end
+
+	-- downstream response header
+	if (self._res_tid_header) then
+		ngx.header["X-FreeWAF-ID"] = self.transaction_id
+	end
+
+	ctx.t_header_set = true
+end
+
 -- cleanup
 local function _finalize(self, ctx)
 	-- write out any log events from this transaction
 	_write_log_events(self, ctx)
+
+	-- set X-FreeWAF-ID headers as appropriate
+	if (not ctx.t_header_set) then
+		_transaction_id_header(self, ctx)
+	end
 
 	-- save our options for the next phase
 	_save(self, ctx)
@@ -271,6 +297,7 @@ function _M.exec(self)
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
 	ctx.score         = ctx.score or 0
+	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.phase         = phase
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
@@ -342,9 +369,12 @@ function _M.new(self)
 		_res_body_max_size        = (1024 * 1024),
 		_res_body_mime_types      = { "text/plain", "text/html" },
 		_process_multipart_body   = true,
+		_req_tid_header           = false,
+		_res_tid_header           = true,
 		_pcre_flags               = 'oij',
 		_score_threshold          = 5,
-		_storage_zone             = nil
+		_storage_zone             = nil,
+		transaction_id            = random.random_bytes(10),
 	}, mt)
 end
 
