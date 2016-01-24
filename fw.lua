@@ -341,6 +341,7 @@ function _M.new(self)
 		_event_log_altered_only   = true,
 		_res_body_max_size        = (1024 * 1024),
 		_res_body_mime_types      = { "text/plain", "text/html" },
+		_process_multipart_body   = true,
 		_pcre_flags               = 'oij',
 		_score_threshold          = 5,
 		_storage_zone             = nil

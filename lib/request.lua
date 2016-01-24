@@ -34,6 +34,10 @@ function _M.parse_request_body(FW, request_headers)
     -- which provides some basic sanity checking as far as form and protocol goes
     -- (but its much less strict that ModSecurity's strict checking)
     if (ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], FW._pcre_flags)) then
+		if (not FW._process_multipart_body) then
+			return
+		end
+
         local form, err = upload:new()
         if not form then
             ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
