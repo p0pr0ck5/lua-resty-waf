@@ -208,23 +208,24 @@ _M.write_log_events = {
 	end,
 	file = function(FW, t)
 		if (not file_logger.initted()) then
-			file_logger.init{
+			file_logger.init({
 				path           = FW._event_log_target_path,
 				flush_limit    = FW._event_log_buffer_size,
 				periodic_flush = FW._event_log_periodic_flush
-			}
+			})
 		end
 
 		file_logger.log(cjson.encode(t) .. "\n")
 	end,
 	socket = function(FW, t)
 		if (not socket_logger.initted()) then
-			socket_logger.init{
-				host         = FW._event_log_target_host,
-				port         = FW._event_log_target_port,
-				flush_limit  = FW._event_log_buffer_size,
-				period_flush = FW._event_log_periodic_flush
-			}
+			socket_logger.init({
+				host           = FW._event_log_target_host,
+				port           = FW._event_log_target_port,
+				sock_type      = FW._event_log_socket_proto,
+				flush_limit    = FW._event_log_buffer_size,
+				periodic_flush = FW._event_log_periodic_flush
+			})
 		end
 
 		socket_logger.log(cjson.encode(t) .. "\n")

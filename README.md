@@ -383,7 +383,7 @@ The resulting event has these extra items:
 
 *Default*: error
 
-Defines the destination for event logs. FreeWAF currently supports logging to the error log, a separate file on the local file system, or a remote UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
+Defines the destination for event logs. FreeWAF currently supports logging to the error log, a separate file on the local file system, or a remote TCP or UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
 
 *Example*:
 
@@ -396,7 +396,7 @@ Defines the destination for event logs. FreeWAF currently supports logging to th
 			-- send event logs to a local file on disk
 			fw:set_option("event_log_target", "file")
 
-			-- send event logs to a remote UDP server
+			-- send event logs to a remote server
 			fw:set_option("event_log_target", "socket")
 		';
 	}
@@ -408,7 +408,7 @@ Note that, due to a limition in the logging library used, only a single target s
 
 *Default*: none
 
-Defines the target server for event logs that target a UDP server.
+Defines the target server for event logs that target a remote server.
 
 *Example*:
 
@@ -424,7 +424,7 @@ Defines the target server for event logs that target a UDP server.
 
 *Default*: none
 
-Defines the target port for event logs that target a UDP server.
+Defines the target port for event logs that target a remote server.
 
 *Example*:
 
@@ -453,6 +453,23 @@ Defines the target path for event logs that target a local file system location.
 ```
 
 This path must be in a location writeable by the nginx user. Note that, by nature, on-disk logging can cause significant performance degredation in high-concurrency environments.
+
+###event_log_socket_proto
+
+*Default*: udp
+
+Defines which IP protocol to use (TCP or UDP) when shipping event logs via a remote socket. The same buffering and recurring flush logic will be used regardless of protocol.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- send logs via TCP
+			fw:set_option("event_log_socket_proto", "tcp")
+		';
+	}
+```
 
 ###event_log_buffer_size
 

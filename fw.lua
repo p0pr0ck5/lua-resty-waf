@@ -318,6 +318,7 @@ function _M.new(self)
 		_event_log_target_host    = '',
 		_event_log_target_port    = '',
 		_event_log_target_path    = '',
+		_event_log_socket_proto   = 'udp',
 		_event_log_buffer_size    = 4096,
 		_event_log_periodic_flush = nil,
 		_event_log_altered_only   = true,
