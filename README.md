@@ -859,7 +859,7 @@ Please target all pull requests towards the development branch, or a feature bra
 ##Roadmap
 
 * **Expanded virtual patch ruleset**: Increase coverage of emerging threats.
-* **Expanded integration/acceptance Testing**: Increase coverage of common threats and usage scenarios.
+* **Expanded integration/acceptance testing**: Increase coverage of common threats and usage scenarios.
 * **Support for different/multiple persistent storage engines**: Memcached, redis, etc (in addition to ngx.shared).
 * **Common application profiles**: Tuned rulesets for common CMS/applications.
 * **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project.
