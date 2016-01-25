@@ -28,6 +28,13 @@ __DATA__
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- raw_request eval
 "GET /t HTTP/1.0\r
@@ -60,6 +67,13 @@ User-Agent: Hostless
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -91,6 +105,13 @@ User-Agent: Acceptless
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -122,6 +143,13 @@ Accept:
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -151,6 +179,13 @@ GET /t
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -182,6 +217,13 @@ User-Agent:
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 POST /t
@@ -215,6 +257,13 @@ User-Agent: Typeless
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- raw_request eval
 "GET /t HTTP/1.0\r

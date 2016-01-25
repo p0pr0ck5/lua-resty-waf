@@ -28,6 +28,13 @@ __DATA__
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -60,6 +67,13 @@ http header: "Content-Length: 7"
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 POST /t
@@ -93,6 +107,13 @@ http header: "Content-Length: 7"
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- raw_request eval
 "POST /t HTTP/1.0\r
@@ -125,6 +146,13 @@ http header: "Content-Length: 7"
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 POST /t
@@ -158,6 +186,13 @@ http header: "Content-Length: 7"
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -190,6 +225,13 @@ Content-Encoding: Identity
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -222,6 +264,13 @@ Accept: */*
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -254,6 +303,13 @@ Range: bytes=0-9999
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -287,6 +343,13 @@ User-Agent: test
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t
@@ -319,6 +382,13 @@ Request-Range: bytes=0-1,2-3,4-5,6-7,8-9,10-
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t

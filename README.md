@@ -87,6 +87,17 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 				-- run the firewall
 				fw:exec()
 			';
+
+			log_by_lua '
+				local FreeWAF = require "fw"
+
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- write out any event log entries to the
+				-- configured target, if applicable
+				fw:write_log_events()
+			';
 		}
 	}
 ```
@@ -632,6 +643,8 @@ FreeWAF is designed to run in multiple phases of the request lifecycle. Rules ca
 * **body_filter**: Response body is available in this phase.
 
 These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running FreeWAF in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
+
+Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. FreeWAF is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
 
 ##Included Rulesets
 

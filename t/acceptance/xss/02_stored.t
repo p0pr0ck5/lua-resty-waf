@@ -62,6 +62,13 @@ __DATA__
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 
 	location /s {
@@ -78,6 +85,13 @@ __DATA__
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request eval
@@ -114,6 +128,13 @@ __DATA__
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 
 	location /s {
@@ -131,6 +152,13 @@ __DATA__
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request eval
@@ -197,6 +225,13 @@ __DATA__
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 
 	location /s {
@@ -213,6 +248,13 @@ __DATA__
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request eval
@@ -249,6 +291,13 @@ __DATA__
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 
 	location /s {
@@ -266,6 +315,13 @@ __DATA__
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request eval

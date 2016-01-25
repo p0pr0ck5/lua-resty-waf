@@ -52,48 +52,6 @@ local function _log_event(self, rule, match, ctx)
 	ctx.log_entries[#ctx.log_entries + 1] = t
 end
 
--- push log data regarding matching rule(s) to the configured target
--- in the case of socket or file logging, this data will be buffered
-local function _write_log_events(self, ctx)
-	if (not ctx.altered[ctx.phase] and self._event_log_altered_only) then
-		logger.log(self, "Not logging a request that wasn't altered")
-		return
-	end
-
-	if (#ctx.log_entries == 0) then
-		logger.log(self, "No log entries, no writing out")
-	end
-
-	local entry = {
-		timestamp = ngx.time(),
-		client = ctx.collections["IP"],
-		uri = ctx.collections["METHOD"],
-		uri = ctx.collections["URI"],
-		alerts = ctx.log_entries,
-		score = ctx.score
-	}
-
-	if self._event_log_request_arguments then
-		entry.uri_args = ctx.collections["URI_ARGS"]
-	end
-
-	if self._event_log_request_headers then
-		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
-	end
-
-	if (table.getn(self._event_log_ngx_vars) ~= 0) then
-		entry.ngx = {}
-		for _, k in ipairs(self._event_log_ngx_vars) do
-			entry.ngx[k] = ngx.var[k]
-		end
-	end
-
-	lookup.write_log_events[self._event_log_target](self, entry)
-
-	-- clear log entries so we don't write duplicates
-	ctx.log_entries = {}
-end
-
 -- restore options from a previous phase
 local function _load(self, opts)
 	for k, v in pairs(opts) do
@@ -130,9 +88,6 @@ end
 
 -- cleanup
 local function _finalize(self, ctx)
-	-- write out any log events from this transaction
-	_write_log_events(self, ctx)
-
 	-- set X-FreeWAF-ID headers as appropriate
 	if (not ctx.t_header_set) then
 		_transaction_id_header(self, ctx)
@@ -411,6 +366,54 @@ function _M.init()
 			end
 		end
 	end
+end
+
+-- push log data regarding matching rule(s) to the configured target
+-- in the case of socket or file logging, this data will be buffered
+function _M.write_log_events(self)
+	-- there is a small bit of code duplication here to get our context
+	-- because this lives outside exec()
+	local ctx = ngx.ctx
+	if (ctx.opts) then
+		_load(self, ctx.opts)
+	end
+
+	if (table.getn(util.table_keys(ctx.altered)) == 0 and self._event_log_altered_only) then
+		logger.log(self, "Not logging a request that wasn't altered")
+		return
+	end
+
+	if (#ctx.log_entries == 0) then
+		logger.log(self, "Not logging a request that had no rule alerts")
+		return
+	end
+
+	local entry = {
+		timestamp = ngx.time(),
+		client    = ctx.collections["IP"],
+		method    = ctx.collections["METHOD"],
+		uri       = ctx.collections["URI"],
+		alerts    = ctx.log_entries,
+		score     = ctx.score,
+		id        = self.transaction_id,
+	}
+
+	if self._event_log_request_arguments then
+		entry.uri_args = ctx.collections["URI_ARGS"]
+	end
+
+	if self._event_log_request_headers then
+		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
+	end
+
+	if (table.getn(self._event_log_ngx_vars) ~= 0) then
+		entry.ngx = {}
+		for _, k in ipairs(self._event_log_ngx_vars) do
+			entry.ngx[k] = ngx.var[k]
+		end
+	end
+
+	lookup.write_log_events[self._event_log_target](self, entry)
 end
 
 return _M

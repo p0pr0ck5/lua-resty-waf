@@ -46,6 +46,13 @@ You've entered the following: 'bar'
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t?foo=bar
@@ -81,6 +88,13 @@ You've entered the following: 'bar'
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request
@@ -134,6 +148,13 @@ You've entered the following: '<script>alert(1)</script>'
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
 		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t?foo=<script>alert(1)</script>
@@ -171,6 +192,13 @@ You've entered the following: '<script>alert(1)</script>'
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
+		';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
 		';
 	}
 --- request

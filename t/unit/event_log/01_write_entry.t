@@ -1,14 +1,14 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 3 * blocks();
+plan tests => repeat_each() * 3 * blocks() + 15;
 
 no_shuffle();
 run_tests();
 
 __DATA__
 
-=== TEST 1: No User-Agent sent
+=== TEST 1: Examine the structure of a log entry
 --- http_config
 	init_by_lua '
 		local FreeWAF = require "fw"
@@ -20,10 +20,7 @@ __DATA__
 			local FreeWAF = require "fw"
 			local fw      = FreeWAF:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
 			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
 			fw:exec()
 		';
 
@@ -39,13 +36,21 @@ __DATA__
 --- request
 GET /t
 --- more_headers
-Accept: */*
+User-Agent: FreeWAF Dummy
 --- error_code: 200
+--- error_log eval
+[
+qr/"client":"127.0.0.1",/,
+qr/"method":"GET",/,
+qr/"uri":"\\\/t",/,
+qr/"alerts":\[/,
+qr/"score":/,
+qr/"id":"[a-f0-9]{20}"/
+]
 --- no_error_log
-"id":35001
-"id":35003
+[error]
 
-=== TEST 2: Valid User-Agent sent
+=== TEST 2: Do not log a request that was not altered
 --- http_config
 	init_by_lua '
 		local FreeWAF = require "fw"
@@ -57,10 +62,7 @@ Accept: */*
 			local FreeWAF = require "fw"
 			local fw      = FreeWAF:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
 			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
 			fw:exec()
 		';
 
@@ -74,55 +76,23 @@ Accept: */*
 		';
 	}
 --- request
-GET /t
---- more_headers
-User-Agent: Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36
-Accept: */*
---- error_code: 200
---- no_error_log
-"id":35001
-"id":35003
-
-=== TEST 3: Known automated scanner
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
---- config
-	location /t {
-		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
-
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
-		';
-
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
-
-		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
-
-			fw:write_log_events()
-		';
-	}
---- request
-GET /t
---- more_headers
-User-Agent: WebInspect
-Accept: */*
+GET /t?a=b
 --- error_code: 200
 --- error_log
-"id":35001
+Not logging a request that wasn't altered
+--- no_error_log eval
+[
+qr/"client":"127.0.0.1",/,
+qr/"method":"GET",/,
+qr/"uri":"\\\/t",/,
+qr/"alerts":\[/,
+qr/"score":/,
+qr/"id":"[a-f0-9]{20}"/
+]
 --- no_error_log
-"id":35003
+[error]
 
-=== TEST 4: Known malicious User-Agent
+=== TEST 3: Do not log a request in which no rules matched
 --- http_config
 	init_by_lua '
 		local FreeWAF = require "fw"
@@ -134,10 +104,8 @@ Accept: */*
 			local FreeWAF = require "fw"
 			local fw      = FreeWAF:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
 			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
+			fw:set_option("event_log_altered_only", false)
 			fw:exec()
 		';
 
@@ -151,13 +119,22 @@ Accept: */*
 		';
 	}
 --- request
-GET /t
+GET /t?a=b
 --- more_headers
-User-Agent: Internet-Exprorer
 Accept: */*
+User-Agent: Test
 --- error_code: 200
 --- error_log
-"id":35003
+Not logging a request that had no rule alerts
+--- no_error_log eval
+[
+qr/"client":"127.0.0.1",/,
+qr/"method":"GET",/,
+qr/"uri":"\\\/t",/,
+qr/"alerts":\[/,
+qr/"score":/,
+qr/"id":"[a-f0-9]{20}"/
+]
 --- no_error_log
-"id":35001
+[error]
 

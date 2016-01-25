@@ -27,6 +27,13 @@ __DATA__
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t?foo=alert(1)
@@ -54,6 +61,13 @@ GET /t?foo=alert(1)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+
+		log_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:write_log_events()
+		';
 	}
 --- request
 GET /t?foo=alert(1)
