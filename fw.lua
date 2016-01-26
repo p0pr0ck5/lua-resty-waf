@@ -279,7 +279,11 @@ function _M.exec(self)
 		local rule   = rs.rules[phase][offset]
 
 		while rule do
-			if (not util.table_has_key(self, rule.id, self._ignored_rules)) then
+			local id = rule.id
+
+			if (not util.table_has_key(id, self._ignored_rules)) then
+				logger.log(self, "Processing rule ", id)
+
 				local ret = _process_rule(self, rule, collections, ctx)
 				if (ret) then
 					offset = offset + ret
