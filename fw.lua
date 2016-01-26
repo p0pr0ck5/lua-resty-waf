@@ -282,7 +282,7 @@ function _M.exec(self)
 			local id = rule.id
 
 			if (not util.table_has_key(id, self._ignored_rules)) then
-				logger.log(self, "Processing rule ", id)
+				logger.log(self, "Processing rule " .. id)
 
 				local ret = _process_rule(self, rule, collections, ctx)
 				if (ret) then
