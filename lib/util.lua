@@ -68,27 +68,21 @@ function _M.table_values(table)
 end
 
 -- return true if the table key exists
-function _M.table_has_key(FW, needle, haystack)
+function _M.table_has_key(needle, haystack)
 	if (type(haystack) ~= "table") then
 		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
-
-	logger.log(FW, "table key " .. needle .. " is " .. tostring(haystack[needle]))
 
 	return haystack[needle] ~= nil
 end
 
 -- determine if the haystack table has a needle for a key
-function _M.table_has_value(FW, needle, haystack)
-	logger.log(FW, "Searching for " .. needle)
-
+function _M.table_has_value(needle, haystack)
 	if (type(haystack) ~= "table") then
 		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 
 	for _, value in pairs(haystack) do
-		logger.log(FW, "Checking " .. value)
-
 		if (value == needle) then
 			return true
 		end

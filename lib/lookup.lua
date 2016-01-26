@@ -63,7 +63,7 @@ _M.collections = {
 			return not eof
 		end
 
-		if (not res_type or not util.table_has_value(FW, res_type, FW._res_body_mime_types)) then
+		if (not res_type or not util.table_has_value(res_type, FW._res_body_mime_types)) then
 			return not eof
 		end
 
@@ -239,8 +239,8 @@ _M.operators = {
 	NOT_EQUALS  = function(FW, a, b) return not operators.equals(FW, a, b) end,
 	GREATER     = function(FW, a, b) return operators.greater(FW, a, b) end,
 	NOT_GREATER = function(FW, a, b) return not operators.greater(FW, a, b) end,
-	EXISTS      = function(FW, haystack, needle) return util.table_has_value(FW, needle, haystack) end,
-	NOT_EXISTS  = function(FW, haystack, needle) return not util.table_has_value(FW, needle, haystack) end,
+	EXISTS      = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
+	NOT_EXISTS  = function(FW, haystack, needle) return not util.table_has_value(needle, haystack) end,
 	PM          = function(FW, needle, haystack, ctx) return operators.ac_lookup(FW, needle, haystack, ctx) end,
 	NOT_PM      = function(FW, needle, haystack, ctx) return not operators.ac_lookup(FW, needle, haystack, ctx) end
 }

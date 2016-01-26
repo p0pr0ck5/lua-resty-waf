@@ -94,7 +94,7 @@ function _M.parse_request_body(FW, request_headers)
 			logger.log(FW, "very large form upload, not parsing")
 			ngx.exit(ngx.OK)
 		end
-	elseif (util.table_has_value(FW, content_type_header, FW._allowed_content_types)) then
+	elseif (util.table_has_value(content_type_header, FW._allowed_content_types)) then
 		-- users can whitelist specific content types that will be passed in but not parsed
 		-- read the request in, but don't set collections[REQUEST_BODY]
 		-- as we have no way to know what kind of data we're getting (i.e xml/json/octet stream)

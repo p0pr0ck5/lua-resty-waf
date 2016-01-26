@@ -102,7 +102,7 @@ end
 
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
-	if (util.table_has_key(self, action, lookup.alter_actions)) then
+	if (util.table_has_key(action, lookup.alter_actions)) then
 		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
 	end

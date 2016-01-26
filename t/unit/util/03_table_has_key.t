@@ -14,7 +14,7 @@ __DATA__
 		content_by_lua '
 			local util = require "lib.util"
 			local t    = { foo = "bar", qux = "frob" }
-			local val  = util.table_has_key({}, "foo", t)
+			local val  = util.table_has_key("foo", t)
 			ngx.say(val)
 		';
 	}
@@ -32,7 +32,7 @@ true
 		content_by_lua '
 			local util = require "lib.util"
 			local t    = { "foo", "bar", "qux", "frob" }
-			local val  = util.table_has_key({}, 1, t)
+			local val  = util.table_has_key(1, t)
 			ngx.say(val)
 		';
 	}
@@ -50,7 +50,7 @@ true
 		content_by_lua '
 			local util = require "lib.util"
 			local t    = { foo = "bar", qux = "frob" }
-			local val  = util.table_has_key({}, "baz", t)
+			local val  = util.table_has_key("baz", t)
 			ngx.say(val)
 		';
 	}
@@ -68,7 +68,7 @@ false
 		content_by_lua '
 			local util = require "lib.util"
 			local t    = { "foo", "bar", "qux", "frob" }
-			local val  = util.table_has_key({}, 0, t)
+			local val  = util.table_has_key(0, t)
 			ngx.say(val)
 		';
 	}
@@ -86,7 +86,7 @@ false
 		content_by_lua '
 			local util = require "lib.util"
 			local t    = "foo, bar"
-			local val  = util.table_has_key({}, "foo", t)
+			local val  = util.table_has_key("foo", t)
 			ngx.say(val)
 		';
 	}
