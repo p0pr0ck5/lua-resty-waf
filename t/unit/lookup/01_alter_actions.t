@@ -47,16 +47,7 @@ IGNORE
 --- no_error_log
 [error]
 
-=== TEST 4: LOG is not an alter action
---- request
-GET /t
---- error_code: 200
---- response_body_unlike
-LOG
---- no_error_log
-[error]
-
-=== TEST 5: CHAIN is not an alter action
+=== TEST 4: CHAIN is not an alter action
 --- request
 GET /t
 --- error_code: 200
@@ -65,7 +56,7 @@ CHAIN
 --- no_error_log
 [error]
 
-=== TEST 6: SKIP is not an alter action
+=== TEST 5: SKIP is not an alter action
 --- request
 GET /t
 --- error_code: 200
@@ -74,7 +65,7 @@ SKIP
 --- no_error_log
 [error]
 
-=== TEST 7: SCORE is not an alter action
+=== TEST 6: SCORE is not an alter action
 --- request
 GET /t
 --- error_code: 200
@@ -83,7 +74,7 @@ SCORE
 --- no_error_log
 [error]
 
-=== TEST 8: SETVAR is not an alter action
+=== TEST 7: SETVAR is not an alter action
 --- request
 GET /t
 --- error_code: 200

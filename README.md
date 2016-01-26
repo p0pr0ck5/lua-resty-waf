@@ -722,7 +722,6 @@ The following rule actions are currently supported:
 * **CHAIN**: Sets a flag in the rule processor to proceed to the next rule in the rule chain. Rule chaining allows the rule processor to mimic logical AND operations; multiple rules can be chained together to define very specific signatures. If a rule in a rule chain does not match, all further rules in the chain are skipped.
 * **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN). This action cannot be used in `body_filter` rules.
 * **IGNORE**: No action is taken, rule processing continues.
-* **LOG**: A placeholder, as all rule matches that do not have the `nolog` option set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
 * **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).

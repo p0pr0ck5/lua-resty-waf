@@ -119,9 +119,6 @@ _M.parse_collection = {
 }
 
 _M.actions = {
-	LOG = function(FW)
-		logger.log(FW, "Rule action was LOG, since we already called log_event this is relatively meaningless")
-	end,
 	ACCEPT = function(FW, ctx)
 		logger.log(FW, "Rule action was ACCEPT, so ending this phase with ngx.OK")
 		if (FW._mode == "ACTIVE") then
