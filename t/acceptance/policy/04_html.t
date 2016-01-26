@@ -29,7 +29,7 @@ GET /foo.css
 --- error_code: 404
 --- error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 2: Whitelist .js
 --- http_config
@@ -52,7 +52,7 @@ GET /foo.js
 --- error_code: 404
 --- error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 3: Whitelist .html
 --- http_config
@@ -75,7 +75,7 @@ GET /foo.html
 --- error_code: 404
 --- error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 4: Whitelist .htm
 --- http_config
@@ -98,7 +98,7 @@ GET /foo.htm
 --- error_code: 404
 --- error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 5: Do not whitelist unmatched extension (.shtml)
 --- http_config
@@ -121,7 +121,7 @@ GET /foo.shtml
 --- error_code: 404
 --- no_error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 6: Do not whitelist non-final extension
 --- http_config
@@ -144,5 +144,5 @@ GET /foo.css.exe
 --- error_code: 404
 --- no_error_log
 Match of rule 11006
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 

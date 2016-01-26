@@ -59,7 +59,7 @@ GET /foo.jpg
 --- error_code: 404
 --- error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 3: Whitelist .jpeg
 --- http_config
@@ -82,7 +82,7 @@ GET /foo.jpeg
 --- error_code: 404
 --- error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 4: Whitelist .png
 --- http_config
@@ -105,7 +105,7 @@ GET /foo.png
 --- error_code: 404
 --- error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 5: Whitelist .gif
 --- http_config
@@ -128,7 +128,7 @@ GET /foo.gif
 --- error_code: 404
 --- error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 6: Whitelist .ico
 --- http_config
@@ -151,7 +151,7 @@ GET /foo.ico
 --- error_code: 404
 --- error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 7: Do not whitelist unmatched extension (.tiff)
 --- http_config
@@ -174,7 +174,7 @@ GET /foo.tiff
 --- error_code: 404
 --- no_error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 
 === TEST 8: Do not whitelist non-final extension
 --- http_config
@@ -197,5 +197,5 @@ GET /foo.jpg.exe
 --- error_code: 404
 --- no_error_log
 Match of rule 11004
-An explicit ACCEPT was sent
+Rule action was ACCEPT
 

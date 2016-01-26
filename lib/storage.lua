@@ -33,7 +33,7 @@ function _M.set_var(FW, ctx, collections)
 	local value  = util.parse_dynamic_value(FW, ctx.rule_setvar_value, collections)
 	local expire = ctx.rule_setvar_expire or 0
 
-	logger.log(FW, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	logger.log(FW, "Initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 
 	local shm = ngx.shared[FW._storage_zone]
 
@@ -60,7 +60,7 @@ function _M.set_var(FW, ctx, collections)
 		end
 	end
 
-	logger.log(FW, "actually setting " .. key .. " to " .. value)
+	logger.log(FW, "Actually setting " .. key .. " to " .. value)
 
 	local ok = shm:safe_set(key, value, expire)
 

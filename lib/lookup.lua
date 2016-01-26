@@ -85,22 +85,22 @@ _M.collections = {
 
 _M.parse_collection = {
 	specific = function(FW, collection, value)
-		logger.log(FW, "_parse_collection is getting a specific value: " .. value)
+		logger.log(FW, "Parse collection is getting a specific value: " .. value)
 		return collection[value]
 	end,
 	ignore = function(FW, collection, value)
-		logger.log(FW, "_parse_collection is ignoring a value: " .. value)
+		logger.log(FW, "Parse collection is ignoring a value: " .. value)
 		local _collection = {}
 		_collection = util.table_copy(collection)
 		_collection[value] = nil
 		return _collection
 	end,
 	keys = function(FW, collection)
-		logger.log(FW, "_parse_collection is getting the keys")
+		logger.log(FW, "Parse collection is getting the keys")
 		return util.table_keys(collection)
 	end,
 	values = function(FW, collection)
-		logger.log(FW, "_parse_collection is getting the values")
+		logger.log(FW, "Parse collection is getting the values")
 		return util.table_values(collection)
 	end,
 	all = function(FW, collection)
@@ -120,10 +120,10 @@ _M.parse_collection = {
 
 _M.actions = {
 	LOG = function(FW)
-		logger.log(FW, "rule.action was LOG, since we already called log_event this is relatively meaningless")
+		logger.log(FW, "Rule action was LOG, since we already called log_event this is relatively meaningless")
 	end,
 	ACCEPT = function(FW, ctx)
-		logger.log(FW, "An explicit ACCEPT was sent, so ending this phase with ngx.OK")
+		logger.log(FW, "Rule action was ACCEPT, so ending this phase with ngx.OK")
 		if (FW._mode == "ACTIVE") then
 			ngx.exit(ngx.OK)
 		end
@@ -140,13 +140,13 @@ _M.actions = {
 		ctx.score = new_score
 	end,
 	DENY = function(FW, ctx)
-		logger.log(FW, "rule.action was DENY, so telling nginx to quit (from the lib!)")
+		logger.log(FW, "Rule action was DENY, so telling nginx to quit (from the lib!)")
 		if (FW._mode == "ACTIVE") then
 			ngx.exit(ngx.HTTP_FORBIDDEN)
 		end
 	end,
 	IGNORE = function(FW)
-		logger.log(FW, "Ingoring rule for now")
+		logger.log(FW, "Ignoring rule for now")
 	end,
 	SETVAR = function(FW, ctx, collections)
 		storage.set_var(FW, ctx, collections)
@@ -158,17 +158,17 @@ _M.transform = {
 		logger.log(FW, "Decoding from base64: " .. tostring(value))
 		local t_val = ngx.decode_base64(tostring(value))
 		if (t_val) then
-			logger.log(FW, "decode successful, decoded value is " .. t_val)
+			logger.log(FW, "Decode successful, decoded value is " .. t_val)
 			return t_val
 		else
-			logger.log(FW, "decode unsuccessful, returning original value " .. value)
+			logger.log(FW, "Decode unsuccessful, returning original value " .. value)
 			return value
 		end
 	end,
 	base64_encode = function(FW, value)
 		logger.log(FW, "Encoding to base64: " .. tostring(value))
 		local t_val = ngx.encode_base64(value)
-		logger.log(FW, "encoded value is " .. t_val)
+		logger.log(FW, "Encoded value is " .. t_val)
 		return t_val
 	end,
 	compress_whitespace = function(FW, value)
