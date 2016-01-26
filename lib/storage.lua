@@ -29,8 +29,8 @@ function _M.set_var(FW, ctx, collections)
 		return
 	end
 
-	local key = util.parse_dynamic_value(FW, ctx.rule_setvar_key, collections)
-	local value = util.parse_dynamic_value(FW, ctx.rule_setvar_value, collections)
+	local key    = util.parse_dynamic_value(FW, ctx.rule_setvar_key, collections)
+	local value  = util.parse_dynamic_value(FW, ctx.rule_setvar_value, collections)
 	local expire = ctx.rule_setvar_expire or 0
 
 	logger.log(FW, "initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
@@ -42,8 +42,8 @@ function _M.set_var(FW, ctx, collections)
 
 	if (incr) then
 		local operator = incr[1]
-		local newval = incr[2]
-		local oldval = _M.retrieve_persistent_var(FW, key)
+		local newval   = incr[2]
+		local oldval   = _M.retrieve_persistent_var(FW, key)
 
 		if (not oldval) then
 			oldval = 0
