@@ -170,7 +170,7 @@ local function _process_rule(self, rule, collections, ctx)
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
-	local t, match
+	local t, match, offset
 
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
 		t = collections[var.type](self, var.opts, collections)
@@ -184,10 +184,10 @@ local function _process_rule(self, rule, collections, ctx)
 		end
 		memokey = memokey .. _transform_memokey(opts.transform)
 
-		logger.log(self, "checking for memokey " .. memokey)
+		logger.log(self, "Checking for memokey " .. memokey)
 
 		if (not ctx.transform_key[memokey]) then
-			logger.log(self, "parsing collections for rule " .. id)
+			logger.log(self, "Parse collection cache not found")
 			t = _parse_collection(self, collections[var.type], var.opts)
 
 			if (opts.transform) then
@@ -197,24 +197,24 @@ local function _process_rule(self, rule, collections, ctx)
 			ctx.transform[memokey] = t
 			ctx.transform_key[memokey] = true
 		else
-			logger.log(self, "parse collection cache hit!")
+			logger.log(self, "Parse collection cache hit!")
 			t = ctx.transform[memokey]
 		end
 	end
 
 	if (not t) then
 		logger.log(self, "parse_collection didnt return anything for " .. var.type)
-		return rule.offset_nomatch
+		offset = rule.offset_nomatch
 	else
 		if (opts.parsepattern) then
-			logger.log(self, "parsing dynamic pattern: " .. pattern)
+			logger.log(self, "Parsing dynamic pattern: " .. pattern)
 			pattern = util.parse_dynamic_value(self, pattern, collections)
 		end
 
 		match = lookup.operators[var.operator](self, t, pattern, ctx)
 
 		if (match) then
-			logger.log(self, "Match of rule " .. id .. "!")
+			logger.log(self, "Match of rule " .. id)
 
 			if (not opts.nolog) then
 				_log_event(self, rule, match, ctx)
@@ -224,11 +224,14 @@ local function _process_rule(self, rule, collections, ctx)
 
 			_rule_action(self, action, ctx, collections)
 
-			return rule.offset_match
+			offset = rule.offset_match
 		else
-			return rule.offset_nomatch
+			offset = rule.offset_nomatch
 		end
 	end
+
+	logger.log(self, "Returning offset " .. tostring(offset))
+	return offset
 end
 
 -- main entry point
@@ -271,6 +274,8 @@ function _M.exec(self)
 	-- store the collections table in ctx, which will get saved to ngx.ctx
 	ctx.collections = collections
 
+	logger.log(self, "Beginning run of phase " .. phase)
+
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
@@ -291,7 +296,7 @@ function _M.exec(self)
 					offset = nil
 				end
 			else
-				logger.log(self, "Ignoring rule " .. rule.id)
+				logger.log(self, "Ignoring rule " .. id)
 				offset = offset + rule.offset_nomatch
 			end
 
