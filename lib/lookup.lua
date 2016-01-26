@@ -233,8 +233,8 @@ _M.write_log_events = {
 }
 
 _M.operators = {
-	REGEX       = function(FW, subject, pattern, opts) return operators.regex_match(FW, subject, pattern, opts) end,
-	NOT_REGEX   = function(FW, subject, pattern, opts) return not operators.regex_match(FW, subject, pattern, opts) end,
+	REGEX       = function(FW, subject, pattern) return operators.regex_match(FW, subject, pattern) end,
+	NOT_REGEX   = function(FW, subject, pattern) return not operators.regex_match(FW, subject, pattern) end,
 	EQUALS      = function(FW, a, b) return operators.equals(a, b) end,
 	NOT_EQUALS  = function(FW, a, b) return not operators.equals(a, b) end,
 	GREATER     = function(FW, a, b) return operators.greater(a, b) end,
