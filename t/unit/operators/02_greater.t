@@ -27,7 +27,7 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, 2, 1))
+			ngx.say(op.greater(2, 1))
         ';
     }
 --- request
@@ -43,7 +43,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, 1, 1))
+			ngx.say(op.greater(1, 1))
         ';
     }
 --- request
@@ -59,7 +59,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, 1, 2))
+			ngx.say(op.greater(1, 2))
         ';
     }
 --- request
@@ -75,7 +75,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, {0, 1, 2}, 1))
+			ngx.say(op.greater({0, 1, 2}, 1))
         ';
     }
 --- request
@@ -91,7 +91,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, {-1, 0, 1}, 1))
+			ngx.say(op.greater({-1, 0, 1}, 1))
         ';
     }
 --- request
@@ -107,7 +107,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.greater({}, {-1, 0, 1}, 2))
+			ngx.say(op.greater({-1, 0, 1}, 2))
         ';
     }
 --- request

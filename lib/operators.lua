@@ -8,36 +8,34 @@ local logger = require("lib.log")
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
 
-function _M.equals(FW, a, b)
+function _M.equals(a, b)
 	local equals
 
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
-			equals = _M.equals(FW, v, b)
+			equals = _M.equals(v, b)
 			if (equals) then
 				break
 			end
 		end
 	else
-		logger.log(FW, "Comparing " .. tostring(a) .. " and " .. tostring(b))
 		equals = a == b
 	end
 
 	return equals
 end
 
-function _M.greater(FW, a, b)
+function _M.greater(a, b)
 	local greater
 
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
-			greater = _M.greater(FW, v, b)
+			greater = _M.greater(v, b)
 			if (greater) then
 				break
 			end
 		end
 	else
-		logger.log(FW, "Comparing (greater) " .. tostring(a) .. " and " .. tostring(b))
 		greater = a > b
 	end
 
@@ -58,8 +56,6 @@ function _M.regex_match(FW, subject, pattern)
 			end
 		end
 	else
-		logger.log(FW, "matching " .. subject .. " against " .. pattern)
-
 		from, to, err = ngx.re.find(subject, pattern, opts)
 
 		if err then
@@ -67,7 +63,6 @@ function _M.regex_match(FW, subject, pattern)
 		end
 
 		if from then
-			logger.log(FW, "regex match! " .. string.sub(subject, from, to))
 			match = string.sub(subject, from, to)
 		end
 	end
@@ -75,24 +70,22 @@ function _M.regex_match(FW, subject, pattern)
 	return match
 end
 
-function _M.ac_lookup(FW, needle, haystack, ctx)
+function _M.ac_lookup(needle, haystack, ctx)
 	local id = ctx.id
 	local match, _ac
 
 	-- dictionary creation is expensive, so we use the id of
 	-- the rule as the key to cache the created dictionary
 	if (not _ac_dicts[id]) then
-		logger.log(FW, "AC dict not found, calling libac.so")
 		_ac = ac.create_ac(haystack)
 		_ac_dicts[id] = _ac
 	else
-		logger.log(FW, "AC dict found, pulling from the module cache")
 		_ac = _ac_dicts[id]
 	end
 
 	if (type(needle) == "table") then
 		for _, v in ipairs(needle) do
-			match = _M.ac_lookup(FW, v, haystack, ctx)
+			match = _M.ac_lookup(v, haystack, ctx)
 
 			if (match) then
 				break

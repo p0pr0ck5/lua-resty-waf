@@ -27,7 +27,7 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, 1, 1))
+			ngx.say(op.equals(1, 1))
         ';
     }
 --- request
@@ -43,7 +43,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, 1, 2))
+			ngx.say(op.equals(1, 2))
         ';
     }
 --- request
@@ -59,7 +59,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, "foo", "foo"))
+			ngx.say(op.equals("foo", "foo"))
         ';
     }
 --- request
@@ -75,7 +75,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, "foo", "bar"))
+			ngx.say(op.equals("foo", "bar"))
         ';
     }
 --- request
@@ -91,7 +91,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, {3, 2, 1}, 1))
+			ngx.say(op.equals({3, 2, 1}, 1))
         ';
     }
 --- request
@@ -107,7 +107,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, {3, 2, 0}, 1))
+			ngx.say(op.equals({3, 2, 0}, 1))
         ';
     }
 --- request
@@ -123,7 +123,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, {"bar", "foo"}, "foo"))
+			ngx.say(op.equals({"bar", "foo"}, "foo"))
         ';
     }
 --- request
@@ -139,7 +139,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, {"bar", "baz"}, "foo"))
+			ngx.say(op.equals({"bar", "baz"}, "foo"))
         ';
     }
 --- request
@@ -155,7 +155,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, "nil", nil))
+			ngx.say(op.equals("nil", nil))
         ';
     }
 --- request
@@ -171,7 +171,7 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({}, "7", 7))
+			ngx.say(op.equals("7", 7))
         ';
     }
 --- request

@@ -235,14 +235,14 @@ _M.write_log_events = {
 _M.operators = {
 	REGEX       = function(FW, subject, pattern, opts) return operators.regex_match(FW, subject, pattern, opts) end,
 	NOT_REGEX   = function(FW, subject, pattern, opts) return not operators.regex_match(FW, subject, pattern, opts) end,
-	EQUALS      = function(FW, a, b) return operators.equals(FW, a, b) end,
-	NOT_EQUALS  = function(FW, a, b) return not operators.equals(FW, a, b) end,
-	GREATER     = function(FW, a, b) return operators.greater(FW, a, b) end,
-	NOT_GREATER = function(FW, a, b) return not operators.greater(FW, a, b) end,
+	EQUALS      = function(FW, a, b) return operators.equals(a, b) end,
+	NOT_EQUALS  = function(FW, a, b) return not operators.equals(a, b) end,
+	GREATER     = function(FW, a, b) return operators.greater(a, b) end,
+	NOT_GREATER = function(FW, a, b) return not operators.greater(a, b) end,
 	EXISTS      = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
 	NOT_EXISTS  = function(FW, haystack, needle) return not util.table_has_value(needle, haystack) end,
-	PM          = function(FW, needle, haystack, ctx) return operators.ac_lookup(FW, needle, haystack, ctx) end,
-	NOT_PM      = function(FW, needle, haystack, ctx) return not operators.ac_lookup(FW, needle, haystack, ctx) end
+	PM          = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
+	NOT_PM      = function(FW, needle, haystack, ctx) return not operators.ac_lookup(needle, haystack, ctx) end
 }
 
 

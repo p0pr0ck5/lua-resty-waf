@@ -13,7 +13,7 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({}, "foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -30,7 +30,7 @@ GET /t
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({}, { "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match = op.ac_lookup({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -47,7 +47,7 @@ GET /t
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({}, "far", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match = op.ac_lookup("far", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -64,7 +64,7 @@ nil
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({}, { "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match = op.ac_lookup({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
