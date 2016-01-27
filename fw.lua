@@ -2,8 +2,10 @@ local _M = {}
 
 _M.version = "0.5.2"
 
+local calc    = require "lib.rule_calc"
 local logger  = require("lib.log")
 local lookup  = require("lib.lookup")
+local phase_t = require("lib.phase")
 local random  = require("lib.random")
 local storage = require("lib.storage")
 local util    = require("lib.util")
@@ -241,9 +243,15 @@ function _M.exec(self)
 		return
 	end
 
-	local phase       = ngx.get_phase()
+	local phase = ngx.get_phase()
+
+	if (not phase_t.is_valid_phase(phase)) then
+		logger.fatal_fail("FreeWAF should not be run in phase " .. phase)
+	end
+
 	local ctx         = ngx.ctx
 	local collections = ctx.collections or {}
+
 
 	-- restore options from a previous phase
 	if (ctx.opts) then
@@ -362,13 +370,10 @@ end
 
 -- preload rulesets and calculate offsets
 function _M.init()
-	local calc  = require "lib.rule_calc"
-	local phase = require "lib.phase"
-
 	for _, ruleset in ipairs(_global_active_rulesets) do
 		local r = require("rules." .. ruleset)
 
-		for phase, i in pairs(phase.phases) do
+		for phase, i in pairs(phase_t.phases) do
 			if (r.rules[phase]) then
 				calc.calculate(r.rules[phase])
 			else
