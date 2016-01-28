@@ -73,8 +73,6 @@ local function _save(self, ctx)
 end
 
 local function _transaction_id_header(self, ctx)
-	local phase = ctx.phase
-
 	-- upstream request header
 	if (self._req_tid_header) then
 		ngx.req.set_header("X-FreeWAF-ID", self.transaction_id)
