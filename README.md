@@ -4,6 +4,8 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 ##Status
 
+[![Build Status](https://travis-ci.org/p0pr0ck5/FreeWAF.svg?branch=development)](https://travis-ci.org/p0pr0ck5/FreeWAF)
+
 FreeWAF is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
 
 ##Description
@@ -38,14 +40,15 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 ```lua
 	http {
-		-- include FreeWAF in the lua_package_path
+		-- include FreeWAF in the appropriate paths
 		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+		lua_package_cpath '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
 	}
 
 	server {
 		location / {
 			access_by_lua '
-				FreeWAF = require "FreeWAF.fw"
+				local FreeWAF = require "fw"
 
 				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
@@ -56,13 +59,46 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 				-- run the firewall
 				fw:exec()
 			';
+
+			header_filter_by_lua '
+				local FreeWAF = require "fw"
+
+				-- instantiate a new instance of the module
+				-- note that options set in previous handlers
+				-- do not need to be set again
+				local fw = FreeWAF:new()
+
+				-- run the firewall
+				fw:exec()
+			';
+
+			body_filter_by_lua '
+				local FreeWAF = require "fw"
+
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- run the firewall
+				fw:exec()
+			';
+
+			log_by_lua '
+				local FreeWAF = require "fw"
+
+				-- instantiate a new instance of the module
+				local fw = FreeWAF:new()
+
+				-- write out any event log entries to the
+				-- configured target, if applicable
+				fw:write_log_events()
+			';
 		}
 	}
 ```
 
 ##Options
 
-Module options can be configured using the `set_option` function. Details for available options are provided below.
+Module options can be configured using the `set_option` function. Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
 
 ###mode
 
@@ -93,7 +129,7 @@ Adds an address to the module whitelist. Whitelisted addresses will not have any
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("whitlist", "127.0.0.1")
+			fw:set_option("whitelist", "127.0.0.1")
 		';
 	}
 ```
@@ -122,7 +158,7 @@ Multiple addresses can be whitelisted by passing a table of addresses to `set_op
 
 *Default*: none
 
-Instructs the module to ignore a specified rule ID. Note that ignoring rules in a chain will likely cause many headaches, so it's best to ignore all rules in a given chain if one rule is causing problems.
+Instructs the module to ignore a specified rule ID. Note that ignoring a rule in a chain will result in the entire chain being ignored, and processing will continue to the next rule following the chain.
 
 *Example*:
 
@@ -266,11 +302,82 @@ Sets the verbosity used in writing event log notification. The higher the verbos
 	}
 ```
 
+###event_log_ngx_vars
+
+*Default*: empty
+
+Defines what extra variables from `ngx.var` are put to the log event. This is a generic way to extend the alert with extra context. The variable name will be the key of the entry under an `ngx` key in the log entry. If the variable is not present as an nginx variable, no item is added to the event.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_ngx_vars", "host")
+			fw:set_option("event_log_ngx_vars", "request_id")
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"ngx": {
+		"host": "example.com",
+		"request_id": "373bcce584e3c18a"
+	}
+}
+```
+
+###event_log_request_arguments
+
+*Default*: false
+
+When set to true, the log entries contain the request arguments under the `uri_args` key.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_request_arguments", true)
+		';
+	}
+```
+
+###event_log_request_headers
+
+*Default*: false
+
+The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_request_headers", true)
+		';
+	}
+```
+
+The resulting event has these extra items:
+
+```json
+{
+	"request_headers": {
+		"accept": "*/*",
+		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
+	}
+}
+```
+
 ###event_log_target
 
 *Default*: error
 
-Defines the destination for event logs. FreeWAF currently supports logging to the error log, a separate file on the local file system, or a remote UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
+Defines the destination for event logs. FreeWAF currently supports logging to the error log, a separate file on the local file system, or a remote TCP or UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
 
 *Example*:
 
@@ -283,7 +390,7 @@ Defines the destination for event logs. FreeWAF currently supports logging to th
 			-- send event logs to a local file on disk
 			fw:set_option("event_log_target", "file")
 
-			-- send event logs to a remote UDP server
+			-- send event logs to a remote server
 			fw:set_option("event_log_target", "socket")
 		';
 	}
@@ -295,7 +402,7 @@ Note that, due to a limition in the logging library used, only a single target s
 
 *Default*: none
 
-Defines the target server for event logs that target a UDP server.
+Defines the target server for event logs that target a remote server.
 
 *Example*:
 
@@ -311,7 +418,7 @@ Defines the target server for event logs that target a UDP server.
 
 *Default*: none
 
-Defines the target port for event logs that target a UDP server.
+Defines the target port for event logs that target a remote server.
 
 *Example*:
 
@@ -341,6 +448,23 @@ Defines the target path for event logs that target a local file system location.
 
 This path must be in a location writeable by the nginx user. Note that, by nature, on-disk logging can cause significant performance degredation in high-concurrency environments.
 
+###event_log_socket_proto
+
+*Default*: udp
+
+Defines which IP protocol to use (TCP or UDP) when shipping event logs via a remote socket. The same buffering and recurring flush logic will be used regardless of protocol.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- send logs via TCP
+			fw:set_option("event_log_socket_proto", "tcp")
+		';
+	}
+```
+
 ###event_log_buffer_size
 
 *Default*: 4096
@@ -364,12 +488,118 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 
 Defines an interval, in seconds, at which the event log buffer will periodically flush. If no value is configured, the buffer will not flush periodically, and will only flush when the `event_log_buffer_size` threshold is reached. Configure this option for very low traffic sites that may not receive any event log data in a long period of time, to prevent stale data from sitting in the buffer.
 
+*Example*:
 
 ```lua
 	location / {
 		access_by_lua '
 			-- flush the event log buffer every 30 seconds
 			fw:set_option("event_log_periodic_flush", 30)
+		';
+	}
+```
+
+###event_log_altered_only
+
+*Default*: true
+
+Determines whether to write log entries for rule matches in a transaction that was not altered by FreeWAF. "Altered" is defined as FreeWAF acting on a rule whose action is `ACCEPT` or `DENY`. When this option is unset, FreeWAF will log rule matches even if the transaction was not altered. By default, FreeWAF will only write log entries for matches if the transaction was altered.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("event_log_altered_only", false)
+		';
+	}
+```
+
+Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but FreeWAF is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
+
+###res_body_max_size
+
+*Default*: 1048576 (1 MB)
+
+Defines the content length threshold beyond which response bodies will not be processed. This size of the response body is determined by the Content-Length response header. If this header does not exist in the response, the response body will never be processed.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- increase the max response size to 2 MB
+			fw:set_option("res_body_max_size", 1024 * 1024 * 2)
+		';
+	}
+```
+Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
+
+###res_body_mime_types
+
+*Default*: "text/plain", "text/html"
+
+Defines the MIME types with which FreeWAF will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- mime types that will be processed are now text/plain, text/html, and text/json
+			fw:set_option("res_body_mime_types", "text/json")
+		';
+	}
+```
+
+Multiple MIME types can be added by passing a table of types to `set_option`.
+
+###process_multipart_body
+
+*Default* true
+
+Enable processing of multipart/form-data request bodies (when present), using the `lua-resty-upload` module. In the future, FreeWAF may use this processing to perform stricter checking of upload bodies; for now this module performs only minimal sanity checks on the request body, and will not log an event if the request body is invalid. Disable this option if you do not need this checking, or if bugs in the upstream module are causing problems with HTTP uploads.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- disable processing of multipart/form-data requests
+			-- note that the request body will still be sent to the upstream
+			fw:set_option("process_multipart_body", false)
+		';
+	}
+```
+
+###req_tid_header
+
+*Default*: false
+
+Set an HTTP header `X-FreeWAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("req_tid_header", true)
+		';
+	}
+```
+
+###res_tid_header
+
+*Default*: false
+
+Set an HTTP header `X-FreeWAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("res_tid_header", true)
 		';
 	}
 ```
@@ -415,6 +645,18 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 	}
 ```
 
+##Phase Handling
+
+FreeWAF is designed to run in multiple phases of the request lifecycle. Rules can be processed in the following phases:
+
+* **access**: Request information, such as URI, request headers, URI args, and request body are available in this phase.
+* **header_filter**: Response headers and HTTP status are available in this phase.
+* **body_filter**: Response body is available in this phase.
+
+These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running FreeWAF in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
+
+Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. FreeWAF is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
+
 ##Included Rulesets
 
 FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
@@ -446,18 +688,15 @@ A string that describes the purpose of the rule. This is purely descriptive.
 
 An enum (currently implemented as a string) that defines how the rule processor will act if a rule is a positive match. See the section on rule actions for available options.
 
-
 ###opts
 
 A table that defines options specific to rule. The following options are currently supported:
 
-* **chainchild**: Defines a rule that is part of a rule chain.
-* **chainend**: Defines the last rule in the rule chain.
 * **nolog**: Do not create a log entry if a rule match occurs. This is most commonly used in rule chains, with rules that have the CHAIN action (to avoid unnecessarily large quantities of log entries).
 * **parsepattern**: Activate dynamic string parsing of the rule's `var.pattern` field; see the section on dynamic string parsing for more details.
 * **score**: Defines the score for a rule with the SCORE action. Must be a numeric value.
 * **setvar**: Defines persistent storage data key, value and optional expiry time.
-* **skipend**: Ends a skip chain. Note that the rule containing this option will be included as part of the skip chain, e.g. it will not be processed.
+* **skip**: Defines the number of proceeding rules to skip, if the rule matches.
 * **transform**: Defines how collection data is altered as an anti-evasion technique. Multiple transforms for a single collection can be specified by defining the `transform` option value as a table itself. See the section on data transformation for more detail.
 
 ###var
@@ -473,14 +712,13 @@ A table that defines the rule's signature. Each var table must contain the follo
 
 The following rule actions are currently supported:
 
-* **ACCEPT**: Explicitly accepts the request, stopping all further rule processing and passing the request to the next phase handler.
+* **ACCEPT**: Explicitly accepts the request in the given phase, stopping all further rule processing and passing the request to the next phase handler. This action cannot be used in `body_filter` rules.
 * **CHAIN**: Sets a flag in the rule processor to proceed to the next rule in the rule chain. Rule chaining allows the rule processor to mimic logical AND operations; multiple rules can be chained together to define very specific signatures. If a rule in a rule chain does not match, all further rules in the chain are skipped.
-* **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN).
+* **DENY**: Explictly denies the request, stopping all further rule processing and exiting the phase handler with a 403 response (ngx.HTTP_FORBIDDEN). This action cannot be used in `body_filter` rules.
 * **IGNORE**: No action is taken, rule processing continues.
-* **LOG**: A placeholder, as all rule matches that do not have the `nolog` option set will be logged.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
-* **SKIP**: Skips processing of all further rules until a rule with the `skipend` flag is specified.
+* **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).
 
 ##Operators
 
@@ -500,17 +738,20 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 
 * **BLACKLIST**: A table containing user-defined blacklisted IPs.
 * **COOKIES**: A table containing the values of the cookies sent in the request.
-* **HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
-* **HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **HTTP_VERSION**: An integer representation of the HTTP version used in the request.
 * **IP**: The IP address of client.
 * **METHOD**: The HTTP method specified in the request.
+* **RESPONSE_BODY**: The response body. This collection will not be populated if response body is too large, or the content type is not in the list of valid MIME types. Available only in the `body_filter` phase.
+* **RESPONSE_HEADERS**: A table containing the response headers. Available only in `header_filter` and later phases.
+* **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
+* **REQUEST_HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
+* **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **URI**: The request URI.
-* **URI_ARGS**: A table containing the request query strings. 
+* **URI_ARGS**: A table containing the request query strings.
 * **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **WHITELIST**: A table containing user-defined whitelisted IPs.
@@ -537,6 +778,10 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 * **replace_comments**: Globally replace all C-style comment characters and their enclosed data with a single `' '` space character. For example, the string `UNION/*xxxx*/SELECT` would be transformed to `UNION SELECT`.
 * **uri_decode**: Decode a string based on URI encoding rules.
 
+##Rule Flow Precalculation
+
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
+
 ##Dynamic Parsing in Rule Definitions
 
 Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
@@ -556,9 +801,9 @@ Persistent data is set with the `SETVAR` action. This requires the associated ru
 Storage keys can be dynamically defined using dynamic parse syntax; this mimics the functionality of ModSecurity's `initcol` and `setvar` options. For example, a rule group to set a storage variable designed to track requests to a specific resource might look like this:
 
 ```lua
-{   
+{
 	id = 12345,
-	var = { 
+	var = {
 		type = "URI",
 		opts = nil,
 		pattern = '/wp-login.php',
@@ -576,7 +821,7 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 		pattern = "POST",
 		operator = "EQUALS"
 	},
-	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 }, chainchild = true, chainend = true, nolog = true },
+	opts = { setvar = { key = '%{IP}.%{URI}.hitcount', value = '+1', expire = 60 }, nolog = true },
 	action = "SETVAR",
 	description = "WP-Login brute force detection"
 },
@@ -596,22 +841,25 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 
 ##Notes
 
+###Communication
+
+There is a Freenode IRC channel `#freewaf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
+
 ###Pull Requests
 
 Please target all pull requests towards the development branch, or a feature branch if the PR is a significant change. Commits to master should only come in the form of documentation updates or other changes that have no impact of the module itself (and can be cleanly merged into development).
 
 ##Roadmap
 
-* **Expanded VP (Virtual Patch) ruleset**: Increase coverage of emerging threats.
-* **HTTP header/body response collections**: Use `header_filter_by_lua` and `body_filter_by_lua` to examine response headers and content. This could be used to build more extensive and complex chains.
-* **Multiple phase handling**: Ties in with response collections. The biggest challenge will be keeping track of the `ctx` between multiple phases (bearing in mind that [ngx.ctx is expensive](https://www.cryptobells.com/openresty-performance-ngx-ctx-vs-ngx-shared-dict/)).
-* **Rule flow optimization**: Pre-calculating rule flow, as [suggested by @splitice](https://github.com/p0pr0ck5/FreeWAF/issues/39).
-* **Improve (debug) logging**: Log levels?
-* **Unit tests**: Testing function, collection, transform, chain, and rule behavior.
+* **Expanded virtual patch ruleset**: Increase coverage of emerging threats.
+* **Expanded integration/acceptance testing**: Increase coverage of common threats and usage scenarios.
+* **Support for different/multiple persistent storage engines**: Memcached, redis, etc (in addition to ngx.shared).
+* **Common application profiles**: Tuned rulesets for common CMS/applications.
+* **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project.
 
 ##Limitations
 
-FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo. 
+FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo.
 
 ##License
 

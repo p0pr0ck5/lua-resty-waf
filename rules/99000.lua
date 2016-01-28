@@ -4,22 +4,33 @@ local _M = {}
 
 _M.version = "0.5.2"
 
-local _rules = {
-	{
-		id = 99001,
-		var = {
-			type = "SCORE",
-			pattern = "%{SCORE_THRESHOLD}",
-			operator = "GREATER"
-		},
-		opts = { parsepattern = true },
-		action = "DENY",
-		description = "Request score greater than score threshold"
+_M.rules = {
+	access = {
+		{
+			id = 99001,
+			var = {
+				type = "SCORE",
+				pattern = "%{SCORE_THRESHOLD}",
+				operator = "GREATER"
+			},
+			opts = { parsepattern = true },
+			action = "DENY",
+			description = "Request score greater than score threshold"
+		}
+	},
+	header_filter = {
+		{
+			id = 99002,
+			var = {
+				type = "SCORE",
+				pattern = "%{SCORE_THRESHOLD}",
+				operator = "GREATER"
+			},
+			opts = { parsepattern = true },
+			action = "DENY",
+			description = "Request score greater than score threshold"
+		}
 	}
 }
-
-function _M.rules()
-	return _rules
-end
 
 return _M

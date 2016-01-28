@@ -44,7 +44,7 @@ function _M.load_ac_lib()
     if ac_lib ~= nil then
         return ac_lib
     else
-        local so_path = find_shared_obj(package.cpath, "FreeWAF/inc/libac.so")
+        local so_path = find_shared_obj(package.cpath, "inc/libac.so")
         if so_path ~= nil then
             ac_lib = ffi.load(so_path)
             ac_create = ac_lib.ac_create
