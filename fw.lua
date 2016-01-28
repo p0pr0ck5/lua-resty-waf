@@ -34,7 +34,7 @@ end
 -- 2. the event_log_altered_only option is unset
 local function _log_event(self, rule, match, ctx)
 	local t = {
-		id = rule.id,
+		id    = rule.id,
 		match = match
 	}
 
@@ -43,7 +43,7 @@ local function _log_event(self, rule, match, ctx)
 	end
 
 	if (self._event_log_verbosity > 2) then
-		t.opts = rule.opts
+		t.opts   = rule.opts
 		t.action = rule.action
 	end
 
