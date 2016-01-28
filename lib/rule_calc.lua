@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.5.2"
+_M.version = "0.6.0"
 
 local function _write_chain_offsets(chain, max, cur_offset)
 	local chain_length = #chain

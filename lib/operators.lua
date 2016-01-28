@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.5.2"
+_M.version = "0.6.0"
 
 local ac     = require("inc.load_ac")
 local logger = require("lib.log")
