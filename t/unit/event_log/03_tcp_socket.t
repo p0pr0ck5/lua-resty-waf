@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: Send a message to a TCP server
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -44,11 +39,6 @@ A response is sent
 [error]
 
 === TEST 2: Delayed send - periodic flush
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -82,11 +72,6 @@ A response is sent
 [error]
 
 === TEST 3: Stale buffer never sends
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

@@ -41,10 +41,6 @@ __DATA__
 === TEST 2: Benign request is not caught in SIMULATE mode
 --- http_config
 	lua_shared_dict shm 10m;
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -106,10 +102,6 @@ __DATA__
 === TEST 3: Benign request is not caught in ACTIVE mode
 --- http_config
 	lua_shared_dict shm 10m;
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -204,10 +196,6 @@ __DATA__
 === TEST 5: Malicious request is logged in SIMULATE mode
 --- http_config
 	lua_shared_dict shm 10m;
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -269,10 +257,6 @@ __DATA__
 === TEST 6: Malicious request is blocked in ACTIVE mode
 --- http_config
 	lua_shared_dict shm 10m;
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

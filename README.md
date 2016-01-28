@@ -43,12 +43,6 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 		-- include FreeWAF in the appropriate paths
 		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
 		lua_package_cpath '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
-
-		init_by_lua '
-			-- preload rulesets and calculate jump offsets
-			local FreeWAF = require "fw"
-			FreeWAF.init()
-		';
 	}
 
 	server {
@@ -786,7 +780,7 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 
 ##Rule Flow Precalculation
 
-FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop. It does, however, _require_ that users call `FreeWAF.init()` in an `init_by_lua` handler to perform the offset calculation. Failure to do so will result in broken behavior.
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
 
 ##Dynamic Parsing in Rule Definitions
 

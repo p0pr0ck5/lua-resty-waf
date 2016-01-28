@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: No whitelisted IPs
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -35,11 +30,6 @@ GET /t
 Match of rule 10001
 
 === TEST 2: Client IP is whitelisted
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -63,11 +53,6 @@ Match of rule 10001
 [error]
 
 === TEST 3: Client IP is among whitelisted IPs
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -91,11 +76,6 @@ Match of rule 10001
 [error]
 
 === TEST 4: Client IP is not among whitelisted IPs
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

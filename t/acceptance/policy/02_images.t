@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: Skip whitelisting of non-passive requests
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -39,11 +34,6 @@ Match of rule 11003
 [error]
 
 === TEST 2: Whitelist .jpg
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -62,11 +52,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 3: Whitelist .jpeg
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -85,11 +70,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 4: Whitelist .png
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -108,11 +88,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 5: Whitelist .gif
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -131,11 +106,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 6: Whitelist .ico
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -154,11 +124,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 7: Do not whitelist unmatched extension (.tiff)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -177,11 +142,6 @@ Match of rule 11004
 Rule action was ACCEPT
 
 === TEST 8: Do not whitelist non-final extension
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"

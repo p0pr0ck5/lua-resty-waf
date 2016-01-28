@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: No User-Agent sent
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -46,11 +41,6 @@ Accept: */*
 "id":35003
 
 === TEST 2: Valid User-Agent sent
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -84,11 +74,6 @@ Accept: */*
 "id":35003
 
 === TEST 3: Known automated scanner
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -123,11 +108,6 @@ Accept: */*
 "id":35003
 
 === TEST 4: Known malicious User-Agent
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

@@ -236,6 +236,21 @@ local function _process_rule(self, rule, collections, ctx)
 	return offset
 end
 
+-- calculate rule jump offsets
+local function _calculate_offset(ruleset)
+	local r = require("rules." .. ruleset)
+
+	for phase, i in pairs(phase_t.phases) do
+		if (r.rules[phase]) then
+			calc.calculate(r.rules[phase])
+		else
+			r.rules[phase] = {}
+		end
+	end
+
+	r.initted = true
+end
+
 -- main entry point
 function _M.exec(self)
 	if (self._mode == "INACTIVE") then
@@ -287,7 +302,13 @@ function _M.exec(self)
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
-		local rs     = require("rules." .. ruleset)
+		local rs = require("rules." .. ruleset)
+
+		if (not rs.initted) then
+			logger.log(self, "Doing offset calculation of " .. ruleset)
+			_calculate_offset(ruleset)
+		end
+
 		local offset = 1
 		local rule   = rs.rules[phase][offset]
 
@@ -366,21 +387,6 @@ function _M.set_option(self, option, value)
 		end
 	end
 
-end
-
--- preload rulesets and calculate offsets
-function _M.init()
-	for _, ruleset in ipairs(_global_active_rulesets) do
-		local r = require("rules." .. ruleset)
-
-		for phase, i in pairs(phase_t.phases) do
-			if (r.rules[phase]) then
-				calc.calculate(r.rules[phase])
-			else
-				r.rules[phase] = {}
-			end
-		end
-	end
 end
 
 -- push log data regarding matching rule(s) to the configured target

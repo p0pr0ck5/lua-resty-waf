@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: Whitelist .mpg
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -32,11 +27,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 2: Whitelist .mpeg
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -55,11 +45,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 3: Whitelist .mp3
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -78,11 +63,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 4: Whitelist .mp4
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -101,11 +81,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 5: Whitelist .avi
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -124,11 +99,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 6: Whitelist .flv
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -147,11 +117,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 7: Whitelist .swf
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -170,11 +135,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 8: Whitelist .wma
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -193,11 +153,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 9: Do not whitelist unmatched extension (.wmd)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"
@@ -216,11 +171,6 @@ Match of rule 11007
 Rule action was ACCEPT
 
 === TEST 10: Do not whitelist non-final extension
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	access_by_lua '
 		local FreeWAF = require "fw"

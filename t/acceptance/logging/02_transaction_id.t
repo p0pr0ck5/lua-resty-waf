@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: Transaction ID exists in log file
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -35,11 +30,6 @@ qr/log[(][)]: \[[a-f0-9]{20}\]/
 [error]
 
 === TEST 2: Transaction ID exists as request header
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -65,11 +55,6 @@ GET /t
 [error]
 
 === TEST 3: Transaction ID exists as response header
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

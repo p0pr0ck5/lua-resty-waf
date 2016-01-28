@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: FreeWAF runs in a valid phase (access)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -36,11 +31,6 @@ Beginning run of phase access
 FreeWAF should not be run in phase access
 
 === TEST 2: FreeWAF runs in a valid phase (header_filter)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -71,11 +61,6 @@ Beginning run of phase header_filter
 FreeWAF should not be run in phase header_filter
 
 === TEST 3: FreeWAF runs in a valid phase (body_filter)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -114,11 +99,6 @@ Beginning run of phase body_filter
 FreeWAF should not be run in phase body_filter
 
 === TEST 4: FreeWAF runs in all valid phases
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -156,11 +136,6 @@ Beginning run of phase body_filter
 [error]
 
 === TEST 5: FreeWAF does not run in an invalid phase (rewrite)
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		rewrite_by_lua '

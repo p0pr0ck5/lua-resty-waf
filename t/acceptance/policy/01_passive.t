@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: GET request with no arguments is ignored
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -36,11 +31,6 @@ Match of rule 11002
 [error]
 
 === TEST 2: GET request with URI args is not ignored
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -62,11 +52,6 @@ GET /t?a=b
 Match of rule 11002
 
 === TEST 3: HEAD request with no arguments is ignored
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -89,11 +74,6 @@ Match of rule 11002
 [error]
 
 === TEST 4: HEAD request with URI args is not ignored
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -115,11 +95,6 @@ HEAD /t?a=b
 Match of rule 11002
 
 === TEST 5: POST request is not ignored
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

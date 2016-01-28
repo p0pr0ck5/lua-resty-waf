@@ -9,11 +9,6 @@ run_tests();
 __DATA__
 
 === TEST 1: Log ngx.var to event log
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -43,11 +38,6 @@ GET /t?foo=alert(1)
 "args":"foo=alert(1)"
 
 === TEST 2: Do not log ngx.var if option is unset
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -76,11 +66,6 @@ GET /t?foo=alert(1)
 "args":"foo=alert(1)"
 
 === TEST 3: Log request arguments
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -111,11 +96,6 @@ GET /t?foo=alert(1)
 [error]
 
 === TEST 4: Do not log request arguments if option is unset
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -144,11 +124,6 @@ GET /t?foo=alert(1)
 [error]
 
 === TEST 5: Log request headers
---- http_config
-	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.init()
-	';
 --- config
 	location /t {
 		access_by_lua '

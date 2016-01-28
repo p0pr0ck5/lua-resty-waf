@@ -26,11 +26,6 @@ You've entered the following: 'bar'
 [error]
 
 === TEST 2: Benign request is not caught in SIMULATE mode
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -68,11 +63,6 @@ You've entered the following: 'bar'
 "id":99001
 
 === TEST 3: Benign request is not caught in ACTIVE mode
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -128,11 +118,6 @@ You've entered the following: '<script>alert(1)</script>'
 [error]
 
 === TEST 5: Malicious request is logged in SIMULATE mode
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
@@ -172,11 +157,6 @@ You've entered the following: '<script>alert(1)</script>'
 [error]
 
 === TEST 6: Malicious request is blocked in ACTIVE mode
---- http_config
-	init_by_lua '
-		local FW = require "fw"
-		FW.init()
-	';
 --- config
 	location /t {
 		access_by_lua '
