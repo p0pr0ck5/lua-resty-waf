@@ -362,7 +362,7 @@ function _M.new(self)
 		_res_body_mime_types         = { "text/plain", "text/html" },
 		_process_multipart_body      = true,
 		_req_tid_header              = false,
-		_res_tid_header              = true,
+		_res_tid_header              = false,
 		_pcre_flags                  = 'oij',
 		_score_threshold             = 5,
 		_storage_zone                = nil,
