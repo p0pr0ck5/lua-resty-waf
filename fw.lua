@@ -249,6 +249,32 @@ local function _calculate_offset(ruleset)
 	r.initted = true
 end
 
+-- merge the default and any custom rules
+local function _merge_rulesets(self)
+	local g = _global_active_rulesets
+	local a = self._added_rulesets
+	local t = {}
+	local i = 1
+	local j = 1
+
+	for k, v in ipairs(g) do
+		t[i] = g[i]
+		i = i + 1
+	end
+
+	for k, v in ipairs(a) do
+		logger.log(self, "Adding additional ruleset " .. a[j])
+		t[i] = a[j]
+		i = i + 1
+		j = j + 1
+	end
+
+	-- rulesets will be processed in numeric order
+	table.sort(t)
+
+	self._active_rulesets = t
+end
+
 -- main entry point
 function _M.exec(self)
 	if (self._mode == "INACTIVE") then
@@ -295,6 +321,9 @@ function _M.exec(self)
 	-- store the collections table in ctx, which will get saved to ngx.ctx
 	ctx.collections = collections
 
+	-- build rulesets
+	_merge_rulesets(self)
+
 	logger.log(self, "Beginning run of phase " .. phase)
 
 	for _, ruleset in ipairs(self._active_rulesets) do
@@ -340,7 +369,7 @@ function _M.new(self)
 		_mode                        = "SIMULATE",
 		_whitelist                   = {},
 		_blacklist                   = {},
-		_active_rulesets             = _global_active_rulesets,
+		_added_rulesets              = {},
 		_ignored_rules               = {},
 		_allowed_content_types       = {},
 		_debug                       = false,

@@ -188,6 +188,30 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 	}
 ```
 
+###add_ruleset
+
+*Default*: none
+
+Adds an additional ruleset to be used during processing. This allows users to implement custom rulesets without stomping over the included rules directory. Additional rulesets much reside within a folder called "rules" that lives within the `lua_package_path`.
+
+*Example*:
+
+```lua
+	http {
+		-- the lua module 50000.lua must live at
+		-- /path/to/extra/rulesets/rules/50000.lua
+		lua_package_path '/path/to/extra/rulesets/?.lua;;';
+	}
+
+	location / {
+		access_by_lua '
+			fw:set_option("add_ruleset", 50000)
+		';
+	}
+```
+
+Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names must be numeric, as they are sorted for processing in numeric order. This also implies some level of control on the users part; because rulesets are processed in increasing numeric order, the order with which rulesets are passed to `set_option` does not matter. Note only that rulesets of a higher numeric value are processed after those of a lower value.
+
 ###score_threshold
 
 *Default*: 5

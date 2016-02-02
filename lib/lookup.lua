@@ -263,6 +263,10 @@ _M.set_option = {
 		end
 		FW._active_rulesets = t
 	end,
+	add_ruleset = function(FW, value)
+		local t = FW._added_rulesets
+		FW._added_rulesets[#t + 1] = value
+	end,
 	ignore_rule = function(FW, value)
 		FW._ignored_rules[value] = true
 	end,
