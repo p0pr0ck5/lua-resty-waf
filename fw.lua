@@ -251,23 +251,27 @@ end
 
 -- merge the default and any custom rules
 local function _merge_rulesets(self)
-	local g = _global_active_rulesets
-	local a = self._added_rulesets
+	local default = _global_active_rulesets
+	local added   = self._added_rulesets
+	local ignored = self._ignored_rulesets
+
 	local t = {}
-	local i = 1
-	local j = 1
 
-	for k, v in ipairs(g) do
-		t[i] = g[i]
-		i = i + 1
+	for k, v in ipairs(default) do
+		t[v] = true
 	end
 
-	for k, v in ipairs(a) do
-		logger.log(self, "Adding additional ruleset " .. a[j])
-		t[i] = a[j]
-		i = i + 1
-		j = j + 1
+	for k, v in ipairs(added) do
+		logger.log(self, "Adding ruleset " .. v)
+		t[v] = true
 	end
+
+	for k, v in ipairs(ignored) do
+		logger.log(self, "Ignoring ruleset " .. v)
+		t[v] = nil
+	end
+
+	t = util.table_keys(t)
 
 	-- rulesets will be processed in numeric order
 	table.sort(t)
@@ -370,6 +374,7 @@ function _M.new(self)
 		_whitelist                   = {},
 		_blacklist                   = {},
 		_added_rulesets              = {},
+		_ignored_rulesets            = {},
 		_ignored_rules               = {},
 		_allowed_content_types       = {},
 		_debug                       = false,

@@ -253,15 +253,8 @@ _M.set_option = {
 		FW._blacklist[#t + 1] = value
 	end,
 	ignore_ruleset = function(FW, value)
-		local t = {}
-		local n = 1
-		for k, v in ipairs(FW._active_rulesets) do
-			if (v ~= value) then
-				t[n] = v
-				n = n + 1
-			end
-		end
-		FW._active_rulesets = t
+		local t = FW._ignored_rulesets
+		FW._ignored_rulesets[#t + 1] = value
 	end,
 	add_ruleset = function(FW, value)
 		local t = FW._added_rulesets
