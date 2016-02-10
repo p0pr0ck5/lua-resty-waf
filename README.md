@@ -8,6 +8,8 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 FreeWAF is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
 
+FreeWAF is compatible with the master branch of `lua-resty-core`. The bundled version of `lua-resty-core` available in the current release of OpenResty (1.9.7.3) is not compatible with FreeWAF, so you will either need to replace your local version with the one available from the [GitHub project](https://github.com/openresty/lua-resty-core), or patch the module based off [this commit](https://github.com/openresty/lua-resty-core/commit/40445b12c0359eb82702f0097cd65948c245b6a4).
+
 ##Description
 
 FreeWAF is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. FreeWAF is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing, and a small virtual patchset for emerging threats.
@@ -43,6 +45,9 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 		-- include FreeWAF in the appropriate paths
 		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
 		lua_package_cpath '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+
+		-- use resty.core for performance improvement, see the status note above
+		require "resty.core"
 	}
 
 	server {
@@ -865,7 +870,7 @@ Storage keys can be dynamically defined using dynamic parse syntax; this mimics 
 
 ##Notes
 
-###Communication
+###Community
 
 There is a Freenode IRC channel `#freewaf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
 
