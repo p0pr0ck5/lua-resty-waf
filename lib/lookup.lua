@@ -19,7 +19,7 @@ _M.collections = {
 		local request_headers       = ngx.req.get_headers()
 		local request_uri_args      = ngx.req.get_uri_args()
 		local request_post_args     = request.parse_request_body(FW, request_headers)
-		local request_cookies       = request.cookies()
+		local request_cookies       = request.cookies() or {}
 		local request_common_args   = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
 
 		collections.IP                   = ngx.var.remote_addr
