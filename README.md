@@ -237,7 +237,7 @@ Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF w
 
 *Default*: none
 
-Defines one or more Content-Type headers that will be allowed, in addition to the default Content-Types `application/x-www-form-urlencoded` and `multipart/form-data`. A request whose Content-Type matches one of `allowed_content_types` will not have its body content parsed during rule execution; a request whose Content-Type does not match one of these values, or `application/x-www-form-urlencoded` or `multipart/form-data`, will be rejected.
+Defines one or more Content-Type headers that will be allowed, in addition to the default Content-Types `application/x-www-form-urlencoded` and `multipart/form-data`. A request whose content type matches one of `allowed_content_types` will set the `REQUEST_BODY` collection to a single string containing (rather than a table); a request whose content type does not match one of these values, or `application/x-www-form-urlencoded` or `multipart/form-data`, will be rejected.
 
 *Example*:
 
@@ -774,7 +774,7 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **RESPONSE_HEADERS**: A table containing the response headers. Available only in `header_filter` and later phases.
 * **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
-* **REQUEST_BODY**: A table containing the request body. This typically contains POST arguments.
+* **REQUEST_BODY**: A table or string containing the request body. This typically contains POST arguments. If the content type of the request matched that of the `allowed_content_type` option(s), this collection will be set as a string.
 * **REQUEST_HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
 * **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
