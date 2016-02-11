@@ -312,6 +312,7 @@ function _M.exec(self)
 	ctx.transform_key = ctx.transform_key or {}
 	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
+	ctx.tx            = ctx.tx or {}
 	ctx.phase         = phase
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y

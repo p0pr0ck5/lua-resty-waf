@@ -34,6 +34,7 @@ _M.collections = {
 		collections.REQUEST_BODY         = request_post_args
 		collections.REQUEST_ARGS         = request_common_args
 		collections.VAR                  = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections) end
+		collections.TX                   = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections, ctx.tx) end
 		collections.SCORE                = function() return ctx.score end
 		collections.SCORE_THRESHOLD      = function(FW) return FW._score_threshold end
 		collections.WHITELIST            = function(FW) return FW._whitelist end
@@ -147,7 +148,10 @@ _M.actions = {
 	end,
 	SETVAR = function(FW, ctx, collections)
 		storage.set_var(FW, ctx, collections)
-	end
+	end,
+	SETTX = function(FW, ctx, collections)
+		storage.set_var(FW, ctx, collections, true)
+	end,
 }
 
 _M.transform = {

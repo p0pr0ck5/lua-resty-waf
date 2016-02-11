@@ -6,26 +6,29 @@ local logger = require("lib.log")
 local util   = require("lib.util")
 
 -- retrieve a given key from persistent storage
-function _M.retrieve_persistent_var(FW, key)
-	local shm = ngx.shared[FW._storage_zone]
-	local var = shm:get(key)
-	return var
+function _M.retrieve_persistent_var(FW, key, tx)
+	if (tx) then
+		return tx[key]
+	else
+		local shm = ngx.shared[FW._storage_zone]
+		return shm:get(key)
+	end
 end
 
 -- wrapper to get persistent storage data
-function _M.get_var(FW, key, collections)
+function _M.get_var(FW, key, collections, tx)
 	-- silently bail from rules that require persistent storage if no shm was configured
-	if (not FW._storage_zone) then
+	if (not tx and not FW._storage_zone) then
 		return
 	end
 
-	return _M.retrieve_persistent_var(FW, util.parse_dynamic_value(FW, key, collections))
+	return _M.retrieve_persistent_var(FW, util.parse_dynamic_value(FW, key, collections), tx)
 end
 
 -- add/update data to persistent storaage
-function _M.set_var(FW, ctx, collections)
+function _M.set_var(FW, ctx, collections, tx_flag)
 	-- silently bail from rules that require persistent storage if no shm was configured
-	if (not FW._storage_zone) then
+	if (not tx_flag and not FW._storage_zone) then
 		return
 	end
 
@@ -35,15 +38,19 @@ function _M.set_var(FW, ctx, collections)
 
 	logger.log(FW, "Initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
 
-	local shm = ngx.shared[FW._storage_zone]
-
 	-- values can have arithmetic operations performed on them
 	local incr = ngx.re.match(value, [=[^([\+\-\*\/])(\d+)]=], FW._pcre_flags)
 
 	if (incr) then
 		local operator = incr[1]
 		local newval   = incr[2]
-		local oldval   = _M.retrieve_persistent_var(FW, key)
+		local oldval
+
+		if (tx_flag) then
+			oldval = _M.retrieve_persistent_var(FW, key, ctx.tx)
+		else
+			oldval = _M.retrieve_persistent_var(FW, key)
+		end
 
 		if (not oldval) then
 			oldval = 0
@@ -62,10 +69,15 @@ function _M.set_var(FW, ctx, collections)
 
 	logger.log(FW, "Actually setting " .. key .. " to " .. value)
 
-	local ok = shm:safe_set(key, value, expire)
+	if (tx_flag) then
+		ctx.tx[key] = value
+	else
+		local shm = ngx.shared[FW._storage_zone]
+		local ok = shm:safe_set(key, value, expire)
 
-	if (not ok) then
-		ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. FW._storage_zone)
+		if (not ok) then
+			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. FW._storage_zone)
+		end
 	end
 end
 
