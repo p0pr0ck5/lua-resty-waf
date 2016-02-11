@@ -103,7 +103,64 @@ GET /t
 --- no_error_log
 [error]
 
-=== TEST 6: Parse invalid collections key
+=== TEST 6: Parse URI_ARGS
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{URI_ARGS}"
+			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t?foo=bar
+--- error_code: 200
+--- response_body
+URI_ARGS
+--- no_error_log
+[error]
+
+=== TEST 7: Parse URI_ARGS (specific)
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{URI_ARGS:foo}"
+			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t?foo=bar
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+
+=== TEST 8: Parse URI_ARGS (specific, dne)
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{URI_ARGS:foo}"
+			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t?foo2=bar
+--- error_code: 200
+--- response_body
+nil
+--- no_error_log
+[error]
+
+=== TEST 9: Parse invalid collections key
 --- config
 	location /t {
 		content_by_lua '

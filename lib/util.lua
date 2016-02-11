@@ -94,14 +94,19 @@ end
 -- pick out dynamic data from storage key definitions
 function _M.parse_dynamic_value(FW, key, collections)
 	local lookup = function(m)
-		local val = collections[m[1]]
+		local val      = collections[m[1]]
+		local specific = m[2]
 
 		if (not val) then
 			logger.fatal_fail("Bad dynamic parse, no collection key " .. m[1])
 		end
 
 		if (type(val) == "table") then
-			return m[1]
+			if (specific) then
+				return tostring(val[specific])
+			else
+				return m[1]
+			end
 		elseif (type(val) == "function") then
 			return val(FW)
 		else
@@ -110,9 +115,9 @@ function _M.parse_dynamic_value(FW, key, collections)
 	end
 
 	-- grab something that looks like
-	-- %{VAL}
+	-- %{VAL} or %{VAL:foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [=[%{([^}]+)}]=], lookup, FW._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([^:]+)(?::([^}]+))?}]], lookup, FW._pcre_flags)
 
 	logger.log(FW, "Parsed dynamic value is " .. str)
 

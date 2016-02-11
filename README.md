@@ -833,6 +833,8 @@ FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based
 
 Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
 
+Additionally, the syntax `%(VAL:foo}` can be used to retrieve specific values from a collection whose type is a table. For example, `%{REQUEST_HEADERS:X-Forwarded-For}` will return the value of the `X-Forwarded-For` header.
+
 Currently, both persistent storage keys and values can be dynamically defined, as well as the rule's `var.pattern` if a separate option was set to explicitly parse the rule pattern definition. See the included 99000 ruleset for an example of dynamic parsing rule patterns and persistent storage data.
 
 ##Persistent Storage
