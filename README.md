@@ -763,6 +763,7 @@ The following rule actions are currently supported:
 * **IGNORE**: No action is taken, rule processing continues.
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
+* **SETTX**: Set a per-transaction variable, using the `setvar` rule options table.
 * **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).
 
 ##Operators
@@ -799,6 +800,7 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **URI_ARGS**: A table containing the request query strings.
 * **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
+* **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **WHITELIST**: A table containing user-defined whitelisted IPs.
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
