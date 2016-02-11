@@ -382,6 +382,7 @@ function _M.new(self)
 		_ignored_rulesets            = {},
 		_ignored_rules               = {},
 		_allowed_content_types       = {},
+		_allow_unknown_content_types = false,
 		_debug                       = false,
 		_debug_log_level             = ngx.INFO,
 		_event_log_level             = ngx.INFO,

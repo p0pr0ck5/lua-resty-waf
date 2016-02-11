@@ -256,6 +256,22 @@ Defines one or more Content-Type headers that will be allowed, in addition to th
 
 Note that mutiple `set_option` calls with a parameter of `allowed_content_types` will simply override the existing options table, so if you want to define multiple allowed content types, you must define them as a Lua table as shown above.
 
+###allow_unknown_content_types
+
+*Default*: false
+
+Instructs FreeWAF to continue processing the request when a Content-Type header has been sent that is not in the `allowed_content_types` table. Such requests will not have their request body processed by FreeWAF (the `REQUEST_BODY` collection will be nil). In this manner, users do not need to explicitly whitelist all possible Content-Type headers they may encounter.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			fw:set_option("allow_unknown_content_types", true)
+		';
+	}
+```
+
 ###debug
 
 *Default*: false

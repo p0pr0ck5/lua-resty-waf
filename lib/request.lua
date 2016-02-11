@@ -105,8 +105,13 @@ function _M.parse_request_body(FW, request_headers)
 			return nil
 		end
 	else
-		logger.log(FW, tostring(content_type_header) .. " not a valid content type!")
-		ngx.exit(ngx.HTTP_FORBIDDEN)
+		if (FW._allow_unknown_content_types) then
+			logger.log(FW, "Allowing request with content type " .. tostring(content_type_header))
+			return nil
+		else
+			logger.log(FW, tostring(content_type_header) .. " not a valid content type!")
+			ngx.exit(ngx.HTTP_FORBIDDEN)
+		end
 	end
 end
 
