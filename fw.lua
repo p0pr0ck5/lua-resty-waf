@@ -17,11 +17,16 @@ _global_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 420
 
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, opts)
-	if (type(collection) ~= "table") then
-		return collection
+	if (type(collection) ~= "table" and opts) then
+		-- if a collection isn't a table it can't be parsed,
+		-- so we shouldn't return the original collection as
+		-- it may have an illegal operator called on it
+		return nil
 	end
 
-	if (opts == nil) then
+	if (type(collection) ~= "table" or not opts) then
+		-- this collection isnt parseable but it's
+		-- not unsafe to use
 		return collection
 	end
 
