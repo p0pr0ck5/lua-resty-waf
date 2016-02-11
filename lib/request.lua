@@ -15,7 +15,7 @@ function _M.parse_request_body(FW, request_headers)
 	-- or result from misconfigured proxies. may consider relaxing
 	-- this or adding an option to disable this checking in the future
 	if (type(content_type_header) == "table") then
-		logger.log(FW, "request contained multiple content-type headers, bailing!")
+		logger.log(FW, "Request contained multiple content-type headers, bailing!")
 		ngx.exit(400)
 	end
 
@@ -24,9 +24,8 @@ function _M.parse_request_body(FW, request_headers)
 	-- but its necessary for us to properly handle the request
 	-- and its likely a sign of nogoodnickery anyway
 	if (not content_type_header) then
-		logger.log(FW, "request has no content type, ignoring the body")
-		ngx.req.discard_body()
-		return
+		logger.log(FW, "Request has no content type, ignoring the body")
+		return nil
 	end
 
 	-- handle the request body based on the Content-Type header
@@ -83,23 +82,28 @@ function _M.parse_request_body(FW, request_headers)
 		ngx.req.finish_body()
 
 		return nil
-	elseif (content_type_header == "application/x-www-form-urlencoded") then
+	elseif (ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], FW._pcre_flags)) then
 		-- use the underlying ngx API to read the request body
 		-- ignore processing the request body if the content length is larger than client_body_buffer_size
 		-- to avoid wasting resources on ruleset matching of very large data sets
 		ngx.req.read_body()
+
 		if (ngx.req.get_body_file() == nil) then
 			return ngx.req.get_post_args()
 		else
-			logger.log(FW, "very large form upload, not parsing")
-			ngx.exit(ngx.OK)
+			logger.log(FW, "Request body size larger than client_body_buffer_size, ignoring request body")
+			return nil
 		end
 	elseif (util.table_has_value(content_type_header, FW._allowed_content_types)) then
-		-- users can whitelist specific content types that will be passed in but not parsed
-		-- read the request in, but don't set collections[REQUEST_BODY]
-		-- as we have no way to know what kind of data we're getting (i.e xml/json/octet stream)
+		-- if the content type has been whitelisted by the user, set REQUEST_BODY as a string
 		ngx.req.read_body()
-		return nil
+
+		if (ngx.req.get_body_file() == nil) then
+			return ngx.req.get_body_data()
+		else
+			logger.log(FW, "Request body size larger than client_body_buffer_size, ignoring request body")
+			return nil
+		end
 	else
 		logger.log(FW, tostring(content_type_header) .. " not a valid content type!")
 		ngx.exit(ngx.HTTP_FORBIDDEN)
@@ -114,11 +118,13 @@ function _M.cookies()
 end
 
 -- return a single table from multiple tables containing request data
+-- note that collections that are not a table (e.g. REQUEST_BODY with
+-- a non application/x-www-form-urlencoded content type) are ignored
 function _M.common_args(FW, collections)
 	local t = {}
 
 	for _, collection in pairs(collections) do
-		if (collection ~= nil) then
+		if (collection ~= nil and type(collection) == "table") then
 			for k, v in pairs(collection) do
 				if (t[k] == nil) then
 					t[k] = v
