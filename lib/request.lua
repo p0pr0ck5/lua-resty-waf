@@ -124,7 +124,7 @@ function _M.common_args(FW, collections)
 	local t = {}
 
 	for _, collection in pairs(collections) do
-		if (collection ~= nil and type(collection) == "table") then
+		if (type(collection) == "table") then
 			for k, v in pairs(collection) do
 				if (t[k] == nil) then
 					t[k] = v
