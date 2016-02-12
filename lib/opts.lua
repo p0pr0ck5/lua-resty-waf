@@ -4,8 +4,6 @@ _M.version = "0.6.0"
 
 _M.defaults = {
 	_mode                        = "SIMULATE",
-	_whitelist                   = {},
-	_blacklist                   = {},
 	_add_ruleset                 = {},
 	_ignore_ruleset              = {},
 	_ignore_rule                 = {},

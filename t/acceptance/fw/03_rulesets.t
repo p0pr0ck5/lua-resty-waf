@@ -1,7 +1,7 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 15 * blocks() - 3;
+plan tests => repeat_each() * 14 * blocks() - 3;
 
 no_shuffle();
 run_tests();
@@ -25,7 +25,6 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log
-Beginning ruleset 10000,
 Beginning ruleset 11000,
 Beginning ruleset 20000,
 Beginning ruleset 21000,
@@ -60,7 +59,6 @@ GET /t
 --- error_code: 200
 --- error_log
 Ignoring ruleset 90000,
-Beginning ruleset 10000,
 Beginning ruleset 11000,
 Beginning ruleset 20000,
 Beginning ruleset 21000,
@@ -95,7 +93,6 @@ GET /t
 --- error_log
 Adding ruleset 1000
 Beginning ruleset 1000,
-Beginning ruleset 10000,
 Beginning ruleset 11000,
 Beginning ruleset 20000,
 Beginning ruleset 21000,

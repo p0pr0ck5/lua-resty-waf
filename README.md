@@ -122,43 +122,6 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 		';
 	}
 ```
-
-###whitelist
-
-*Default*: none
-
-Adds an address to the module whitelist. Whitelisted addresses will not have any rules applied to their requests, and will be immediately passed through the module.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			fw:set_option("whitelist", "127.0.0.1")
-		';
-	}
-```
-
-Multiple addresses can be whitelisted by passing a table of addresses to `set_option`.
-
-###blacklist
-
-*Default*: none
-
-Adds an address to the module blacklist. Blacklisted addresses will not have any rules appled to their requests, and will be immediately rejected by the module (Nginx will return a 403 to the client).
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			fw:set_option("blacklist", "5.6.7.8")
-		';
-	}
-```
-
-Multiple addresses can be whitelisted by passing a table of addresses to `set_option`. Note that blacklists are processed _after_ whitelists, so an address that is whitelisted and blacklisted will always be processed as a whitelisted address.
-
 ###ignore_rule
 
 *Default*: none
@@ -706,7 +669,6 @@ Additionally, it is required to call `write_log_events` in a `log_by_lua` handle
 
 FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
 
-* **10000**: Whitelist/blacklist handling
 * **11000**: Local policy whitelisting
 * **20000**: HTTP protocol violation
 * **21000**: HTTP protocol anomalies
@@ -782,7 +744,6 @@ All operators have a corresponding negated option, e.g., `NOT_EQUALS`, `NOT_EXIS
 
 FreeWAF's rule processor works on a basic principle of matching a `pattern` against a given `collection`. The following collections are currently supported:
 
-* **BLACKLIST**: A table containing user-defined blacklisted IPs.
 * **COOKIES**: A table containing the values of the cookies sent in the request.
 * **HTTP_VERSION**: An integer representation of the HTTP version used in the request.
 * **IP**: The IP address of client.
@@ -801,7 +762,6 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
-* **WHITELIST**: A table containing user-defined whitelisted IPs.
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
@@ -831,9 +791,7 @@ FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based
 
 ##Dynamic Parsing in Rule Definitions
 
-Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Other useful collections are the `WHITELIST` and `BLACKLIST` collections, as well as `SCORE` and `SCORE_THRESHOLD`.
-
-Additionally, the syntax `%(VAL:foo}` can be used to retrieve specific values from a collection whose type is a table. For example, `%{REQUEST_HEADERS:X-Forwarded-For}` will return the value of the `X-Forwarded-For` header.
+Certain parts of a rule definition may be dynamically defined at runtime via a special syntax `%{VAL}`, where `VAL` is a key in the `collections` table. This allows FreeWAF to take advantage of changing values throughout the life of one or multiple requests, greatly increasing flexibility. For example, including the string `%{IP}` in a dynamically parsed rule definition will translate to the IP address of the client. Additionally, the syntax `%(VAL:foo}` can be used to retrieve specific values from a collection whose type is a table. For example, `%{REQUEST_HEADERS:X-Forwarded-For}` will return the value of the `X-Forwarded-For` header.
 
 Currently, both persistent storage keys and values can be dynamically defined, as well as the rule's `var.pattern` if a separate option was set to explicitly parse the rule pattern definition. See the included 99000 ruleset for an example of dynamic parsing rule patterns and persistent storage data.
 

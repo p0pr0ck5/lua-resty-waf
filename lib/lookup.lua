@@ -39,8 +39,6 @@ _M.collections = {
 		collections.TX                   = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections, ctx.tx) end
 		collections.SCORE                = function() return ctx.score end
 		collections.SCORE_THRESHOLD      = function(FW) return FW._score_threshold end
-		collections.WHITELIST            = function(FW) return FW._whitelist end
-		collections.BLACKLIST            = function(FW) return FW._blacklist end
 	end,
 	header_filter = function(FW, collections)
 		local response_headers = ngx.resp.get_headers()
@@ -252,14 +250,6 @@ _M.operators = {
 
 
 _M.set_option = {
-	whitelist = function(FW, value)
-		local t = FW._whitelist
-		FW._whitelist[#t + 1] = value
-	end,
-	blacklist = function(FW, value)
-		local t = FW._blacklist
-		FW._blacklist[#t + 1] = value
-	end,
 	ignore_ruleset = function(FW, value)
 		local t = FW._ignore_ruleset
 		FW._ignore_ruleset[#t + 1] = value
