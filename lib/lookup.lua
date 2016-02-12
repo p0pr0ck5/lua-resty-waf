@@ -4,8 +4,10 @@ _M.version = "0.6.0"
 
 local cjson         = require("cjson")
 local file_logger   = require("inc.resty.logger.file")
+local iputils       = require("inc.resty.iputils")
 local socket_logger = require("inc.resty.logger.socket")
 
+local cidr_lib  = require("lib.cidr")
 local logger    = require("lib.log")
 local operators = require("lib.operators")
 local request   = require("lib.request")
@@ -234,16 +236,18 @@ _M.write_log_events = {
 }
 
 _M.operators = {
-	REGEX       = function(FW, subject, pattern) return operators.regex_match(FW, subject, pattern) end,
-	NOT_REGEX   = function(FW, subject, pattern) return not operators.regex_match(FW, subject, pattern) end,
-	EQUALS      = function(FW, a, b) return operators.equals(a, b) end,
-	NOT_EQUALS  = function(FW, a, b) return not operators.equals(a, b) end,
-	GREATER     = function(FW, a, b) return operators.greater(a, b) end,
-	NOT_GREATER = function(FW, a, b) return not operators.greater(a, b) end,
-	EXISTS      = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
-	NOT_EXISTS  = function(FW, haystack, needle) return not util.table_has_value(needle, haystack) end,
-	PM          = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
-	NOT_PM      = function(FW, needle, haystack, ctx) return not operators.ac_lookup(needle, haystack, ctx) end
+	REGEX          = function(FW, subject, pattern) return operators.regex_match(FW, subject, pattern) end,
+	NOT_REGEX      = function(FW, subject, pattern) return not operators.regex_match(FW, subject, pattern) end,
+	EQUALS         = function(FW, a, b) return operators.equals(a, b) end,
+	NOT_EQUALS     = function(FW, a, b) return not operators.equals(a, b) end,
+	GREATER        = function(FW, a, b) return operators.greater(a, b) end,
+	NOT_GREATER    = function(FW, a, b) return not operators.greater(a, b) end,
+	EXISTS         = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
+	NOT_EXISTS     = function(FW, haystack, needle) return not util.table_has_value(needle, haystack) end,
+	PM             = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
+	NOT_PM         = function(FW, needle, haystack, ctx) return not operators.ac_lookup(needle, haystack, ctx) end,
+	CIDR_MATCH     = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
+	NOT_CIDR_MATCH = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
 }
 
 
@@ -291,7 +295,13 @@ _M.set_option = {
 	event_log_ngx_vars = function(FW, value)
 		local t = FW._event_log_ngx_vars
 		FW._event_log_ngx_vars[#t + 1] = value
-	end
+	end,
+	process_cidr = function(FW, value)
+		if (not cidr_lib.cidrs[value]) then
+			local lower, upper = iputils.parse_cidr(value)
+			cidr_lib.cidrs[value] = { lower, upper }
+		end
+	end,
 }
 
 return _M

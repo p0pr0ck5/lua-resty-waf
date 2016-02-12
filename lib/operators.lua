@@ -2,8 +2,10 @@ local _M = {}
 
 _M.version = "0.6.0"
 
-local ac     = require("inc.load_ac")
-local logger = require("lib.log")
+local ac       = require("inc.load_ac")
+local cidr_lib = require("lib.cidr")
+local iputils  = require("inc.resty.iputils")
+local logger   = require("lib.log")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -96,6 +98,22 @@ function _M.ac_lookup(needle, haystack, ctx)
 	end
 
 	return match
+end
+
+function _M.cidr_match(ip, cidr_pattern)
+	local t = {}
+	local n = 1
+
+	if (type(cidr_pattern) ~= "table") then
+		cidr_pattern = { cidr_pattern }
+	end
+
+	for _, v in ipairs(cidr_pattern) do
+		t[n] = cidr_lib.cidrs[v]
+		n = n + 1
+	end
+
+	return iputils.ip_in_cidrs(ip, t)
 end
 
 return _M
