@@ -15,6 +15,41 @@ local mt = { __index = _M }
 -- default list of rulesets (global here to have offsets precomputed)
 _global_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
+-- default options
+local default_opts = {
+	_mode                        = "SIMULATE",
+	_whitelist                   = {},
+	_blacklist                   = {},
+	_added_rulesets              = {},
+	_ignored_rulesets            = {},
+	_ignored_rules               = {},
+	_allowed_content_types       = {},
+	_allow_unknown_content_types = false,
+	_debug                       = false,
+	_debug_log_level             = ngx.INFO,
+	_event_log_level             = ngx.INFO,
+	_event_log_verbosity         = 1,
+	_event_log_request_arguments = false,
+	_event_log_request_headers   = false,
+	_event_log_ngx_vars          = {},
+	_event_log_target            = 'error',
+	_event_log_target_host       = '',
+	_event_log_target_port       = '',
+	_event_log_target_path       = '',
+	_event_log_socket_proto      = 'udp',
+	_event_log_buffer_size       = 4096,
+	_event_log_periodic_flush    = nil,
+	_event_log_altered_only      = true,
+	_res_body_max_size           = (1024 * 1024),
+	_res_body_mime_types         = { "text/plain", "text/html" },
+	_process_multipart_body      = true,
+	_req_tid_header              = false,
+	_res_tid_header              = false,
+	_pcre_flags                  = 'oij',
+	_score_threshold             = 5,
+	_storage_zone                = nil,
+}
+
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, opts)
 	if (type(collection) ~= "table" and opts) then
@@ -375,43 +410,16 @@ end
 
 -- instantiate a new instance of the module
 function _M.new(self)
-	return setmetatable({
-		_mode                        = "SIMULATE",
-		_whitelist                   = {},
-		_blacklist                   = {},
-		_added_rulesets              = {},
-		_ignored_rulesets            = {},
-		_ignored_rules               = {},
-		_allowed_content_types       = {},
-		_allow_unknown_content_types = false,
-		_debug                       = false,
-		_debug_log_level             = ngx.INFO,
-		_event_log_level             = ngx.INFO,
-		_event_log_verbosity         = 1,
-		_event_log_request_arguments = false,
-		_event_log_request_headers   = false,
-		_event_log_ngx_vars          = {},
-		_event_log_target            = 'error',
-		_event_log_target_host       = '',
-		_event_log_target_port       = '',
-		_event_log_target_path       = '',
-		_event_log_socket_proto      = 'udp',
-		_event_log_buffer_size       = 4096,
-		_event_log_periodic_flush    = nil,
-		_event_log_altered_only      = true,
-		_res_body_max_size           = (1024 * 1024),
-		_res_body_mime_types         = { "text/plain", "text/html" },
-		_process_multipart_body      = true,
-		_req_tid_header              = false,
-		_res_tid_header              = false,
-		_pcre_flags                  = 'oij',
-		_score_threshold             = 5,
-		_storage_zone                = nil,
-		transaction_id               = random.random_bytes(10),
-	}, mt)
+	-- we need a separate copy of this table since we will
+	-- potentially override values with set_option
+	local t = util.table_copy(default_opts)
+
+	t.transaction_id = random.random_bytes(10)
+
+	return setmetatable(t, mt)
 end
 
--- configuraton wrapper
+-- configuraton wrapper for per-instance options
 function _M.set_option(self, option, value)
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
@@ -425,7 +433,22 @@ function _M.set_option(self, option, value)
 			self[_option] = value
 		end
 	end
+end
 
+-- configuraton wrapper for default options
+function _M.default_option(option, value)
+	if (type(value) == "table") then
+		for _, v in ipairs(value) do
+			_M.default_option(option, v)
+		end
+	else
+		if (lookup.set_option[option]) then
+			lookup.set_option[option](default_opts, value)
+		else
+			local _option = "_" .. option
+			default_opts[_option] = value
+		end
+	end
 end
 
 -- push log data regarding matching rule(s) to the configured target
