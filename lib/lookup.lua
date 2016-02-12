@@ -257,17 +257,17 @@ _M.set_option = {
 		FW._blacklist[#t + 1] = value
 	end,
 	ignore_ruleset = function(FW, value)
-		local t = FW._ignored_rulesets
-		FW._ignored_rulesets[#t + 1] = value
+		local t = FW._ignore_ruleset
+		FW._ignore_ruleset[#t + 1] = value
 		FW.need_merge = true
 	end,
 	add_ruleset = function(FW, value)
-		local t = FW._added_rulesets
-		FW._added_rulesets[#t + 1] = value
+		local t = FW._add_ruleset
+		FW._add_ruleset[#t + 1] = value
 		FW.need_merge = true
 	end,
 	ignore_rule = function(FW, value)
-		FW._ignored_rules[value] = true
+		FW._ignore_rule[value] = true
 	end,
 	disable_pcre_optimization = function(FW, value)
 		if (value == true) then

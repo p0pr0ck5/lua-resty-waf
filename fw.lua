@@ -5,6 +5,7 @@ _M.version = "0.6.0"
 local calc    = require "lib.rule_calc"
 local logger  = require("lib.log")
 local lookup  = require("lib.lookup")
+local opts    = require("lib.opts")
 local phase_t = require("lib.phase")
 local random  = require("lib.random")
 local storage = require("lib.storage")
@@ -16,39 +17,7 @@ local mt = { __index = _M }
 _global_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
 -- default options
-local default_opts = {
-	_mode                        = "SIMULATE",
-	_whitelist                   = {},
-	_blacklist                   = {},
-	_added_rulesets              = {},
-	_ignored_rulesets            = {},
-	_ignored_rules               = {},
-	_allowed_content_types       = {},
-	_allow_unknown_content_types = false,
-	_debug                       = false,
-	_debug_log_level             = ngx.INFO,
-	_event_log_level             = ngx.INFO,
-	_event_log_verbosity         = 1,
-	_event_log_request_arguments = false,
-	_event_log_request_headers   = false,
-	_event_log_ngx_vars          = {},
-	_event_log_target            = 'error',
-	_event_log_target_host       = '',
-	_event_log_target_port       = '',
-	_event_log_target_path       = '',
-	_event_log_socket_proto      = 'udp',
-	_event_log_buffer_size       = 4096,
-	_event_log_periodic_flush    = nil,
-	_event_log_altered_only      = true,
-	_res_body_max_size           = (1024 * 1024),
-	_res_body_mime_types         = { "text/plain", "text/html" },
-	_process_multipart_body      = true,
-	_req_tid_header              = false,
-	_res_tid_header              = false,
-	_pcre_flags                  = 'oij',
-	_score_threshold             = 5,
-	_storage_zone                = nil,
-}
+local default_opts = util.table_copy(opts.defaults)
 
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, opts)
@@ -292,8 +261,8 @@ end
 -- merge the default and any custom rules
 local function _merge_rulesets(self)
 	local default = _global_rulesets
-	local added   = self._added_rulesets
-	local ignored = self._ignored_rulesets
+	local added   = self._add_ruleset
+	local ignored = self._ignore_ruleset
 
 	local t = {}
 
@@ -389,7 +358,7 @@ function _M.exec(self)
 		while rule do
 			local id = rule.id
 
-			if (not util.table_has_key(id, self._ignored_rules)) then
+			if (not util.table_has_key(id, self._ignore_rule)) then
 				logger.log(self, "Processing rule " .. id)
 
 				local ret = _process_rule(self, rule, collections, ctx)
@@ -479,6 +448,16 @@ function _M.default_option(option, value)
 			local _option = "_" .. option
 			default_opts[_option] = value
 		end
+	end
+end
+
+-- reset the given option to its static default
+function _M.reset_option(self, option)
+	local _option = "_" .. option
+	self[_option] = opts.defaults[_option]
+
+	if (option == "add_ruleset" or option == "ignore_ruleset") then
+		self.need_merge = true
 	end
 end
 
