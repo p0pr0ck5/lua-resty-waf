@@ -66,7 +66,7 @@ _M.collections = {
 			return not eof
 		end
 
-		if (not res_type or not util.table_has_value(res_type, FW._res_body_mime_types)) then
+		if (not res_type or not util.table_has_key(res_type, FW._res_body_mime_types)) then
 			return not eof
 		end
 
@@ -285,12 +285,10 @@ _M.set_option = {
 		FW._storage_zone = value
 	end,
 	allowed_content_types = function(FW, value)
-		local t = FW._allowed_content_types
-		FW._allowed_content_types[#t + 1] = value
+		FW._allowed_content_types[value] = true
 	end,
 	res_body_mime_types = function(FW, value)
-		local t = FW._res_body_mime_types
-		FW._res_body_mime_types[#t + 1] = value
+		FW._res_body_mime_types[value] = true
 	end,
 	event_log_ngx_vars = function(FW, value)
 		local t = FW._event_log_ngx_vars

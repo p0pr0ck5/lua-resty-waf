@@ -94,7 +94,7 @@ function _M.parse_request_body(FW, request_headers)
 			logger.log(FW, "Request body size larger than client_body_buffer_size, ignoring request body")
 			return nil
 		end
-	elseif (util.table_has_value(content_type_header, FW._allowed_content_types)) then
+	elseif (util.table_has_key(content_type_header, FW._allowed_content_types)) then
 		-- if the content type has been whitelisted by the user, set REQUEST_BODY as a string
 		ngx.req.read_body()
 
