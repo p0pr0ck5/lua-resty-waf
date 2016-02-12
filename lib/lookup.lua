@@ -259,10 +259,12 @@ _M.set_option = {
 	ignore_ruleset = function(FW, value)
 		local t = FW._ignored_rulesets
 		FW._ignored_rulesets[#t + 1] = value
+		FW.need_merge = true
 	end,
 	add_ruleset = function(FW, value)
 		local t = FW._added_rulesets
 		FW._added_rulesets[#t + 1] = value
+		FW.need_merge = true
 	end,
 	ignore_rule = function(FW, value)
 		FW._ignored_rules[value] = true

@@ -13,7 +13,7 @@ local util    = require("lib.util")
 local mt = { __index = _M }
 
 -- default list of rulesets (global here to have offsets precomputed)
-_global_active_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
+_global_rulesets = { 10000, 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
 -- default options
 local default_opts = {
@@ -291,7 +291,7 @@ end
 
 -- merge the default and any custom rules
 local function _merge_rulesets(self)
-	local default = _global_active_rulesets
+	local default = _global_rulesets
 	local added   = self._added_rulesets
 	local ignored = self._ignored_rulesets
 
@@ -367,7 +367,9 @@ function _M.exec(self)
 	ctx.collections = collections
 
 	-- build rulesets
-	_merge_rulesets(self)
+	if (self.need_merge) then
+		_merge_rulesets(self)
+	end
 
 	logger.log(self, "Beginning run of phase " .. phase)
 
@@ -408,6 +410,29 @@ function _M.exec(self)
 	_finalize(self, ctx)
 end
 
+-- init_by_lua handler precomputations
+function _M.init()
+	-- do an initial rule merge based on default_option calls
+	-- this prevents have to merge every request in scopes
+	-- which do not further alter elected rulesets
+	_merge_rulesets(default_opts)
+
+	-- do offset jump calculations for default rulesets
+	-- this is also lazily handled in exec() for rulesets
+	-- that dont appear here
+	for _, ruleset in ipairs(default_opts._active_rulesets) do
+		local rs = require("rules." .. ruleset)
+
+		if (not rs.initted) then
+			_calculate_offset(ruleset)
+		end
+	end
+
+	-- clear this flag if we handled additional rulesets
+	-- so its not passed to new objects
+	default_opts.need_merge = false
+end
+
 -- instantiate a new instance of the module
 function _M.new(self)
 	-- we need a separate copy of this table since we will
@@ -415,6 +440,12 @@ function _M.new(self)
 	local t = util.table_copy(default_opts)
 
 	t.transaction_id = random.random_bytes(10)
+
+	-- handle conditions where init() wasnt called
+	-- and the default rulesets weren't merged
+	if (not t._active_rulesets) then
+		t.need_merge = true
+	end
 
 	return setmetatable(t, mt)
 end
