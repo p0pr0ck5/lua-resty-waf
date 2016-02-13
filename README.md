@@ -48,6 +48,16 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 		-- use resty.core for performance improvement, see the status note above
 		require "resty.core"
+
+		-- require the base module
+		local FreeWAF = require "fw"
+
+		-- define options that will be inherited across all scopes
+		FreeWAF.default_option("debug", true)
+		FreeWAF.default_option("mode", "ACTIVE")
+
+		-- perform some preloading and optimization
+		FreeWAF.init()
 	}
 
 	server {
@@ -55,11 +65,10 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 			access_by_lua '
 				local FreeWAF = require "fw"
 
-				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
 
-				-- setup FreeWAF to deny requests that match a rule
-				fw:set_option("mode", "ACTIVE")
+				-- default options can be overridden
+				fw:set_option("debug", false)
 
 				-- run the firewall
 				fw:exec()
@@ -68,29 +77,24 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 			header_filter_by_lua '
 				local FreeWAF = require "fw"
 
-				-- instantiate a new instance of the module
-				-- note that options set in previous handlers
+				-- note that options set in previous handlers (in the same scope)
 				-- do not need to be set again
 				local fw = FreeWAF:new()
 
-				-- run the firewall
 				fw:exec()
 			';
 
 			body_filter_by_lua '
 				local FreeWAF = require "fw"
 
-				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
 
-				-- run the firewall
 				fw:exec()
 			';
 
 			log_by_lua '
 				local FreeWAF = require "fw"
 
-				-- instantiate a new instance of the module
 				local fw = FreeWAF:new()
 
 				-- write out any event log entries to the
@@ -101,9 +105,134 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 	}
 ```
 
+##Public Functions
+
+###FreeWAF.default_option()
+
+Define default values for configuration options that will be inherited across all scopes. This is useful when you are using FreeWAF in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
+
+```lua
+	http {
+		init_by_lua '
+			local FreeWAF = require "fw"
+
+			FreeWAF.default_option("debug", true)
+
+			-- this would be a useless operation since it does not change the default
+			FreeWAF.default_option("debug_log_level", ngx.INFO)
+		';
+	}
+```
+
+###FreeWAF.init()
+
+Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any FreeWAF function call in `init_by_lua`, and should never be called outside this scope.
+
+*Example*:
+
+```lua
+	http {
+		init_by_lua '
+			local FreeWAF = require "fw"
+
+			-- set default options...
+
+			FreeWAF.init()
+		';
+	}
+```
+
+##Public Methods
+
+###FreeWAF:new()
+
+Instantiate a new instance of FreeWAF. You must call this in every request handler phase you wish to run FreeWAF, and use the return result to call further object methods.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			local FreeWAF = require "fw"
+
+			local fw = FreeWAF:new()
+		';
+	}
+```
+
+###FreeWAF:set_option()
+
+Configure an option on a per-scope basis. You should only do this if you are overriding a default value in this scope (e.g. it would be useless to use this to define the same configurable everywhere).
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			local FreeWAF = require "fw"
+
+			local fw = FreeWAF:new()
+
+			-- enable debug logging only for this scope
+			fw:set_option("debug", true)
+		';
+	}
+```
+
+###FreeWAF:reset_option()
+
+Set the given option to its documented default, regardless of whatever value was assigned via `default_option`. This is most useful for options that are more complex than boolean or integer values.
+
+*Example*:
+
+```lua
+	http {
+		init_by_lua '
+			local FreeWAF = require "fw"
+
+			FreeWAF.default_option("allowed_content_types", "text/json")
+		';
+	}
+
+	[...snip...]
+
+	location / {
+		access_by_lua '
+			local FreeWAF = require "fw"
+
+			local fw = FreeWAF:new()
+
+			-- reset the value to its documented default
+			fw:reset_option("allowed_content_types")
+		';
+	}
+```
+
+###FreeWAF:write_log_events()
+
+Write any audit log entries that were generated from the transaction. This should be called in the `log_by_lua` handler.
+
+*Example*:
+
+```lua
+	location / {
+		log_by_lua '
+			local FreeWAF = require "fw"
+
+			local fw = FreeWAF:new()
+
+			-- write out any event log entries to the
+			-- configured target, if applicable
+			fw:write_log_events()
+		';
+	}
+```
+
 ##Options
 
-Module options can be configured using the `set_option` function. Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
+Module options can be configured using the `default_option` and `set_option` functions. Use `default_option` when in the `init_by_lua` handler, and without calling `FreeWAF:new()`, to set default values that will be inherited across all scopes. These values (or options that were not modified by `default_option` can be further adjusted on a per-scope basis via `set_option`. Additionally, scope-level options can be re-adjusted back to the documented defaults via the `reset_option` method. This will set the given option to its documented default, overriding the default set by the `default_option` function.
+
+Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
 
 ###mode
 
@@ -732,6 +861,7 @@ The following rule actions are currently supported:
 
 The following pattern operators are currently supported:
 
+* **CIDR_MATCH**: Matches an IP against one or more IPv4 CIDR blocks.
 * **EQUALS**: Matches using the `==` operator; comparison values can be any Lua primitive that can be compared directly (most commonly this is strings or integers).
 * **EXISTS**: Searches for the existence of a given key in a table.
 * **GREATER**: Matches using the `>` operator. Returns true if the collection data is greater than the pattern. Most commonly this is used for comparing running counters stored in persistent storage.
@@ -757,11 +887,11 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
+* **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings.
 * **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
-* **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
