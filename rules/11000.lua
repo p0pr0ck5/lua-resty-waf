@@ -10,7 +10,6 @@ _M.rules = {
 			id = 11001,
 			var  = {
 				type = "METHOD",
-				opts = nil,
 				pattern = [=[^(?:GET|HEAD)$]=],
 				operator = "REGEX"
 			},
@@ -34,7 +33,6 @@ _M.rules = {
 			id = 11003,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = [=[^(?:GET|HEAD)$]=],
 				operator = "NOT_REGEX"
 			},
@@ -46,7 +44,6 @@ _M.rules = {
 			id = 11004,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[\.(?:(?:jpe?|pn)g|gif|ico)$]=],
 				operator = "REGEX"
 			},
@@ -58,7 +55,6 @@ _M.rules = {
 			id = 11005,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[\.(?:doc|pdf|txt|xls)$]=],
 				operator = "REGEX"
 			},
@@ -70,7 +66,6 @@ _M.rules = {
 			id = 11006,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[\.(?:(?:cs|j)s|html?)$]=],
 				operator = "REGEX"
 			},
@@ -82,7 +77,6 @@ _M.rules = {
 			id = 11007,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$]=],
 				operator = "REGEX"
 			},

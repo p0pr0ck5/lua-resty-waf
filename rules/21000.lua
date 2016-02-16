@@ -10,7 +10,6 @@ _M.rules = {
 			id = 21001,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "host",
 				operator = "NOT_CONTAINS"
 			},
@@ -22,7 +21,6 @@ _M.rules = {
 			id = 21002,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "OPTIONS",
 				operator = "NOT_EQUALS"
 			},
@@ -33,7 +31,6 @@ _M.rules = {
 			id = 21003,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "accept",
 				operator = "NOT_CONTAINS"
 			},
@@ -45,7 +42,6 @@ _M.rules = {
 			id = 21004,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "OPTIONS",
 				operator = "NOT_EQUALS"
 			},
@@ -68,7 +64,6 @@ _M.rules = {
 			id = 21006,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "user-agent",
 				operator = "NOT_CONTAINS"
 			},
@@ -92,7 +87,6 @@ _M.rules = {
 			id = 21008,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "content-type",
 				operator = "NOT_CONTAINS"
 			},

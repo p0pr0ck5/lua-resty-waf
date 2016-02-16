@@ -274,7 +274,6 @@ _M.rules = {
 			id = 40023,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[%00+$]=],
 				operator = "REGEX"
 			},

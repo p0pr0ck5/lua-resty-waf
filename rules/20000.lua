@@ -10,7 +10,6 @@ _M.rules = {
 			id = 20001,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = [=[^(?:GET|HEAD)$]=],
 				operator = "REGEX"
 			},
@@ -34,7 +33,6 @@ _M.rules = {
 			id = 20003,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "POST",
 				operator = "EQUALS"
 			},
@@ -46,7 +44,6 @@ _M.rules = {
 			id = 20004,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "content-length",
 				operator = "NOT_CONTAINS"
 			},
@@ -82,7 +79,6 @@ _M.rules = {
 			id = 20007,
 			var = {
 				type = "HTTP_VERSION",
-				opts = nil,
 				pattern = 1.1,
 				operator = "NOT_EQUALS"
 			},
@@ -94,7 +90,6 @@ _M.rules = {
 			id = 20008,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "pragma",
 				operator = "CONTAINS"
 			},
@@ -116,7 +111,6 @@ _M.rules = {
 			id = 20010,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "cache-control",
 				operator = "NOT_CONTAINS"
 			},
@@ -127,7 +121,6 @@ _M.rules = {
 			id = 20011,
 			var = {
 				type = "HTTP_VERSION",
-				opts = nil,
 				pattern = "1.1",
 				operator = "NOT_EQUALS"
 			},

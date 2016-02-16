@@ -166,7 +166,7 @@ end
 local function _process_rule(self, rule, collections, ctx)
 	local id      = rule.id
 	local var     = rule.var
-	local opts    = rule.opts
+	local opts    = rule.opts or {}
 	local action  = rule.action
 	local pattern = var.pattern
 

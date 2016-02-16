@@ -22,11 +22,9 @@ _M.rules = {
 			id = 90002,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[^\/(?:(?:id_)?[dr]sa(?:\.old)?|key(?:\.priv)?)$]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "SSH key scan (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)" 
 		},
@@ -34,7 +32,6 @@ _M.rules = {
 			id = 90003,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/checknfurl123",
 				operator = "EQUALS"
 			},
@@ -45,11 +42,9 @@ _M.rules = {
 			id = 90004,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "HEAD",
 				operator = "EQUALS"
 			},
-			opts = {},
 			action = "DENY",
 			description = "SSH key scan signature (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)"
 		},
@@ -57,7 +52,6 @@ _M.rules = {
 			id = 90005,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = [=[/((?:tim)?thumb|img)\.php]=],
 				operator = "REGEX"
 			},
@@ -83,7 +77,6 @@ _M.rules = {
 				pattern = [=[\$\(.*\)]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)"
 		},
@@ -91,7 +84,6 @@ _M.rules = {
 			id = 90008,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/xmlrpc.php",
 				operator = "EQUALS"
 			},
@@ -106,7 +98,6 @@ _M.rules = {
 				pattern = [=[WinHttp\.WinHttpRequest\.5]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Brute force botnet affecting Wordpress domains"
 		},
@@ -118,7 +109,6 @@ _M.rules = {
 				pattern = [=[Mozilla/5\.0 \(compatible; Zollard; Linux\)]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Known *Coin miner worm (https://isc.sans.edu/forums/diary/Multi+Platform+Coin+Miner+Attacking+Routers+on+Port+32764/18353)"
 		},
@@ -126,7 +116,6 @@ _M.rules = {
 			id = 90011,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/wp-login.php",
 				operator = "EQUALS"
 			},
@@ -149,7 +138,6 @@ _M.rules = {
 			id = 90013,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/wp-login.php",
 				operator = "EQUALS"
 			},
@@ -160,7 +148,6 @@ _M.rules = {
 			id = 90014,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "POST",
 				operator = "EQUALS"
 			},
@@ -171,11 +158,9 @@ _M.rules = {
 			id = 90015,
 			var = {
 				type = "REQUEST_HEADER_NAMES",
-				opts = nil,
 				pattern = "referer",
 				operator = "NOT_CONTAINS"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Wordpress login attempted with no Referer"
 		},
@@ -183,7 +168,6 @@ _M.rules = {
 			id = 90016,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/wp-admin/admin-ajax.php",
 				operator = "EQUALS"
 			},
@@ -209,7 +193,6 @@ _M.rules = {
 				pattern = [=[^\.\./wp-*|\.php$]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Slider Revolution WordPress Plugin LFI Vulnerability"
 		},
@@ -221,7 +204,6 @@ _M.rules = {
 				pattern = [=[^\(\)]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Bash environmental variable injection (CVE-2014-6271)",
 		},
@@ -233,7 +215,6 @@ _M.rules = {
 				pattern = [=[^\(\)]=],
 				operator = "REGEX"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Bash environmental variable injection (CVE-2014-6271)"
 		},
@@ -241,7 +222,6 @@ _M.rules = {
 			id = 90021,
 			var = {
 				type = "URI",
-				opts = nil,
 				pattern = "/wp-login.php",
 				operator = "EQUALS"
 			},
@@ -252,7 +232,6 @@ _M.rules = {
 			id = 90022,
 			var = {
 				type = "METHOD",
-				opts = nil,
 				pattern = "POST",
 				operator = "EQUALS"
 			},
@@ -263,11 +242,9 @@ _M.rules = {
 			id = 90023,
 			var = {
 				type = "USER_AGENT",
-				opts = nil,
 				pattern =  "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
 				operator = "EQUALS"
 			},
-			opts = {},
 			action = "DENY",
 			description = "Emerging fake Googlebot wp-login bruteforce"
 		},
@@ -321,7 +298,6 @@ _M.rules = {
 				pattern = "POST",
 				operator = "EQUALS"
 			},
-			opts = {},
 			action = "DENY",
 			description = "FancyBox for Wordpress access control vulnerability (https://www.cryptobells.com/fancybox-for-wordpress-zero-day-and-broken-patch/)"
 		}
