@@ -326,11 +326,11 @@ function _M.exec(self)
 	end
 
 	-- populate the collections table
-	local short_circuit = lookup.collections[phase](self, collections, ctx)
+	lookup.collections[phase](self, collections, ctx)
 
 	-- don't run through the rulesets if we're going to be here again
 	-- (e.g. multiple chunks are going through body_filter)
-	if short_circuit then return end
+	if ctx.short_circuit then return end
 
 	-- store the collections table in ctx, which will get saved to ngx.ctx
 	ctx.collections = collections

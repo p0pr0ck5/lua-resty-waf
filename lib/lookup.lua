@@ -62,11 +62,13 @@ _M.collections = {
 		local res_type   = collections.RESPONSE_HEADERS["content-type"]
 
 		if (not res_length or res_length > FW._res_body_max_size) then
-			return not eof
+			ctx.short_circuit = not eof
+			return
 		end
 
 		if (not res_type or not util.table_has_key(res_type, FW._res_body_mime_types)) then
-			return not eof
+			ctx.short_circuit = not eof
+			return
 		end
 
 		if data then
