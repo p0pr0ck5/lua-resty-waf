@@ -179,10 +179,10 @@ local function _process_rule(self, rule, collections, ctx)
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
-	local t, match, offset
+	local collection, match, offset
 
 	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
-		t = collections[var.type](self, var.opts, collections)
+		collection = collections[var.type](self, var.opts, collections)
 	else
 		local memokey
 
@@ -197,21 +197,21 @@ local function _process_rule(self, rule, collections, ctx)
 
 		if (not ctx.transform_key[memokey]) then
 			logger.log(self, "Parse collection cache not found")
-			t = _parse_collection(self, collections[var.type], var.opts)
+			collection = _parse_collection(self, collections[var.type], var.opts)
 
 			if (opts.transform) then
-				t = _do_transform(self, t, opts.transform)
+				collection = _do_transform(self, collection, opts.transform)
 			end
 
-			ctx.transform[memokey] = t
+			ctx.transform[memokey] = collection
 			ctx.transform_key[memokey] = true
 		else
 			logger.log(self, "Parse collection cache hit!")
-			t = ctx.transform[memokey]
+			collection = ctx.transform[memokey]
 		end
 	end
 
-	if (not t) then
+	if (not collection) then
 		logger.log(self, "parse_collection didnt return anything for " .. var.type)
 		offset = rule.offset_nomatch
 	else
@@ -220,7 +220,7 @@ local function _process_rule(self, rule, collections, ctx)
 			pattern = util.parse_dynamic_value(self, pattern, collections)
 		end
 
-		match = lookup.operators[var.operator](self, t, pattern, ctx)
+		match = lookup.operators[var.operator](self, collection, pattern, ctx)
 
 		if (match) then
 			logger.log(self, "Match of rule " .. id)
