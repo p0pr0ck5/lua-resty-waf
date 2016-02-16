@@ -25,7 +25,7 @@ _M.defaults = {
 	_event_log_periodic_flush    = nil,
 	_event_log_altered_only      = true,
 	_res_body_max_size           = (1024 * 1024),
-	_res_body_mime_types         = { "text/plain", "text/html" },
+	_res_body_mime_types         = { ["text/plain"] = true, ["text/html"] = true },
 	_process_multipart_body      = true,
 	_req_tid_header              = false,
 	_res_tid_header              = false,
