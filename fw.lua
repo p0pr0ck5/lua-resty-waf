@@ -361,9 +361,9 @@ function _M.exec(self)
 			if (not util.table_has_key(id, self._ignore_rule)) then
 				logger.log(self, "Processing rule " .. id)
 
-				local ret = _process_rule(self, rule, collections, ctx)
-				if (ret) then
-					offset = offset + ret
+				local returned_offset = _process_rule(self, rule, collections, ctx)
+				if (returned_offset) then
+					offset = offset + returned_offset
 				else
 					offset = nil
 				end
@@ -371,6 +371,8 @@ function _M.exec(self)
 				logger.log(self, "Ignoring rule " .. id)
 				offset = offset + rule.offset_nomatch
 			end
+
+			if not offset then break end
 
 			rule = rs.rules[phase][offset]
 		end
