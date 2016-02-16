@@ -105,9 +105,11 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 	}
 ```
 
-##Public Functions
+##Public Functions and Methods
 
-###FreeWAF.default_option()
+###Functions
+
+####FreeWAF.default_option()
 
 Define default values for configuration options that will be inherited across all scopes. This is useful when you are using FreeWAF in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
 
@@ -124,7 +126,21 @@ Define default values for configuration options that will be inherited across al
 	}
 ```
 
-###FreeWAF.init()
+####FreeWAF.process_cidr(cidr)
+
+Parse (and cache) a CIDR block for later usage in a `CIDR_MATCH` operator. CIDR blocks are processed and cached at the module level. Any CIDR block used in a `pattern` with a `CIDR_MATCH` operator must be added in this phase.
+
+```lua
+	http {
+		init_by_lua '
+			local FreeWAF = require "fw"
+
+			FreeWAF.process_cidr("127.0.0.0/8")
+		';
+	}
+```
+
+####FreeWAF.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any FreeWAF function call in `init_by_lua`, and should never be called outside this scope.
 
@@ -142,9 +158,9 @@ Perform some pre-computation of rules and rulesets, based on what's been made av
 	}
 ```
 
-##Public Methods
+###Public Methods
 
-###FreeWAF:new()
+####FreeWAF:new()
 
 Instantiate a new instance of FreeWAF. You must call this in every request handler phase you wish to run FreeWAF, and use the return result to call further object methods.
 
@@ -160,7 +176,7 @@ Instantiate a new instance of FreeWAF. You must call this in every request handl
 	}
 ```
 
-###FreeWAF:set_option()
+####FreeWAF:set_option()
 
 Configure an option on a per-scope basis. You should only do this if you are overriding a default value in this scope (e.g. it would be useless to use this to define the same configurable everywhere).
 
@@ -179,7 +195,7 @@ Configure an option on a per-scope basis. You should only do this if you are ove
 	}
 ```
 
-###FreeWAF:reset_option()
+####FreeWAF:reset_option()
 
 Set the given option to its documented default, regardless of whatever value was assigned via `default_option`. This is most useful for options that are more complex than boolean or integer values.
 
@@ -208,7 +224,7 @@ Set the given option to its documented default, regardless of whatever value was
 	}
 ```
 
-###FreeWAF:write_log_events()
+####FreeWAF:write_log_events()
 
 Write any audit log entries that were generated from the transaction. This should be called in the `log_by_lua` handler.
 

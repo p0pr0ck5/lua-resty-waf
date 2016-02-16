@@ -463,6 +463,14 @@ function _M.reset_option(self, option)
 	end
 end
 
+-- process and cache a CIDR for iputils
+function _M.process_cidr(value)
+	if (not cidr_lib.cidrs[value]) then
+		local lower, upper = iputils.parse_cidr(value)
+		cidr_lib.cidrs[value] = { lower, upper }
+	end
+end
+
 -- push log data regarding matching rule(s) to the configured target
 -- in the case of socket or file logging, this data will be buffered
 function _M.write_log_events(self)

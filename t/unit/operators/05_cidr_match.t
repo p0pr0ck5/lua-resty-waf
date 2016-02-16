@@ -14,10 +14,10 @@ __DATA__
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
 			local cidr_lib = require "lib.cidr"
-			local         op = require "lib.operators"
+			local op       = require "lib.operators"
 
-			local cidr     = "192.168.0.0/16"
-			local u, l     = iputils.parse_cidr(cidr)
+			local cidr = "192.168.0.0/16"
+			local u, l = iputils.parse_cidr(cidr)
 			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("192.168.0.1", cidr)
@@ -38,11 +38,11 @@ true
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
 			local cidr_lib = require "lib.cidr"
-			local         op = require "lib.operators"
+			local op       = require "lib.operators"
 
-			local cidrs    = { "192.168.0.0/16", "192.169.0.0/16" }
+			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 			for _, cidr in ipairs(cidrs) do
-				local u, l     = iputils.parse_cidr(cidr)
+				local u, l = iputils.parse_cidr(cidr)
 				cidr_lib.cidrs[cidr] = { u, l }
 			end
 
@@ -64,10 +64,10 @@ true
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
 			local cidr_lib = require "lib.cidr"
-			local         op = require "lib.operators"
+			local op       = require "lib.operators"
 
-			local cidr     = "192.168.0.0/16"
-			local u, l     = iputils.parse_cidr(cidr)
+			local cidr = "192.168.0.0/16"
+			local u, l = iputils.parse_cidr(cidr)
 			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("172.16.31.255", cidr)
@@ -88,11 +88,11 @@ false
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
 			local cidr_lib = require "lib.cidr"
-			local         op = require "lib.operators"
+			local op       = require "lib.operators"
 
-			local cidrs    = { "192.168.0.0/16", "192.169.0.0/16" }
+			local cidrs= { "192.168.0.0/16", "192.169.0.0/16" }
 			for _, cidr in ipairs(cidrs) do
-				local u, l     = iputils.parse_cidr(cidr)
+				local u, l = iputils.parse_cidr(cidr)
 				cidr_lib.cidrs[cidr] = { u, l }
 			end
 
@@ -114,10 +114,10 @@ false
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
 			local cidr_lib = require "lib.cidr"
-			local         op = require "lib.operators"
+			local op       = require "lib.operators"
 
-			local cidr     = "192.168.0.0/16"
-			local u, l     = iputils.parse_cidr(cidr)
+			local cidr = "192.168.0.0/16"
+			local u, l = iputils.parse_cidr(cidr)
 			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("foobar", cidr)
