@@ -70,7 +70,7 @@ _M.rules = {
 				type = "URI_ARGS",
 				opts = { key = "keys" },
 				pattern = "webshot",
-				operator = "EXISTS"
+				operator = "CONTAINS"
 			},
 			opts = { nolog = true },
 			action = "CHAIN"
@@ -173,7 +173,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "referer",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = {},
 			action = "DENY",
@@ -277,7 +277,7 @@ _M.rules = {
 				type = "REQUEST_BODY",
 				opts = { key = 'keys' },
 				pattern = "mfbfw",
-				operator = "EXISTS"
+				operator = "CONTAINS"
 			},
 			opts = { nolog = true, transform = 'lowercase' },
 			action = "CHAIN",

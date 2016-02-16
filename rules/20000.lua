@@ -48,7 +48,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "content-length",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { score = 2 },
 			action = "SCORE",
@@ -96,7 +96,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "pragma",
-				operator = "EXISTS"
+				operator = "CONTAINS"
 			},
 			opts = { nolog = true },
 			action = "CHAIN",
@@ -118,7 +118,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "cache-control",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { nolog = true },
 			action = "CHAIN"

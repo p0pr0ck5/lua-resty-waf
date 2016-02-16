@@ -12,7 +12,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "host",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { score = 2 },
 			action = "SCORE",
@@ -35,7 +35,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "accept",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { score = 2 },
 			action = "SCORE",
@@ -70,7 +70,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "user-agent",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { score = 2 },
 			action = "SCORE",
@@ -94,7 +94,7 @@ _M.rules = {
 				type = "REQUEST_HEADER_NAMES",
 				opts = nil,
 				pattern = "content-type",
-				operator = "NOT_EXISTS"
+				operator = "NOT_CONTAINS"
 			},
 			opts = { nolog = true },
 			action = "CHAIN",
