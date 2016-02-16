@@ -37,6 +37,7 @@ _M.collections = {
 		collections.REQUEST_ARGS         = request_common_args
 		collections.VAR                  = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections) end
 		collections.TX                   = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections, ctx.tx) end
+		collections.NGX_VAR              = ngx.var
 		collections.SCORE                = function() return ctx.score end
 		collections.SCORE_THRESHOLD      = function(FW) return FW._score_threshold end
 	end,
@@ -245,7 +246,7 @@ _M.operators = {
 	PM             = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
 	NOT_PM         = function(FW, needle, haystack, ctx) return not operators.ac_lookup(needle, haystack, ctx) end,
 	CIDR_MATCH     = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
-	NOT_CIDR_MATCH = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
+	NOT_CIDR_MATCH = function(FW, ip, cidrs) return not operators.cidr_match(ip, cidrs) end,
 }
 
 
