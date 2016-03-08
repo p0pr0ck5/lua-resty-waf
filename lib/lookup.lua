@@ -48,7 +48,7 @@ _M.collections = {
 	end,
 	body_filter = function(FW, collections, ctx)
 		if ctx.buffers == nil then
-			ctx.buffers = {}
+			ctx.buffers  = {}
 			ctx.nbuffers = 0
 		end
 
