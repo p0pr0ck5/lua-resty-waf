@@ -30,7 +30,6 @@ _M.collections = {
 		collections.URI                  = ngx.var.uri
 		collections.URI_ARGS             = request_uri_args
 		collections.REQUEST_HEADERS      = request_headers
-		collections.REQUEST_HEADER_NAMES = util.table_keys(request_headers)
 		collections.USER_AGENT           = ngx.var.http_user_agent
 		collections.COOKIES              = request_cookies
 		collections.REQUEST_BODY         = request_post_args
@@ -45,7 +44,6 @@ _M.collections = {
 		local response_headers = ngx.resp.get_headers()
 
 		collections.RESPONSE_HEADERS      = response_headers
-		collections.RESPONSE_HEADER_NAMES = util.table_keys(response_headers)
 		collections.STATUS                = ngx.status
 	end,
 	body_filter = function(FW, collections, ctx)

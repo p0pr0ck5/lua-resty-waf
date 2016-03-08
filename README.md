@@ -896,11 +896,9 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **METHOD**: The HTTP method specified in the request.
 * **RESPONSE_BODY**: The response body. This collection will not be populated if response body is too large, or the content type is not in the list of valid MIME types. Available only in the `body_filter` phase.
 * **RESPONSE_HEADERS**: A table containing the response headers. Available only in `header_filter` and later phases.
-* **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table or string containing the request body. This typically contains POST arguments. If the content type of the request matched that of the `allowed_content_type` option(s), this collection will be set as a string.
 * **REQUEST_HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
-* **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
@@ -913,7 +911,7 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.
-* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collection parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
+* **keys**: Retrieves the keys in the given collection. Note that this key does not require a `value` counterpart.
 * **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 

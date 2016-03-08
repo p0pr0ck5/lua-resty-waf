@@ -157,7 +157,8 @@ _M.rules = {
 		{
 			id = 90015,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "referer",
 				operator = "NOT_CONTAINS"
 			},

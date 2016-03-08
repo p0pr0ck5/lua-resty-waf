@@ -43,7 +43,8 @@ _M.rules = {
 		{
 			id = 20004,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "content-length",
 				operator = "NOT_CONTAINS"
 			},
@@ -89,7 +90,8 @@ _M.rules = {
 		{
 			id = 20008,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "pragma",
 				operator = "CONTAINS"
 			},
@@ -110,7 +112,8 @@ _M.rules = {
 		{
 			id = 20010,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "cache-control",
 				operator = "NOT_CONTAINS"
 			},

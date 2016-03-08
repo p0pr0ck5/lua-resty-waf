@@ -9,7 +9,8 @@ _M.rules = {
 		{
 			id = 21001,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "host",
 				operator = "NOT_CONTAINS"
 			},
@@ -30,7 +31,8 @@ _M.rules = {
 		{
 			id = 21003,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "accept",
 				operator = "NOT_CONTAINS"
 			},
@@ -63,7 +65,8 @@ _M.rules = {
 		{
 			id = 21006,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "user-agent",
 				operator = "NOT_CONTAINS"
 			},
@@ -86,7 +89,8 @@ _M.rules = {
 		{
 			id = 21008,
 			var = {
-				type = "REQUEST_HEADER_NAMES",
+				type = "REQUEST_HEADERS",
+				opts = { key = "keys" },
 				pattern = "content-type",
 				operator = "NOT_CONTAINS"
 			},
