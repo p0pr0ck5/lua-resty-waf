@@ -79,7 +79,10 @@ _M.collections = {
 		if not eof then
 			-- Send nothing to the client yet.
 			ngx.arg[1] = nil
-			return 1
+
+			-- no need to process further at this point
+			ctx.short_circuit = true
+			return
 		else
 			collections.RESPONSE_BODY = table.concat(ctx.buffers, '')
 			ngx.arg[1] = collections.RESPONSE_BODY
