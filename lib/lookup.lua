@@ -29,6 +29,7 @@ _M.collections = {
 		collections.METHOD               = ngx.req.get_method()
 		collections.URI                  = ngx.var.uri
 		collections.URI_ARGS             = request_uri_args
+		collections.QUERY_STRING         = ngx.var.query_string
 		collections.REQUEST_HEADERS      = request_headers
 		collections.USER_AGENT           = ngx.var.http_user_agent
 		collections.COOKIES              = request_cookies
