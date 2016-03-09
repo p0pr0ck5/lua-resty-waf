@@ -170,6 +170,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local action   = rule.action
 	local pattern  = rule.pattern
 	local operator = rule.operator
+	local offset
 
 	ctx.id = id
 	ctx.rule_score = opts.score
@@ -180,12 +181,8 @@ local function _process_rule(self, rule, collections, ctx)
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
-	local final_collection, collection_count, match, offset
-	final_collection = {}
-	collection_count = 1
-
 	for k, v in ipairs(vars) do
-		local memokey, collection, var
+		local memokey, collection, var, match
 		var = vars[k]
 
 		if (var.parse ~= nil) then
@@ -212,43 +209,35 @@ local function _process_rule(self, rule, collections, ctx)
 			collection = ctx.transform[memokey]
 		end
 
-
-		if (type(collection) == "table") then
-			for element in ipairs(collection) do
-				final_collection[collection_count] = collection[element]
-				collection_count = collection_count + 1
-			end
-		elseif (collection) then
-			final_collection[collection_count] = collection
-			collection_count = collection_count + 1
-		end
-	end
-
-	if (#final_collection == 0) then
-		logger.log(self, "parse_collection didnt return anything")
-		offset = rule.offset_nomatch
-	else
-		if (opts.parsepattern) then
-			logger.log(self, "Parsing dynamic pattern: " .. pattern)
-			pattern = util.parse_dynamic_value(self, pattern, collections)
-		end
-
-		match = lookup.operators[operator](self, final_collection, pattern, ctx)
-
-		if (match) then
-			logger.log(self, "Match of rule " .. id)
-
-			if (not opts.nolog) then
-				_log_event(self, rule, match, ctx)
-			else
-				logger.log(self, "We had a match, but not logging because opts.nolog is set")
-			end
-
-			_rule_action(self, action, ctx, collections)
-
-			offset = rule.offset_match
-		else
+		if (not collection) then
+			logger.log(self, "parse_collection didnt return anything")
 			offset = rule.offset_nomatch
+		else
+			if (opts.parsepattern) then
+				logger.log(self, "Parsing dynamic pattern: " .. pattern)
+				pattern = util.parse_dynamic_value(self, pattern, collections)
+			end
+
+			match = lookup.operators[operator](self, collection, pattern, ctx)
+
+			if (match) then
+				logger.log(self, "Match of memokey " .. memokey)
+
+				if (not opts.nolog) then
+					_log_event(self, rule, match, ctx)
+				else
+					logger.log(self, "We had a match, but not logging because opts.nolog is set")
+				end
+
+				_rule_action(self, action, ctx, collections)
+
+				offset = rule.offset_match
+
+				break
+			else
+				logger.log(self, "No match for " .. memokey)
+				offset = rule.offset_nomatch
+			end
 		end
 	end
 
