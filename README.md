@@ -904,7 +904,6 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings.
-* **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
@@ -912,7 +911,7 @@ Collections can be parsed based on the contents of a rule's `var.opts` table. Th
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.
 * **keys**: Retrieves the keys in the given collection. Note that this key does not require a `value` counterpart.
-* **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
+* **specific**: Retrieves a specific value from the collection.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 
 ##Data Transformation

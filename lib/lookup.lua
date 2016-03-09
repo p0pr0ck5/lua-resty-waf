@@ -31,7 +31,6 @@ _M.collections = {
 		collections.URI_ARGS             = request_uri_args
 		collections.QUERY_STRING         = ngx.var.query_string
 		collections.REQUEST_HEADERS      = request_headers
-		collections.USER_AGENT           = ngx.var.http_user_agent
 		collections.COOKIES              = request_cookies
 		collections.REQUEST_BODY         = request_post_args
 		collections.REQUEST_ARGS         = request_common_args
