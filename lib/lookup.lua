@@ -34,6 +34,7 @@ _M.collections = {
 		collections.COOKIES              = request_cookies
 		collections.REQUEST_BODY         = request_post_args
 		collections.REQUEST_ARGS         = request_common_args
+		collections.REQUEST_LINE         = ngx.var.request
 		collections.VAR                  = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections) end
 		collections.TX                   = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections, ctx.tx) end
 		collections.NGX_VAR              = ngx.var
