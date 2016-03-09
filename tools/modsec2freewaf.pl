@@ -49,6 +49,7 @@ my $valid_operators = {
 };
 
 my $valid_transforms = {
+	base64decode       => 'base64_decode',
 	base64Decode       => 'base64_decode',
 	base64DecodeExt    => 'base64_decode',
 	base64Encode       => 'base64_encode',
