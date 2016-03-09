@@ -164,11 +164,12 @@ end
 
 -- process an individual rule
 local function _process_rule(self, rule, collections, ctx)
-	local id      = rule.id
-	local var     = rule.var
-	local opts    = rule.opts or {}
-	local action  = rule.action
-	local pattern = var.pattern
+	local id       = rule.id
+	local vars     = rule.vars
+	local opts     = rule.opts or {}
+	local action   = rule.action
+	local pattern  = rule.pattern
+	local operator = rule.operator
 
 	ctx.id = id
 	ctx.rule_score = opts.score
@@ -179,15 +180,16 @@ local function _process_rule(self, rule, collections, ctx)
 		ctx.rule_setvar_expire = opts.setvar.expire
 	end
 
-	local collection, match, offset
+	local final_collection, collection_count, match, offset
+	final_collection = {}
+	collection_count = 1
 
-	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
-		collection = collections[var.type](self, var.opts, collections)
-	else
-		local memokey
+	for k, v in ipairs(vars) do
+		local memokey, collection, var
+		var = vars[k]
 
-		if (var.opts ~= nil) then
-			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
+		if (var.parse ~= nil) then
+			memokey = var.type .. tostring(var.parse.key) .. tostring(var.parse.value)
 		else
 			memokey = var.type
 		end
@@ -197,7 +199,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 		if (not ctx.transform_key[memokey]) then
 			logger.log(self, "Parse collection cache not found")
-			collection = _parse_collection(self, collections[var.type], var.opts)
+			collection = _parse_collection(self, collections[var.type], var.parse)
 
 			if (opts.transform) then
 				collection = _do_transform(self, collection, opts.transform)
@@ -209,10 +211,21 @@ local function _process_rule(self, rule, collections, ctx)
 			logger.log(self, "Parse collection cache hit!")
 			collection = ctx.transform[memokey]
 		end
+
+
+		if (type(collection) == "table") then
+			for element in ipairs(collection) do
+				final_collection[collection_count] = collection[element]
+				collection_count = collection_count + 1
+			end
+		elseif (collection) then
+			final_collection[collection_count] = collection
+			collection_count = collection_count + 1
+		end
 	end
 
-	if (not collection) then
-		logger.log(self, "parse_collection didnt return anything for " .. var.type)
+	if (#final_collection == 0) then
+		logger.log(self, "parse_collection didnt return anything")
 		offset = rule.offset_nomatch
 	else
 		if (opts.parsepattern) then
@@ -220,7 +233,7 @@ local function _process_rule(self, rule, collections, ctx)
 			pattern = util.parse_dynamic_value(self, pattern, collections)
 		end
 
-		match = lookup.operators[var.operator](self, collection, pattern, ctx)
+		match = lookup.operators[operator](self, final_collection, pattern, ctx)
 
 		if (match) then
 			logger.log(self, "Match of rule " .. id)
