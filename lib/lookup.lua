@@ -4,10 +4,8 @@ _M.version = "0.6.0"
 
 local cjson         = require("cjson")
 local file_logger   = require("inc.resty.logger.file")
-local iputils       = require("inc.resty.iputils")
 local socket_logger = require("inc.resty.logger.socket")
 
-local cidr_lib  = require("lib.cidr")
 local logger    = require("lib.log")
 local operators = require("lib.operators")
 local request   = require("lib.request")
@@ -290,12 +288,6 @@ _M.set_option = {
 	event_log_ngx_vars = function(FW, value)
 		local t = FW._event_log_ngx_vars
 		FW._event_log_ngx_vars[#t + 1] = value
-	end,
-	process_cidr = function(FW, value)
-		if (not cidr_lib.cidrs[value]) then
-			local lower, upper = iputils.parse_cidr(value)
-			cidr_lib.cidrs[value] = { lower, upper }
-		end
 	end,
 }
 

@@ -13,12 +13,9 @@ __DATA__
     location = /t {
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
-			local cidr_lib = require "lib.cidr"
 			local op       = require "lib.operators"
 
 			local cidr = "192.168.0.0/16"
-			local u, l = iputils.parse_cidr(cidr)
-			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("192.168.0.1", cidr)
 			ngx.say(match)
@@ -37,14 +34,9 @@ true
     location = /t {
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
-			local cidr_lib = require "lib.cidr"
 			local op       = require "lib.operators"
 
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
-			for _, cidr in ipairs(cidrs) do
-				local u, l = iputils.parse_cidr(cidr)
-				cidr_lib.cidrs[cidr] = { u, l }
-			end
 
 			local match = op.cidr_match("192.168.0.1", cidrs)
 			ngx.say(match)
@@ -63,12 +55,9 @@ true
     location = /t {
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
-			local cidr_lib = require "lib.cidr"
 			local op       = require "lib.operators"
 
 			local cidr = "192.168.0.0/16"
-			local u, l = iputils.parse_cidr(cidr)
-			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("172.16.31.255", cidr)
 			ngx.say(match)
@@ -87,14 +76,9 @@ false
     location = /t {
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
-			local cidr_lib = require "lib.cidr"
 			local op       = require "lib.operators"
 
 			local cidrs= { "192.168.0.0/16", "192.169.0.0/16" }
-			for _, cidr in ipairs(cidrs) do
-				local u, l = iputils.parse_cidr(cidr)
-				cidr_lib.cidrs[cidr] = { u, l }
-			end
 
 			local match = op.cidr_match("172.16.31.255", cidrs)
 			ngx.say(match)
@@ -113,12 +97,9 @@ false
     location = /t {
         content_by_lua '
 			local iputils  = require "inc.resty.iputils"
-			local cidr_lib = require "lib.cidr"
 			local op       = require "lib.operators"
 
 			local cidr = "192.168.0.0/16"
-			local u, l = iputils.parse_cidr(cidr)
-			cidr_lib.cidrs[cidr] = { u, l }
 
 			local match = op.cidr_match("foobar", cidr)
 			ngx.say(match)

@@ -3,12 +3,14 @@ local _M = {}
 _M.version = "0.6.0"
 
 local ac       = require("inc.load_ac")
-local cidr_lib = require("lib.cidr")
 local iputils  = require("inc.resty.iputils")
 local logger   = require("lib.log")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
+
+-- module-level cache of cidr objects
+local _cidr_cache = {}
 
 function _M.equals(a, b)
 	local equals
@@ -109,7 +111,17 @@ function _M.cidr_match(ip, cidr_pattern)
 	end
 
 	for _, v in ipairs(cidr_pattern) do
-		t[n] = cidr_lib.cidrs[v]
+		-- try to grab the parsed cidr from out module cache
+		local cidr = _cidr_cache[v]
+
+		-- if it wasn't there, compute and cache the value
+		if (not cidr) then
+			local lower, upper = iputils.parse_cidr(v)
+			cidr = { lower, upper }
+			_cidr_cache[v] = cidr
+		end
+
+		t[n] = cidr
 		n = n + 1
 	end
 

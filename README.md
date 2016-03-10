@@ -126,20 +126,6 @@ Define default values for configuration options that will be inherited across al
 	}
 ```
 
-####FreeWAF.process_cidr(cidr)
-
-Parse (and cache) a CIDR block for later usage in a `CIDR_MATCH` operator. CIDR blocks are processed and cached at the module level. Any CIDR block used in a `pattern` with a `CIDR_MATCH` operator must be added in this phase.
-
-```lua
-	http {
-		init_by_lua '
-			local FreeWAF = require "fw"
-
-			FreeWAF.process_cidr("127.0.0.0/8")
-		';
-	}
-```
-
 ####FreeWAF.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any FreeWAF function call in `init_by_lua`, and should never be called outside this scope.
