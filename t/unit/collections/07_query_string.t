@@ -80,7 +80,7 @@ foo=bar&foo=bat&frob&qux=
 --- no_error_log
 [error]
 
-=== TEST 4: QUERY_STRING collections variable (type verification)
+=== TEST 4: QUERY_STRING collections variable (type verification, empty)
 --- config
 	location /t {
 		access_by_lua '
@@ -98,6 +98,30 @@ foo=bar&foo=bat&frob&qux=
 	}
 --- request
 GET /t
+--- error_code: 200
+--- response_body
+nil
+--- no_error_log
+[error]
+
+=== TEST 5: QUERY_STRING collections variable (type verification)
+--- config
+	location /t {
+		access_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			fw:exec()
+		';
+
+		content_by_lua '
+			local collections = ngx.ctx.collections
+
+			ngx.say(type(collections.QUERY_STRING))
+		';
+	}
+--- request
+GET /t?foo=bar
 --- error_code: 200
 --- response_body
 string
