@@ -246,8 +246,6 @@ sub parse_operator {
 	# is not single space separated from the pattern, and splitting
 	# on \s+ isn't possible because that could break the pattern
 	# when joining back together
-	$raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s+)?(.*)$/;
-
 	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s+)?(.*)$/;
 	$operator ||= 'rx';
 
@@ -458,9 +456,9 @@ sub translate_operator {
 	die "Cannot translate operator $original_operator"
 		if !$translated_operator;
 
-	$translation->{operator} = $translated_operator;
-	$translation->{negated}  = $rule->{operator}->{negated} if $rule->{operator}->{negated};
-	$translation->{pattern}  = $rule->{operator}->{pattern};
+	$translation->{operator}   = $translated_operator;
+	$translation->{op_negated} = 1 if $rule->{operator}->{negated};
+	$translation->{pattern}    = $rule->{operator}->{pattern};
 
 	# hack for lua-aho-corasick which needs the pattern as a table
 	if ($translated_operator eq 'PM') {
