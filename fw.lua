@@ -16,6 +16,9 @@ local mt = { __index = _M }
 -- default list of rulesets (global here to have offsets precomputed)
 _global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
+-- ruleset table cache
+_ruleset_defs = {}
+
 -- default options
 local default_opts = util.table_copy(opts.defaults)
 
@@ -185,28 +188,32 @@ local function _process_rule(self, rule, collections, ctx)
 		local memokey, collection, var, match
 		var = vars[k]
 
-		if (var.parse ~= nil) then
-			memokey = var.type .. tostring(var.parse.key) .. tostring(var.parse.value)
+		if (type(collections[var.type]) == "function") then
+			collection = collections[var.type](self, var.opts, collections)
 		else
-			memokey = var.type
-		end
-		memokey = memokey .. _transform_memokey(opts.transform)
-
-		logger.log(self, "Checking for memokey " .. memokey)
-
-		if (not ctx.transform_key[memokey]) then
-			logger.log(self, "Parse collection cache not found")
-			collection = _parse_collection(self, collections[var.type], var.parse)
-
-			if (opts.transform) then
-				collection = _do_transform(self, collection, opts.transform)
+			if (var.parse ~= nil) then
+				memokey = var.type .. tostring(var.parse.key) .. tostring(var.parse.value)
+			else
+				memokey = var.type
 			end
+			memokey = memokey .. _transform_memokey(opts.transform)
 
-			ctx.transform[memokey] = collection
-			ctx.transform_key[memokey] = true
-		else
-			logger.log(self, "Parse collection cache hit!")
-			collection = ctx.transform[memokey]
+			logger.log(self, "Checking for memokey " .. memokey)
+
+			if (not ctx.transform_key[memokey]) then
+				logger.log(self, "Parse collection cache not found")
+				collection = _parse_collection(self, collections[var.type], var.parse)
+
+				if (opts.transform) then
+					collection = _do_transform(self, collection, opts.transform)
+				end
+
+				ctx.transform[memokey] = collection
+				ctx.transform_key[memokey] = true
+			else
+				logger.log(self, "Parse collection cache hit!")
+				collection = ctx.transform[memokey]
+			end
 		end
 
 		if (not collection) then
@@ -220,8 +227,12 @@ local function _process_rule(self, rule, collections, ctx)
 
 			match = lookup.operators[operator](self, collection, pattern, ctx)
 
+			if (rule.op_negated) then
+				match = not match
+			end
+
 			if (match) then
-				logger.log(self, "Match of memokey " .. memokey)
+				logger.log(self, "Match of rule " .. id)
 
 				if (not opts.nolog) then
 					_log_event(self, rule, match, ctx)
@@ -235,7 +246,6 @@ local function _process_rule(self, rule, collections, ctx)
 
 				break
 			else
-				logger.log(self, "No match for " .. memokey)
 				offset = rule.offset_nomatch
 			end
 		end
@@ -247,17 +257,15 @@ end
 
 -- calculate rule jump offsets
 local function _calculate_offset(ruleset)
-	local r = require("rules." .. ruleset)
-
 	for phase, i in pairs(phase_t.phases) do
-		if (r.rules[phase]) then
-			calc.calculate(r.rules[phase])
+		if (ruleset[phase]) then
+			calc.calculate(ruleset[phase])
 		else
-			r.rules[phase] = {}
+			ruleset[phase] = {}
 		end
 	end
 
-	r.initted = true
+	ruleset.initted = true
 end
 
 -- merge the default and any custom rules
@@ -306,7 +314,6 @@ function _M.exec(self)
 	local ctx         = ngx.ctx
 	local collections = ctx.collections or {}
 
-
 	-- restore options from a previous phase
 	if (ctx.opts) then
 		_load(self, ctx.opts)
@@ -347,15 +354,23 @@ function _M.exec(self)
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
-		local rs = require("rules." .. ruleset)
+		local rs = _ruleset_defs[ruleset]
 
-		if (not rs.initted) then
-			logger.log(self, "Doing offset calculation of " .. ruleset)
-			_calculate_offset(ruleset)
+		if (not rs) then
+			rs, err = util.load_ruleset(ruleset)
+
+			if (err) then
+				logger.fatal_fail(err)
+			else
+				logger.log(self, "Doing offset calculation of " .. ruleset)
+				_calculate_offset(rs)
+
+				_ruleset_defs[ruleset] = rs
+			end
 		end
 
 		local offset = 1
-		local rule   = rs.rules[phase][offset]
+		local rule   = rs[phase][offset]
 
 		while rule do
 			local id = rule.id
@@ -376,7 +391,7 @@ function _M.exec(self)
 
 			if not offset then break end
 
-			rule = rs.rules[phase][offset]
+			rule = rs[phase][offset]
 		end
 	end
 
@@ -394,10 +409,14 @@ function _M.init()
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
 	for _, ruleset in ipairs(default_opts._active_rulesets) do
-		local rs = require("rules." .. ruleset)
+		local rs, err = util.load_ruleset(ruleset)
 
-		if (not rs.initted) then
-			_calculate_offset(ruleset)
+		if (err) then
+			ngx.log(ngx.ERR, err)
+		else
+			_calculate_offset(rs)
+
+			_ruleset_defs[ruleset] = rs
 		end
 	end
 

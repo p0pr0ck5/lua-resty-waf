@@ -2,6 +2,7 @@ local _M = {}
 
 _M.version = "0.6.0"
 
+local cjson  = require("cjson")
 local logger = require("lib.log")
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
@@ -126,6 +127,29 @@ function _M.parse_dynamic_value(FW, key, collections)
 	else
 		return str
 	end
+end
+
+-- find a rule file with a .json prefix, read it, and return a ruleset table
+function _M.load_ruleset(name)
+	for k, v in string.gmatch(package.path, "[^;]+") do
+		local path = string.match(k, "(.*/)")
+
+		local full_name = path .. "rules/" .. name .. ".json"
+
+		local f = io.open(full_name)
+		if (f ~= nil) then
+			local data  = f:read("*all")
+			local jdata
+
+			if pcall(function() jdata = cjson.decode(data) end) then
+				return jdata, nil
+			else
+				return nil, "could not decode " .. data
+			end
+		end
+	end
+
+	return nil, "could not find " .. name
 end
 
 return _M
