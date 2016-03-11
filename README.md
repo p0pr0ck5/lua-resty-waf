@@ -311,6 +311,8 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names must be numeric, as they are sorted for processing in numeric order. This also implies some level of control on the users part; because rulesets are processed in increasing numeric order, the order with which rulesets are passed to `set_option` does not matter. Note only that rulesets of a higher numeric value are processed after those of a lower value.
 
+**NOTE: It is STRONGLY recommend avoiding adding rulesets via `set_option`. It is much safer to add rulesets globally via `default_option`, and ignore rulesets in necessary scopes. Loading a ruleset requires reading the rule from disk on first load; when done outside the `init` phase, this can block the nginx event loop. Caveat emptor.**
+
 ###score_threshold
 
 *Default*: 5
