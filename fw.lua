@@ -123,7 +123,7 @@ local function _rule_action(self, action, ctx, collections)
 end
 
 -- build the transform portion of the collection memoization key
-local function _transform_memokey(transform)
+local function _transform_collection_key(transform)
 	if (not transform) then
 		return 'nil'
 	end
@@ -133,6 +133,22 @@ local function _transform_memokey(transform)
 	else
 		return table.concat(transform, ',')
 	end
+end
+
+-- build the collection memoization key
+local function _build_collection_key(var, transform)
+	local key = {}
+	key[1] = var.type
+
+	if (var.parse ~= nil) then
+		key[2] = tostring(var.parse.key)
+		key[3] = tostring(var.parse.value)
+		key[4] = _transform_collection_key(transform)
+	else
+		key[2] = _transform_collection_key(transform)
+	end
+
+	return table.concat(key, "|")
 end
 
 -- transform collection values based on rule opts
@@ -185,39 +201,34 @@ local function _process_rule(self, rule, collections, ctx)
 	end
 
 	for k, v in ipairs(vars) do
-		local memokey, collection, var, match
+		local collection, var, match
 		var = vars[k]
 
 		if (type(collections[var.type]) == "function") then
 			collection = collections[var.type](self, var.opts, collections)
 		else
-			if (var.parse ~= nil) then
-				memokey = var.type .. tostring(var.parse.key) .. tostring(var.parse.value)
-			else
-				memokey = var.type
-			end
-			memokey = memokey .. _transform_memokey(opts.transform)
+			local collection_key = _build_collection_key(var, opts.transform)
 
-			logger.log(self, "Checking for memokey " .. memokey)
+			logger.log(self, "Checking for collection_key " .. collection_key)
 
-			if (not ctx.transform_key[memokey]) then
-				logger.log(self, "Parse collection cache not found")
+			if (not ctx.transform_key[collection_key]) then
+				logger.log(self, "Collection cache miss")
 				collection = _parse_collection(self, collections[var.type], var.parse)
 
 				if (opts.transform) then
 					collection = _do_transform(self, collection, opts.transform)
 				end
 
-				ctx.transform[memokey] = collection
-				ctx.transform_key[memokey] = true
+				ctx.transform[collection_key] = collection
+				ctx.transform_key[collection_key] = true
 			else
-				logger.log(self, "Parse collection cache hit!")
-				collection = ctx.transform[memokey]
+				logger.log(self, "Collection cache hit!")
+				collection = ctx.transform[collection_key]
 			end
 		end
 
 		if (not collection) then
-			logger.log(self, "parse_collection didnt return anything")
+			logger.log(self, "No values for this collection")
 			offset = rule.offset_nomatch
 		else
 			if (opts.parsepattern) then
