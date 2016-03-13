@@ -240,8 +240,8 @@ _M.operators = {
 	REGEX          = function(FW, subject, pattern) return operators.regex_match(FW, subject, pattern) end,
 	EQUALS         = function(FW, a, b) return operators.equals(a, b) end,
 	GREATER        = function(FW, a, b) return operators.greater(a, b) end,
-	EXISTS         = function(FW, needle, haystack) return util.table_has_value(needle, haystack) end,
-	CONTAINS       = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
+	EXISTS         = function(FW, collection, pattern) return operators.exists(collection, pattern) end,
+	CONTAINS       = function(FW, collection, pattern) return operators.contains(collection, pattern) end,
 	PM             = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
 	CIDR_MATCH     = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
 }

@@ -5,6 +5,7 @@ _M.version = "0.6.0"
 local ac      = require("inc.load_ac")
 local iputils = require("inc.resty.iputils")
 local logger  = require("lib.log")
+local util    = require("lib.util")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -52,6 +53,50 @@ function _M.greater(a, b)
 	end
 
 	return greater, value
+end
+
+function _M.exists(needle, haystack)
+	local exists, value
+
+	if (type(needle) == "table") then
+		for _, v in ipairs(needle) do
+			exists, value = _M.exists(v, haystack)
+
+			if (exists) then
+				break
+			end
+		end
+	else
+		exists = util.table_has_value(needle, haystack)
+
+		if (exists) then
+			value = needle
+		end
+	end
+
+	return exists, value
+end
+
+function _M.contains(haystack, needle)
+	local contains, value
+
+	if (type(needle) == "table") then
+		for _, v in ipairs(needle) do
+			contains, value = _M.contains(haystack, v)
+
+			if (contains) then
+				break
+			end
+		end
+	else
+		contains = util.table_has_value(needle, haystack)
+
+		if (contains) then
+			value = needle
+		end
+	end
+
+	return contains, value
 end
 
 function _M.regex_match(FW, subject, pattern)
