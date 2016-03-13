@@ -44,10 +44,10 @@ end
 -- all event logs will be written out at the completion of the transaction if either:
 -- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
 -- 2. the event_log_altered_only option is unset
-local function _log_event(self, rule, match, ctx)
+local function _log_event(self, rule, value, ctx)
 	local t = {
 		id    = rule.id,
-		match = match
+		match = value
 	}
 
 	if (self._event_log_verbosity > 1) then
@@ -201,7 +201,7 @@ local function _process_rule(self, rule, collections, ctx)
 	end
 
 	for k, v in ipairs(vars) do
-		local collection, var, match
+		local collection, var
 		var = vars[k]
 
 		if (type(collections[var.type]) == "function") then
@@ -236,7 +236,7 @@ local function _process_rule(self, rule, collections, ctx)
 				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
-			match = lookup.operators[operator](self, collection, pattern, ctx)
+			local match, value = lookup.operators[operator](self, collection, pattern, ctx)
 
 			if (rule.op_negated) then
 				match = not match
@@ -246,7 +246,7 @@ local function _process_rule(self, rule, collections, ctx)
 				logger.log(self, "Match of rule " .. id)
 
 				if (not opts.nolog) then
-					_log_event(self, rule, match, ctx)
+					_log_event(self, rule, value, ctx)
 				else
 					logger.log(self, "We had a match, but not logging because opts.nolog is set")
 				end

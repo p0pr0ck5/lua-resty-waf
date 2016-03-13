@@ -2,9 +2,9 @@ local _M = {}
 
 _M.version = "0.6.0"
 
-local ac       = require("inc.load_ac")
-local iputils  = require("inc.resty.iputils")
-local logger   = require("lib.log")
+local ac      = require("inc.load_ac")
+local iputils = require("inc.resty.iputils")
+local logger  = require("lib.log")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -13,47 +13,54 @@ local _ac_dicts = {}
 local _cidr_cache = {}
 
 function _M.equals(a, b)
-	local equals
+	local equals, value
 
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
-			equals = _M.equals(v, b)
+			equals, value = _M.equals(v, b)
 			if (equals) then
 				break
 			end
 		end
 	else
 		equals = a == b
+
+		if (equals) then
+			value = a
+		end
 	end
 
-	return equals
+	return equals, value
 end
 
 function _M.greater(a, b)
-	local greater
+	local greater, value
 
 	if (type(a) == "table") then
 		for _, v in ipairs(a) do
-			greater = _M.greater(v, b)
+			greater, value = _M.greater(v, b)
 			if (greater) then
 				break
 			end
 		end
 	else
 		greater = a > b
+
+		if (greater) then
+			value = a
+		end
 	end
 
-	return greater
+	return greater, value
 end
 
 function _M.regex_match(FW, subject, pattern)
 	local opts = FW._pcre_flags
-	local from, to, err
-	local match
+	local from, to, err, match, value
 
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
-			match = _M.regex_match(FW, v, pattern, opts)
+			match, value = _M.regex_match(FW, v, pattern)
 
 			if (match) then
 				break
@@ -67,16 +74,17 @@ function _M.regex_match(FW, subject, pattern)
 		end
 
 		if from then
-			match = string.sub(subject, from, to)
+			match = true
+			value = string.sub(subject, from, to)
 		end
 	end
 
-	return match
+	return match, value
 end
 
 function _M.ac_lookup(needle, haystack, ctx)
 	local id = ctx.id
-	local match, _ac
+	local match, _ac, value
 
 	-- dictionary creation is expensive, so we use the id of
 	-- the rule as the key to cache the created dictionary
@@ -89,7 +97,7 @@ function _M.ac_lookup(needle, haystack, ctx)
 
 	if (type(needle) == "table") then
 		for _, v in ipairs(needle) do
-			match = _M.ac_lookup(v, haystack, ctx)
+			match, value = _M.ac_lookup(v, haystack, ctx)
 
 			if (match) then
 				break
@@ -97,9 +105,14 @@ function _M.ac_lookup(needle, haystack, ctx)
 		end
 	else
 		match = ac.match(_ac, needle)
+
+		if (match) then
+			match = true
+			value = needle
+		end
 	end
 
-	return match
+	return match, value
 end
 
 function _M.cidr_match(ip, cidr_pattern)
@@ -125,7 +138,7 @@ function _M.cidr_match(ip, cidr_pattern)
 		n = n + 1
 	end
 
-	return iputils.ip_in_cidrs(ip, t)
+	return iputils.ip_in_cidrs(ip, t), ip
 end
 
 return _M

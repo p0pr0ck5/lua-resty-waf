@@ -12,12 +12,10 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local iputils  = require "inc.resty.iputils"
-			local op       = require "lib.operators"
-
+			local op   = require "lib.operators"
 			local cidr = "192.168.0.0/16"
 
-			local match = op.cidr_match("192.168.0.1", cidr)
+			local match, value = op.cidr_match("192.168.0.1", cidr)
 			ngx.say(match)
 		';
 	}
@@ -33,12 +31,10 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local iputils  = require "inc.resty.iputils"
-			local op       = require "lib.operators"
-
+			local op    = require "lib.operators"
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
-			local match = op.cidr_match("192.168.0.1", cidrs)
+			local match, value = op.cidr_match("192.168.0.1", cidrs)
 			ngx.say(match)
 		';
 	}
@@ -54,12 +50,10 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local iputils  = require "inc.resty.iputils"
-			local op       = require "lib.operators"
-
+			local op   = require "lib.operators"
 			local cidr = "192.168.0.0/16"
 
-			local match = op.cidr_match("172.16.31.255", cidr)
+			local match, value = op.cidr_match("172.16.31.255", cidr)
 			ngx.say(match)
 		';
 	}
@@ -75,12 +69,10 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local iputils  = require "inc.resty.iputils"
-			local op       = require "lib.operators"
+			local op    = require "lib.operators"
+			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
-			local cidrs= { "192.168.0.0/16", "192.169.0.0/16" }
-
-			local match = op.cidr_match("172.16.31.255", cidrs)
+			local match, value = op.cidr_match("172.16.31.255", cidrs)
 			ngx.say(match)
 		';
 	}
@@ -96,12 +88,10 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local iputils  = require "inc.resty.iputils"
-			local op       = require "lib.operators"
-
+			local op   = require "lib.operators"
 			local cidr = "192.168.0.0/16"
 
-			local match = op.cidr_match("foobar", cidr)
+			local match, value = op.cidr_match("foobar", cidr)
 			ngx.say(match)
 		';
 	}
@@ -110,6 +100,48 @@ GET /t
 --- error_code: 200
 --- response_body
 nil
+--- no_error_log
+[error]
+
+=== TEST 6: Return values
+--- config
+    location = /t {
+        content_by_lua '
+			local op   = require "lib.operators"
+			local cidr = "192.168.0.0/16"
+
+			local match, value = op.cidr_match("192.168.0.1", cidr)
+			ngx.say(match)
+			ngx.say(value)
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+true
+192.168.0.1
+--- no_error_log
+[error]
+
+=== TEST 7: Return value types
+--- config
+    location = /t {
+        content_by_lua '
+			local op   = require "lib.operators"
+			local cidr = "192.168.0.0/16"
+
+			local match, value = op.cidr_match("192.168.0.1", cidr)
+			ngx.say(type(match))
+			ngx.say(type(value))
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+boolean
+string
 --- no_error_log
 [error]
 
