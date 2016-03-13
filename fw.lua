@@ -409,33 +409,6 @@ function _M.exec(self)
 	_finalize(self, ctx)
 end
 
--- init_by_lua handler precomputations
-function _M.init()
-	-- do an initial rule merge based on default_option calls
-	-- this prevents have to merge every request in scopes
-	-- which do not further alter elected rulesets
-	_merge_rulesets(default_opts)
-
-	-- do offset jump calculations for default rulesets
-	-- this is also lazily handled in exec() for rulesets
-	-- that dont appear here
-	for _, ruleset in ipairs(default_opts._active_rulesets) do
-		local rs, err = util.load_ruleset(ruleset)
-
-		if (err) then
-			ngx.log(ngx.ERR, err)
-		else
-			_calculate_offset(rs)
-
-			_ruleset_defs[ruleset] = rs
-		end
-	end
-
-	-- clear this flag if we handled additional rulesets
-	-- so its not passed to new objects
-	default_opts.need_merge = false
-end
-
 -- instantiate a new instance of the module
 function _M.new(self)
 	-- we need a separate copy of this table since we will
@@ -493,6 +466,33 @@ function _M.reset_option(self, option)
 	if (option == "add_ruleset" or option == "ignore_ruleset") then
 		self.need_merge = true
 	end
+end
+
+-- init_by_lua handler precomputations
+function _M.init()
+	-- do an initial rule merge based on default_option calls
+	-- this prevents have to merge every request in scopes
+	-- which do not further alter elected rulesets
+	_merge_rulesets(default_opts)
+
+	-- do offset jump calculations for default rulesets
+	-- this is also lazily handled in exec() for rulesets
+	-- that dont appear here
+	for _, ruleset in ipairs(default_opts._active_rulesets) do
+		local rs, err = util.load_ruleset(ruleset)
+
+		if (err) then
+			ngx.log(ngx.ERR, err)
+		else
+			_calculate_offset(rs)
+
+			_ruleset_defs[ruleset] = rs
+		end
+	end
+
+	-- clear this flag if we handled additional rulesets
+	-- so its not passed to new objects
+	default_opts.need_merge = false
 end
 
 -- push log data regarding matching rule(s) to the configured target
