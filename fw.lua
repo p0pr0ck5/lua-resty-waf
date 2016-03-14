@@ -23,21 +23,23 @@ _ruleset_defs = {}
 local default_opts = util.table_copy(opts.defaults)
 
 -- get a subset or superset of request data collection
-local function _parse_collection(self, collection, opts)
-	if (type(collection) ~= "table" and opts) then
+local function _parse_collection(self, collection, parse)
+	if (type(collection) ~= "table" and parse) then
 		-- if a collection isn't a table it can't be parsed,
 		-- so we shouldn't return the original collection as
 		-- it may have an illegal operator called on it
 		return nil
 	end
 
-	if (type(collection) ~= "table" or not opts) then
-		-- this collection isnt parseable
-		-- but it's not unsafe to use
+	if (type(collection) ~= "table" or not parse) then
+		-- this collection isnt parseable but it's not unsafe to use
 		return collection
 	end
 
-	return lookup.parse_collection[opts.key](self, collection, opts.value)
+	-- get the next (first)(only) k/v pair in the parse table
+	local key, value = next(parse)
+
+	return lookup.parse_collection[key](self, collection, value)
 end
 
 -- buffer a single log event into the per-request ctx table
@@ -141,8 +143,10 @@ local function _build_collection_key(var, transform)
 	key[1] = var.type
 
 	if (var.parse ~= nil) then
-		key[2] = tostring(var.parse.key)
-		key[3] = tostring(var.parse.value)
+		local k, v = next(var.parse)
+
+		key[2] = tostring(k)
+		key[3] = tostring(v)
 		key[4] = _transform_collection_key(transform)
 	else
 		key[2] = _transform_collection_key(transform)
