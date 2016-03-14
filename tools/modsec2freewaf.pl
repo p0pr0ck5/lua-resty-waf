@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Clone qw(clone);
+use Getopt::Long qw(:config bundling no_ignore_case);
 use JSON;
 use List::MoreUtils qw(none);
 use Try::Tiny;
@@ -38,14 +39,18 @@ my $valid_vars = {
 };
 
 my $valid_operators = {
-	contains => 'CONTAINS',
-	eq       => 'EQUALS',
-	gt       => 'GREATER',
-	ipMatch  => "CIDR_MATCH",
-	pm       => "PM",
-	rx       => 'REGEX',
-	streq    => "EQUALS",
-	within   => "EXISTS",
+	contains         => 'CONTAINS',
+	eq               => 'EQUALS',
+	gt               => 'GREATER',
+	ipMatch          => "CIDR_MATCH",
+	ipMatchF         => "CIDR_MATCH",
+	ipMatchFromFile  => "CIDR_MATCH",
+	pm               => "PM",
+	pmf              => "PM",
+	pmFromFile       => "PM",
+	rx               => 'REGEX',
+	streq            => "EQUALS",
+	within           => "EXISTS",
 };
 
 my $valid_transforms = {
@@ -77,13 +82,28 @@ my $phase_lookup = {
 	5 => 'body_filter', # FreeWAF doesnt have a proper logging phase
 };
 
+my $op_sep_lookup = {
+	PM         => '\s+',
+	CIDR_MATCH => ',',
+};
+
 my $defaults = {
 	action => 'DENY',
 	phase  => 'access',
 };
 
 sub usage {
-	# run the damn thing
+	print <<"_EOF";
+Usage $0 < <data> [hqspP]a
+Translate ModSecurity configs to FreeWAF rulesets, reading from standard input and writing to standard output.
+
+  -h|--help      Print this help
+  -q|--quiet     Be quite when translating (do not print imcompatible chains)
+  -s|--silent    Be silent when translating (do not print any information apart from translated rules)
+  -p|--path      Provide an optional path to search for *FromFile data files. If not given, the current dir will be used
+  -P|--pretty    Pretty-print translated rulesets
+
+_EOF
 	exit 1;
 }
 
@@ -352,7 +372,11 @@ sub build_chains {
 
 # take an array of ModSecurity chain hashrefs and return a hashref of FreeWAF rule hashrefs (including appropriate phases)
 sub translate_chains {
-	my (@chains) = @_;
+	my ($args) = @_;
+	my @chains = @{$args->{chains}};
+	my $quiet  = $args->{quiet};
+	my $silent = $args->{silent};
+	my $path   = $args->{path};
 
 	my $freewaf_chains = {
 		access        => [],
@@ -361,17 +385,19 @@ sub translate_chains {
 	};
 
 	for my $chain (@chains) {
-		my @rules = @{$chain};
-
 		try {
-			my @translation = translate_chain(@rules);
-			my $phase       = figure_phase(@translation);
+			my @translation = translate_chain({
+				chain  => $chain,
+				silent => $silent,
+				path   => $path,
+			});
 
-			push @{$freewaf_chains->{$phase}}, [ @translation ];
+			my $phase = figure_phase(@translation);
+
+			push @{$freewaf_chains->{$phase}}, @translation;
 		} catch {
-			warn sprintf "%s\n%s\n",
-				join ("\n", map { $_->{original} } @rules),
-				$_;
+			warn "$_" if !$silent;
+			warn join ("\n", map { $_->{original} } @{$chain} ) . "\n\n" if !$quiet;
 		};
 	}
 
@@ -382,17 +408,19 @@ sub translate_chains {
 # hashrefs representing FreeWAF rules. if the translation cannot be performed
 # due to an imcompatability, die with the incompatible elements
 sub translate_chain {
-	my (@chain) = @_;
+	my ($args) = @_;
+	my @chain  = @{$args->{chain}};
+	my $silent = $args->{silent};
+	my $path   = $args->{path};
 
 	my (@freewaf_chain, $chain_action, $ctr);
-	#$ctr = 0;
 
 	for my $rule (@chain) {
 		my $translation = {};
 
 		translate_vars($rule, $translation);
-		translate_operator($rule, $translation);
-		translate_options($rule, $translation);
+		translate_operator($rule, $translation, $path);
+		translate_options($rule, $translation, $silent);
 
 		# grab the action if it was set
 		$chain_action = $action_lookup->{$translation->{action}}
@@ -448,7 +476,7 @@ sub translate_vars {
 }
 
 sub translate_operator {
-	my ($rule, $translation) = @_;
+	my ($rule, $translation, $path) = @_;
 
 	my $original_operator   = $rule->{operator}->{operator};
 	my $translated_operator = $valid_operators->{$original_operator};
@@ -460,9 +488,40 @@ sub translate_operator {
 	$translation->{op_negated} = 1 if $rule->{operator}->{negated};
 	$translation->{pattern}    = $rule->{operator}->{pattern};
 
-	# hack for lua-aho-corasick which needs the pattern as a table
-	if ($translated_operator eq 'PM') {
-		my @pattern = split /\s+/, $rule->{operator}->{pattern};
+	# this operator reads from a file.
+	# read the file and build the pattern table
+	# n.b. this regex is very simple, we rely on the
+	# fact that no other support operators end with the
+	# letter 'f' in order to support this. thanks SpiderLabs.
+	# see https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#pmf
+	# and https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#ipmatchf
+	if ($rule->{operator}->{operator} =~ m/[fF]$|FromFile$/) {
+		my @buffer;
+		my $pattern_file = $rule->{operator}->{pattern};
+
+		$path ||= '.'; # if a path wasn't given, check in the current dir
+
+		open my $fh, '<', "$path/$pattern_file" or die $!;
+
+		# read the FromFile target and build out the pattern based on its contents
+		while (my $line = <$fh>) {
+			chomp $line;
+
+			# ignore comments and blank lines
+			next if $line =~ m/^\s*$/;
+			next if $line =~ m/^\s*#/;
+
+			push @buffer, $line;
+		}
+
+		$translation->{pattern} = [ @buffer ];
+		return;
+	}
+
+	# some operator that behave on split patterns need to be adjusted
+	# as FreeWAF will expect the pattern as a table
+	if (my $special_op = $op_sep_lookup->{$translated_operator}) {
+		my @pattern = split /$special_op/, $rule->{operator}->{pattern};
 		$translation->{pattern} = \@pattern;
 	}
 
@@ -470,7 +529,7 @@ sub translate_operator {
 }
 
 sub translate_options {
-	my ($rule, $translation) = @_;
+	my ($rule, $translation, $silent) = @_;
 
 	for my $opt (@{$rule->{opts}}) {
 		my $key   = $opt->{opt};
@@ -496,7 +555,7 @@ sub translate_options {
 			my $transform = $valid_transforms->{$value};
 
 			if (!$transform) {
-				warn "Cannot perform transform $value";
+				warn "Cannot perform transform $value" if !$silent;
 				next;
 			}
 
@@ -518,14 +577,39 @@ sub figure_phase {
 }
 
 sub main {
-	my $fh = *STDIN;
+	my ($path, $quiet, $silent, $pretty);
 
-	my @cleaned_lines  = clean_input($fh);
-	my @parsed_lines   = map { parse_tokens(tokenize($_)) } @cleaned_lines;
-	my @modsec_chains  = build_chains(@parsed_lines);
-	my $freewaf_chains = translate_chains(@modsec_chains);
+	GetOptions(
+		'q|quiet'  => \$quiet,
+		's|silent' => \$silent,
+		'p|path'   => \$path,
+		'P|pretty' => \$pretty,
+		'h|help'   => sub { usage(); },
+	) or usage();
 
-	print to_json($freewaf_chains, { pretty => 1 });
+	# silent implies quiet
+	$quiet = 1 if $silent;
+
+	# ModSecurity ruleset parsing
+	# clean the input and build an array of tokens
+	my @cleaned_lines = clean_input(*STDIN);
+	my @parsed_lines  = map { parse_tokens(tokenize($_)) } @cleaned_lines;
+
+	# ModSecurity knows where it lives in a chain
+	# via pointer arithmetic and internal state handling
+	# we need to be a little more obvious about chain
+	# definitions for the purposes of translation
+	my @modsec_chains = build_chains(@parsed_lines);
+
+	# do the actual translation
+	my $freewaf_chains = translate_chains({
+		chains => \@modsec_chains,
+		path   => $path,
+		quiet  => $quiet,
+		silent => $silent,
+	});
+
+	print to_json($freewaf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
 }
 
 main();
