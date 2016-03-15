@@ -13,8 +13,8 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
-			ngx.say(value)
+			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
+			ngx.say(value[0])
 		';
 	}
 --- request
@@ -30,8 +30,8 @@ hello
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "hello, 1234"}, "([a-z])[a-z]+")
-			ngx.say(value)
+			local match, value = op.regex({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "hello, 1234"}, "([a-z])[a-z]+")
+			ngx.say(value[0])
 		';
 	}
 --- request
@@ -47,7 +47,7 @@ hello
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, "HELLO, 1234", "([a-z])[a-z]+")
+			local match, value = op.regex({ _pcre_flags = "" }, "HELLO, 1234", "([a-z])[a-z]+")
 			ngx.say(match)
 		';
 	}
@@ -64,7 +64,7 @@ nil
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "HELLO, 1234"}, "([a-z])[a-z]+")
+			local match, value = op.regex({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "HELLO, 1234"}, "([a-z])[a-z]+")
 			ngx.say(match)
 		';
 	}
@@ -81,7 +81,7 @@ nil
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "+([a-z])[a-z]+")
+			local match = op.regex({ _pcre_flags = "" }, "hello, 1234", "+([a-z])[a-z]+")
 			ngx.say(match)
 		';
 	}
@@ -89,7 +89,7 @@ nil
 GET /t
 --- error_code: 200
 --- error_log
-error in regex_match:
+error in ngx.re.match:
 --- no_error_log
 [error]
 
@@ -98,9 +98,12 @@ error in regex_match:
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
+			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])([a-z]+)")
 			ngx.say(match)
-			ngx.say(value)
+			ngx.say(value[0])
+			for k in ipairs(value) do
+				ngx.say(value[k])
+			end
 		';
 	}
 --- request
@@ -109,6 +112,8 @@ GET /t
 --- response_body
 true
 hello
+h
+ello
 --- no_error_log
 [error]
 
@@ -117,7 +122,7 @@ hello
     location = /t {
         content_by_lua '
 			local op    = require "lib.operators"
-			local match, value = op.regex_match({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
+			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
 			ngx.say(type(match))
 			ngx.say(type(value))
 		';
@@ -127,7 +132,7 @@ GET /t
 --- error_code: 200
 --- response_body
 boolean
-string
+table
 --- no_error_log
 [error]
 

@@ -99,13 +99,13 @@ function _M.contains(haystack, needle)
 	return contains, value
 end
 
-function _M.regex_match(FW, subject, pattern)
+function _M.str_find(FW, subject, pattern)
 	local opts = FW._pcre_flags
 	local from, to, err, match, value
 
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
-			match, value = _M.regex_match(FW, v, pattern)
+			match, value = _M.str_find(FW, v, pattern)
 
 			if (match) then
 				break
@@ -115,7 +115,7 @@ function _M.regex_match(FW, subject, pattern)
 		from, to, err = ngx.re.find(subject, pattern, opts)
 
 		if err then
-			ngx.log(ngx.WARN, "error in regex_match: " .. err)
+			ngx.log(ngx.WARN, "error in ngx.re.find: " .. err)
 		end
 
 		if from then
@@ -125,6 +125,33 @@ function _M.regex_match(FW, subject, pattern)
 	end
 
 	return match, value
+end
+
+function _M.regex(FW, subject, pattern)
+	local opts = FW._pcre_flags
+	local captures, err, match
+
+	if (type(subject) == "table") then
+		for _, v in ipairs(subject) do
+			match, captures = _M.regex(FW, v, pattern)
+
+			if (match) then
+				break
+			end
+		end
+	else
+		captures, err = ngx.re.match(subject, pattern, opts)
+
+		if err then
+			ngx.log(ngx.WARN, "error in ngx.re.match: " .. err)
+		end
+
+		if captures then
+			match = true
+		end
+	end
+
+	return match, captures
 end
 
 function _M.ac_lookup(needle, haystack, ctx)

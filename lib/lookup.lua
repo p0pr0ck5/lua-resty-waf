@@ -239,7 +239,7 @@ _M.write_log_events = {
 }
 
 _M.operators = {
-	REGEX      = function(FW, collection, pattern) return operators.regex_match(FW, collection, pattern) end,
+	REGEX      = function(FW, collection, pattern) return operators.regex(FW, collection, pattern) end,
 	EQUALS     = function(FW, collection, pattern) return operators.equals(collection, pattern) end,
 	GREATER    = function(FW, collection, pattern) return operators.greater(collection, pattern) end,
 	EXISTS     = function(FW, collection, pattern) return operators.exists(collection, pattern) end,
