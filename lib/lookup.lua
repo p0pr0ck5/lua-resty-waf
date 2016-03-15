@@ -134,9 +134,6 @@ _M.actions = {
 	CHAIN = function(FW, ctx)
 		logger.log(FW, "Chaining (pre-processed)")
 	end,
-	SKIP = function(FW, ctx)
-		logger.log(FW, "Skipping (pre-processed)")
-	end,
 	SCORE = function(FW, ctx)
 		local new_score = ctx.score + ctx.rule_score
 		logger.log(FW, "New score is " .. new_score)

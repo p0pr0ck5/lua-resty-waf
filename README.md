@@ -859,7 +859,6 @@ The following rule actions are currently supported:
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
 * **SETTX**: Set a per-transaction variable, using the `setvar` rule options table.
-* **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).
 
 ##Operators
 
@@ -918,7 +917,7 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 
 ##Rule Flow Precalculation
 
-FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
 
 ##Dynamic Parsing in Rule Definitions
 

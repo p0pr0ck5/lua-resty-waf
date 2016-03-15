@@ -116,6 +116,10 @@ end
 
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
+	if (not action) then
+		return
+	end
+
 	if (util.table_has_key(action, lookup.alter_actions)) then
 		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
@@ -257,7 +261,11 @@ local function _process_rule(self, rule, collections, ctx)
 
 				_rule_action(self, action, ctx, collections)
 
-				offset = rule.offset_match
+				if (opts.skip) then
+					offset = opts.skip + 1
+				else
+					offset = rule.offset_match
+				end
 
 				break
 			else
