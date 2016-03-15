@@ -39,7 +39,7 @@ my $valid_vars = {
 };
 
 my $valid_operators = {
-	contains         => 'CONTAINS',
+	contains         => 'STR_CONTAINS',
 	eq               => 'EQUALS',
 	gt               => 'GREATER',
 	ipMatch          => "CIDR_MATCH",
@@ -50,7 +50,7 @@ my $valid_operators = {
 	pmFromFile       => "PM",
 	rx               => 'REGEX',
 	streq            => "EQUALS",
-	within           => "EXISTS",
+	within           => "STR_EXISTS",
 };
 
 my $valid_transforms = {
