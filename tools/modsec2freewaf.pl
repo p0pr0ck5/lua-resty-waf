@@ -20,6 +20,7 @@ my $valid_vars = {
 	ARGS_POST_NAMES         => { type => 'REQUEST_BODY', parse => { keys => 1 } },
 	QUERY_STRING            => { type => 'QUERY_STRING' },
 	REMOTE_ADDR             => { type => 'IP' },
+	REQUEST_BODY            => { type => 'REQUEST_BODY' },
 	REQUEST_COOKIES         => { type => 'COOKIES', parse => { values => 1 } },
 	REQUEST_COOKIES_NAMES   => { type => 'COOKIES', parse => { keys => 1 } },
 	REQUEST_FILENAME        => { type => 'URI' },
