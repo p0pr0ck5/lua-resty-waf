@@ -16,11 +16,12 @@ _M.alter_actions = { ACCEPT = true, DENY = true }
 
 _M.collections = {
 	access = function(FW, collections, ctx)
-		local request_headers       = ngx.req.get_headers()
-		local request_uri_args      = ngx.req.get_uri_args()
-		local request_post_args     = request.parse_request_body(FW, request_headers)
-		local request_cookies       = request.cookies() or {}
-		local request_common_args   = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
+		local request_headers     = ngx.req.get_headers()
+		local request_uri_args    = ngx.req.get_uri_args()
+		local request_uri         = request.request_uri()
+		local request_post_args   = request.parse_request_body(FW, request_headers)
+		local request_cookies     = request.cookies() or {}
+		local request_common_args = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
 
 		collections.IP                   = ngx.var.remote_addr
 		collections.HTTP_VERSION         = ngx.req.http_version()
@@ -28,6 +29,7 @@ _M.collections = {
 		collections.URI                  = ngx.var.uri
 		collections.URI_ARGS             = request_uri_args
 		collections.QUERY_STRING         = ngx.var.query_string
+		collections.REQUEST_URI          = request_uri
 		collections.REQUEST_HEADERS      = request_headers
 		collections.COOKIES              = request_cookies
 		collections.REQUEST_BODY         = request_post_args

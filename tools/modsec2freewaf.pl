@@ -27,7 +27,7 @@ my $valid_vars = {
 	REQUEST_HEADERS_NAMES   => { type => 'REQUEST_HEADERS', parse => { keys => 1 } },
 	REQUEST_LINE            => { type => 'REQUEST_LINE' },
 	REQUEST_METHOD          => { type => 'METHOD' },
-	REQUEST_URI             => { type => 'URI' },
+	REQUEST_URI             => { type => 'REQUEST_URI' },
 	RESPONSE_BODY           => { type => 'RESPONSE_BODY' },
 	RESPONSE_CONTENT_LENGTH => { type => 'RESPONSE_HEADERS', parse => { specific => 'Content-Length' } },
 	RESPONSE_CONTENT_TYPE   => { type => 'RESPONSE_HEADERS', parse => { specific => 'Content-Type' } },

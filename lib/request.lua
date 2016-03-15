@@ -115,6 +115,20 @@ function _M.parse_request_body(FW, request_headers)
 	end
 end
 
+function _M.request_uri()
+	local request_line = {}
+	local is_args      = ngx.var.is_args
+
+	request_line[1] = ngx.var.uri
+
+	if (is_args) then
+		request_line[2] = is_args
+		request_line[3] = ngx.var.query_string
+	end
+
+	return table.concat(request_line, '')
+end
+
 function _M.cookies()
 	local cookies = cookiejar:new()
 	local request_cookies, cookie_err = cookies:get_all()
