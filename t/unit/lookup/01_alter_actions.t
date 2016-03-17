@@ -64,13 +64,3 @@ GET /t
 SCORE
 --- no_error_log
 [error]
-
-=== TEST 6: SETVAR is not an alter action
---- request
-GET /t
---- error_code: 200
---- response_body_unlike
-SETVAR
---- no_error_log
-[error]
-

@@ -110,8 +110,45 @@ local function _finalize(self, ctx)
 	-- save our options for the next phase
 	_save(self, ctx)
 
+	-- persistent variable storage
+	storage.persist(self, ctx.storage)
+
 	-- store the local copy of the ctx table
 	ngx.ctx = ctx
+end
+
+-- non-disruptive actions for persistent storage handling
+local function _handle_storage(self, opts, ctx, collections)
+	if (opts.initcol) then
+		for col, value in pairs(opts.initcol) do
+			local parsed = util.parse_dynamic_value(self, value, collections)
+
+			logger.log(self, "Initializing " .. col .. " as " .. parsed)
+
+			storage.initialize(self, ctx.storage, parsed)
+			ctx.col_lookup[col] = parsed
+			collections[col]    = ctx.storage[parsed]
+		end
+	end
+
+	if (opts.setvar) then
+		for k in ipairs(opts.setvar) do
+			local element = opts.setvar[k]
+			local value   = util.parse_dynamic_value(self, element.value, collections)
+
+			storage.set_var(self, ctx, element, value)
+		end
+	end
+
+	if (opts.expirevar) then
+		for k in ipairs(opts.expirevar) do
+			local element = opts.expirevar[k]
+
+			logger.log(self, "Expiring " .. element.col .. ":" .. element.key .. " in " .. element.time)
+
+			storage.set_var(self, ctx, element, element.time + ngx.time())
+		end
+	end
 end
 
 -- use the lookup table to figure out what to do
@@ -202,24 +239,18 @@ local function _process_rule(self, rule, collections, ctx)
 	ctx.id = id
 	ctx.rule_score = opts.score
 
-	if (opts.setvar) then
-		ctx.rule_setvar_key    = opts.setvar.key
-		ctx.rule_setvar_value  = opts.setvar.value
-		ctx.rule_setvar_expire = opts.setvar.expire
-	end
-
 	for k, v in ipairs(vars) do
 		local collection, var
 		var = vars[k]
 
 		if (type(collections[var.type]) == "function") then
-			collection = collections[var.type](self, var.opts, collections)
+			collection = collections[var.type](self)
 		else
 			local collection_key = _build_collection_key(var, opts.transform)
 
 			logger.log(self, "Checking for collection_key " .. collection_key)
 
-			if (not ctx.transform_key[collection_key]) then
+			if (not var.storage and not ctx.transform_key[collection_key]) then
 				logger.log(self, "Collection cache miss")
 				collection = _parse_collection(self, collections[var.type], var.parse)
 
@@ -227,8 +258,11 @@ local function _process_rule(self, rule, collections, ctx)
 					collection = _do_transform(self, collection, opts.transform)
 				end
 
-				ctx.transform[collection_key] = collection
+				ctx.transform[collection_key]     = collection
 				ctx.transform_key[collection_key] = true
+			elseif (var.storage) then
+				logger.log(self, "Forcing cache miss")
+				collection = _parse_collection(self, collections[var.type], var.parse)
 			else
 				logger.log(self, "Collection cache hit!")
 				collection = ctx.transform[collection_key]
@@ -259,6 +293,10 @@ local function _process_rule(self, rule, collections, ctx)
 					logger.log(self, "We had a match, but not logging because opts.nolog is set")
 				end
 
+				-- wrapper for initcol, setvar, and expirevar actions
+				_handle_storage(self, opts, ctx, collections)
+
+				-- wrapper for the rules action
 				_rule_action(self, action, ctx, collections)
 
 				if (opts.skip) then
@@ -343,13 +381,19 @@ function _M.exec(self)
 	end
 
 	ctx.altered       = ctx.altered or {}
+	ctx.col_lookup    = ctx.col_lookup or {}
 	ctx.log_entries   = ctx.log_entries or {}
+	ctx.storage       = ctx.storage or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
 	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.tx            = ctx.tx or {}
 	ctx.phase         = phase
+
+	-- pre-initialize the TX collection
+	ctx.storage["TX"]    = ctx.storage["TX"] or {}
+	ctx.col_lookup["TX"] = "TX"
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	if (ctx.altered[phase]) then
@@ -529,7 +573,7 @@ function _M.write_log_events(self)
 
 	local entry = {
 		timestamp = ngx.time(),
-		client    = ctx.collections["IP"],
+		client    = ctx.collections["REMOTE_ADDR"],
 		method    = ctx.collections["METHOD"],
 		uri       = ctx.collections["URI"],
 		alerts    = ctx.log_entries,

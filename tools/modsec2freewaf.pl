@@ -19,7 +19,7 @@ my $valid_vars = {
 	ARGS_POST               => { type => 'REQUEST_BODY', parse => { values => 1 } },
 	ARGS_POST_NAMES         => { type => 'REQUEST_BODY', parse => { keys => 1 } },
 	QUERY_STRING            => { type => 'QUERY_STRING' },
-	REMOTE_ADDR             => { type => 'IP' },
+	REMOTE_ADDR             => { type => 'REMOTE_ADDR' },
 	REQUEST_BODY            => { type => 'REQUEST_BODY' },
 	REQUEST_COOKIES         => { type => 'COOKIES', parse => { values => 1 } },
 	REQUEST_COOKIES_NAMES   => { type => 'COOKIES', parse => { keys => 1 } },
@@ -36,7 +36,8 @@ my $valid_vars = {
 	RESPONSE_HEADERS_NAMES  => { type => 'RESPONSE_HEADERS', parse => { keys => 1 } },
 	RESPONSE_STATUS         => { type => 'STATUS' },
 	SERVER_NAME             => { type => 'REQUEST_HEADERS', parse => { specific => 'Host' } },
-	TX                      => { type => 'TX' },
+	TX                      => { type => 'TX', storage => 1 },
+	IP                      => { type => 'IP', storage => 1 },
 };
 
 my $valid_operators = {
@@ -489,6 +490,9 @@ sub translate_operator {
 	$translation->{op_negated} = 1 if $rule->{operator}->{negated};
 	$translation->{pattern}    = $rule->{operator}->{pattern};
 
+	# force int
+	$translation->{pattern} +=0 if $translation->{pattern} =~ m/^\d+$/;
+
 	# this operator reads from a file.
 	# read the file and build the pattern table
 	# n.b. this regex is very simple, we rely on the
@@ -539,8 +543,18 @@ sub translate_options {
 		# easier to do this than a lookup table
 		if (grep { $_ eq $key } qw(allow block deny pass)) {
 			$translation->{action} = $key;
+		} elsif ($key eq 'expirevar') {
+			my ($var, $time)           = split /=/, $value;
+			my ($collection, $element) = split /\./, $var;
+
+			push @{$translation->{opts}->{expirevar}},
+				{ col => $collection, key => "__expire_$element", time => $time * 1 };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
+		} elsif ($key eq 'initcol') {
+			my ($col, $val) = split /=/, $value;
+
+			$translation->{opts}->{initcol}->{uc $col} = $val;
 		} elsif ($key eq 'msg') {
 			$translation->{description} = $value;
 		} elsif ($key eq 'noauditlog') {
@@ -550,6 +564,20 @@ sub translate_options {
 		} elsif ($key eq 'skip') {
 			$translation->{action} = 'SKIP';
 			$translation->{opts}->{skip} = $value;
+		} elsif ($key eq 'setvar') {
+			my ($var, $val)            = split /=/, $value;
+			my ($collection, $element) = split /\./, $var;
+
+			my $setvar = { col => $collection, key => $element };
+
+			if ($val =~ m/^\+/) {
+				substr $val, 0, 1, '';
+				$setvar->{inc} = 1;
+			}
+
+			$setvar->{value}  = $val;
+
+			push @{$translation->{opts}->{setvar}}, $setvar;
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
