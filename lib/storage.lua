@@ -11,8 +11,10 @@ function _M.initialize(FW, storage, col)
 		return
 	end
 
-	local shm        = ngx.shared[FW._storage_zone]
-	local serialized = shm:get(col)
+	local altered, serialized, shm
+	shm        = ngx.shared[FW._storage_zone]
+	serialized = shm:get(col)
+	altered    = false
 
 	if (not serialized) then
 		logger.log(FW, "Initializing an empty collection for " .. col)
@@ -30,6 +32,7 @@ function _M.initialize(FW, storage, col)
 					logger.log(FW, "Removing expired key: " .. key)
 					data["__expire_" .. key] = nil
 					data[key] = nil
+					altered = true
 				end
 			end
 		end
@@ -37,7 +40,7 @@ function _M.initialize(FW, storage, col)
 		storage[col] = data
 	end
 
-	storage[col]["__altered"] = false
+	storage[col]["__altered"] = altered
 end
 
 function _M.set_var(FW, ctx, element, value)

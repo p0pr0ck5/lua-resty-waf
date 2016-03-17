@@ -85,7 +85,44 @@ Not persisting a collection that wasn't altered
 [error]
 Persisting value: {"
 
-=== TEST 3: Don't persist the TX collection
+=== TEST 3: Persist an unaltered collection with expired keys
+--- http_config
+	lua_shared_dict store 10m;
+	init_by_lua '
+		local FreeWAF = require "fw"
+		FreeWAF.default_option("storage_zone", "store")
+		FreeWAF.default_option("debug", true)
+	';
+--- config
+    location = /t {
+        access_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
+			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10 })
+			local shm = ngx.shared[fw._storage_zone]
+			shm:set("FOO", var)
+
+			local storage = require "lib.storage"
+			storage.initialize(fw, ctx.storage, "FOO")
+
+			storage.persist(fw, ctx.storage)
+		';
+
+		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- error_log
+Examining FOO
+Persisting value: {"
+--- no_error_log
+[error]
+Not persisting a collection that wasn't altered
+
+=== TEST 4: Don't persist the TX collection
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '

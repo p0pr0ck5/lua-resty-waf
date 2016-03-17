@@ -70,6 +70,8 @@ Initializing an empty collection for FOO
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
+
+			ngx.say(ngx.ctx["__altered"])
 		';
 	}
 --- request
@@ -77,6 +79,7 @@ GET /t
 --- error_code: 200
 --- response_body
 a: b
+false
 --- no_error_log
 [error]
 Initializing an empty collection for FOO
@@ -114,6 +117,8 @@ Removing expired key:
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
+
+			ngx.say(ngx.ctx["__altered"])
 		';
 	}
 --- request
@@ -121,6 +126,7 @@ GET /t
 --- error_code: 200
 --- response_body
 a: b
+true
 --- error_log
 Removing expired key: c
 --- no_error_log
@@ -159,6 +165,8 @@ Initializing an empty collection for FOO
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
+
+			ngx.say(ngx.ctx["__altered"])
 		';
 	}
 --- request
@@ -166,6 +174,7 @@ GET /t
 --- error_code: 200
 --- response_body
 a: b
+true
 --- error_log
 Removing expired key: c
 --- no_error_log
