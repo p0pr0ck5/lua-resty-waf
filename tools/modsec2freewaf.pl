@@ -420,8 +420,13 @@ sub translate_chain {
 	for my $rule (@chain) {
 		my $translation = {};
 
-		translate_vars($rule, $translation);
-		translate_operator($rule, $translation, $path);
+		if ($rule->{directive} eq 'SecRule') {
+			translate_vars($rule, $translation);
+			translate_operator($rule, $translation, $path);
+		} elsif ($rule->{directive} eq 'SecAction') {
+			push @{$translation->{vars}}, { unconditional => 1 };
+		}
+
 		translate_options($rule, $translation, $silent);
 
 		# grab the action if it was set

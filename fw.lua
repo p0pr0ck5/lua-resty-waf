@@ -245,7 +245,9 @@ local function _process_rule(self, rule, collections, ctx)
 		local collection, var
 		var = vars[k]
 
-		if (type(collections[var.type]) == "function") then
+		if (var.unconditional) then
+			collection = true
+		elseif (type(collections[var.type]) == "function") then
 			collection = collections[var.type](self)
 		else
 			local collection_key = _build_collection_key(var, opts.transform)
@@ -285,7 +287,14 @@ local function _process_rule(self, rule, collections, ctx)
 				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
-			local match, value = lookup.operators[operator](self, collection, pattern, ctx)
+			local match, value
+
+			if (var.unconditional) then
+				match = true
+				value = 1
+			else
+				match, value = lookup.operators[operator](self, collection, pattern, ctx)
+			end
 
 			if (rule.op_negated) then
 				match = not match
