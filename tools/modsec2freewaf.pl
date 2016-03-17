@@ -415,7 +415,7 @@ sub translate_chain {
 	my $silent = $args->{silent};
 	my $path   = $args->{path};
 
-	my (@freewaf_chain, $chain_action, $ctr);
+	my (@freewaf_chain, $chain_action, $chain_id, $ctr);
 
 	for my $rule (@chain) {
 		my $translation = {};
@@ -432,6 +432,14 @@ sub translate_chain {
 		# grab the action if it was set
 		$chain_action = $action_lookup->{$translation->{action}}
 			if $translation->{action};
+
+		# assign the same ID to each rule in the chain
+		# it is guaranteed that the first rule in a
+		# ModSecurity chain must have a valid, unique ID
+		# FreeWAF only requires that each rule has an ID,
+		# not that each rule's ID must be unique
+		$chain_id = $translation->{id} if $translation->{id};
+		$translation->{id} = $chain_id if ! $translation->{id};
 
 		# if we're the last (or only) rule in the chain,
 		# set our action as the chain action
