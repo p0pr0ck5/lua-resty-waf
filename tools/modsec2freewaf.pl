@@ -468,7 +468,7 @@ sub translate_vars {
 		}
 
 		if (defined $modifier && $modifier eq '&') {
-			$translated_var->{parse}->{length} = 1;
+			$translated_var->{length} = 1;
 		}
 
 		push @{$translation->{vars}}, $translated_var;

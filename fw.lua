@@ -189,8 +189,10 @@ local function _build_collection_key(var, transform)
 		key[2] = tostring(k)
 		key[3] = tostring(v)
 		key[4] = _transform_collection_key(transform)
+		key[5] = tostring(var.length)
 	else
 		key[2] = _transform_collection_key(transform)
+		key[3] = tostring(var.length)
 	end
 
 	return table.concat(key, "|")
@@ -256,6 +258,11 @@ local function _process_rule(self, rule, collections, ctx)
 
 				if (opts.transform) then
 					collection = _do_transform(self, collection, opts.transform)
+				end
+
+				if (collection and var.length) then
+					logger.log(self, "col length is " .. #collection)
+					collection = #collection
 				end
 
 				ctx.transform[collection_key]     = collection
