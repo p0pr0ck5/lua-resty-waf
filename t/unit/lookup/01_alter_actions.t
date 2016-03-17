@@ -56,16 +56,7 @@ CHAIN
 --- no_error_log
 [error]
 
-=== TEST 5: SKIP is not an alter action
---- request
-GET /t
---- error_code: 200
---- response_body_unlike
-SKIP
---- no_error_log
-[error]
-
-=== TEST 6: SCORE is not an alter action
+=== TEST 5: SCORE is not an alter action
 --- request
 GET /t
 --- error_code: 200
@@ -73,13 +64,3 @@ GET /t
 SCORE
 --- no_error_log
 [error]
-
-=== TEST 7: SETVAR is not an alter action
---- request
-GET /t
---- error_code: 200
---- response_body_unlike
-SETVAR
---- no_error_log
-[error]
-

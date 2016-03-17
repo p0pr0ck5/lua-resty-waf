@@ -27,7 +27,8 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals(1, 1))
+			local equals, value = op.equals(1, 1)
+			ngx.say(equals)
         ';
     }
 --- request
@@ -43,7 +44,8 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals(1, 2))
+			local equals, value = op.equals(1, 2)
+			ngx.say(equals)
         ';
     }
 --- request
@@ -59,7 +61,8 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals("foo", "foo"))
+			local equals, value = op.equals("foo", "foo")
+			ngx.say(equals)
         ';
     }
 --- request
@@ -75,7 +78,8 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals("foo", "bar"))
+			local equals, value = op.equals("foo", "bar")
+			ngx.say(equals)
         ';
     }
 --- request
@@ -91,7 +95,8 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({3, 2, 1}, 1))
+			local equals, value = op.equals({3, 2, 1}, 1)
+			ngx.say(equals)
         ';
     }
 --- request
@@ -107,7 +112,8 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({3, 2, 0}, 1))
+			local equals, value = op.equals({3, 2, 0}, 1)
+			ngx.say(equals)
         ';
     }
 --- request
@@ -123,7 +129,8 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({"bar", "foo"}, "foo"))
+			local equals, value = op.equals({"bar", "foo"}, "foo")
+			ngx.say(equals)
         ';
     }
 --- request
@@ -139,7 +146,8 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals({"bar", "baz"}, "foo"))
+			local equals, value = op.equals({"bar", "baz"}, "foo")
+			ngx.say(equals)
         ';
     }
 --- request
@@ -155,7 +163,8 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals("nil", nil))
+			local equals, value = op.equals("nil", nil)
+			ngx.say(equals)
         ';
     }
 --- request
@@ -171,13 +180,52 @@ false
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			ngx.say(op.equals("7", 7))
+			local equals, value = op.equals("7", 7)
+			ngx.say(equals)
         ';
     }
 --- request
     GET /t
 --- response_body
 false
+--- error_code: 200
+--- no_error_log
+[error]
+
+=== TEST 12: return values
+--- config
+    location = /t {
+        content_by_lua '
+			local op = require "lib.operators"
+			local equals, value = op.equals("foo", "foo")
+			ngx.say(equals)
+			ngx.say(value)
+        ';
+    }
+--- request
+    GET /t
+--- response_body
+true
+foo
+--- error_code: 200
+--- no_error_log
+[error]
+
+=== TEST 13: return value types
+--- config
+    location = /t {
+        content_by_lua '
+			local op = require "lib.operators"
+			local equals, value = op.equals("foo", "foo")
+			ngx.say(type(equals))
+			ngx.say(type(value))
+        ';
+    }
+--- request
+    GET /t
+--- response_body
+boolean
+string
 --- error_code: 200
 --- no_error_log
 [error]

@@ -4,10 +4,8 @@ _M.version = "0.6.0"
 
 local cjson         = require("cjson")
 local file_logger   = require("inc.resty.logger.file")
-local iputils       = require("inc.resty.iputils")
 local socket_logger = require("inc.resty.logger.socket")
 
-local cidr_lib  = require("lib.cidr")
 local logger    = require("lib.log")
 local operators = require("lib.operators")
 local request   = require("lib.request")
@@ -18,39 +16,39 @@ _M.alter_actions = { ACCEPT = true, DENY = true }
 
 _M.collections = {
 	access = function(FW, collections, ctx)
-		local request_headers       = ngx.req.get_headers()
-		local request_uri_args      = ngx.req.get_uri_args()
-		local request_post_args     = request.parse_request_body(FW, request_headers)
-		local request_cookies       = request.cookies() or {}
-		local request_common_args   = request.common_args(FW, { request_uri_args, request_post_args, request_cookies })
+		local request_headers     = ngx.req.get_headers()
+		local request_uri_args    = ngx.req.get_uri_args()
+		local request_uri         = request.request_uri()
+		local request_body        = request.parse_request_body(FW, request_headers)
+		local request_cookies     = request.cookies() or {}
+		local request_common_args = request.common_args(FW, { request_uri_args, request_body, request_cookies })
 
-		collections.IP                   = ngx.var.remote_addr
-		collections.HTTP_VERSION         = ngx.req.http_version()
-		collections.METHOD               = ngx.req.get_method()
-		collections.URI                  = ngx.var.uri
-		collections.URI_ARGS             = request_uri_args
-		collections.REQUEST_HEADERS      = request_headers
-		collections.REQUEST_HEADER_NAMES = util.table_keys(request_headers)
-		collections.USER_AGENT           = ngx.var.http_user_agent
-		collections.COOKIES              = request_cookies
-		collections.REQUEST_BODY         = request_post_args
-		collections.REQUEST_ARGS         = request_common_args
-		collections.VAR                  = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections) end
-		collections.TX                   = function(FW, opts, collections) return storage.get_var(FW, opts.value, collections, ctx.tx) end
-		collections.NGX_VAR              = ngx.var
-		collections.SCORE                = function() return ctx.score end
-		collections.SCORE_THRESHOLD      = function(FW) return FW._score_threshold end
+		collections.REMOTE_ADDR     = ngx.var.remote_addr
+		collections.HTTP_VERSION    = ngx.req.http_version()
+		collections.METHOD          = ngx.req.get_method()
+		collections.URI             = ngx.var.uri
+		collections.URI_ARGS        = request_uri_args
+		collections.QUERY_STRING    = ngx.var.query_string
+		collections.REQUEST_URI     = request_uri
+		collections.REQUEST_HEADERS = request_headers
+		collections.COOKIES         = request_cookies
+		collections.REQUEST_BODY    = request_body
+		collections.REQUEST_ARGS    = request_common_args
+		collections.REQUEST_LINE    = ngx.var.request
+		collections.TX              = ctx.storage["TX"]
+		collections.NGX_VAR         = ngx.var
+		collections.SCORE           = function() return ctx.score end
+		collections.SCORE_THRESHOLD = function(FW) return FW._score_threshold end
 	end,
 	header_filter = function(FW, collections)
 		local response_headers = ngx.resp.get_headers()
 
 		collections.RESPONSE_HEADERS      = response_headers
-		collections.RESPONSE_HEADER_NAMES = util.table_keys(response_headers)
 		collections.STATUS                = ngx.status
 	end,
 	body_filter = function(FW, collections, ctx)
 		if ctx.buffers == nil then
-			ctx.buffers = {}
+			ctx.buffers  = {}
 			ctx.nbuffers = 0
 		end
 
@@ -135,9 +133,6 @@ _M.actions = {
 	CHAIN = function(FW, ctx)
 		logger.log(FW, "Chaining (pre-processed)")
 	end,
-	SKIP = function(FW, ctx)
-		logger.log(FW, "Skipping (pre-processed)")
-	end,
 	SCORE = function(FW, ctx)
 		local new_score = ctx.score + ctx.rule_score
 		logger.log(FW, "New score is " .. new_score)
@@ -151,12 +146,6 @@ _M.actions = {
 	end,
 	IGNORE = function(FW)
 		logger.log(FW, "Ignoring rule for now")
-	end,
-	SETVAR = function(FW, ctx, collections)
-		storage.set_var(FW, ctx, collections)
-	end,
-	SETTX = function(FW, ctx, collections)
-		storage.set_var(FW, ctx, collections, true)
 	end,
 }
 
@@ -240,22 +229,16 @@ _M.write_log_events = {
 }
 
 _M.operators = {
-	REGEX          = function(FW, subject, pattern) return operators.regex_match(FW, subject, pattern) end,
-	NOT_REGEX      = function(FW, subject, pattern) return not operators.regex_match(FW, subject, pattern) end,
-	EQUALS         = function(FW, a, b) return operators.equals(a, b) end,
-	NOT_EQUALS     = function(FW, a, b) return not operators.equals(a, b) end,
-	GREATER        = function(FW, a, b) return operators.greater(a, b) end,
-	NOT_GREATER    = function(FW, a, b) return not operators.greater(a, b) end,
-	EXISTS         = function(FW, needle, haystack) return util.table_has_value(needle, haystack) end,
-	NOT_EXISTS     = function(FW, needle, haystack) return not util.table_has_value(needle, haystack) end,
-	CONTAINS       = function(FW, haystack, needle) return util.table_has_value(needle, haystack) end,
-	NOT_CONTAINS   = function(FW, haystack, needle) return not util.table_has_value(needle, haystack) end,
-	PM             = function(FW, needle, haystack, ctx) return operators.ac_lookup(needle, haystack, ctx) end,
-	NOT_PM         = function(FW, needle, haystack, ctx) return not operators.ac_lookup(needle, haystack, ctx) end,
-	CIDR_MATCH     = function(FW, ip, cidrs) return operators.cidr_match(ip, cidrs) end,
-	NOT_CIDR_MATCH = function(FW, ip, cidrs) return not operators.cidr_match(ip, cidrs) end,
+	REGEX        = function(FW, collection, pattern) return operators.regex(FW, collection, pattern) end,
+	EQUALS       = function(FW, collection, pattern) return operators.equals(collection, pattern) end,
+	GREATER      = function(FW, collection, pattern) return operators.greater(collection, pattern) end,
+	EXISTS       = function(FW, collection, pattern) return operators.exists(collection, pattern) end,
+	CONTAINS     = function(FW, collection, pattern) return operators.contains(collection, pattern) end,
+	STR_EXISTS   = function(FW, collection, pattern) return operators.str_find(FW, pattern, collection) end,
+	STR_CONTAINS = function(FW, collection, pattern) return operators.str_find(FW, collection, pattern) end,
+	PM           = function(FW, collection, pattern, ctx) return operators.ac_lookup(collection, pattern, ctx) end,
+	CIDR_MATCH   = function(FW, collection, pattern) return operators.cidr_match(collection, pattern) end,
 }
-
 
 _M.set_option = {
 	ignore_ruleset = function(FW, value)
@@ -291,12 +274,6 @@ _M.set_option = {
 	event_log_ngx_vars = function(FW, value)
 		local t = FW._event_log_ngx_vars
 		FW._event_log_ngx_vars[#t + 1] = value
-	end,
-	process_cidr = function(FW, value)
-		if (not cidr_lib.cidrs[value]) then
-			local lower, upper = iputils.parse_cidr(value)
-			cidr_lib.cidrs[value] = { lower, upper }
-		end
 	end,
 }
 

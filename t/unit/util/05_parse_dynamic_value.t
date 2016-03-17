@@ -27,13 +27,13 @@ foo
 --- no_error_log
 [error]
 
-=== TEST 2: Parse IP
+=== TEST 2: Parse REMOTE_ADDR
 --- config
 	location /t {
 		content_by_lua '
 			local util   = require "lib.util"
-			local key    = "%{IP}"
-			local coll   = { IP = ngx.var.remote_addr }
+			local key    = "%{REMOTE_ADDR}"
+			local coll   = { REMOTE_ADDR = ngx.var.remote_addr }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
 			ngx.say(parsed)
 		';
@@ -127,7 +127,7 @@ URI_ARGS
 	location /t {
 		content_by_lua '
 			local util   = require "lib.util"
-			local key    = "%{URI_ARGS:foo}"
+			local key    = "%{URI_ARGS.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
 			ngx.say(parsed)
@@ -146,7 +146,7 @@ bar
 	location /t {
 		content_by_lua '
 			local util   = require "lib.util"
-			local key    = "%{URI_ARGS:foo}"
+			local key    = "%{URI_ARGS.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
 			ngx.say(parsed)
@@ -165,8 +165,8 @@ nil
 	location /t {
 		content_by_lua '
 			local util   = require "lib.util"
-			local key    = "%{IPP}"
-			local coll   = { IP = "127.0.0.1" }
+			local key    = "%{REMOTE_ADDRP}"
+			local coll   = { REMOTE_ADDR = "127.0.0.1" }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
 			ngx.say(parsed)
 		';
@@ -176,5 +176,5 @@ GET /t
 --- error_code: 500
 --- error_log
 [error]
-Bad dynamic parse, no collection key IPP
+Bad dynamic parse, no collection key REMOTE_ADDRP
 

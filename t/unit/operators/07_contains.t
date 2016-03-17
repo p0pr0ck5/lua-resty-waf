@@ -13,7 +13,7 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(match)
 		';
 	}
@@ -30,7 +30,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, { "bang", "bash", "qux" })
 			ngx.say(match)
 		';
 	}
@@ -47,7 +47,7 @@ true
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup("far", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "far")
 			ngx.say(match)
 		';
 	}
@@ -55,7 +55,7 @@ true
 GET /t
 --- error_code: 200
 --- response_body
-nil
+false
 --- no_error_log
 [error]
 
@@ -64,7 +64,7 @@ nil
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, { "bang", "bash", "quz" })
 			ngx.say(match)
 		';
 	}
@@ -72,7 +72,7 @@ nil
 GET /t
 --- error_code: 200
 --- response_body
-nil
+false
 --- no_error_log
 [error]
 
@@ -81,7 +81,7 @@ nil
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(match)
 			ngx.say(value)
 		';
@@ -100,7 +100,7 @@ foo
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(type(match))
 			ngx.say(type(value))
 		';

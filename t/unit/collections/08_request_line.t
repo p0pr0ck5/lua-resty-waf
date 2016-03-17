@@ -8,7 +8,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: REQUEST_HEADER_NAMES collections variable (single element)
+=== TEST 1: REQUEST_LINE collections variable (simple)
 --- config
 	location /t {
 		access_by_lua '
@@ -20,22 +20,19 @@ __DATA__
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local util        = require "lib.util"
 
-			ngx.say(util.table_has_value("x-foo", collections.REQUEST_HEADER_NAMES))
+			ngx.say(collections.REQUEST_LINE)
 		';
 	}
 --- request
 GET /t
---- more_headers
-X-Foo: bar
 --- error_code: 200
 --- response_body
-true
+GET /t HTTP/1.1
 --- no_error_log
 [error]
 
-=== TEST 2: REQUEST_HEADER_NAMES collections variable (multiple elements)
+=== TEST 2: REQUEST_LINE collections variable (single pair)
 --- config
 	location /t {
 		access_by_lua '
@@ -47,23 +44,19 @@ true
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local util        = require "lib.util"
 
-			ngx.say(util.table_has_value("x-foo", collections.REQUEST_HEADER_NAMES))
+			ngx.say(collections.REQUEST_LINE)
 		';
 	}
 --- request
-GET /t
---- more_headers
-X-Foo: bar
-X-Foo: baz
+GET /t?foo=bar
 --- error_code: 200
 --- response_body
-true
+GET /t?foo=bar HTTP/1.1
 --- no_error_log
 [error]
 
-=== TEST 3: REQUEST_HEADER_NAMES collections variable (non-existent element)
+=== TEST 3: REQUEST_LINE collections variable (complex)
 --- config
 	location /t {
 		access_by_lua '
@@ -75,20 +68,19 @@ true
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local util        = require "lib.util"
 
-			ngx.say(util.table_has_value("x-foo", collections.REQUEST_HEADER_NAMES))
+			ngx.say(collections.REQUEST_LINE)
 		';
 	}
 --- request
-GET /t
+GET /t?foo=bar&foo=bat&frob&qux=
 --- error_code: 200
 --- response_body
-false
+GET /t?foo=bar&foo=bat&frob&qux= HTTP/1.1
 --- no_error_log
 [error]
 
-=== TEST 4: REQUEST_HEADER_NAMES collections variable (type verification)
+=== TEST 4: REQUEST_LINE collections variable (type verification)
 --- config
 	location /t {
 		access_by_lua '
@@ -100,18 +92,15 @@ false
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local util = require "lib.util"
 
-			ngx.say(type(collections.REQUEST_HEADER_NAMES))
+			ngx.say(type(collections.REQUEST_LINE))
 		';
 	}
 --- request
 GET /t
---- more_headers
-X-Foo: bar
 --- error_code: 200
 --- response_body
-table
+string
 --- no_error_log
 [error]
 

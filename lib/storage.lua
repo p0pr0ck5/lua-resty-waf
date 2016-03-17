@@ -2,81 +2,94 @@ local _M = {}
 
 _M.version = "0.6.0"
 
+local cjson  = require("cjson")
 local logger = require("lib.log")
 local util   = require("lib.util")
 
--- retrieve a given key from persistent storage
-function _M.retrieve_persistent_var(FW, key, tx)
-	if (tx) then
-		return tx[key]
-	else
-		local shm = ngx.shared[FW._storage_zone]
-		return shm:get(key)
-	end
-end
-
--- wrapper to get persistent storage data
-function _M.get_var(FW, key, collections, tx)
-	-- silently bail from rules that require persistent storage if no shm was configured
-	if (not tx and not FW._storage_zone) then
+function _M.initialize(FW, storage, col)
+	if (not FW._storage_zone) then
 		return
 	end
 
-	return _M.retrieve_persistent_var(FW, util.parse_dynamic_value(FW, key, collections), tx)
+	local altered, serialized, shm
+	shm        = ngx.shared[FW._storage_zone]
+	serialized = shm:get(col)
+	altered    = false
+
+	if (not serialized) then
+		logger.log(FW, "Initializing an empty collection for " .. col)
+		storage[col] = {}
+	else
+		local data = cjson.decode(serialized)
+
+		-- because we're serializing out the contents of the collection
+		-- we need to roll our own expire handling. lua_shared_dict's
+		-- internal expiry can't act on individual collection elements
+		for key in pairs(data) do
+			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
+				logger.log(FW, "checking " .. key)
+				if (data["__expire_" .. key] < ngx.time()) then
+					logger.log(FW, "Removing expired key: " .. key)
+					data["__expire_" .. key] = nil
+					data[key] = nil
+					altered = true
+				end
+			end
+		end
+
+		storage[col] = data
+	end
+
+	storage[col]["__altered"] = altered
 end
 
--- add/update data to persistent storaage
-function _M.set_var(FW, ctx, collections, tx_flag)
-	-- silently bail from rules that require persistent storage if no shm was configured
-	if (not tx_flag and not FW._storage_zone) then
+function _M.set_var(FW, ctx, element, value)
+	local col     = ctx.col_lookup[string.upper(element.col)]
+	local key     = element.key
+	local inc     = element.inc
+	local storage = ctx.storage
+
+	if (inc) then
+		local existing = storage[col][key]
+
+		if (existing and type(existing) ~= "number") then
+			logger.fatal_fail("Cannot increment a value that was not previously a number")
+		elseif (not existing) then
+			logger.log(FW, "Incrementing a non-existing value")
+			existing = 0
+		end
+
+		value = value + existing
+	end
+
+	logger.log(FW, "Setting " .. col .. ":" .. key .. " to " .. value)
+
+	-- save data to in-memory table
+	-- data not in the TX col will be persisted at the end of the phase
+	storage[col][key]         = value
+	storage[col]["__altered"] = true
+end
+
+function _M.persist(FW, storage)
+	if (not FW._storage_zone) then
 		return
 	end
 
-	local key    = util.parse_dynamic_value(FW, ctx.rule_setvar_key, collections)
-	local value  = util.parse_dynamic_value(FW, ctx.rule_setvar_value, collections)
-	local expire = ctx.rule_setvar_expire or 0
+	local shm = ngx.shared[FW._storage_zone]
 
-	logger.log(FW, "Initially setting " .. ctx.rule_setvar_key .. " to " .. ctx.rule_setvar_value)
+	for col in pairs(storage) do
+		if (col ~= 'TX') then
+			logger.log(FW, 'Examining ' .. col)
 
-	-- values can have arithmetic operations performed on them
-	local incr = ngx.re.match(value, [=[^([\+\-\*\/])(\d+)]=], FW._pcre_flags)
+			if (storage[col]["__altered"]) then
+				local serialized = cjson.encode(storage[col])
 
-	if (incr) then
-		local operator = incr[1]
-		local newval   = incr[2]
-		local oldval
+				logger.log(FW, 'Persisting value: ' .. tostring(serialized))
 
-		if (tx_flag) then
-			oldval = _M.retrieve_persistent_var(FW, key, ctx.tx)
-		else
-			oldval = _M.retrieve_persistent_var(FW, key)
-		end
-
-		if (not oldval) then
-			oldval = 0
-		end
-
-		if (operator == "+") then
-			value = oldval + newval
-		elseif (operator == "-") then
-			value = oldval - newval
-		elseif (operator == "*") then
-			value = oldval * newval
-		elseif (operator == "/") then
-			value = oldval / newval
-		end
-	end
-
-	logger.log(FW, "Actually setting " .. key .. " to " .. value)
-
-	if (tx_flag) then
-		ctx.tx[key] = value
-	else
-		local shm = ngx.shared[FW._storage_zone]
-		local ok = shm:safe_set(key, value, expire)
-
-		if (not ok) then
-			ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. FW._storage_zone)
+				shm:set(col, serialized)
+			else
+				logger.log(FW, "Not persisting a collection that wasn't altered")
+			end
 		end
 	end
 end

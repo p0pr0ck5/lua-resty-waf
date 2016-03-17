@@ -16,35 +16,40 @@ local mt = { __index = _M }
 -- default list of rulesets (global here to have offsets precomputed)
 _global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
+-- ruleset table cache
+_ruleset_defs = {}
+
 -- default options
 local default_opts = util.table_copy(opts.defaults)
 
 -- get a subset or superset of request data collection
-local function _parse_collection(self, collection, opts)
-	if (type(collection) ~= "table" and opts) then
+local function _parse_collection(self, collection, parse)
+	if (type(collection) ~= "table" and parse) then
 		-- if a collection isn't a table it can't be parsed,
 		-- so we shouldn't return the original collection as
 		-- it may have an illegal operator called on it
 		return nil
 	end
 
-	if (type(collection) ~= "table" or not opts) then
-		-- this collection isnt parseable but it's
-		-- not unsafe to use
+	if (type(collection) ~= "table" or not parse) then
+		-- this collection isnt parseable but it's not unsafe to use
 		return collection
 	end
 
-	return lookup.parse_collection[opts.key](self, collection, opts.value)
+	-- get the next (first)(only) k/v pair in the parse table
+	local key, value = next(parse)
+
+	return lookup.parse_collection[key](self, collection, value)
 end
 
 -- buffer a single log event into the per-request ctx table
 -- all event logs will be written out at the completion of the transaction if either:
 -- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
 -- 2. the event_log_altered_only option is unset
-local function _log_event(self, rule, match, ctx)
+local function _log_event(self, rule, value, ctx)
 	local t = {
 		id    = rule.id,
-		match = match
+		match = value
 	}
 
 	if (self._event_log_verbosity > 1) then
@@ -105,12 +110,53 @@ local function _finalize(self, ctx)
 	-- save our options for the next phase
 	_save(self, ctx)
 
+	-- persistent variable storage
+	storage.persist(self, ctx.storage)
+
 	-- store the local copy of the ctx table
 	ngx.ctx = ctx
 end
 
+-- non-disruptive actions for persistent storage handling
+local function _handle_storage(self, opts, ctx, collections)
+	if (opts.initcol) then
+		for col, value in pairs(opts.initcol) do
+			local parsed = util.parse_dynamic_value(self, value, collections)
+
+			logger.log(self, "Initializing " .. col .. " as " .. parsed)
+
+			storage.initialize(self, ctx.storage, parsed)
+			ctx.col_lookup[col] = parsed
+			collections[col]    = ctx.storage[parsed]
+		end
+	end
+
+	if (opts.setvar) then
+		for k in ipairs(opts.setvar) do
+			local element = opts.setvar[k]
+			local value   = util.parse_dynamic_value(self, element.value, collections)
+
+			storage.set_var(self, ctx, element, value)
+		end
+	end
+
+	if (opts.expirevar) then
+		for k in ipairs(opts.expirevar) do
+			local element = opts.expirevar[k]
+
+			logger.log(self, "Expiring " .. element.col .. ":" .. element.key .. " in " .. element.time)
+
+			storage.set_var(self, ctx, element, element.time + ngx.time())
+		end
+	end
+end
+
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
+	if (not action) then
+		return
+	end
+
 	if (util.table_has_key(action, lookup.alter_actions)) then
 		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
@@ -120,7 +166,7 @@ local function _rule_action(self, action, ctx, collections)
 end
 
 -- build the transform portion of the collection memoization key
-local function _transform_memokey(transform)
+local function _transform_collection_key(transform)
 	if (not transform) then
 		return 'nil'
 	end
@@ -130,6 +176,26 @@ local function _transform_memokey(transform)
 	else
 		return table.concat(transform, ',')
 	end
+end
+
+-- build the collection memoization key
+local function _build_collection_key(var, transform)
+	local key = {}
+	key[1] = var.type
+
+	if (var.parse ~= nil) then
+		local k, v = next(var.parse)
+
+		key[2] = tostring(k)
+		key[3] = tostring(v)
+		key[4] = _transform_collection_key(transform)
+		key[5] = tostring(var.length)
+	else
+		key[2] = _transform_collection_key(transform)
+		key[3] = tostring(var.length)
+	end
+
+	return table.concat(key, "|")
 end
 
 -- transform collection values based on rule opts
@@ -164,78 +230,101 @@ end
 
 -- process an individual rule
 local function _process_rule(self, rule, collections, ctx)
-	local id      = rule.id
-	local var     = rule.var
-	local opts    = rule.opts or {}
-	local action  = rule.action
-	local pattern = var.pattern
+	local id       = rule.id
+	local vars     = rule.vars
+	local opts     = rule.opts or {}
+	local action   = rule.action
+	local pattern  = rule.pattern
+	local operator = rule.operator
+	local offset
 
 	ctx.id = id
 	ctx.rule_score = opts.score
 
-	if (opts.setvar) then
-		ctx.rule_setvar_key    = opts.setvar.key
-		ctx.rule_setvar_value  = opts.setvar.value
-		ctx.rule_setvar_expire = opts.setvar.expire
-	end
+	for k, v in ipairs(vars) do
+		local collection, var
+		var = vars[k]
 
-	local collection, match, offset
-
-	if (type(collections[var.type]) == "function") then -- dynamic collection data - pers. storage, score, etc
-		collection = collections[var.type](self, var.opts, collections)
-	else
-		local memokey
-
-		if (var.opts ~= nil) then
-			memokey = var.type .. tostring(var.opts.key) .. tostring(var.opts.value)
+		if (var.unconditional) then
+			collection = true
+		elseif (type(collections[var.type]) == "function") then
+			collection = collections[var.type](self)
 		else
-			memokey = var.type
-		end
-		memokey = memokey .. _transform_memokey(opts.transform)
+			local collection_key = _build_collection_key(var, opts.transform)
 
-		logger.log(self, "Checking for memokey " .. memokey)
+			logger.log(self, "Checking for collection_key " .. collection_key)
 
-		if (not ctx.transform_key[memokey]) then
-			logger.log(self, "Parse collection cache not found")
-			collection = _parse_collection(self, collections[var.type], var.opts)
+			if (not var.storage and not ctx.transform_key[collection_key]) then
+				logger.log(self, "Collection cache miss")
+				collection = _parse_collection(self, collections[var.type], var.parse)
 
-			if (opts.transform) then
-				collection = _do_transform(self, collection, opts.transform)
-			end
+				if (opts.transform) then
+					collection = _do_transform(self, collection, opts.transform)
+				end
 
-			ctx.transform[memokey] = collection
-			ctx.transform_key[memokey] = true
-		else
-			logger.log(self, "Parse collection cache hit!")
-			collection = ctx.transform[memokey]
-		end
-	end
+				if (collection and var.length) then
+					logger.log(self, "col length is " .. #collection)
+					collection = #collection
+				end
 
-	if (not collection) then
-		logger.log(self, "parse_collection didnt return anything for " .. var.type)
-		offset = rule.offset_nomatch
-	else
-		if (opts.parsepattern) then
-			logger.log(self, "Parsing dynamic pattern: " .. pattern)
-			pattern = util.parse_dynamic_value(self, pattern, collections)
-		end
-
-		match = lookup.operators[var.operator](self, collection, pattern, ctx)
-
-		if (match) then
-			logger.log(self, "Match of rule " .. id)
-
-			if (not opts.nolog) then
-				_log_event(self, rule, match, ctx)
+				ctx.transform[collection_key]     = collection
+				ctx.transform_key[collection_key] = true
+			elseif (var.storage) then
+				logger.log(self, "Forcing cache miss")
+				collection = _parse_collection(self, collections[var.type], var.parse)
 			else
-				logger.log(self, "We had a match, but not logging because opts.nolog is set")
+				logger.log(self, "Collection cache hit!")
+				collection = ctx.transform[collection_key]
+			end
+		end
+
+		if (not collection) then
+			logger.log(self, "No values for this collection")
+			offset = rule.offset_nomatch
+		else
+			if (opts.parsepattern) then
+				logger.log(self, "Parsing dynamic pattern: " .. pattern)
+				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
-			_rule_action(self, action, ctx, collections)
+			local match, value
 
-			offset = rule.offset_match
-		else
-			offset = rule.offset_nomatch
+			if (var.unconditional) then
+				match = true
+				value = 1
+			else
+				match, value = lookup.operators[operator](self, collection, pattern, ctx)
+			end
+
+			if (rule.op_negated) then
+				match = not match
+			end
+
+			if (match) then
+				logger.log(self, "Match of rule " .. id)
+
+				if (not opts.nolog) then
+					_log_event(self, rule, value, ctx)
+				else
+					logger.log(self, "We had a match, but not logging because opts.nolog is set")
+				end
+
+				-- wrapper for initcol, setvar, and expirevar actions
+				_handle_storage(self, opts, ctx, collections)
+
+				-- wrapper for the rules action
+				_rule_action(self, action, ctx, collections)
+
+				if (opts.skip) then
+					offset = opts.skip + 1
+				else
+					offset = rule.offset_match
+				end
+
+				break
+			else
+				offset = rule.offset_nomatch
+			end
 		end
 	end
 
@@ -245,17 +334,15 @@ end
 
 -- calculate rule jump offsets
 local function _calculate_offset(ruleset)
-	local r = require("rules." .. ruleset)
-
 	for phase, i in pairs(phase_t.phases) do
-		if (r.rules[phase]) then
-			calc.calculate(r.rules[phase])
+		if (ruleset[phase]) then
+			calc.calculate(ruleset[phase])
 		else
-			r.rules[phase] = {}
+			ruleset[phase] = {}
 		end
 	end
 
-	r.initted = true
+	ruleset.initted = true
 end
 
 -- merge the default and any custom rules
@@ -304,20 +391,25 @@ function _M.exec(self)
 	local ctx         = ngx.ctx
 	local collections = ctx.collections or {}
 
-
 	-- restore options from a previous phase
 	if (ctx.opts) then
 		_load(self, ctx.opts)
 	end
 
 	ctx.altered       = ctx.altered or {}
+	ctx.col_lookup    = ctx.col_lookup or {}
 	ctx.log_entries   = ctx.log_entries or {}
+	ctx.storage       = ctx.storage or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
 	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.tx            = ctx.tx or {}
 	ctx.phase         = phase
+
+	-- pre-initialize the TX collection
+	ctx.storage["TX"]    = ctx.storage["TX"] or {}
+	ctx.col_lookup["TX"] = "TX"
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	if (ctx.altered[phase]) then
@@ -345,15 +437,23 @@ function _M.exec(self)
 	for _, ruleset in ipairs(self._active_rulesets) do
 		logger.log(self, "Beginning ruleset " .. ruleset)
 
-		local rs = require("rules." .. ruleset)
+		local rs = _ruleset_defs[ruleset]
 
-		if (not rs.initted) then
-			logger.log(self, "Doing offset calculation of " .. ruleset)
-			_calculate_offset(ruleset)
+		if (not rs) then
+			rs, err = util.load_ruleset(ruleset)
+
+			if (err) then
+				logger.fatal_fail(err)
+			else
+				logger.log(self, "Doing offset calculation of " .. ruleset)
+				_calculate_offset(rs)
+
+				_ruleset_defs[ruleset] = rs
+			end
 		end
 
 		local offset = 1
-		local rule   = rs.rules[phase][offset]
+		local rule   = rs[phase][offset]
 
 		while rule do
 			local id = rule.id
@@ -374,34 +474,11 @@ function _M.exec(self)
 
 			if not offset then break end
 
-			rule = rs.rules[phase][offset]
+			rule = rs[phase][offset]
 		end
 	end
 
 	_finalize(self, ctx)
-end
-
--- init_by_lua handler precomputations
-function _M.init()
-	-- do an initial rule merge based on default_option calls
-	-- this prevents have to merge every request in scopes
-	-- which do not further alter elected rulesets
-	_merge_rulesets(default_opts)
-
-	-- do offset jump calculations for default rulesets
-	-- this is also lazily handled in exec() for rulesets
-	-- that dont appear here
-	for _, ruleset in ipairs(default_opts._active_rulesets) do
-		local rs = require("rules." .. ruleset)
-
-		if (not rs.initted) then
-			_calculate_offset(ruleset)
-		end
-	end
-
-	-- clear this flag if we handled additional rulesets
-	-- so its not passed to new objects
-	default_opts.need_merge = false
 end
 
 -- instantiate a new instance of the module
@@ -463,12 +540,31 @@ function _M.reset_option(self, option)
 	end
 end
 
--- process and cache a CIDR for iputils
-function _M.process_cidr(value)
-	if (not cidr_lib.cidrs[value]) then
-		local lower, upper = iputils.parse_cidr(value)
-		cidr_lib.cidrs[value] = { lower, upper }
+-- init_by_lua handler precomputations
+function _M.init()
+	-- do an initial rule merge based on default_option calls
+	-- this prevents have to merge every request in scopes
+	-- which do not further alter elected rulesets
+	_merge_rulesets(default_opts)
+
+	-- do offset jump calculations for default rulesets
+	-- this is also lazily handled in exec() for rulesets
+	-- that dont appear here
+	for _, ruleset in ipairs(default_opts._active_rulesets) do
+		local rs, err = util.load_ruleset(ruleset)
+
+		if (err) then
+			ngx.log(ngx.ERR, err)
+		else
+			_calculate_offset(rs)
+
+			_ruleset_defs[ruleset] = rs
+		end
 	end
+
+	-- clear this flag if we handled additional rulesets
+	-- so its not passed to new objects
+	default_opts.need_merge = false
 end
 
 -- push log data regarding matching rule(s) to the configured target
@@ -493,7 +589,7 @@ function _M.write_log_events(self)
 
 	local entry = {
 		timestamp = ngx.time(),
-		client    = ctx.collections["IP"],
+		client    = ctx.collections["REMOTE_ADDR"],
 		method    = ctx.collections["METHOD"],
 		uri       = ctx.collections["URI"],
 		alerts    = ctx.log_entries,

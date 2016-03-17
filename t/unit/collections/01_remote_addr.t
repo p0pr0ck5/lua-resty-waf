@@ -8,7 +8,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: USER_AGENT collections variable
+=== TEST 1: REMOTE_ADDR collections variable
 --- config
 	location /t {
 		access_by_lua '
@@ -21,44 +21,18 @@ __DATA__
 		content_by_lua '
 			local collections = ngx.ctx.collections
 
-			ngx.say(collections.USER_AGENT)
-		';
-	}
---- request
-GET /t
---- more_headers
-User-Agent: FreeWAF Test
---- error_code: 200
---- response_body
-FreeWAF Test
---- no_error_log
-[error]
-
-=== TEST 2: USER_AGENT collections variable (User-Agent not sent)
---- config
-	location /t {
-		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
-
-			fw:exec()
-		';
-
-		content_by_lua '
-			local collections = ngx.ctx.collections
-
-			ngx.say(collections.USER_AGENT)
+			ngx.say(collections.REMOTE_ADDR)
 		';
 	}
 --- request
 GET /t
 --- error_code: 200
 --- response_body
-nil
+127.0.0.1
 --- no_error_log
 [error]
 
-=== TEST 3: USER_AGENT collections variable (type verification)
+=== TEST 2: REMOTE_ADDR collections variable (type verification)
 --- config
 	location /t {
 		access_by_lua '
@@ -71,14 +45,12 @@ nil
 		content_by_lua '
 			local collections = ngx.ctx.collections
 
-			ngx.say(type(collections.USER_AGENT))
+			ngx.say(type(collections.REMOTE_ADDR))
 		';
 	}
 --- request
 GET /t
 --- error_code: 200
---- more_headers
-User-Agent: FreeWAF Test
 --- response_body
 string
 --- no_error_log

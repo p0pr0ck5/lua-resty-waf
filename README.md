@@ -126,20 +126,6 @@ Define default values for configuration options that will be inherited across al
 	}
 ```
 
-####FreeWAF.process_cidr(cidr)
-
-Parse (and cache) a CIDR block for later usage in a `CIDR_MATCH` operator. CIDR blocks are processed and cached at the module level. Any CIDR block used in a `pattern` with a `CIDR_MATCH` operator must be added in this phase.
-
-```lua
-	http {
-		init_by_lua '
-			local FreeWAF = require "fw"
-
-			FreeWAF.process_cidr("127.0.0.0/8")
-		';
-	}
-```
-
 ####FreeWAF.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any FreeWAF function call in `init_by_lua`, and should never be called outside this scope.
@@ -324,6 +310,8 @@ Adds an additional ruleset to be used during processing. This allows users to im
 ```
 
 Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names must be numeric, as they are sorted for processing in numeric order. This also implies some level of control on the users part; because rulesets are processed in increasing numeric order, the order with which rulesets are passed to `set_option` does not matter. Note only that rulesets of a higher numeric value are processed after those of a lower value.
+
+**NOTE: It is STRONGLY recommend avoiding adding rulesets via `set_option`. It is much safer to add rulesets globally via `default_option`, and ignore rulesets in necessary scopes. Loading a ruleset requires reading the rule from disk on first load; when done outside the `init` phase, this can block the nginx event loop. Caveat emptor.**
 
 ###score_threshold
 
@@ -871,7 +859,6 @@ The following rule actions are currently supported:
 * **SCORE**: Increments the running request score by the score defined in the rule's option table.
 * **SETVAR**: Set a persistent variable, using the `setvar` rule options table.
 * **SETTX**: Set a per-transaction variable, using the `setvar` rule options table.
-* **SKIP**: Skips processing of a number of rules (based on the `skip` rule option).
 
 ##Operators
 
@@ -896,25 +883,22 @@ FreeWAF's rule processor works on a basic principle of matching a `pattern` agai
 * **METHOD**: The HTTP method specified in the request.
 * **RESPONSE_BODY**: The response body. This collection will not be populated if response body is too large, or the content type is not in the list of valid MIME types. Available only in the `body_filter` phase.
 * **RESPONSE_HEADERS**: A table containing the response headers. Available only in `header_filter` and later phases.
-* **RESPONSE_HEADER_NAMES**: A table containing the keys of the `RESPONSE_HEADERS` table. Note that header names are automatically converted to a lowercase form. Available only in `header_filter` and later phases.
 * **REQUEST_ARGS**: A table containing the keys and values of all the arguments in the request, including query string arguments, POST arguments, and request cookies.
 * **REQUEST_BODY**: A table or string containing the request body. This typically contains POST arguments. If the content type of the request matched that of the `allowed_content_type` option(s), this collection will be set as a string.
 * **REQUEST_HEADERS**: A table containing the request headers. Note that cookies are not included in this collection.
-* **REQUEST_HEADER_NAMES**: A table containing the keys of the `HEADERS` table. Note that header names are automatically converted to a lowercase form.
 * **SCORE**: An integer representing the currently anomaly score for the request.
 * **SCORE_THRESHOLD**: An integer representing the user-defined score threshold.
 * **TX**: The per-transaction variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 * **URI**: The request URI.
 * **URI_ARGS**: A table containing the request query strings.
-* **USER_AGENT**: The value of the `User-Agent` header.
 * **VAR**: The persistent storage variable collection. Specific values are obtained by defining the `value` key of the rule's `var.opts` table (see below).
 
 Collections can be parsed based on the contents of a rule's `var.opts` table. This table must contain two keys: `key`, which defines how to parse the collection, and `value`, which determines what to parse out of the collection. The following values are supported for `key`:
 
 * **all**: Retrieves both the keys and values of the collection. Note that this key does not require a `value` counterpart.
 * **ignore**: Returns the collection minus the key (and its associated value) specified.
-* **keys**: Retrieves the keys in the given collection. For example, the HEADER_NAMES collection is just a shortcut for the HEADERS collection parsed by `{ key = "keys" }`. Note that this key does not require a `value` counterpart.
-* **specific**: Retrieves a specific value from the collection. For example, the USER_AGENT collection is just a shortcut for the HEADERS collections parsed by `{ key = "specific", value = "user-agent" }`.
+* **keys**: Retrieves the keys in the given collection. Note that this key does not require a `value` counterpart.
+* **specific**: Retrieves a specific value from the collection.
 * **values**: Retrieves the values in the given collection. Note that this key does not require a `value` counterpart.
 
 ##Data Transformation
@@ -933,7 +917,7 @@ FreeWAF has the ability to modify request data, similar to ModSecurity's transfo
 
 ##Rule Flow Precalculation
 
-FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `SKIP` and `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
+FreeWAF processes rules in a given ruleset by pre-calculating offset jumps based on the result of pre-processing the rule, and moving forward in the ruleset based on the returned offset. This allows the rule engine to smartly jump through `CHAIN` chunks of rules, and has little user-facing implication, save for a small performance gain when compared to a naive iterative loop.
 
 ##Dynamic Parsing in Rule Definitions
 
