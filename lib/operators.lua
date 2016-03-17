@@ -100,8 +100,7 @@ function _M.contains(haystack, needle)
 end
 
 function _M.str_find(FW, subject, pattern)
-	local opts = FW._pcre_flags
-	local from, to, err, match, value
+	local from, to, match, value
 
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
@@ -112,7 +111,7 @@ function _M.str_find(FW, subject, pattern)
 			end
 		end
 	else
-		from, to, err = ngx.re.find(subject, pattern, opts)
+		from, to = string.find(subject, pattern, 1, true)
 
 		if err then
 			ngx.log(ngx.WARN, "error in ngx.re.find: " .. err)
