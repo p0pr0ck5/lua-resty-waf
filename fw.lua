@@ -165,39 +165,6 @@ local function _rule_action(self, action, ctx, collections)
 	lookup.actions[action](self, ctx, collections)
 end
 
--- build the transform portion of the collection memoization key
-local function _transform_collection_key(transform)
-	if (not transform) then
-		return 'nil'
-	end
-
-	if (type(transform) ~= 'table') then
-		return tostring(transform)
-	else
-		return table.concat(transform, ',')
-	end
-end
-
--- build the collection memoization key
-local function _build_collection_key(var, transform)
-	local key = {}
-	key[1] = var.type
-
-	if (var.parse ~= nil) then
-		local k, v = next(var.parse)
-
-		key[2] = tostring(k)
-		key[3] = tostring(v)
-		key[4] = _transform_collection_key(transform)
-		key[5] = tostring(var.length)
-	else
-		key[2] = _transform_collection_key(transform)
-		key[3] = tostring(var.length)
-	end
-
-	return table.concat(key, "|")
-end
-
 -- transform collection values based on rule opts
 local function _do_transform(self, collection, transform)
 	local t = {}
@@ -250,7 +217,7 @@ local function _process_rule(self, rule, collections, ctx)
 		elseif (type(collections[var.type]) == "function") then
 			collection = collections[var.type](self)
 		else
-			local collection_key = _build_collection_key(var, opts.transform)
+			local collection_key = var.collection_key
 
 			logger.log(self, "Checking for collection_key " .. collection_key)
 
