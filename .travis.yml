@@ -6,17 +6,17 @@ notifications:
   irc: "chat.freenode.net#freewaf"
   webhooks: https://www.cryptobells.com/endpoint
 env:
-    - V_OPENRESTY=1.9.7.1 V_PCRE=8.38 TEST=unit
-    - V_OPENRESTY=1.9.7.1 V_PCRE=8.38 TEST=acceptance
+    - V_OPENRESTY=1.9.7.4 V_PCRE=8.38 TEST=unit
+    - V_OPENRESTY=1.9.7.4 V_PCRE=8.38 TEST=acceptance
 install:
     - cpanm -v --notest Test::Nginx
 before_script:
     - sudo apt-get update -q
     - sudo apt-get install libssl-dev -y
-    - wget https://openresty.org/download/ngx_openresty-$V_OPENRESTY.tar.gz
+    - wget https://openresty.org/download/openresty-$V_OPENRESTY.tar.gz
     - wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$V_PCRE.tar.bz2
     - tar xjf pcre-$V_PCRE.tar.bz2
-    - tar xzf ngx_openresty-$V_OPENRESTY.tar.gz
-    - cd ngx_openresty-$V_OPENRESTY && ./configure --with-pcre=../pcre-$V_PCRE --with-pcre-jit --with-pcre-opt=-g --with-debug -j2 && make -j2 && sudo make install && cd ..
+    - tar xzf openresty-$V_OPENRESTY.tar.gz
+    - cd openresty-$V_OPENRESTY && ./configure --with-pcre=../pcre-$V_PCRE --with-pcre-jit --with-pcre-opt=-g --with-debug -j2 && make -j2 && sudo make install && cd ..
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
