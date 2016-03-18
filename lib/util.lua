@@ -18,7 +18,7 @@ function _M.table_copy(orig)
 			copy[_M.table_copy(orig_key)] = _M.table_copy(orig_value)
 		end
 
-		setmetatable(copy, _M.table_copy(FW, getmetatable(orig)))
+		setmetatable(copy, _M.table_copy(getmetatable(orig)))
 	else
 		copy = orig
 	end

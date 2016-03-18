@@ -14,10 +14,10 @@ local util    = require("lib.util")
 local mt = { __index = _M }
 
 -- default list of rulesets (global here to have offsets precomputed)
-_global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
+local _global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
 
 -- ruleset table cache
-_ruleset_defs = {}
+local _ruleset_defs = {}
 
 -- default options
 local default_opts = util.table_copy(opts.defaults)
@@ -407,6 +407,7 @@ function _M.exec(self)
 		local rs = _ruleset_defs[ruleset]
 
 		if (not rs) then
+			local err
 			rs, err = util.load_ruleset(ruleset)
 
 			if (err) then

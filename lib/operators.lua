@@ -113,10 +113,6 @@ function _M.str_find(FW, subject, pattern)
 	else
 		from, to = string.find(subject, pattern, 1, true)
 
-		if err then
-			ngx.log(ngx.WARN, "error in ngx.re.find: " .. err)
-		end
-
 		if from then
 			match = true
 			value = string.sub(subject, from, to)

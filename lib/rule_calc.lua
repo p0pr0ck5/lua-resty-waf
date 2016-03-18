@@ -75,7 +75,6 @@ function _M.calculate(ruleset)
 	local sentinal = false
 
 	for i = 1, max do
-		skip = false
 		local rule = ruleset[i]
 
 		if (not rule.opts) then rule.opts = {} end
