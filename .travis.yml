@@ -12,7 +12,7 @@ install:
     - cpanm -v --notest Test::Nginx
 before_script:
     - sudo apt-get update -q
-    - sudo apt-get install libssl-dev -y
+    - sudo apt-get install libssl-dev lua5.1 -y
     - wget https://openresty.org/download/openresty-$V_OPENRESTY.tar.gz
     - wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-$V_PCRE.tar.bz2
     - tar xjf pcre-$V_PCRE.tar.bz2
