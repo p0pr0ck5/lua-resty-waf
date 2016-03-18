@@ -20,3 +20,4 @@ before_script:
     - cd openresty-$V_OPENRESTY && ./configure --with-pcre=../pcre-$V_PCRE --with-pcre-jit --with-pcre-opt=-g --with-debug -j2 && make -j2 && sudo make install && cd ..
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
+  - ./tools/lua-releng -L
