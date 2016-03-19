@@ -429,10 +429,6 @@ sub translate_chain {
 
 		translate_options($rule, $translation, $silent);
 
-		# grab the action if it was set
-		$chain_action = $action_lookup->{$translation->{action}}
-			if $translation->{action};
-
 		# assign the same ID to each rule in the chain
 		# it is guaranteed that the first rule in a
 		# ModSecurity chain must have a valid, unique ID
@@ -441,11 +437,15 @@ sub translate_chain {
 		$chain_id = $translation->{id} if $translation->{id};
 		$translation->{id} = $chain_id if ! $translation->{id};
 
+		# grab the action if it was set
+		$chain_action = $action_lookup->{$translation->{action}}
+			if $translation->{action};
+
 		# if we're the last (or only) rule in the chain,
 		# set our action as the chain action
 		# otherwise, our action is CHAIN (which is a no-op)
 		$translation->{action} = (++$ctr == scalar @chain) ?
-			$chain_action ? $chain_action : $defaults->{action} :
+			($chain_action || $defaults->{action}) :
 			'CHAIN';
 
 		push @freewaf_chain, $translation;
@@ -609,11 +609,10 @@ sub translate_options {
 }
 
 sub figure_phase {
-	my (@translation) = @_;
+	my ($translation) = @_; # grab only the first element
 
 	# phase must be defined in the first rule of the chain
-	my $phase = $translation[0]->{phase};
-	delete $translation[0]->{phase};
+	my $phase = delete $translation->{phase};
 
 	return $phase ? $phase_lookup->{$phase} : $defaults->{phase};
 }
