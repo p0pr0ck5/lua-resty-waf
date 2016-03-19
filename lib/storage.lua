@@ -59,7 +59,12 @@ function _M.set_var(FW, ctx, element, value)
 			existing = 0
 		end
 
-		value = value + existing
+		if (type(value) == "number") then
+			value = value + existing
+		else
+			logger.log(FW, "Failed to increment a non-number, falling back to existing value")
+			value = existing
+		end
 	end
 
 	logger.log(FW, "Setting " .. col .. ":" .. key .. " to " .. value)

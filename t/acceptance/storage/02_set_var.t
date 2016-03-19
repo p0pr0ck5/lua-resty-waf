@@ -1,7 +1,7 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 4 * blocks();
+plan tests => repeat_each() * 4 * blocks() + 3;
 
 no_shuffle();
 run_tests();
@@ -213,7 +213,7 @@ Setting FOO:COUNT to 1
 --- no_error_log
 [error]
 
-=== TEST 6: Fail to increment a non-numeric value
+=== TEST 6: Fail to increment a non-numeric value 1/2
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
@@ -252,4 +252,47 @@ GET /t
 Cannot increment a value that was not previously a number
 --- no_error_log
 Setting FOO:COUNT to 6
+
+=== TEST 7: Fail to increment a non-numeric value 2/2
+--- http_config
+	lua_shared_dict store 10m;
+	init_by_lua '
+		local FreeWAF = require "fw"
+		FreeWAF.default_option("storage_zone", "store")
+		FreeWAF.default_option("debug", true)
+	';
+--- config
+    location = /t {
+        access_by_lua '
+			local FreeWAF = require "fw"
+			local fw      = FreeWAF:new()
+
+			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
+			local var = require("cjson").encode({ COUNT = 3 })
+			local shm = ngx.shared[fw._storage_zone]
+			shm:set("FOO", var)
+
+			local storage = require "lib.storage"
+			storage.initialize(fw, ctx.storage, "FOO")
+
+			local element = { col = "FOO", key = "COUNT", value = nil, inc = 1 }
+			storage.set_var(fw, ctx, element, element.value)
+
+			ngx.ctx = ctx.storage["FOO"]
+		';
+
+		content_by_lua '
+			ngx.say(ngx.ctx["COUNT"])
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+3
+--- error_log
+Failed to increment a non-number, falling back to existing value
+Setting FOO:COUNT to 3
+--- no_error_log
+[error]
 
