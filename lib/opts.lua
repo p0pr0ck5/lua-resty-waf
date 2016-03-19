@@ -15,6 +15,7 @@ _M.defaults = {
 	_event_log_verbosity         = 1,
 	_event_log_request_arguments = false,
 	_event_log_request_headers   = false,
+	_event_log_request_body      = false,
 	_event_log_ngx_vars          = {},
 	_event_log_target            = 'error',
 	_event_log_target_host       = '',

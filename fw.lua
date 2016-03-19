@@ -575,6 +575,10 @@ function _M.write_log_events(self)
 		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
 	end
 
+	if self._event_log_request_body then
+		entry.request_body = ctx.collections["REQUEST_BODY"]
+	end
+
 	if (table.getn(util.table_keys(self._event_log_ngx_vars)) ~= 0) then
 		entry.ngx = {}
 		for k, v in pairs(self._event_log_ngx_vars) do
