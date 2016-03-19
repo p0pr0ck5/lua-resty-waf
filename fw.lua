@@ -65,7 +65,8 @@ local function _log_event(self, rule, value, ctx)
 		t.var = rule.var
 	end
 
-	ctx.log_entries[#ctx.log_entries + 1] = t
+	ctx.log_entries_n = ctx.log_entries_n + 1
+	ctx.log_entries[ctx.log_entries_n] = t
 end
 
 -- restore options from a previous phase
@@ -366,6 +367,7 @@ function _M.exec(self)
 	ctx.altered       = ctx.altered or {}
 	ctx.col_lookup    = ctx.col_lookup or {}
 	ctx.log_entries   = ctx.log_entries or {}
+	ctx.log_entries_n = ctx.log_entries_n or 0
 	ctx.storage       = ctx.storage or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
@@ -550,7 +552,7 @@ function _M.write_log_events(self)
 		return
 	end
 
-	if (#ctx.log_entries == 0) then
+	if (ctx.log_entries_n == 0) then
 		logger.log(self, "Not logging a request that had no rule alerts")
 		return
 	end
@@ -573,9 +575,9 @@ function _M.write_log_events(self)
 		entry.request_headers = ctx.collections["REQUEST_HEADERS"]
 	end
 
-	if (table.getn(self._event_log_ngx_vars) ~= 0) then
+	if (table.getn(util.table_keys(self._event_log_ngx_vars)) ~= 0) then
 		entry.ngx = {}
-		for _, k in ipairs(self._event_log_ngx_vars) do
+		for k, v in pairs(self._event_log_ngx_vars) do
 			entry.ngx[k] = ngx.var[k]
 		end
 	end

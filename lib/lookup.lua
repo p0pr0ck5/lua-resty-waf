@@ -242,13 +242,11 @@ _M.operators = {
 
 _M.set_option = {
 	ignore_ruleset = function(FW, value)
-		local t = FW._ignore_ruleset
-		FW._ignore_ruleset[#t + 1] = value
+		FW._ignore_ruleset[#FW._ignore_ruleset + 1] = value
 		FW.need_merge = true
 	end,
 	add_ruleset = function(FW, value)
-		local t = FW._add_ruleset
-		FW._add_ruleset[#t + 1] = value
+		FW._add_ruleset[#FW._add_ruleset + 1] = value
 		FW.need_merge = true
 	end,
 	ignore_rule = function(FW, value)
@@ -272,8 +270,7 @@ _M.set_option = {
 		FW._res_body_mime_types[value] = true
 	end,
 	event_log_ngx_vars = function(FW, value)
-		local t = FW._event_log_ngx_vars
-		FW._event_log_ngx_vars[#t + 1] = value
+		FW._event_log_ngx_vars[value] = true
 	end,
 }
 
