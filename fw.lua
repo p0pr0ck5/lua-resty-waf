@@ -65,6 +65,10 @@ local function _log_event(self, rule, value, ctx)
 		t.var = rule.var
 	end
 
+	if (rule.logdata) then
+		t.logdata = util.parse_dynamic_value(self, rule.logdata, ctx.collections)
+	end
+
 	ctx.log_entries_n = ctx.log_entries_n + 1
 	ctx.log_entries[ctx.log_entries_n] = t
 end

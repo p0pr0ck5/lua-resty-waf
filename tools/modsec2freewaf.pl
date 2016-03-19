@@ -568,6 +568,8 @@ sub translate_options {
 			my ($col, $val) = split /=/, $value;
 
 			$translation->{opts}->{initcol}->{uc $col} = $val;
+		} elsif ($key eq 'logdata') {
+			$translation->{logdata} = $value;
 		} elsif ($key eq 'msg') {
 			$translation->{description} = $value;
 		} elsif ($key eq 'noauditlog') {
