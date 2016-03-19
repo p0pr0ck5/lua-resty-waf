@@ -16,7 +16,7 @@ end
 
 local function _build_collection_key(var, transform)
 	local key = {}
-	key[1] = var.type
+	key[1] = tostring(var.type)
 
 	if (var.parse ~= nil) then
 		local k, v = next(var.parse)
