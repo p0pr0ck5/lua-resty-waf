@@ -281,6 +281,18 @@ local function _process_rule(self, rule, collections, ctx)
 					logger.log(self, "We had a match, but not logging because opts.nolog is set")
 				end
 
+				-- store this match as the most recent match
+				collections.MATCHED_VAR      = value
+				collections.MATCHED_VAR_NAME = var
+
+				-- also add the match to our list of matches for the transaction
+				if value then
+					local match_n = ctx.match_n + 1
+					collections.MATCHED_VARS[match_n] = value
+					collections.MATCHED_VAR_NAMES[match_n] = var
+					ctx.match_n = match_n
+				end
+
 				-- wrapper for initcol, setvar, and expirevar actions
 				_handle_storage(self, opts, ctx, collections)
 
@@ -378,6 +390,7 @@ function _M.exec(self)
 	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.phase         = phase
+	ctx.match_n       = ctx.match_n or 0
 
 	-- pre-initialize the TX collection
 	ctx.storage["TX"]    = ctx.storage["TX"] or {}

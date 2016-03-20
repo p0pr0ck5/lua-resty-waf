@@ -37,6 +37,8 @@ _M.collections = {
 		collections.REQUEST_LINE    = ngx.var.request
 		collections.TX              = ctx.storage["TX"]
 		collections.NGX_VAR         = ngx.var
+		collections.MATCHED_VARS    = {}
+		collections.MATCHED_VAR_NAMES = {}
 		collections.SCORE           = function() return ctx.score end
 		collections.SCORE_THRESHOLD = function(FW) return FW._score_threshold end
 	end,
