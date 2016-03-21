@@ -275,12 +275,6 @@ local function _process_rule(self, rule, collections, ctx)
 			if (match) then
 				logger.log(self, "Match of rule " .. id)
 
-				if (not opts.nolog) then
-					_log_event(self, rule, value, ctx)
-				else
-					logger.log(self, "We had a match, but not logging because opts.nolog is set")
-				end
-
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value
 				collections.MATCHED_VAR_NAME = var
@@ -308,6 +302,13 @@ local function _process_rule(self, rule, collections, ctx)
 
 				-- wrapper for initcol, setvar, and expirevar actions
 				_handle_storage(self, opts, ctx, collections)
+
+				-- log the event
+				if (not opts.nolog) then
+					_log_event(self, rule, value, ctx)
+				else
+					logger.log(self, "We had a match, but not logging because opts.nolog is set")
+				end
 
 				-- wrapper for the rules action
 				_rule_action(self, action, ctx, collections)
