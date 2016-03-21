@@ -293,6 +293,18 @@ local function _process_rule(self, rule, collections, ctx)
 					ctx.match_n = match_n
 				end
 
+				-- auto populate TX.# elements
+				if (not rule.op_negated) then
+					if (operator == "REGEX") then
+						collections.TX["0"] = value[0]
+						for i in ipairs(value) do
+							collections.TX[tostring(i)] = value[i]
+						end
+					else
+						collections.TX["0"] = value
+					end
+				end
+
 				-- wrapper for initcol, setvar, and expirevar actions
 				_handle_storage(self, opts, ctx, collections)
 

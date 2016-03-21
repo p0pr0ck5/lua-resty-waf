@@ -252,7 +252,7 @@ sub parse_vars {
 		}
 
 		$parsed->{variable} = $var;
-		$parsed->{specific} = $specific if $specific;
+		$parsed->{specific} = $specific;
 
 		push @parsed_vars, $parsed;
 	}
@@ -479,7 +479,7 @@ sub translate_vars {
 
 		if (defined $modifier && $modifier eq '!') {
 			$translated_var->{parse}->{ignore} = $specific;
-		} elsif ($specific) {
+		} elsif ($specific || length $specific) {
 			$translated_var->{parse}->{specific} = $specific;
 			delete $translated_var->{parse}->{values};
 		}
