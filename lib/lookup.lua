@@ -198,6 +198,12 @@ _M.transform = {
 	md5 = function(FW, value)
 		return ngx.md5_bin(value)
 	end,
+	normalise_path = function(FW, value)
+		while (ngx.re.match(value, [=[[^/][^/]*/\.\./|/\./|/{2,}]=], FW._pcre_flags)) do
+			value = ngx.re.gsub(value, [=[[^/][^/]*/\.\./|/\./|/{2,}]=], '/', FW._pcre_flags)
+		end
+		return value
+	end,
 	remove_comments = function(FW, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', FW._pcre_flags)
 	end,

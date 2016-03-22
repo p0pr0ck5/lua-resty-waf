@@ -77,6 +77,7 @@ my $valid_transforms = {
 	length             => 'length',
 	lowercase          => 'lowercase',
 	md5                => 'md5',
+	normalisePath      => 'normalise_path',
 	removeWhitespace   => 'remove_whitespace',
 	removeComments     => 'remove_comments',
 	removeCommentsChar => 'remove_comments_char',
