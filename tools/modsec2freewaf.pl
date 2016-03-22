@@ -24,6 +24,7 @@ my $valid_vars = {
 	MATCHED_VAR_NAMES       => { type => 'MATCHED_VAR_NAMES' },
 	QUERY_STRING            => { type => 'QUERY_STRING' },
 	REMOTE_ADDR             => { type => 'REMOTE_ADDR' },
+	REQUEST_BASENAME        => { type => 'REQUEST_BASENAME' },
 	REQUEST_BODY            => { type => 'REQUEST_BODY' },
 	REQUEST_COOKIES         => { type => 'COOKIES', parse => { values => 1 } },
 	REQUEST_COOKIES_NAMES   => { type => 'COOKIES', parse => { keys => 1 } },

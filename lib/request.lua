@@ -129,6 +129,11 @@ function _M.request_uri()
 	return table.concat(request_line, '')
 end
 
+function _M.basename(FW, uri)
+	local m = ngx.re.match(uri, [=[(/[^/]*+)+]=], FW._pcre_flags)
+	return m[1]
+end
+
 function _M.cookies()
 	local cookies = cookiejar:new()
 	local request_cookies, cookie_err = cookies:get_all()
