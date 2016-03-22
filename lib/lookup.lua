@@ -172,6 +172,12 @@ _M.transform = {
 	compress_whitespace = function(FW, value)
 		return ngx.re.gsub(value, [=[\s+]=], ' ', FW._pcre_flags)
 	end,
+	hex_decode = function(FW, value)
+		return util.hex_decode(value)
+	end,
+	hex_encode = function(FW, value)
+		return util.hex_encode(value)
+	end,
 	html_decode = function(FW, value)
 		local str = ngx.re.gsub(value, [=[&lt;]=], '<', FW._pcre_flags)
 		str = ngx.re.gsub(str, [=[&gt;]=], '>', FW._pcre_flags)
@@ -194,6 +200,14 @@ _M.transform = {
 	end,
 	replace_comments = function(FW, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], ' ', FW._pcre_flags)
+	end,
+	sql_hex_decode = function(FW, value)
+		if (string.find(value, '0x', 1, true)) then
+			value = string.sub(value, 3)
+			return util.hex_decode(value)
+		else
+			return value
+		end
 	end,
 	uri_decode = function(FW, value)
 		return ngx.unescape_uri(value)

@@ -62,7 +62,24 @@ Hello, world!
 --- no_error_log
 [error]
 
-=== TEST 4: hex_encode
+=== TEST 5: invalid hex_decode
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local value  = "this is not hex"
+			ngx.say(util.hex_decode(value))
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+this is not hex
+--- no_error_log
+[error]
+
+=== TEST 6: hex_encode
 --- config
 	location /t {
 		content_by_lua '

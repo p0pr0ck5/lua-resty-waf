@@ -152,4 +152,26 @@ function _M.load_ruleset(name)
 	return nil, "could not find " .. name
 end
 
+-- encode a given string as hex
+function _M.hex_encode(str)
+	return (str:gsub('.', function (c)
+		return string.format('%02x', string.byte(c))
+	end))
+end
+
+-- decode a given hex string
+function _M.hex_decode(str)
+	local value
+
+	if (pcall(function()
+		value = str:gsub('..', function (cc)
+			return string.char(tonumber(cc, 16))
+		end)
+	end)) then
+		return value
+	else
+		return str
+	end
+end
+
 return _M

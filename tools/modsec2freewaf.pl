@@ -71,11 +71,14 @@ my $valid_transforms = {
 	base64DecodeExt    => 'base64_decode',
 	base64Encode       => 'base64_encode',
 	compressWhitespace => 'compress_whitespace',
+	hexDecode          => 'hex_decode',
+	hexEncode          => 'hex_encode',
 	htmlEntityDecode   => 'html_decode',
 	lowercase          => 'lowercase',
 	removeWhitespace   => 'remove_whitespace',
 	replaceComments    => 'replace_comments',
 	removeComments     => 'remove_comments',
+	sqlHexDecode       => 'sql_hex_decode',
 	urlDecode          => 'uri_decode',
 };
 
