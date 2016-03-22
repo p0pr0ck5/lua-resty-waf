@@ -37,6 +37,7 @@ _M.collections = {
 		collections.REQUEST_BODY    = request_body
 		collections.REQUEST_ARGS    = request_common_args
 		collections.REQUEST_LINE    = ngx.var.request
+		collections.PROTOCOL        = ngx.var.server_protocol
 		collections.TX              = ctx.storage["TX"]
 		collections.NGX_VAR         = ngx.var
 		collections.MATCHED_VARS    = {}
