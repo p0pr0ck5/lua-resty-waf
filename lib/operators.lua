@@ -55,6 +55,69 @@ function _M.greater(a, b)
 	return greater, value
 end
 
+function _M.less(a, b)
+	local less, value
+
+	if (type(a) == "table") then
+		for _, v in ipairs(a) do
+			less, value = _M.less(v, b)
+			if (less) then
+				break
+			end
+		end
+	else
+		less = a < b
+
+		if (less) then
+			value = a
+		end
+	end
+
+	return less, value
+end
+
+function _M.greater_equals(a, b)
+	local greater_equals, value
+
+	if (type(a) == "table") then
+		for _, v in ipairs(a) do
+			greater_equals, value = _M.greater_equals(v, b)
+			if (greater_equals) then
+				break
+			end
+		end
+	else
+		greater_equals = a >= b
+
+		if (greater_equals) then
+			value = a
+		end
+	end
+
+	return greater_equals, value
+end
+
+function _M.less_equals(a, b)
+	local less_equals, value
+
+	if (type(a) == "table") then
+		for _, v in ipairs(a) do
+			less_equals, value = _M.less_equals(v, b)
+			if (less_equals) then
+				break
+			end
+		end
+	else
+		less_equals = a <= b
+
+		if (less_equals) then
+			value = a
+		end
+	end
+
+	return less_equals, value
+end
+
 function _M.exists(needle, haystack)
 	local exists, value
 
