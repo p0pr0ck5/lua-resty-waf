@@ -6,7 +6,7 @@ use warnings;
 use Clone qw(clone);
 use Getopt::Long qw(:config bundling no_ignore_case);
 use JSON;
-use List::MoreUtils qw(none);
+use List::MoreUtils qw(any none);
 use Try::Tiny;
 
 my @valid_directives = qw(SecRule SecAction SecDefaultAction);
@@ -45,7 +45,10 @@ my $valid_vars = {
 };
 
 my $valid_operators = {
+	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
+	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
+	endsWith         => sub { my $pattern = shift; return('REGEX', $pattern . '$'); },
 	eq               => 'EQUALS',
 	ge               => 'GREATER_EQ',
 	gt               => 'GREATER',
@@ -100,6 +103,10 @@ my $defaults = {
 	action => 'DENY',
 	phase  => 'access',
 };
+
+my @auto_expand_operators = qw(beginsWith contains endsWith streq within);
+
+my @alters_pattern_operators = qw(beginsWith containsWord endsWith);
 
 sub usage {
 	print <<"_EOF";
@@ -482,7 +489,7 @@ sub translate_vars {
 
 		if (defined $modifier && $modifier eq '!') {
 			$translated_var->{parse}->{ignore} = $specific;
-		} elsif ($specific || length $specific) {
+		} elsif (length $specific) {
 			$translated_var->{parse}->{specific} = $specific;
 			delete $translated_var->{parse}->{values};
 		}
@@ -506,9 +513,20 @@ sub translate_operator {
 	die "Cannot translate operator $original_operator"
 		if !$translated_operator;
 
-	$translation->{operator}   = $translated_operator;
+	# in some cases its easier to have our translation alter the pattern
+	# rather than create separate-but-mostly equal operators
+	# in these cases the lookup table gives us a function we can use
+	# to get both the operator and the altered pattern
+	if (any { $_ eq $original_operator } @alters_pattern_operators) {
+		my ($operator, $pattern) = $translated_operator->($rule->{operator}->{pattern});
+		$translation->{operator} = $operator;
+		$translation->{pattern}  = $pattern;
+	} else {
+		$translation->{operator} = $translated_operator;
+		$translation->{pattern}  = $rule->{operator}->{pattern};
+	}
+
 	$translation->{op_negated} = 1 if $rule->{operator}->{negated};
-	$translation->{pattern}    = $rule->{operator}->{pattern};
 
 	# force int
 	$translation->{pattern} +=0 if $translation->{pattern} =~ m/^\d+$/;
@@ -543,12 +561,16 @@ sub translate_operator {
 		return;
 	}
 
-	# some operator that behave on split patterns need to be adjusted
+	# some operators that behave on split patterns need to be adjusted
 	# as FreeWAF will expect the pattern as a table
 	if (my $special_op = $op_sep_lookup->{$translated_operator}) {
 		my @pattern = split /$special_op/, $rule->{operator}->{pattern};
 		$translation->{pattern} = \@pattern;
 	}
+
+	# automatically expand the rule pattern for certain operators
+	$translation->{opts}->{parsepattern} = 1
+		if any { $_ eq $original_operator } @auto_expand_operators;
 
 	return;
 }
