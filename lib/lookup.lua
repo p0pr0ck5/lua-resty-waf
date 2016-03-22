@@ -24,32 +24,32 @@ _M.collections = {
 		local request_cookies     = request.cookies() or {}
 		local request_common_args = request.common_args(FW, { request_uri_args, request_body, request_cookies })
 
-		collections.REMOTE_ADDR     = ngx.var.remote_addr
-		collections.HTTP_VERSION    = ngx.req.http_version()
-		collections.METHOD          = ngx.req.get_method()
-		collections.URI             = ngx.var.uri
-		collections.URI_ARGS        = request_uri_args
-		collections.QUERY_STRING    = ngx.var.query_string
-		collections.REQUEST_URI     = request_uri
-		collections.REQUEST_BASENAME = request_basename
-		collections.REQUEST_HEADERS = request_headers
-		collections.COOKIES         = request_cookies
-		collections.REQUEST_BODY    = request_body
-		collections.REQUEST_ARGS    = request_common_args
-		collections.REQUEST_LINE    = ngx.var.request
-		collections.PROTOCOL        = ngx.var.server_protocol
-		collections.TX              = ctx.storage["TX"]
-		collections.NGX_VAR         = ngx.var
-		collections.MATCHED_VARS    = {}
+		collections.REMOTE_ADDR       = ngx.var.remote_addr
+		collections.HTTP_VERSION      = ngx.req.http_version()
+		collections.METHOD            = ngx.req.get_method()
+		collections.URI               = ngx.var.uri
+		collections.URI_ARGS          = request_uri_args
+		collections.QUERY_STRING      = ngx.var.query_string
+		collections.REQUEST_URI       = request_uri
+		collections.REQUEST_BASENAME  = request_basename
+		collections.REQUEST_HEADERS   = request_headers
+		collections.COOKIES           = request_cookies
+		collections.REQUEST_BODY      = request_body
+		collections.REQUEST_ARGS      = request_common_args
+		collections.REQUEST_LINE      = ngx.var.request
+		collections.PROTOCOL          = ngx.var.server_protocol
+		collections.TX                = ctx.storage["TX"]
+		collections.NGX_VAR           = ngx.var
+		collections.MATCHED_VARS      = {}
 		collections.MATCHED_VAR_NAMES = {}
-		collections.SCORE           = function() return ctx.score end
-		collections.SCORE_THRESHOLD = function(FW) return FW._score_threshold end
+		collections.SCORE             = function() return ctx.score end
+		collections.SCORE_THRESHOLD   = function(FW) return FW._score_threshold end
 	end,
 	header_filter = function(FW, collections)
 		local response_headers = ngx.resp.get_headers()
 
-		collections.RESPONSE_HEADERS      = response_headers
-		collections.STATUS                = ngx.status
+		collections.RESPONSE_HEADERS = response_headers
+		collections.STATUS           = ngx.status
 	end,
 	body_filter = function(FW, collections, ctx)
 		if ctx.buffers == nil then
