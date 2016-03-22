@@ -201,6 +201,9 @@ _M.transform = {
 	remove_comments = function(FW, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', FW._pcre_flags)
 	end,
+	remove_comments_char = function(FW, value)
+		return ngx.re.gsub(value, [=[\/\*|\*\/|--|#]=], '', FW._pcre_flags)
+	end,
 	remove_whitespace = function(FW, value)
 		return ngx.re.gsub(value, [=[\s+]=], '', FW._pcre_flags)
 	end,
