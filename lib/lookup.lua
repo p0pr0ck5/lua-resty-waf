@@ -209,6 +209,15 @@ _M.transform = {
 			return value
 		end
 	end,
+	trim = function(FW, value)
+		return ngx.re.gsub(value, [=[^\s*|\s+$]=], '')
+	end,
+	trim_left = function(FW, value)
+		return ngx.re.sub(value, [=[^\s+]=], '')
+	end,
+	trim_right = function(FW, value)
+		return ngx.re.sub(value, [=[\s+$]=], '')
+	end,
 	uri_decode = function(FW, value)
 		return ngx.unescape_uri(value)
 	end,

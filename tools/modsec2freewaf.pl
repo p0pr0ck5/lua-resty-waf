@@ -79,6 +79,9 @@ my $valid_transforms = {
 	replaceComments    => 'replace_comments',
 	removeComments     => 'remove_comments',
 	sqlHexDecode       => 'sql_hex_decode',
+	trim               => 'trim',
+	trimLeft           => 'trim_left',
+	trimRight          => 'trim_right',
 	urlDecode          => 'uri_decode',
 };
 
