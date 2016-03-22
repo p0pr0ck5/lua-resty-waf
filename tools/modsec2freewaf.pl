@@ -74,6 +74,7 @@ my $valid_transforms = {
 	hexDecode          => 'hex_decode',
 	hexEncode          => 'hex_encode',
 	htmlEntityDecode   => 'html_decode',
+	length             => 'length',
 	lowercase          => 'lowercase',
 	removeWhitespace   => 'remove_whitespace',
 	replaceComments    => 'replace_comments',

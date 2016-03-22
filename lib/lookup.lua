@@ -189,6 +189,9 @@ _M.transform = {
 		logger.log(FW, "html decoded value is " .. str)
 		return str
 	end,
+	length = function(FW, value)
+		return string.len(tostring(value))
+	end,
 	lowercase = function(FW, value)
 		return string.lower(tostring(value))
 	end,
