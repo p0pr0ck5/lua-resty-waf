@@ -195,6 +195,9 @@ _M.transform = {
 	lowercase = function(FW, value)
 		return string.lower(tostring(value))
 	end,
+	md5 = function(FW, value)
+		return ngx.md5_bin(value)
+	end,
 	remove_comments = function(FW, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', FW._pcre_flags)
 	end,
@@ -203,6 +206,9 @@ _M.transform = {
 	end,
 	replace_comments = function(FW, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], ' ', FW._pcre_flags)
+	end,
+	sha1 = function(FW, value)
+		return ngx.sha1_bin(value)
 	end,
 	sql_hex_decode = function(FW, value)
 		if (string.find(value, '0x', 1, true)) then
