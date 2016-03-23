@@ -503,6 +503,7 @@ sub translate_vars {
 
 		if (defined $modifier && $modifier eq '!') {
 			$translated_var->{parse}->{ignore} = $specific;
+			delete $translated_var->{parse}->{values};
 		} elsif (length $specific) {
 			$translated_var->{parse}->{specific} = $specific;
 			delete $translated_var->{parse}->{values};
