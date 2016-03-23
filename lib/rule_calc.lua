@@ -86,7 +86,7 @@ function _M.calculate(ruleset)
 			var.collection_key = _build_collection_key(var, rule.opts.transform)
 		end
 
-		if (rule.action == "SKIP") then
+		if (rule.opts.skip) then
 			_write_skip_offset(rule, max, i)
 			chain = {}
 		elseif (rule.action ~= "CHAIN") then

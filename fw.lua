@@ -313,11 +313,7 @@ local function _process_rule(self, rule, collections, ctx)
 				-- wrapper for the rules action
 				_rule_action(self, action, ctx, collections)
 
-				if (opts.skip) then
-					offset = opts.skip + 1
-				else
-					offset = rule.offset_match
-				end
+				offset = rule.offset_match
 
 				break
 			else

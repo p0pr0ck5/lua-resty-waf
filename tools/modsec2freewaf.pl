@@ -621,7 +621,6 @@ sub translate_options {
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
-			$translation->{action} = 'SKIP';
 			$translation->{opts}->{skip} = $value;
 		} elsif ($key eq 'setvar') {
 			my ($var, $val)            = split /=/, $value;
