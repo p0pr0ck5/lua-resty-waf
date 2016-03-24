@@ -58,7 +58,7 @@ local function _write_chain_offsets(chain, max, cur_offset)
 end
 
 local function _write_skip_offset(rule, max, cur_offset)
-	local offset = rule.opts.skip + 1
+	local offset = rule.skip + 1
 
 	rule.offset_nomatch = 1
 
@@ -72,7 +72,6 @@ end
 function _M.calculate(ruleset)
 	local max = #ruleset
 	local chain = {}
-	local sentinal = false
 
 	for i = 1, max do
 		local rule = ruleset[i]
@@ -86,16 +85,29 @@ function _M.calculate(ruleset)
 			var.collection_key = _build_collection_key(var, rule.opts.transform)
 		end
 
-		if (rule.opts.skip) then
-			_write_skip_offset(rule, max, i)
-			chain = {}
-		elseif (rule.action ~= "CHAIN") then
-			sentinal = true
-		end
-
-		if (sentinal) then
+		if (rule.action ~= "CHAIN") then
 			_write_chain_offsets(chain, max, i - #chain)
-			sentinal = false
+
+			if (rule.skip) then
+				_write_skip_offset(rule, max, i)
+			elseif (rule.skip_after) then
+				local skip_after = rule.skip_after
+				-- read ahead in the chain to look for our target
+				-- when we find it, set the rule's skip value appropriately
+				local j, ctr
+				ctr = 0
+				for j = i, max do
+					ctr = ctr + 1
+					local check_rule = ruleset[j]
+					if (check_rule.id == skip_after) then
+						break
+					end
+				end
+
+				rule.skip = ctr - 1
+				_write_skip_offset(rule, max, i)
+			end
+
 			chain = {}
 		end
 	end

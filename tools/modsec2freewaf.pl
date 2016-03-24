@@ -443,7 +443,9 @@ sub translate_chain {
 	my $silent = $args->{silent};
 	my $path   = $args->{path};
 
-	my (@freewaf_chain, $chain_action, $chain_id, $ctr);
+	my (@freewaf_chain, $chain_id, $chain_opt, $ctr);
+
+	my @end_opts = qw(action skip skip_after);
 
 	for my $rule (@chain) {
 		my $translation = {};
@@ -451,8 +453,16 @@ sub translate_chain {
 		if ($rule->{directive} eq 'SecRule') {
 			translate_vars($rule, $translation);
 			translate_operator($rule, $translation, $path);
-		} elsif ($rule->{directive} eq 'SecAction') {
+		} elsif ($rule->{directive} =~ m/Sec(?:Action|Marker)/) {
 			push @{$translation->{vars}}, { unconditional => 1 };
+
+			# SecMarker is a rule that never matches
+			# with its only option representing its ID
+			if ($rule->{directive} eq 'SecMarker') {
+				$translation->{op_negated} = 1;
+				my $marker = pop @{$rule->{opts}};
+				$translation->{id} = $marker->{opt};
+			}
 		}
 
 		translate_options($rule, $translation, $silent);
@@ -465,16 +475,25 @@ sub translate_chain {
 		$chain_id = $translation->{id} if $translation->{id};
 		$translation->{id} = $chain_id if ! $translation->{id};
 
-		# grab the action if it was set
-		$chain_action = $action_lookup->{$translation->{action}}
-			if $translation->{action};
+		# these opts exist in the chain starter in ModSecurity
+		# but they belong in the final rule in FreeWAF
+		for my $opt (@end_opts) {
+			if ($translation->{$opt}) {
+				$chain_opt->{$opt} = delete $translation->{$opt};
+			};
+		}
 
-		# if we're the last (or only) rule in the chain,
-		# set our action as the chain action
-		# otherwise, our action is CHAIN (which is a no-op)
-		$translation->{action} = (++$ctr == scalar @chain) ?
-			($chain_action || $defaults->{action}) :
-			'CHAIN';
+		if (++$ctr == scalar @chain) {
+			for my $opt (@end_opts) {
+				if ($chain_opt->{$opt}) {
+					$translation->{$opt} = $chain_opt->{$opt};
+				} elsif ($defaults->{$opt}) {
+					$translation->{$opt} = $defaults->{$opt};
+				}
+			}
+		} else {
+			$translation->{action} = 'CHAIN';
+		}
 
 		push @freewaf_chain, $translation;
 	}
@@ -621,7 +640,9 @@ sub translate_options {
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
-			$translation->{opts}->{skip} = $value;
+			$translation->{skip} = $value;
+		} elsif ($key eq 'skipAfter') {
+			$translation->{skip_after} = $value;
 		} elsif ($key eq 'setvar') {
 			my ($var, $val)            = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
