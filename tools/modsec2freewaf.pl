@@ -239,8 +239,7 @@ sub parse_tokens {
 	}
 	$opts = shift @tokens;
 
-	die "Uh oh! We shouldn't have any fields left but we still have @tokens\n"
-		if @tokens;
+	die "Uh oh! We shouldn't have any fields left but we still have @tokens\n" if @tokens;
 
 	$entry->{directive} = $directive;
 	$entry->{vars}      = parse_vars($vars) if $vars;
@@ -510,8 +509,7 @@ sub translate_vars {
 		my $original_var = $var->{variable};
 		my $lookup_var   = clone($valid_vars->{$original_var});
 
-		die "Cannot translate variable $original_var"
-			if !$lookup_var;
+		die "Cannot translate variable $original_var" if !$lookup_var;
 
 		die "Cannot have a specific attribute when the lookup table already provided one"
 			if ($var->{specific} && $lookup_var->{parse}->{specific});
@@ -700,8 +698,7 @@ sub translate_macro {
 		if (my $lookup = clone($valid_vars->{$key})) {
 			$replacement = $lookup->{type};
 
-			$replacement .= ".$lookup->{parse}->{specific}"
-				if $lookup->{parse}->{specific};
+			$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
 
 			$replacement .= ".$specific" if length $specific;
 		} else {
