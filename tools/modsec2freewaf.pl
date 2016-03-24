@@ -9,7 +9,7 @@ use JSON;
 use List::MoreUtils qw(any none);
 use Try::Tiny;
 
-my @valid_directives = qw(SecRule SecAction SecDefaultAction);
+my @valid_directives = qw(SecRule SecAction SecDefaultAction SecMarker);
 
 my $valid_vars = {
 	ARGS                    => { type => 'REQUEST_ARGS', parse => { values => 1 } },
@@ -94,7 +94,7 @@ my $valid_transforms = {
 };
 
 my $action_lookup = {
-	allow => 'ALLOW',
+	allow => 'ACCEPT',
 	block => 'DENY',
 	deny  => 'DENY',
 	pass  => 'IGNORE'
@@ -603,8 +603,10 @@ sub translate_operator {
 	}
 
 	# automatically expand the rule pattern for certain operators
-	$translation->{opts}->{parsepattern} = 1
-		if any { $_ eq $original_operator } @auto_expand_operators;
+	if (any { $_ eq $original_operator } @auto_expand_operators) {
+		$translation->{opts}->{parsepattern} = 1;
+		$translation->{pattern} = translate_macro($translation->{pattern});
+	}
 
 	return;
 }
@@ -618,7 +620,7 @@ sub translate_options {
 
 		# easier to do this than a lookup table
 		if (grep { $_ eq $key } qw(allow block deny pass)) {
-			$translation->{action} = $key;
+			$translation->{action} = uc $action_lookup->{$key};
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
@@ -632,7 +634,7 @@ sub translate_options {
 
 			$translation->{opts}->{initcol}->{uc $col} = $val;
 		} elsif ($key eq 'logdata') {
-			$translation->{logdata} = $value;
+			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
 			$translation->{description} = $value;
 		} elsif ($key eq 'noauditlog') {
@@ -681,6 +683,37 @@ sub figure_phase {
 	my $phase = delete $translation->{phase};
 
 	return $phase ? $phase_lookup->{$phase} : $defaults->{phase};
+}
+
+# because we don't maintain a strict 1-1 mapping of collection names
+# we need to fudge the contents of macros. note this is not actually
+# performing the expansion (that happens at runtime by the rule engine),
+# we're merely updating the string to accomodate FreeWAF's lookup table
+sub translate_macro {
+	my ($string) = @_;
+
+	# grab each macro and replace it with its lookup equivalent
+	for my $macro ($string =~ m/%{([^}]+)}/g) {
+		my ($key, $specific) = split /\./, $macro;
+		my $replacement;
+
+		if (my $lookup = clone($valid_vars->{$key})) {
+			$replacement = $lookup->{type};
+
+			$replacement .= ".$lookup->{parse}->{specific}"
+				if $lookup->{parse}->{specific};
+
+			$replacement .= ".$specific" if length $specific;
+		} else {
+			$replacement = $macro;
+		}
+
+		$replacement = "%{$replacement}";
+
+		$string =~ s/\Q%{$macro}\E/$replacement/g;
+	};
+
+	return $string;
 }
 
 sub main {
