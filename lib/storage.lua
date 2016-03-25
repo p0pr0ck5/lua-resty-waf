@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.6.0"
+_M.version = "0.7.0"
 
 local cjson  = require("cjson")
 local logger = require("lib.log")
