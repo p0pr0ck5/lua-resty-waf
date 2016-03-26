@@ -479,7 +479,7 @@ sub translate_chain {
 		for my $opt (@end_opts) {
 			if ($translation->{$opt}) {
 				$chain_opt->{$opt} = delete $translation->{$opt};
-			};
+			}
 		}
 
 		if (++$ctr == scalar @chain) {
@@ -561,7 +561,7 @@ sub translate_operator {
 	$translation->{op_negated} = 1 if $rule->{operator}->{negated};
 
 	# force int
-	$translation->{pattern} +=0 if $translation->{pattern} =~ m/^\d+$/;
+	$translation->{pattern} += 0 if $translation->{pattern} =~ m/^\d+$/;
 
 	# this operator reads from a file.
 	# read the file and build the pattern table
@@ -588,6 +588,8 @@ sub translate_operator {
 
 			push @buffer, $line;
 		}
+
+		close $fh;
 
 		$translation->{pattern} = [ @buffer ];
 		return;
