@@ -364,7 +364,9 @@ local function _merge_rulesets(self)
 	t = util.table_keys(t)
 
 	-- rulesets will be processed in numeric order
-	table.sort(t)
+	table.sort(t, function(a, b)
+		return string.lower(a) < string.lower(b)
+	end)
 
 	self._active_rulesets = t
 end
