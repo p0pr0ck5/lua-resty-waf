@@ -639,6 +639,8 @@ sub translate_options {
 			$translation->{description} = $value;
 		} elsif ($key eq 'noauditlog') {
 			$translation->{opts}->{nolog} = 1;
+		} elsif ($key eq 'nolog') {
+			$translation->{opts}->{nolog} = 1;
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
