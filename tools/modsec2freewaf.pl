@@ -723,7 +723,7 @@ sub main {
 	GetOptions(
 		'q|quiet'  => \$quiet,
 		's|silent' => \$silent,
-		'p|path'   => \$path,
+		'p|path=s' => \$path,
 		'P|pretty' => \$pretty,
 		'h|help'   => sub { usage(); },
 	) or usage();
