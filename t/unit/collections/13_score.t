@@ -12,10 +12,10 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -28,7 +28,7 @@ __DATA__
 GET /t
 --- more_headers
 Accept: */*
-User-Agent: FreeWAF Dummy
+User-Agent: lua-resty-waf Dummy
 --- error_code: 200
 --- response_body
 3
@@ -39,10 +39,10 @@ User-Agent: FreeWAF Dummy
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -55,7 +55,7 @@ User-Agent: FreeWAF Dummy
 GET /t
 --- more_headers
 Accept: */*
-User-Agent: FreeWAF Dummy
+User-Agent: lua_resty_waf Dummy
 --- error_code: 200
 --- response_body
 function
@@ -66,10 +66,10 @@ function
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -82,7 +82,7 @@ function
 GET /t
 --- more_headers
 Accept: */*
-User-Agent: FreeWAF Dummy
+User-Agent: lua_resty_waf Dummy
 --- error_code: 200
 --- response_body
 number

@@ -12,10 +12,10 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -36,10 +36,10 @@ GET
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -60,10 +60,10 @@ POST
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 
 			local collections = ngx.ctx.collections
 			ngx.header["X-Method"] = collections.METHOD
@@ -83,10 +83,10 @@ X-Method: HEAD
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '

@@ -12,11 +12,11 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -39,11 +39,11 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -66,11 +66,11 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -94,11 +94,11 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -122,11 +122,11 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -154,11 +154,11 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -185,11 +185,11 @@ Request has no content type, ignoring the body
 		client_body_buffer_size 1k;
 
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -217,11 +217,11 @@ Request body size larger than client_body_buffer_size, ignoring request body
 		client_body_buffer_size 1k;
 
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -247,12 +247,12 @@ Request body size larger than client_body_buffer_size, ignoring request body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("allowed_content_types", "text/json")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("allowed_content_types", "text/json")
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -277,12 +277,12 @@ Request has no content type, ignoring the body
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("allowed_content_types", "text/json")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("allowed_content_types", "text/json")
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -309,12 +309,12 @@ Request has no content type, ignoring the body
 		client_body_buffer_size 1k;
 
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("allowed_content_types", "text/json")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("allowed_content_types", "text/json")
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -342,12 +342,12 @@ Request body size larger than client_body_buffer_size, ignoring request body
 		client_body_buffer_size 1k;
 
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("allowed_content_types", "text/json")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("allowed_content_types", "text/json")
+			waf:exec()
 		';
 
 		content_by_lua '

@@ -12,10 +12,10 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -36,10 +36,10 @@ nil
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -60,10 +60,10 @@ foo=bar
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -84,10 +84,10 @@ foo=bar&foo=bat&frob&qux=
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -108,10 +108,10 @@ nil
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '

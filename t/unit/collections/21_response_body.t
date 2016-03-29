@@ -12,27 +12,27 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 
 			local collections = ngx.ctx.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
@@ -57,11 +57,11 @@ Hello, world!
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -72,19 +72,19 @@ Hello, world!
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 
 			local collections = ngx.ctx.collections
 			ngx.log(ngx.INFO, tostring(collections.RESPONSE_BODY))
@@ -109,29 +109,29 @@ world!
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		header_filter_by_lua '
 			ngx.header["Content-Type"] = "text/foo"
 
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 
 			local collections = ngx.ctx.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
@@ -156,27 +156,27 @@ Hello, world!
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 
 			local collections = ngx.ctx.collections
 			ngx.log(ngx.INFO, [["]] .. type(collections.RESPONSE_BODY) .. [["]])

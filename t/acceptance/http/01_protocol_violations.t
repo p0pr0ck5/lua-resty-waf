@@ -12,23 +12,23 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -46,23 +46,23 @@ http header: "Content-Length: 7"
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -81,23 +81,23 @@ http header: "Content-Length: 7"
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- raw_request eval
@@ -115,23 +115,23 @@ http header: "Content-Length: 7"
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -150,23 +150,23 @@ http header: "Content-Length: 7"
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -184,23 +184,23 @@ Content-Encoding: Identity
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -218,23 +218,23 @@ Accept: */*
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -252,23 +252,23 @@ Range: bytes=0-9999
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -287,23 +287,23 @@ User-Agent: test
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -321,23 +321,23 @@ Request-Range: bytes=0-1,2-3,4-5,6-7,8-9,10-
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("ignore_rule", 11001)
-			fw:set_option("event_log_altered_only", false)
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("ignore_rule", 11001)
+			waf:set_option("event_log_altered_only", false)
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request

@@ -8,7 +8,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: FreeWAF runs with resty.core included
+=== TEST 1: lua_resty_waf runs with resty.core included
 --- http_config
 	init_by_lua '
 		require "resty.core"
@@ -16,25 +16,25 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

@@ -12,23 +12,23 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -51,23 +51,23 @@ Setting FOO:COUNT to 1
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -90,26 +90,26 @@ Setting FOO:COUNT to 1
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -132,26 +132,26 @@ Setting FOO:COUNT to 1
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -174,26 +174,26 @@ Setting FOO:COUNT to 6
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ blah = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -217,26 +217,26 @@ Setting FOO:COUNT to 1
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = "blah" })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';
@@ -257,26 +257,26 @@ Setting FOO:COUNT to 6
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 3 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = nil, inc = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
 		';

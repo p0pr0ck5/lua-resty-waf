@@ -12,10 +12,10 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -24,10 +24,10 @@ __DATA__
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		log_by_lua '
@@ -48,10 +48,10 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -60,10 +60,10 @@ GET /t
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		log_by_lua '
@@ -87,10 +87,10 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -98,10 +98,10 @@ GET /t
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		log_by_lua '
@@ -122,10 +122,10 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -133,10 +133,10 @@ GET /t
 		';
 
 		header_filter_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		log_by_lua '

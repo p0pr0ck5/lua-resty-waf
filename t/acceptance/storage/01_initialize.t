@@ -12,20 +12,20 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local data = {}
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, data, "FOO")
+			storage.initialize(waf, data, "FOO")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -42,24 +42,24 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b" })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local data = {}
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, data, "FOO")
+			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
 		';
@@ -89,24 +89,24 @@ Removing expired key:
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local data = {}
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, data, "FOO")
+			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
 		';
@@ -137,24 +137,24 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local data = {}
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, data, "FOO")
+			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
 		';

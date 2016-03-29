@@ -93,7 +93,7 @@ function _M.table_has_value(needle, haystack)
 end
 
 -- pick out dynamic data from storage key definitions
-function _M.parse_dynamic_value(FW, key, collections)
+function _M.parse_dynamic_value(waf, key, collections)
 	local lookup = function(m)
 		local val      = collections[m[1]]
 		local specific = m[2]
@@ -109,7 +109,7 @@ function _M.parse_dynamic_value(FW, key, collections)
 				return m[1]
 			end
 		elseif (type(val) == "function") then
-			return val(FW)
+			return val(waf)
 		else
 			return val
 		end
@@ -118,11 +118,11 @@ function _M.parse_dynamic_value(FW, key, collections)
 	-- grab something that looks like
 	-- %{VAL} or %{VAL.foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [[%{([^\.]+?)(?:\.([^}]+))?}]], lookup, FW._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([^\.]+?)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
-	logger.log(FW, "Parsed dynamic value is " .. str)
+	logger.log(waf, "Parsed dynamic value is " .. str)
 
-	if (ngx.re.find(str, [=[^\d+$]=], FW._pcre_flags)) then
+	if (ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags)) then
 		return tonumber(str)
 	else
 		return str

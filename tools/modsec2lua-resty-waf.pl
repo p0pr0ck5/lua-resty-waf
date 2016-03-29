@@ -105,7 +105,7 @@ my $phase_lookup = {
 	2 => 'access',
 	3 => 'header_filter',
 	4 => 'body_filter',
-	5 => 'body_filter', # FreeWAF doesnt have a proper logging phase
+	5 => 'body_filter', # lua-resty-waf doesnt have a proper logging phase
 };
 
 my $op_sep_lookup = {
@@ -124,8 +124,8 @@ my @alters_pattern_operators = qw(beginsWith containsWord endsWith);
 
 sub usage {
 	print <<"_EOF";
-Usage $0 < <data> [hqspP]a
-Translate ModSecurity configs to FreeWAF rulesets, reading from standard input and writing to standard output.
+Usage $0 < <data> [hqspP]
+Translate ModSecurity configs to lua-resty-waf rulesets, reading from standard input and writing to standard output.
 
   -h|--help      Print this help
   -q|--quiet     Be quite when translating (do not print imcompatible chains)
@@ -399,7 +399,7 @@ sub build_chains {
 	return @chains;
 }
 
-# take an array of ModSecurity chain hashrefs and return a hashref of FreeWAF rule hashrefs (including appropriate phases)
+# take an array of ModSecurity chain hashrefs and return a hashref of lua-resty-waf rule hashrefs (including appropriate phases)
 sub translate_chains {
 	my ($args) = @_;
 	my @chains = @{$args->{chains}};
@@ -407,7 +407,7 @@ sub translate_chains {
 	my $silent = $args->{silent};
 	my $path   = $args->{path};
 
-	my $freewaf_chains = {
+	my $lua_resty_waf_chains = {
 		access        => [],
 		header_filter => [],
 		body_filter   => [],
@@ -423,18 +423,18 @@ sub translate_chains {
 
 			my $phase = figure_phase(@translation);
 
-			push @{$freewaf_chains->{$phase}}, @translation;
+			push @{$lua_resty_waf_chains->{$phase}}, @translation;
 		} catch {
 			warn "$_" if !$silent;
 			warn join ("\n", map { $_->{original} } @{$chain} ) . "\n\n" if !$quiet;
 		};
 	}
 
-	return $freewaf_chains;
+	return $lua_resty_waf_chains;
 }
 
 # take an array of hashrefs representing modsec rules and return an array of
-# hashrefs representing FreeWAF rules. if the translation cannot be performed
+# hashrefs representing lua-resty-waf rules. if the translation cannot be performed
 # due to an imcompatability, die with the incompatible elements
 sub translate_chain {
 	my ($args) = @_;
@@ -442,7 +442,7 @@ sub translate_chain {
 	my $silent = $args->{silent};
 	my $path   = $args->{path};
 
-	my (@freewaf_chain, $chain_id, $chain_opt, $ctr);
+	my (@lua_resty_waf_chain, $chain_id, $chain_opt, $ctr);
 
 	my @end_opts = qw(action skip skip_after);
 
@@ -469,13 +469,13 @@ sub translate_chain {
 		# assign the same ID to each rule in the chain
 		# it is guaranteed that the first rule in a
 		# ModSecurity chain must have a valid, unique ID
-		# FreeWAF only requires that each rule has an ID,
+		# lua-resty-waf only requires that each rule has an ID,
 		# not that each rule's ID must be unique
 		$chain_id = $translation->{id} if $translation->{id};
 		$translation->{id} = $chain_id if ! $translation->{id};
 
 		# these opts exist in the chain starter in ModSecurity
-		# but they belong in the final rule in FreeWAF
+		# but they belong in the final rule in lua-resty-waf
 		for my $opt (@end_opts) {
 			if ($translation->{$opt}) {
 				$chain_opt->{$opt} = delete $translation->{$opt};
@@ -494,17 +494,17 @@ sub translate_chain {
 			$translation->{action} = 'CHAIN';
 		}
 
-		push @freewaf_chain, $translation;
+		push @lua_resty_waf_chain, $translation;
 	}
 
-	return @freewaf_chain;
+	return @lua_resty_waf_chain;
 }
 
 sub translate_vars {
 	my ($rule, $translation) = @_;
 
-	# maintain a 1-1 translation of modsec vars to FreeWAF vars
-	# this necessitates that a FreeWAF rule vars key is an array
+	# maintain a 1-1 translation of modsec vars to lua-resty-waf vars
+	# this necessitates that a lua-resty-waf rule vars key is an array
 	for my $var (@{$rule->{vars}}) {
 		my $original_var = $var->{variable};
 		my $lookup_var   = clone($valid_vars->{$original_var});
@@ -596,7 +596,7 @@ sub translate_operator {
 	}
 
 	# some operators that behave on split patterns need to be adjusted
-	# as FreeWAF will expect the pattern as a table
+	# as lua-resty-waf will expect the pattern as a table
 	if (my $special_op = $op_sep_lookup->{$translated_operator}) {
 		my @pattern = split /$special_op/, $rule->{operator}->{pattern};
 		$translation->{pattern} = \@pattern;
@@ -690,7 +690,7 @@ sub figure_phase {
 # because we don't maintain a strict 1-1 mapping of collection names
 # we need to fudge the contents of macros. note this is not actually
 # performing the expansion (that happens at runtime by the rule engine),
-# we're merely updating the string to accomodate FreeWAF's lookup table
+# we're merely updating the string to accomodate lua-resty-waf's lookup table
 sub translate_macro {
 	my ($string) = @_;
 
@@ -743,14 +743,14 @@ sub main {
 	my @modsec_chains = build_chains(@parsed_lines);
 
 	# do the actual translation
-	my $freewaf_chains = translate_chains({
+	my $lua_resty_waf_chains = translate_chains({
 		chains => \@modsec_chains,
 		path   => $path,
 		quiet  => $quiet,
 		silent => $silent,
 	});
 
-	print to_json($freewaf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
+	print to_json($lua_resty_waf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
 }
 
 main();

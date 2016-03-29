@@ -1,6 +1,6 @@
 ##Name
 
-FreeWAF - High-performance WAF built on the OpenResty stack
+lua-resty-waf - High-performance WAF built on the OpenResty stack
 
 ##Table of Contents
 
@@ -12,13 +12,13 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 * [Installation](#installation)
 * [Synopsis](#synopsis)
 * [Public Functions](#public-functions)
-	* [FreeWAF.default_option()](#freewafdefault_option)
-	* [FreeWAF.init()](#freewafinit)
+	* [lua-resty-waf.default_option()](#lua-resty-wafdefault_option)
+	* [lua-resty-waf.init()](#lua-resty-wafinit)
 * [Public Methods](#public-methods)
-	* [FreeWAF:new()](#freewafnew)
-	* [FreeWAF:set_option()](#freewafset_option)
-	* [FreeWAF:reset_option()](#freewafreset_option)
-	* [FreeWAF:write_log_events()](#freewafwrite_log_events)
+	* [lua-resty-waf:new()](#lua-resty-wafnew)
+	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
+	* [lua-resty-waf:reset_option()](#lua-resty-wafreset_option)
+	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [allow_unknown_content_types](#allow_unknown_content_types)
 	* [allowed_content_types](#allowed_content_types)
@@ -62,21 +62,21 @@ FreeWAF - High-performance WAF built on the OpenResty stack
 
 ##Status
 
-[![Build Status](https://travis-ci.org/p0pr0ck5/FreeWAF.svg?branch=development)](https://travis-ci.org/p0pr0ck5/FreeWAF)
+[![Build Status](https://travis-ci.org/p0pr0ck5/lua-resty-waf.svg?branch=development)](https://travis-ci.org/p0pr0ck5/lua-resty-waf)
 
-FreeWAF is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
+lua-resty-waf is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
 
-FreeWAF is compatible with the master branch of `lua-resty-core`. The bundled version of `lua-resty-core` available in the current release of OpenResty (>= 1.9.7.4) is compatible with FreeWAF; versions bundled with older OpenResty bundles are not, so users wanting to leverage `resty.core` will either need to replace the local version with the one available from the [GitHub project](https://github.com/openresty/lua-resty-core), or patch the module based off [this commit](https://github.com/openresty/lua-resty-core/commit/40445b12c0359eb82702f0097cd65948c245b6a4).
+lua-resty-waf is compatible with the master branch of `lua-resty-core`. The bundled version of `lua-resty-core` available in the current release of OpenResty (>= 1.9.7.4) is compatible with lua-resty-waf; versions bundled with older OpenResty bundles are not, so users wanting to leverage `resty.core` will either need to replace the local version with the one available from the [GitHub project](https://github.com/openresty/lua-resty-core), or patch the module based off [this commit](https://github.com/openresty/lua-resty-core/commit/40445b12c0359eb82702f0097cd65948c245b6a4).
 
 ##Description
 
-FreeWAF is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. FreeWAF is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing, and a small virtual patchset for emerging threats. Additionally, FreeWAF is distributed with tooling to automatically translate existing ModSecurity rules, allowing users to extend FreeWAF implementation without the need to learn a new rule syntax.
+lua-resty-waf is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. lua-resty-waf is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing, and a small virtual patchset for emerging threats. Additionally, lua-resty-waf is distributed with tooling to automatically translate existing ModSecurity rules, allowing users to extend lua-resty-waf implementation without the need to learn a new rule syntax.
 
-FreeWAF was initially developed by Robert Paprocki for his Master's thesis at Western Governor's University.
+lua-resty-waf was initially developed by Robert Paprocki for his Master's thesis at Western Governor's University.
 
 ##Requirements
 
-FreeWAF requires several third-party resty lua modules, though these are all packaged with FreeWAF, and thus do not need to be installed separately. It is recommended to install FreeWAF on a system running the OpenResty software bundle; FreeWAF has not been tested on platforms built using separate Nginx source and Nginx Lua module packages.
+lua-resty-waf requires several third-party resty lua modules, though these are all packaged with lua-resty-waf, and thus do not need to be installed separately. It is recommended to install lua-resty-waf on a system running the OpenResty software bundle; lua-resty-waf has not been tested on platforms built using separate Nginx source and Nginx Lua module packages.
 
 For optimal regex compilation performance, it is recommended to build Nginx/OpenResty with a version of PCRE that supports JIT compilation. If your OS does not provide this, you can build JIT-capable PCRE directly into your Nginx/OpenResty build. To do this, reference the path to the PCRE source in the `--with-pcre` configure flag. For example:
 
@@ -88,78 +88,78 @@ You can download the PCRE source from the [PCRE website](http://www.pcre.org/). 
 
 ##Performance
 
-FreeWAF was designed with efficiency and scalability in mind. It leverages Nginx's asynchronous processing model and an efficient design to process each transaction as quickly as possible. Load testing has show that deployments implementing all provided rulesets, which are designed to mimic the logic behind the ModSecurity CRS, process transactions in roughly 300-500 microseconds per request; this equals the performance advertised by [Cloudflare's WAF](https://www.cloudflare.com/waf). Tests were run on a reasonable hardware stack (E3-1230 CPU, 32 GB RAM, 2 x 840 EVO in RAID 0), maxing at roughly 15,000 requests per second. See [this blog post](http://www.cryptobells.com/freewaf-a-high-performance-scalable-open-web-firewall) for more information.
+lua-resty-waf was designed with efficiency and scalability in mind. It leverages Nginx's asynchronous processing model and an efficient design to process each transaction as quickly as possible. Load testing has show that deployments implementing all provided rulesets, which are designed to mimic the logic behind the ModSecurity CRS, process transactions in roughly 300-500 microseconds per request; this equals the performance advertised by [Cloudflare's WAF](https://www.cloudflare.com/waf). Tests were run on a reasonable hardware stack (E3-1230 CPU, 32 GB RAM, 2 x 840 EVO in RAID 0), maxing at roughly 15,000 requests per second. See [this blog post](http://www.cryptobells.com/freewaf-a-high-performance-scalable-open-web-firewall) for more information.
 
 FreWAF workload is almost exclusively CPU bound. Memory footprint in the Lua VM (excluding persistent storage backed by `lua-shared-dict`) is roughly 2MB.
 
 ##Installation
 
-Clone the FreeWAF repo into Nginx/OpenResty's Lua package path. Module setup and configuration is detailed in the synopsis.
+Clone the lua-resty-waf repo into Nginx/OpenResty's Lua package path. Module setup and configuration is detailed in the synopsis.
 
-Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
+Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
 ##Synopsis
 
 ```lua
 	http {
-		-- include FreeWAF in the appropriate paths
-		lua_package_path '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
-		lua_package_cpath '/usr/local/openresty/lualib/FreeWAF/?.lua;;';
+		-- include lua_resty_waf in the appropriate paths
+		lua_package_path '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
+		lua_package_cpath '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
 
 		-- use resty.core for performance improvement, see the status note above
 		require "resty.core"
 
 		-- require the base module
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
 		-- define options that will be inherited across all scopes
-		FreeWAF.default_option("debug", true)
-		FreeWAF.default_option("mode", "ACTIVE")
+		lua_resty_waf.default_option("debug", true)
+		lua_resty_waf.default_option("mode", "ACTIVE")
 
 		-- perform some preloading and optimization
-		FreeWAF.init()
+		lua_resty_waf.init()
 	}
 
 	server {
 		location / {
 			access_by_lua '
-				local FreeWAF = require "fw"
+				local lua_resty_waf = require "waf"
 
-				local fw = FreeWAF:new()
+				local waf = lua_resty_waf:new()
 
 				-- default options can be overridden
-				fw:set_option("debug", false)
+				waf:set_option("debug", false)
 
 				-- run the firewall
-				fw:exec()
+				waf:exec()
 			';
 
 			header_filter_by_lua '
-				local FreeWAF = require "fw"
+				local lua_resty_waf = require "waf"
 
 				-- note that options set in previous handlers (in the same scope)
 				-- do not need to be set again
-				local fw = FreeWAF:new()
+				local waf = lua_resty_waf:new()
 
-				fw:exec()
+				waf:exec()
 			';
 
 			body_filter_by_lua '
-				local FreeWAF = require "fw"
+				local lua_resty_waf = require "waf"
 
-				local fw = FreeWAF:new()
+				local waf = lua_resty_waf:new()
 
-				fw:exec()
+				waf:exec()
 			';
 
 			log_by_lua '
-				local FreeWAF = require "fw"
+				local lua_resty_waf = require "waf"
 
-				local fw = FreeWAF:new()
+				local waf = lua_resty_waf:new()
 
 				-- write out any event log entries to the
 				-- configured target, if applicable
-				fw:write_log_events()
+				waf:write_log_events()
 			';
 		}
 	}
@@ -167,60 +167,60 @@ Note that by default FreeWAF runs in SIMULATE mode, to prevent immediately affec
 
 ##Public Functions
 
-###FreeWAF.default_option()
+###lua_resty_waf.default_option()
 
-Define default values for configuration options that will be inherited across all scopes. This is useful when you are using FreeWAF in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
+Define default values for configuration options that will be inherited across all scopes. This is useful when you are using lua-resty-waf in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
 
 ```lua
 	http {
 		init_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
-			FreeWAF.default_option("debug", true)
+			lua_resty_waf.default_option("debug", true)
 
 			-- this would be a useless operation since it does not change the default
-			FreeWAF.default_option("debug_log_level", ngx.INFO)
+			lua_resty_waf.default_option("debug_log_level", ngx.INFO)
 		';
 	}
 ```
 
-###FreeWAF.init()
+###lua-resty-waf.init()
 
-Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any FreeWAF function call in `init_by_lua`, and should never be called outside this scope.
+Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any lua-resty-waf function call in `init_by_lua`, and should never be called outside this scope.
 
 *Example*:
 
 ```lua
 	http {
 		init_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
 			-- set default options...
 
-			FreeWAF.init()
+			lua_resty_waf.init()
 		';
 	}
 ```
 
 ##Public Methods
 
-###FreeWAF:new()
+###lua-resty-waf:new()
 
-Instantiate a new instance of FreeWAF. You must call this in every request handler phase you wish to run FreeWAF, and use the return result to call further object methods.
+Instantiate a new instance of lua-resty-waf. You must call this in every request handler phase you wish to run lua-resty-waf, and use the return result to call further object methods.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
-			local fw = FreeWAF:new()
+			local waf = lua_resty_waf:new()
 		';
 	}
 ```
 
-###FreeWAF:set_option()
+###lua-resty-waf:set_option()
 
 Configure an option on a per-scope basis. You should only do this if you are overriding a default value in this scope (e.g. it would be useless to use this to define the same configurable everywhere).
 
@@ -229,17 +229,17 @@ Configure an option on a per-scope basis. You should only do this if you are ove
 ```lua
 	location / {
 		access_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
-			local fw = FreeWAF:new()
+			local waf = lua_resty_waf:new()
 
 			-- enable debug logging only for this scope
-			fw:set_option("debug", true)
+			waf:set_option("debug", true)
 		';
 	}
 ```
 
-###FreeWAF:reset_option()
+###lua-resty-waf:reset_option()
 
 Set the given option to its documented default, regardless of whatever value was assigned via `default_option`. This is most useful for options that are more complex than boolean or integer values.
 
@@ -248,9 +248,9 @@ Set the given option to its documented default, regardless of whatever value was
 ```lua
 	http {
 		init_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
-			FreeWAF.default_option("allowed_content_types", "text/json")
+			lua_resty_waf.default_option("allowed_content_types", "text/json")
 		';
 	}
 
@@ -258,17 +258,17 @@ Set the given option to its documented default, regardless of whatever value was
 
 	location / {
 		access_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "waf"
 
-			local fw = FreeWAF:new()
+			local waf = lua_resty_waf:new()
 
 			-- reset the value to its documented default
-			fw:reset_option("allowed_content_types")
+			waf:reset_option("allowed_content_types")
 		';
 	}
 ```
 
-###FreeWAF:write_log_events()
+###lua-resty-waf:write_log_events()
 
 Write any audit log entries that were generated from the transaction. This should be called in the `log_by_lua` handler.
 
@@ -277,20 +277,20 @@ Write any audit log entries that were generated from the transaction. This shoul
 ```lua
 	location / {
 		log_by_lua '
-			local FreeWAF = require "fw"
+			local lua_resty_waf = require "awf"
 
-			local fw = FreeWAF:new()
+			local waf = lua_resty_waf:new()
 
 			-- write out any event log entries to the
 			-- configured target, if applicable
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 ```
 
 ##Options
 
-Module options can be configured using the `default_option` and `set_option` functions. Use `default_option` when in the `init_by_lua` handler, and without calling `FreeWAF:new()`, to set default values that will be inherited across all scopes. These values (or options that were not modified by `default_option` can be further adjusted on a per-scope basis via `set_option`. Additionally, scope-level options can be re-adjusted back to the documented defaults via the `reset_option` method. This will set the given option to its documented default, overriding the default set by the `default_option` function.
+Module options can be configured using the `default_option` and `set_option` functions. Use `default_option` when in the `init_by_lua` handler, and without calling `lua-resty-waf:new()`, to set default values that will be inherited across all scopes. These values (or options that were not modified by `default_option` can be further adjusted on a per-scope basis via `set_option`. Additionally, scope-level options can be re-adjusted back to the documented defaults via the `reset_option` method. This will set the given option to its documented default, overriding the default set by the `default_option` function.
 
 Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
 
@@ -311,7 +311,7 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 	location / {
 		access_by_lua '
-			fw:set_option("add_ruleset", 50000)
+			waf:set_option("add_ruleset", 50000)
 		';
 	}
 ```
@@ -324,14 +324,14 @@ Multiple rulesets may be added by passing a table of values to `set_option`. Not
 
 *Default*: false
 
-Instructs FreeWAF to continue processing the request when a Content-Type header has been sent that is not in the `allowed_content_types` table. Such requests will not have their request body processed by FreeWAF (the `REQUEST_BODY` collection will be nil). In this manner, users do not need to explicitly whitelist all possible Content-Type headers they may encounter.
+Instructs lua-resty-waf to continue processing the request when a Content-Type header has been sent that is not in the `allowed_content_types` table. Such requests will not have their request body processed by lua-resty-waf (the `REQUEST_BODY` collection will be nil). In this manner, users do not need to explicitly whitelist all possible Content-Type headers they may encounter.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("allow_unknown_content_types", true)
+			waf:set_option("allow_unknown_content_types", true)
 		';
 	}
 ```
@@ -349,10 +349,10 @@ Defines one or more Content-Type headers that will be allowed, in addition to th
 	location / {
 		access_by_lua '
 			-- define a single allowed Content-Type value
-			fw:set_option("allowed_content_types", "text/xml")
+			waf:set_option("allowed_content_types", "text/xml")
 
 			-- defines multiple allowed Content-Type values
-			fw:set_option("allowed_content_types", { "text/html", "text/json", "application/json" })
+			waf:set_option("allowed_content_types", { "text/html", "text/json", "application/json" })
 		';
 	}
 ```
@@ -370,7 +370,7 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("debug", true)
+			waf:set_option("debug", true)
 		';
 	}
 ```
@@ -386,7 +386,7 @@ Sets the nginx log level constant used for debug logging.
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("debug_log_level", ngx.DEBUG)
+			waf:set_option("debug_log_level", ngx.DEBUG)
 		';
 	}
 ```
@@ -402,7 +402,7 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("disable_pcre_optimization", true)
+			waf:set_option("disable_pcre_optimization", true)
 		';
 	}
 ```
@@ -411,19 +411,19 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 
 *Default*: true
 
-Determines whether to write log entries for rule matches in a transaction that was not altered by FreeWAF. "Altered" is defined as FreeWAF acting on a rule whose action is `ACCEPT` or `DENY`. When this option is unset, FreeWAF will log rule matches even if the transaction was not altered. By default, FreeWAF will only write log entries for matches if the transaction was altered.
+Determines whether to write log entries for rule matches in a transaction that was not altered by lua-resty-waf. "Altered" is defined as lua-resty-waf acting on a rule whose action is `ACCEPT` or `DENY`. When this option is unset, lua-resty-waf will log rule matches even if the transaction was not altered. By default, lua-resty-waf will only write log entries for matches if the transaction was altered.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_altered_only", false)
+			waf:set_option("event_log_altered_only", false)
 		';
 	}
 ```
 
-Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but FreeWAF is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
+Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but lua-resty-waf is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
 
 ###event_log_buffer_size
 
@@ -437,7 +437,7 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 	location / {
 		access_by_lua '
 			-- 8 KB event log message buffer
-			fw:set_option("event_log_buffer_size", 8192)
+			waf:set_option("event_log_buffer_size", 8192)
 		';
 	}
 ```
@@ -453,7 +453,7 @@ Sets the nginx log level constant used for event logging.
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_level", ngx.WARN)
+			waf:set_option("event_log_level", ngx.WARN)
 		';
 	}
 ```
@@ -469,8 +469,8 @@ Defines what extra variables from `ngx.var` are put to the log event. This is a 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_ngx_vars", "host")
-			fw:set_option("event_log_ngx_vars", "request_id")
+			waf:set_option("event_log_ngx_vars", "host")
+			waf:set_option("event_log_ngx_vars", "request_id")
 		';
 	}
 ```
@@ -498,7 +498,7 @@ Defines an interval, in seconds, at which the event log buffer will periodically
 	location / {
 		access_by_lua '
 			-- flush the event log buffer every 30 seconds
-			fw:set_option("event_log_periodic_flush", 30)
+			waf:set_option("event_log_periodic_flush", 30)
 		';
 	}
 ```
@@ -514,7 +514,7 @@ When set to true, the log entries contain the request arguments under the `uri_a
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_request_arguments", true)
+			waf:set_option("event_log_request_arguments", true)
 		';
 	}
 ```
@@ -530,7 +530,7 @@ The headers of the HTTP request is copied to the log event, under the `request_h
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_request_headers", true)
+			waf:set_option("event_log_request_headers", true)
 		';
 	}
 ```
@@ -558,7 +558,7 @@ Defines which IP protocol to use (TCP or UDP) when shipping event logs via a rem
 	location / {
 		access_by_lua '
 			-- send logs via TCP
-			fw:set_option("event_log_socket_proto", "tcp")
+			waf:set_option("event_log_socket_proto", "tcp")
 		';
 	}
 ```
@@ -567,7 +567,7 @@ Defines which IP protocol to use (TCP or UDP) when shipping event logs via a rem
 
 *Default*: error
 
-Defines the destination for event logs. FreeWAF currently supports logging to the error log, a separate file on the local file system, or a remote TCP or UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
+Defines the destination for event logs. lua-resty-waf currently supports logging to the error log, a separate file on the local file system, or a remote TCP or UDP server. In the latter two cases, event logs are buffered and flushed when a defined threshold is reached (see below for further options regarding event logging options).
 
 *Example*:
 
@@ -575,13 +575,13 @@ Defines the destination for event logs. FreeWAF currently supports logging to th
 	location / {
 		access_by_lua '
 			-- send event logs to the server's error_log location (default)
-			fw:set_option("event_log_target", "error")
+			waf:set_option("event_log_target", "error")
 
 			-- send event logs to a local file on disk
-			fw:set_option("event_log_target", "file")
+			waf:set_option("event_log_target", "file")
 
 			-- send event logs to a remote server
-			fw:set_option("event_log_target", "socket")
+			waf:set_option("event_log_target", "socket")
 		';
 	}
 ```
@@ -599,7 +599,7 @@ Defines the target server for event logs that target a remote server.
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_target_host", "10.10.10.10")
+			waf:set_option("event_log_target_host", "10.10.10.10")
 		';
 	}
 ```
@@ -615,7 +615,7 @@ Defines the target path for event logs that target a local file system location.
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_target_path", "/var/log/freewaf/event.log")
+			waf:set_option("event_log_target_path", "/var/log/lua-resty-waf/event.log")
 		';
 	}
 ```
@@ -633,7 +633,7 @@ Defines the target port for event logs that target a remote server.
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("event_log_target_port", 9001)
+			waf:set_option("event_log_target_port", 9001)
 		';
 	}
 ```
@@ -650,17 +650,17 @@ Sets the verbosity used in writing event log notification. The higher the verbos
 	location / {
 		access_by_lua '
 			-- default verbosity. the client IP, request URI, rule match data, and rule ID will be logged
-			fw:set_option("event_log_verbosity", 1)
+			waf:set_option("event_log_verbosity", 1)
 
 			-- the rule description will be written in addition to existing data
-			fw:set_option("event_log_verbosity", 2)
+			waf:set_option("event_log_verbosity", 2)
 
 			-- the rule description, options and action will be written in addition to existing data
-			fw:set_option("event_log_verbosity", 3)
+			waf:set_option("event_log_verbosity", 3)
 
 			-- the entire rule definition, including the match pattern, will be written in addition to existing data
 			-- note that for some rule definitions, such as the XSS and SQLi rulesets, this pattern can be large
-			fw:set_option("event_log_verbosity", 4)
+			waf:set_option("event_log_verbosity", 4)
 		';
 	}
 ```
@@ -676,7 +676,7 @@ Instructs the module to ignore a specified rule ID. Note that ignoring a rule in
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("ignore_rule", 40294)
+			waf:set_option("ignore_rule", 40294)
 		';
 	}
 ```
@@ -694,7 +694,7 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("ignore_ruleset", 40000)
+			waf:set_option("ignore_ruleset", 40000)
 		';
 	}
 ```
@@ -703,7 +703,7 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 
 *Default*: SIMULATE
 
-Sets the operational mode of the module. Options are ACTIVE, INACTIVE, and SIMULATE. In ACTIVE mode, rule matches are logged and actions are run. In SIMULATE mode, FreeWAF loops through each enabled rule and logs rule matches, but does not complete the action specified in a given run. INACTIVE mode prevents the module from running.
+Sets the operational mode of the module. Options are ACTIVE, INACTIVE, and SIMULATE. In ACTIVE mode, rule matches are logged and actions are run. In SIMULATE mode, lua-resty-waf loops through each enabled rule and logs rule matches, but does not complete the action specified in a given run. INACTIVE mode prevents the module from running.
 
 By default, SIMULATE is selected if a mode is not explicitly set; this requires new users to actively implement blocking by setting the mode to ACTIVE.
 
@@ -712,7 +712,7 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("mode", "ACTIVE")
+			waf:set_option("mode", "ACTIVE")
 		';
 	}
 ```
@@ -721,7 +721,7 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 
 *Default* true
 
-Enable processing of multipart/form-data request bodies (when present), using the `lua-resty-upload` module. In the future, FreeWAF may use this processing to perform stricter checking of upload bodies; for now this module performs only minimal sanity checks on the request body, and will not log an event if the request body is invalid. Disable this option if you do not need this checking, or if bugs in the upstream module are causing problems with HTTP uploads.
+Enable processing of multipart/form-data request bodies (when present), using the `lua-resty-upload` module. In the future, lua-resty-waf may use this processing to perform stricter checking of upload bodies; for now this module performs only minimal sanity checks on the request body, and will not log an event if the request body is invalid. Disable this option if you do not need this checking, or if bugs in the upstream module are causing problems with HTTP uploads.
 
 *Example*:
 
@@ -730,7 +730,7 @@ Enable processing of multipart/form-data request bodies (when present), using th
 		access_by_lua '
 			-- disable processing of multipart/form-data requests
 			-- note that the request body will still be sent to the upstream
-			fw:set_option("process_multipart_body", false)
+			waf:set_option("process_multipart_body", false)
 		';
 	}
 ```
@@ -739,14 +739,14 @@ Enable processing of multipart/form-data request bodies (when present), using th
 
 *Default*: 5
 
-Sets the threshold for anomaly scoring. When the threshold is reached, FreeWAF will deny the request.
+Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty-waf will deny the request.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("score_threshold", 10)
+			waf:set_option("score_threshold", 10)
 		';
 	}
 ```
@@ -767,7 +767,7 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 
 	location / {
 		access_by_lua '
-			fw:set_option("storage_zone", "persistent_storage")
+			waf:set_option("storage_zone", "persistent_storage")
 		';
 	}
 ```
@@ -788,7 +788,7 @@ Defines the content length threshold beyond which response bodies will not be pr
 	location / {
 		access_by_lua '
 			-- increase the max response size to 2 MB
-			fw:set_option("res_body_max_size", 1024 * 1024 * 2)
+			waf:set_option("res_body_max_size", 1024 * 1024 * 2)
 		';
 	}
 ```
@@ -798,7 +798,7 @@ Note that by nature, it is required to buffer the entire response body in order 
 
 *Default*: "text/plain", "text/html"
 
-Defines the MIME types with which FreeWAF will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
+Defines the MIME types with which lua-resty-waf will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
 
 *Example*:
 
@@ -806,7 +806,7 @@ Defines the MIME types with which FreeWAF will process the response body. This v
 	location / {
 		access_by_lua '
 			-- mime types that will be processed are now text/plain, text/html, and text/json
-			fw:set_option("res_body_mime_types", "text/json")
+			waf:set_option("res_body_mime_types", "text/json")
 		';
 	}
 ```
@@ -817,14 +817,14 @@ Multiple MIME types can be added by passing a table of types to `set_option`.
 
 *Default*: false
 
-Set an HTTP header `X-FreeWAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("req_tid_header", true)
+			waf:set_option("req_tid_header", true)
 		';
 	}
 ```
@@ -833,33 +833,33 @@ Set an HTTP header `X-FreeWAF-ID` in the upstream request, with the value as the
 
 *Default*: false
 
-Set an HTTP header `X-FreeWAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
 
 *Example*:
 
 ```lua
 	location / {
 		access_by_lua '
-			fw:set_option("res_tid_header", true)
+			waf:set_option("res_tid_header", true)
 		';
 	}
 ```
 
 ##Phase Handling
 
-FreeWAF is designed to run in multiple phases of the request lifecycle. Rules can be processed in the following phases:
+lua-resty-waf is designed to run in multiple phases of the request lifecycle. Rules can be processed in the following phases:
 
 * **access**: Request information, such as URI, request headers, URI args, and request body are available in this phase.
 * **header_filter**: Response headers and HTTP status are available in this phase.
 * **body_filter**: Response body is available in this phase.
 
-These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running FreeWAF in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
+These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
 
-Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. FreeWAF is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
+Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. lua-resty-waf is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
 
 ##Included Rulesets
 
-FreeWAF is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
+lua-resty-waf is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
 
 * **11000**: Local policy whitelisting
 * **20000**: HTTP protocol violation
@@ -873,15 +873,15 @@ FreeWAF is distributed with a number of rulesets that are designed to mimic the 
 
 ##Rule Definitions
 
-FreeWAF parses rules definitions from JSON blobs stored on-disk. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic some functionality of the ModSecurity CRS, particularly the `base_rules` definitions. Additionally, the included `modsec2freewaf.pl` script can be used to translate additional or custom rulesets to a FreeWAF-compatible JSON blob.
+lua-resty-waf parses rules definitions from JSON blobs stored on-disk. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic some functionality of the ModSecurity CRS, particularly the `base_rules` definitions. Additionally, the included `modsec2lua-resty-waf.pl` script can be used to translate additional or custom rulesets to a lua-resty-waf-compatible JSON blob.
 
-Note that there are several limitations in the translation script, with respect to unsupported actions, collections, and operators. Please see [this wiki page](https://github.com/p0pr0ck5/FreeWAF/wiki/Known-ModSecurity-Translation-Limitations) for an up-to-date list of known incompatibilities.
+Note that there are several limitations in the translation script, with respect to unsupported actions, collections, and operators. Please see [this wiki page](https://github.com/p0pr0ck5/lua-resty-waf/wiki/Known-ModSecurity-Translation-Limitations) for an up-to-date list of known incompatibilities.
 
 ##Notes
 
 ###Community
 
-There is a Freenode IRC channel `#freewaf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
+There is a Freenode IRC channel `#lua-resty-waf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
 
 ###Pull Requests
 
@@ -898,7 +898,7 @@ Please target all pull requests towards the development branch, or a feature bra
 
 ##Limitations
 
-FreeWAF is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo.
+lua-resty-waf is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo.
 
 ##License
 
@@ -922,4 +922,4 @@ Please report bugs by creating a ticket with the GitHub issue tracker.
 ##See Also
 
 - The OpenResty project: <http://openresty.org/>
-- My personal blog for updates and notes on FreeWAF development: <http://www.cryptobells.com/tag/freewaf/>
+- My personal blog for updates and notes on lua-resty-waf development: <http://www.cryptobells.com/tag/lua-resty-waf/>

@@ -11,17 +11,17 @@ __DATA__
 === TEST 1: Call init with no options
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.init()
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -36,19 +36,19 @@ GET /t
 === TEST 2: Inherit init options
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.default_option("debug", true)
-		FreeWAF.default_option("debug_log_level", ngx.DEBUG)
-		FreeWAF.init()
+		lua_resty_waf.default_option("debug", true)
+		lua_resty_waf.default_option("debug_log_level", ngx.DEBUG)
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

@@ -12,18 +12,18 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local FreeWAF     = require "fw"
-			local fw          = FreeWAF:new()
+			local lua_resty_waf     = require "waf"
+			local waf               = lua_resty_waf:new()
 
-			ngx.say(collections.SCORE_THRESHOLD(fw))
+			ngx.say(collections.SCORE_THRESHOLD(waf))
 		';
 	}
 --- request
@@ -38,10 +38,10 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -62,18 +62,18 @@ function
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:exec()
+			waf:exec()
 		';
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local FreeWAF     = require "fw"
-			local fw          = FreeWAF:new()
+			local lua_resty_waf     = require "waf"
+			local waf               = lua_resty_waf:new()
 
-			ngx.say(type(collections.SCORE_THRESHOLD(fw)))
+			ngx.say(type(collections.SCORE_THRESHOLD(waf)))
 		';
 	}
 --- request

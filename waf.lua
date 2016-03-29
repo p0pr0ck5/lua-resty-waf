@@ -94,12 +94,12 @@ end
 local function _transaction_id_header(self, ctx)
 	-- upstream request header
 	if (self._req_tid_header) then
-		ngx.req.set_header("X-FreeWAF-ID", self.transaction_id)
+		ngx.req.set_header("X-Lua-Resty-WAF-ID", self.transaction_id)
 	end
 
 	-- downstream response header
 	if (self._res_tid_header) then
-		ngx.header["X-FreeWAF-ID"] = self.transaction_id
+		ngx.header["X-Lua-Resty-WAF-ID"] = self.transaction_id
 	end
 
 	ctx.t_header_set = true
@@ -107,7 +107,7 @@ end
 
 -- cleanup
 local function _finalize(self, ctx)
-	-- set X-FreeWAF-ID headers as appropriate
+	-- set X-Lua-Resty-WAF-ID headers as appropriate
 	if (not ctx.t_header_set) then
 		_transaction_id_header(self, ctx)
 	end
@@ -381,7 +381,7 @@ function _M.exec(self)
 	local phase = ngx.get_phase()
 
 	if (not phase_t.is_valid_phase(phase)) then
-		logger.fatal_fail("FreeWAF should not be run in phase " .. phase)
+		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
 	end
 
 	local ctx         = ngx.ctx

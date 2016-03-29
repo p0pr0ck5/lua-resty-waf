@@ -12,11 +12,11 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
         ';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -35,12 +35,12 @@ application/foobar not a valid content type
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("allow_unknown_content_types", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("allow_unknown_content_types", true)
+			waf:exec()
         ';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

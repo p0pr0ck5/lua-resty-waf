@@ -11,12 +11,12 @@ __DATA__
 === TEST 1: Skip whitelisting of non-passive requests
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 
 	location /t {
@@ -36,13 +36,13 @@ Match of rule 11003
 === TEST 2: Whitelist .jpg
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.jpg
@@ -54,13 +54,13 @@ Rule action was ACCEPT
 === TEST 3: Whitelist .jpeg
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.jpeg
@@ -72,13 +72,13 @@ Rule action was ACCEPT
 === TEST 4: Whitelist .png
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.png
@@ -90,13 +90,13 @@ Rule action was ACCEPT
 === TEST 5: Whitelist .gif
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.gif
@@ -108,13 +108,13 @@ Rule action was ACCEPT
 === TEST 6: Whitelist .ico
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.ico
@@ -126,13 +126,13 @@ Rule action was ACCEPT
 === TEST 7: Do not whitelist unmatched extension (.tiff)
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.tiff
@@ -144,13 +144,13 @@ Rule action was ACCEPT
 === TEST 8: Do not whitelist non-final extension
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.jpg.exe

@@ -6,18 +6,18 @@ local cjson  = require("cjson")
 local logger = require("lib.log")
 local util   = require("lib.util")
 
-function _M.initialize(FW, storage, col)
-	if (not FW._storage_zone) then
+function _M.initialize(waf, storage, col)
+	if (not waf._storage_zone) then
 		return
 	end
 
 	local altered, serialized, shm
-	shm        = ngx.shared[FW._storage_zone]
+	shm        = ngx.shared[waf._storage_zone]
 	serialized = shm:get(col)
 	altered    = false
 
 	if (not serialized) then
-		logger.log(FW, "Initializing an empty collection for " .. col)
+		logger.log(waf, "Initializing an empty collection for " .. col)
 		storage[col] = {}
 	else
 		local data = cjson.decode(serialized)
@@ -27,9 +27,9 @@ function _M.initialize(FW, storage, col)
 		-- internal expiry can't act on individual collection elements
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
-				logger.log(FW, "checking " .. key)
+				logger.log(waf, "checking " .. key)
 				if (data["__expire_" .. key] < ngx.time()) then
-					logger.log(FW, "Removing expired key: " .. key)
+					logger.log(waf, "Removing expired key: " .. key)
 					data["__expire_" .. key] = nil
 					data[key] = nil
 					altered = true
@@ -43,7 +43,7 @@ function _M.initialize(FW, storage, col)
 	storage[col]["__altered"] = altered
 end
 
-function _M.set_var(FW, ctx, element, value)
+function _M.set_var(waf, ctx, element, value)
 	local col     = ctx.col_lookup[string.upper(element.col)]
 	local key     = element.key
 	local inc     = element.inc
@@ -55,19 +55,19 @@ function _M.set_var(FW, ctx, element, value)
 		if (existing and type(existing) ~= "number") then
 			logger.fatal_fail("Cannot increment a value that was not previously a number")
 		elseif (not existing) then
-			logger.log(FW, "Incrementing a non-existing value")
+			logger.log(waf, "Incrementing a non-existing value")
 			existing = 0
 		end
 
 		if (type(value) == "number") then
 			value = value + existing
 		else
-			logger.log(FW, "Failed to increment a non-number, falling back to existing value")
+			logger.log(waf, "Failed to increment a non-number, falling back to existing value")
 			value = existing
 		end
 	end
 
-	logger.log(FW, "Setting " .. col .. ":" .. key .. " to " .. value)
+	logger.log(waf, "Setting " .. col .. ":" .. key .. " to " .. value)
 
 	-- save data to in-memory table
 	-- data not in the TX col will be persisted at the end of the phase
@@ -75,25 +75,25 @@ function _M.set_var(FW, ctx, element, value)
 	storage[col]["__altered"] = true
 end
 
-function _M.persist(FW, storage)
-	if (not FW._storage_zone) then
+function _M.persist(waf, storage)
+	if (not waf._storage_zone) then
 		return
 	end
 
-	local shm = ngx.shared[FW._storage_zone]
+	local shm = ngx.shared[waf._storage_zone]
 
 	for col in pairs(storage) do
 		if (col ~= 'TX') then
-			logger.log(FW, 'Examining ' .. col)
+			logger.log(waf, 'Examining ' .. col)
 
 			if (storage[col]["__altered"]) then
 				local serialized = cjson.encode(storage[col])
 
-				logger.log(FW, 'Persisting value: ' .. tostring(serialized))
+				logger.log(waf, 'Persisting value: ' .. tostring(serialized))
 
 				shm:set(col, serialized)
 			else
-				logger.log(FW, "Not persisting a collection that wasn't altered")
+				logger.log(waf, "Not persisting a collection that wasn't altered")
 			end
 		end
 	end

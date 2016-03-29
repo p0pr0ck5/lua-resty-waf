@@ -3,7 +3,7 @@ cache:
     - apt
     - ccache
 notifications:
-  irc: "chat.freenode.net#freewaf"
+  irc: "chat.freenode.net#lua-resty-waf"
   webhooks: https://www.cryptobells.com/endpoint
 env:
     - V_OPENRESTY=1.9.7.4 V_PCRE=8.38 TEST=unit

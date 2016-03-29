@@ -12,17 +12,17 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 			local lookup  = require "lib.lookup"
 
-			fw:set_option("event_log_target", "socket")
-			fw:set_option("event_log_target_host", "127.0.0.1")
-			fw:set_option("event_log_target_port", 9001)
-			fw:set_option("event_log_socket_proto", "tcp")
-			fw:set_option("event_log_buffer_size", 32)
+			waf:set_option("event_log_target", "socket")
+			waf:set_option("event_log_target_host", "127.0.0.1")
+			waf:set_option("event_log_target_port", 9001)
+			waf:set_option("event_log_socket_proto", "tcp")
+			waf:set_option("event_log_buffer_size", 32)
 
-			lookup.write_log_events[fw._event_log_target](fw, "A message has been sent to a socket")
+			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -42,18 +42,18 @@ A response is sent
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 			local lookup  = require "lib.lookup"
 
-			fw:set_option("event_log_target", "socket")
-			fw:set_option("event_log_target_host", "127.0.0.1")
-			fw:set_option("event_log_target_port", 9001)
-			fw:set_option("event_log_socket_proto", "tcp")
-			fw:set_option("event_log_buffer_size", 64)
-			fw:set_option("event_log_periodic_flush", 1)
+			waf:set_option("event_log_target", "socket")
+			waf:set_option("event_log_target_host", "127.0.0.1")
+			waf:set_option("event_log_target_port", 9001)
+			waf:set_option("event_log_socket_proto", "tcp")
+			waf:set_option("event_log_buffer_size", 64)
+			waf:set_option("event_log_periodic_flush", 1)
 
-			lookup.write_log_events[fw._event_log_target](fw, "A message has been sent to a socket")
+			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(2)
 		';
@@ -75,17 +75,17 @@ A response is sent
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 			local lookup  = require "lib.lookup"
 
-			fw:set_option("event_log_target", "socket")
-			fw:set_option("event_log_target_host", "127.0.0.1")
-			fw:set_option("event_log_target_port", 9001)
-			fw:set_option("event_log_socket_proto", "tcp")
-			fw:set_option("event_log_buffer_size", 64)
+			waf:set_option("event_log_target", "socket")
+			waf:set_option("event_log_target_host", "127.0.0.1")
+			waf:set_option("event_log_target_port", 9001)
+			waf:set_option("event_log_socket_proto", "tcp")
+			waf:set_option("event_log_buffer_size", 64)
 
-			lookup.write_log_events[fw._event_log_target](fw, "A message has been sent to a socket")
+			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(2)
 		';

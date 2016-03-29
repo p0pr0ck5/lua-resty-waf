@@ -162,12 +162,12 @@ function _M.contains(haystack, needle)
 	return contains, value
 end
 
-function _M.str_find(FW, subject, pattern)
+function _M.str_find(waf, subject, pattern)
 	local from, to, match, value
 
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
-			match, value = _M.str_find(FW, v, pattern)
+			match, value = _M.str_find(waf, v, pattern)
 
 			if (match) then
 				break
@@ -185,13 +185,13 @@ function _M.str_find(FW, subject, pattern)
 	return match, value
 end
 
-function _M.regex(FW, subject, pattern)
-	local opts = FW._pcre_flags
+function _M.regex(waf, subject, pattern)
+	local opts = waf._pcre_flags
 	local captures, err, match
 
 	if (type(subject) == "table") then
 		for _, v in ipairs(subject) do
-			match, captures = _M.regex(FW, v, pattern)
+			match, captures = _M.regex(waf, v, pattern)
 
 			if (match) then
 				break

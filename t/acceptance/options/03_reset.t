@@ -11,19 +11,19 @@ __DATA__
 === TEST 1: Reset a simple value
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.default_option("debug", true)
-		FreeWAF.init()
+		lua_resty_waf.default_option("debug", true)
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:reset_option("debug")
-			fw:exec()
+			waf:reset_option("debug")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -38,20 +38,20 @@ GET /t
 === TEST 2: Reset a simple value and set it again
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.default_option("debug", true)
-		FreeWAF.init()
+		lua_resty_waf.default_option("debug", true)
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:reset_option("debug")
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:reset_option("debug")
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -67,20 +67,20 @@ GET /t
 === TEST 3: Reset a table value
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.default_option("ignore_ruleset", 11000)
-		FreeWAF.init()
+		lua_resty_waf.default_option("ignore_ruleset", 11000)
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:reset_option("ignore_ruleset")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:reset_option("ignore_ruleset")
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -96,21 +96,21 @@ Beginning ruleset 11000,
 === TEST 4: Reset a table value and set it again
 --- http_config
 	init_by_lua '
-		local FreeWAF = require "fw"
+		local lua_resty_waf = require "waf"
 
-		FreeWAF.default_option("ignore_ruleset", 11000)
-		FreeWAF.init()
+		lua_resty_waf.default_option("ignore_ruleset", 11000)
+		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:reset_option("ignore_ruleset")
-			fw:set_option("ignore_ruleset", 10000)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:reset_option("ignore_ruleset")
+			waf:set_option("ignore_ruleset", 10000)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

@@ -12,28 +12,28 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
-			storage.persist(fw, ctx.storage)
+			storage.persist(waf, ctx.storage)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -52,25 +52,25 @@ Not persisting a collection that wasn't altered
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
-			storage.persist(fw, ctx.storage)
+			storage.persist(waf, ctx.storage)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -89,25 +89,25 @@ Persisting value: {"
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "FOO")
+			storage.initialize(waf, ctx.storage, "FOO")
 
-			storage.persist(fw, ctx.storage)
+			storage.persist(waf, ctx.storage)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -126,28 +126,28 @@ Not persisting a collection that wasn't altered
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local FreeWAF = require "fw"
-		FreeWAF.default_option("storage_zone", "store")
-		FreeWAF.default_option("debug", true)
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { TX = "TX" } }
 			local var = require("cjson").encode({ COUNT = 5 })
-			local shm = ngx.shared[fw._storage_zone]
+			local shm = ngx.shared[waf._storage_zone]
 			shm:set("TX", var)
 
 			local storage = require "lib.storage"
-			storage.initialize(fw, ctx.storage, "TX")
+			storage.initialize(waf, ctx.storage, "TX")
 
 			local element = { col = "TX", key = "COUNT", value = 1 }
-			storage.set_var(fw, ctx, element, element.value)
+			storage.set_var(waf, ctx, element, element.value)
 
-			storage.persist(fw, ctx.storage)
+			storage.persist(waf, ctx.storage)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
