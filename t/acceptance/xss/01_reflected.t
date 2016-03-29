@@ -29,11 +29,11 @@ You've entered the following: 'bar'
 --- config
 	location /t {
 		access_by_lua '
-			FreeWAF = require "fw"
-			local fw = FreeWAF:new()
+			lua_resty_waf = require "waf"
+			local waf      = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -43,10 +43,10 @@ You've entered the following: 'bar'
 		';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -66,12 +66,12 @@ You've entered the following: 'bar'
 --- config
 	location /t {
 		access_by_lua '
-			FreeWAF = require "fw"
-			local fw = FreeWAF:new()
+			lua_resty_waf = require "waf"
+			local waf      = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -81,10 +81,10 @@ You've entered the following: 'bar'
 		';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -121,11 +121,11 @@ You've entered the following: '<script>alert(1)</script>'
 --- config
 	location /t {
 		access_by_lua '
-			FreeWAF = require "fw"
-			local fw = FreeWAF:new()
+			lua_resty_waf = require "waf"
+			local waf      = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -135,10 +135,10 @@ You've entered the following: '<script>alert(1)</script>'
 		';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -160,12 +160,12 @@ You've entered the following: '<script>alert(1)</script>'
 --- config
 	location /t {
 		access_by_lua '
-			FreeWAF = require "fw"
-			local fw = FreeWAF:new()
+			lua_resty_waf = require "waf"
+			local waf      = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("mode", "ACTIVE")
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("mode", "ACTIVE")
+			waf:exec()
 		';
 
 		content_by_lua '
@@ -175,10 +175,10 @@ You've entered the following: '<script>alert(1)</script>'
 		';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request

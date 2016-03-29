@@ -13,7 +13,7 @@ __DATA__
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -21,7 +21,7 @@ __DATA__
 GET /t
 --- error_code: 200
 --- response_body
-0
+true
 --- no_error_log
 [error]
 
@@ -30,7 +30,7 @@ GET /t
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.ac_lookup({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -38,7 +38,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- response_body
-0
+true
 --- no_error_log
 [error]
 
@@ -47,7 +47,7 @@ GET /t
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup("far", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.ac_lookup("far", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -64,7 +64,7 @@ nil
     location = /t {
         content_by_lua '
 			local op = require "lib.operators"
-			local match = op.ac_lookup({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
+			local match, value = op.ac_lookup({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
 	}
@@ -73,6 +73,44 @@ GET /t
 --- error_code: 200
 --- response_body
 nil
+--- no_error_log
+[error]
+
+=== TEST 5: Return values
+--- config
+    location = /t {
+        content_by_lua '
+			local op = require "lib.operators"
+			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			ngx.say(match)
+			ngx.say(value)
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+true
+foo
+--- no_error_log
+[error]
+
+=== TEST 6: Return value types
+--- config
+    location = /t {
+        content_by_lua '
+			local op = require "lib.operators"
+			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
+			ngx.say(type(match))
+			ngx.say(type(value))
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+boolean
+string
 --- no_error_log
 [error]
 

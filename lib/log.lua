@@ -1,11 +1,11 @@
 local _M = {}
 
-_M.version = "0.6.0"
+_M.version = "0.7.0"
 
 -- debug logger
-function _M.log(FW, msg)
-	if (FW._debug == true) then
-		ngx.log(FW._debug_log_level, '[', FW.transaction_id, '] ', msg)
+function _M.log(waf, msg)
+	if (waf._debug == true) then
+		ngx.log(waf._debug_log_level, '[', waf.transaction_id, '] ', msg)
 	end
 end
 

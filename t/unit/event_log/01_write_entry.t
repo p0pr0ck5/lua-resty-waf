@@ -12,26 +12,26 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
 GET /t
 --- more_headers
-User-Agent: FreeWAF Dummy
+User-Agent: lua_resty_waf Dummy
 --- error_code: 200
 --- error_log eval
 [
@@ -49,20 +49,20 @@ qr/"id":"[a-f0-9]{20}"/
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request
@@ -86,21 +86,21 @@ qr/"id":"[a-f0-9]{20}"/
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("event_log_altered_only", false)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("event_log_altered_only", false)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:write_log_events()
+			waf:write_log_events()
 		';
 	}
 --- request

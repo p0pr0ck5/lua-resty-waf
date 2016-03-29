@@ -11,15 +11,15 @@ __DATA__
 === TEST 1: Log a string
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", true)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", true)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -35,16 +35,16 @@ We have logged a string!
 === TEST 2: Log a string at ngx.INFO log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", true)
-			fw:set_option("debug_log_level", ngx.INFO)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", true)
+			waf:set_option("debug_log_level", ngx.INFO)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -62,16 +62,16 @@ We have logged a string!
 === TEST 3: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", true)
-			fw:set_option("debug_log_level", ngx.WARN)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", true)
+			waf:set_option("debug_log_level", ngx.WARN)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -87,16 +87,16 @@ qr/\[warn\].*We have logged a string!/
 === TEST 4: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", true)
-			fw:set_option("debug_log_level", ngx.DEBUG)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", true)
+			waf:set_option("debug_log_level", ngx.DEBUG)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -112,15 +112,15 @@ qr/\[debug\].*We have logged a string!/
 === TEST 5: Do not log a string if debug disabled
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", false)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", false)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -135,15 +135,15 @@ We have logged a string!
 === TEST 6: Do not log a string if insufficient log level
 --- http_config
 	init_by_lua '
-		FreeWAF = require "fw"
+		lua_resty_waf = require "waf"
 		logger  = require "lib.log"
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local fw = FreeWAF:new()
-			fw:set_option("debug", true)
-			logger.log(fw, "We have logged a string!")
+			local waf      = lua_resty_waf:new()
+			waf:set_option("debug", true)
+			logger.log(waf, "We have logged a string!")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

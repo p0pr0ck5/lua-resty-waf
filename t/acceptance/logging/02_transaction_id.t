@@ -12,11 +12,11 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -33,24 +33,24 @@ qr/log[(][)]: \[[a-f0-9]{20}\]/
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("req_tid_header", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("req_tid_header", true)
+			waf:exec()
 		';
 
 		content_by_lua '
 			local t = ngx.req.get_headers()
-			ngx.say("X-FreeWAF-ID: " .. t["X-FreeWAF-ID"])
+			ngx.say("X-lua_resty_waf-ID: " .. t["X-Lua-Resty-WAF-ID"])
 		';
 	}
 --- request
 GET /t
 --- error_code: 200
 --- response_body_like
-^X-FreeWAF-ID: [a-f0-9]{20}$
+^X-lua_resty_waf-ID: [a-f0-9]{20}$
 --- no_error_log
 [error]
 
@@ -58,12 +58,12 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local FreeWAF = require "fw"
-			local fw      = FreeWAF:new()
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
 
-			fw:set_option("debug", true)
-			fw:set_option("res_tid_header", true)
-			fw:exec()
+			waf:set_option("debug", true)
+			waf:set_option("res_tid_header", true)
+			waf:exec()
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -72,7 +72,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- response_headers_like
-X-FreeWAF-ID: [a-f0-9]{20}
+X-lua_resty_waf-ID: [a-f0-9]{20}
 --- no_error_log
 [error]
 

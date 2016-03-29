@@ -11,13 +11,13 @@ __DATA__
 === TEST 1: Whitelist .mpg
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.mpg
@@ -29,13 +29,13 @@ Rule action was ACCEPT
 === TEST 2: Whitelist .mpeg
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.mpeg
@@ -47,13 +47,13 @@ Rule action was ACCEPT
 === TEST 3: Whitelist .mp3
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.mp3
@@ -65,13 +65,13 @@ Rule action was ACCEPT
 === TEST 4: Whitelist .mp4
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.mp4
@@ -83,13 +83,13 @@ Rule action was ACCEPT
 === TEST 5: Whitelist .avi
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.avi
@@ -101,13 +101,13 @@ Rule action was ACCEPT
 === TEST 6: Whitelist .flv
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.flv
@@ -119,13 +119,13 @@ Rule action was ACCEPT
 === TEST 7: Whitelist .swf
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.swf
@@ -137,13 +137,13 @@ Rule action was ACCEPT
 === TEST 8: Whitelist .wma
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.wma
@@ -155,13 +155,13 @@ Rule action was ACCEPT
 === TEST 9: Do not whitelist unmatched extension (.wmd)
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.wmd
@@ -173,13 +173,13 @@ Rule action was ACCEPT
 === TEST 10: Do not whitelist non-final extension
 --- config
 	access_by_lua '
-		local FreeWAF = require "fw"
-		local fw      = FreeWAF:new()
+		local lua_resty_waf = require "waf"
+		local waf           = lua_resty_waf:new()
 
-		fw:set_option("ignore_rule", 11001)
-		fw:set_option("debug", true)
-		fw:set_option("mode", "ACTIVE")
-		fw:exec()
+		waf:set_option("ignore_rule", 11001)
+		waf:set_option("debug", true)
+		waf:set_option("mode", "ACTIVE")
+		waf:exec()
 	';
 --- request
 GET /foo.avi.exe

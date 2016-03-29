@@ -1,7 +1,8 @@
 local _M = {}
 
-_M.version = "0.6.0"
+_M.version = "0.7.0"
 
+local cjson  = require("cjson")
 local logger = require("lib.log")
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
@@ -17,7 +18,7 @@ function _M.table_copy(orig)
 			copy[_M.table_copy(orig_key)] = _M.table_copy(orig_value)
 		end
 
-		setmetatable(copy, _M.table_copy(FW, getmetatable(orig)))
+		setmetatable(copy, _M.table_copy(getmetatable(orig)))
 	else
 		copy = orig
 	end
@@ -92,32 +93,82 @@ function _M.table_has_value(needle, haystack)
 end
 
 -- pick out dynamic data from storage key definitions
-function _M.parse_dynamic_value(FW, key, collections)
+function _M.parse_dynamic_value(waf, key, collections)
 	local lookup = function(m)
-		local val = collections[m[1]]
+		local val      = collections[m[1]]
+		local specific = m[2]
 
 		if (not val) then
 			logger.fatal_fail("Bad dynamic parse, no collection key " .. m[1])
 		end
 
 		if (type(val) == "table") then
-			return m[1]
+			if (specific) then
+				return tostring(val[specific])
+			else
+				return m[1]
+			end
 		elseif (type(val) == "function") then
-			return val(FW)
+			return val(waf)
 		else
 			return val
 		end
 	end
 
 	-- grab something that looks like
-	-- %{VAL}
+	-- %{VAL} or %{VAL.foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [=[%{([^}]+)}]=], lookup, FW._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([^\.]+?)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
-	logger.log(FW, "Parsed dynamic value is " .. str)
+	logger.log(waf, "Parsed dynamic value is " .. str)
 
-	if (ngx.re.find(str, [=[^\d+$]=], FW._pcre_flags)) then
+	if (ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags)) then
 		return tonumber(str)
+	else
+		return str
+	end
+end
+
+-- find a rule file with a .json prefix, read it, and return a ruleset table
+function _M.load_ruleset(name)
+	for k, v in string.gmatch(package.path, "[^;]+") do
+		local path = string.match(k, "(.*/)")
+
+		local full_name = path .. "rules/" .. name .. ".json"
+
+		local f = io.open(full_name)
+		if (f ~= nil) then
+			local data  = f:read("*all")
+			local jdata
+
+			if pcall(function() jdata = cjson.decode(data) end) then
+				return jdata, nil
+			else
+				return nil, "could not decode " .. data
+			end
+		end
+	end
+
+	return nil, "could not find " .. name
+end
+
+-- encode a given string as hex
+function _M.hex_encode(str)
+	return (str:gsub('.', function (c)
+		return string.format('%02x', string.byte(c))
+	end))
+end
+
+-- decode a given hex string
+function _M.hex_decode(str)
+	local value
+
+	if (pcall(function()
+		value = str:gsub('..', function (cc)
+			return string.char(tonumber(cc, 16))
+		end)
+	end)) then
+		return value
 	else
 		return str
 	end
