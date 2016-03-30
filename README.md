@@ -20,6 +20,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [lua-resty-waf:reset_option()](#lua-resty-wafreset_option)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
+	* [add_ruleset](#add_ruleset)
 	* [allow_unknown_content_types](#allow_unknown_content_types)
 	* [allowed_content_types](#allowed_content_types)
 	* [debug](#debug)
@@ -44,9 +45,9 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [process_multipart_body](#process_multipart_body)
 	* [score_threshold](#score_threshold)
 	* [storage_zone](#storage_zone)
+	* [req_tid_header](#req_tid_header)
 	* [res_body_max_size](#res_body_max_size)
 	* [res_body_mime_types](#res_body_mime_types)
-	* [req_tid_header](#req_tid_header)
 	* [res_tid_header](#res_tid_header)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
@@ -776,6 +777,22 @@ Multiple shared zones can be defined and used, though only one zone can be defin
 
 `Could not add key to persistent storage, increase the size of the lua_shared_dict`
 
+###req_tid_header
+
+*Default*: false
+
+Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("req_tid_header", true)
+		';
+	}
+```
+
 ###res_body_max_size
 
 *Default*: 1048576 (1 MB)
@@ -812,22 +829,6 @@ Defines the MIME types with which lua-resty-waf will process the response body. 
 ```
 
 Multiple MIME types can be added by passing a table of types to `set_option`.
-
-###req_tid_header
-
-*Default*: false
-
-Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			waf:set_option("req_tid_header", true)
-		';
-	}
-```
 
 ###res_tid_header
 
