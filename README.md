@@ -44,12 +44,12 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
 	* [process_multipart_body](#process_multipart_body)
-	* [score_threshold](#score_threshold)
-	* [storage_zone](#storage_zone)
 	* [req_tid_header](#req_tid_header)
 	* [res_body_max_size](#res_body_max_size)
 	* [res_body_mime_types](#res_body_mime_types)
 	* [res_tid_header](#res_tid_header)
+	* [score_threshold](#score_threshold)
+	* [storage_zone](#storage_zone)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
 * [Rule Definitions](#rule-definitions)
@@ -753,47 +753,6 @@ Enable processing of multipart/form-data request bodies (when present), using th
 	}
 ```
 
-###score_threshold
-
-*Default*: 5
-
-Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty-waf will deny the request.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			waf:set_option("score_threshold", 10)
-		';
-	}
-```
-
-###storage_zone
-
-*Default*: none
-
-Defines the `lua_shared_dict` that will be used to hold persistent storage data. This zone must be defined in the `http{}` block of the configuration.
-
-*Example*:
-
-```lua
-	http {
-		-- define a 64M shared memory zone to hold persistent storage data
-		lua_shared_dict persistent_storage 64m;
-	}
-
-	location / {
-		access_by_lua '
-			waf:set_option("storage_zone", "persistent_storage")
-		';
-	}
-```
-
-Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
-
-`Could not add key to persistent storage, increase the size of the lua_shared_dict`
-
 ###req_tid_header
 
 *Default*: false
@@ -862,6 +821,47 @@ Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the val
 		';
 	}
 ```
+
+###score_threshold
+
+*Default*: 5
+
+Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty-waf will deny the request.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("score_threshold", 10)
+		';
+	}
+```
+
+###storage_zone
+
+*Default*: none
+
+Defines the `lua_shared_dict` that will be used to hold persistent storage data. This zone must be defined in the `http{}` block of the configuration.
+
+*Example*:
+
+```lua
+	http {
+		-- define a 64M shared memory zone to hold persistent storage data
+		lua_shared_dict persistent_storage 64m;
+	}
+
+	location / {
+		access_by_lua '
+			waf:set_option("storage_zone", "persistent_storage")
+		';
+	}
+```
+
+Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
+
+`Could not add key to persistent storage, increase the size of the lua_shared_dict`
 
 ##Phase Handling
 
