@@ -118,7 +118,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 	-- grab something that looks like
 	-- %{VAL} or %{VAL.foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [[%{([^\.]+?)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([A-Z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
 	logger.log(waf, "Parsed dynamic value is " .. str)
 
