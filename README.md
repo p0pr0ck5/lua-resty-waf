@@ -32,6 +32,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_ngx_vars](#event_log_ngx_vars)
 	* [event_log_periodic_flush](#event_log_periodic_flush)
 	* [event_log_request_arguments](#event_log_request_arguments)
+	* [event_log_request_body](#event_log_request_body)
 	* [event_log_request_headers](#event_log_request_headers)
 	* [event_log_socket_proto](#event_log_socket_proto)
 	* [event_log_target](#event_log_target)
@@ -520,11 +521,27 @@ When set to true, the log entries contain the request arguments under the `uri_a
 	}
 ```
 
+###event_log_request_body
+
+*Default*: false
+
+When set to true, the log entries contain the request body under the `request_body` key.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_request_arguments", true)
+		';
+	}
+```
+
 ###event_log_request_headers
 
 *Default*: false
 
-The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+The headers of the HTTP request is copied to the log event, under the `request_headers` key.
 
 *Example*:
 
