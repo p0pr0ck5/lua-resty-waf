@@ -25,6 +25,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [allowed_content_types](#allowed_content_types)
 	* [debug](#debug)
 	* [debug_log_level](#debug_log_level)
+	* [deny_status](#deny_status)
 	* [disable_pcre_optimization](#disable_pcre_optimization)
 	* [event_log_altered_only](#event_log_altered_only)
 	* [event_log_buffer_size](#event_log_buffer_size)
@@ -389,6 +390,22 @@ Sets the nginx log level constant used for debug logging.
 	location / {
 		access_by_lua '
 			waf:set_option("debug_log_level", ngx.DEBUG)
+		';
+	}
+```
+
+###deny_status
+
+*Default*: ngx.HTTP_FORBIDDEN
+
+Sets the status to use when denying requests.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("deny_status", ngx.HTTP_NOT_FOUND)
 		';
 	}
 ```

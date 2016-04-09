@@ -8,6 +8,7 @@ _M.defaults = {
 	_allowed_content_types       = {},
 	_debug                       = false,
 	_debug_log_level             = ngx.INFO,
+	_deny_status                 = ngx.HTTP_FORBIDDEN,
 	_event_log_altered_only      = true,
 	_event_log_buffer_size       = 4096,
 	_event_log_level             = ngx.INFO,

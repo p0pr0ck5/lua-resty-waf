@@ -146,7 +146,7 @@ _M.actions = {
 	DENY = function(waf, ctx)
 		logger.log(waf, "Rule action was DENY, so telling nginx to quit (from the lib!)")
 		if (waf._mode == "ACTIVE") then
-			ngx.exit(ngx.HTTP_FORBIDDEN)
+			ngx.exit(waf._deny_status)
 		end
 	end,
 	IGNORE = function(waf)
