@@ -106,18 +106,20 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 		lua_package_path '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
 		lua_package_cpath '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
 
-		-- use resty.core for performance improvement, see the status note above
-		require "resty.core"
+		init_by_lua '
+			-- use resty.core for performance improvement, see the status note above
+			require "resty.core"
 
-		-- require the base module
-		local lua_resty_waf = require "waf"
+			-- require the base module
+			local lua_resty_waf = require "waf"
 
-		-- define options that will be inherited across all scopes
-		lua_resty_waf.default_option("debug", true)
-		lua_resty_waf.default_option("mode", "ACTIVE")
+			-- define options that will be inherited across all scopes
+			lua_resty_waf.default_option("debug", true)
+			lua_resty_waf.default_option("mode", "ACTIVE")
 
-		-- perform some preloading and optimization
-		lua_resty_waf.init()
+			-- perform some preloading and optimization
+			lua_resty_waf.init()
+		';
 	}
 
 	server {
