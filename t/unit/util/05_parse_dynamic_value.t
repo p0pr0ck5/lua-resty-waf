@@ -179,7 +179,7 @@ GET /t
 --- no_error_log
 [error]
 
-=== TEST 10: Parse string and table values
+=== TEST 10: Parse string and table values (1/2)
 --- config
 	location /t {
 		content_by_lua '
@@ -198,7 +198,26 @@ bar - GET /t?foo=bar HTTP/1.1
 --- no_error_log
 [error]
 
-=== TEST 11: Parse invalid collections key
+=== TEST 11: Parse string and table values (2/2)
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{REQUEST_LINE} - %{URI_ARGS.foo}"
+			local coll   = { URI_ARGS = ngx.req.get_uri_args(), REQUEST_LINE = ngx.var.request }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t?foo=bar
+--- error_code: 200
+--- response_body
+GET /t?foo=bar HTTP/1.1 - bar
+--- no_error_log
+[error]
+
+=== TEST 12: Parse invalid collections key
 --- config
 	location /t {
 		content_by_lua '

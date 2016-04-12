@@ -20,10 +20,12 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [lua-resty-waf:reset_option()](#lua-resty-wafreset_option)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
+	* [add_ruleset](#add_ruleset)
 	* [allow_unknown_content_types](#allow_unknown_content_types)
 	* [allowed_content_types](#allowed_content_types)
 	* [debug](#debug)
 	* [debug_log_level](#debug_log_level)
+	* [deny_status](#deny_status)
 	* [disable_pcre_optimization](#disable_pcre_optimization)
 	* [event_log_altered_only](#event_log_altered_only)
 	* [event_log_buffer_size](#event_log_buffer_size)
@@ -31,7 +33,11 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_ngx_vars](#event_log_ngx_vars)
 	* [event_log_periodic_flush](#event_log_periodic_flush)
 	* [event_log_request_arguments](#event_log_request_arguments)
+	* [event_log_request_body](#event_log_request_body)
 	* [event_log_request_headers](#event_log_request_headers)
+	* [event_log_ssl](#event_log_ssl)
+	* [event_log_ssl_sni_host](*event_log_ssl_sni_host)
+	* [event_log_ssl_verify](*event_log_ssl_verify)
 	* [event_log_socket_proto](#event_log_socket_proto)
 	* [event_log_target](#event_log_target)
 	* [event_log_target_host](#event_log_target_host)
@@ -42,12 +48,12 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
 	* [process_multipart_body](#process_multipart_body)
-	* [score_threshold](#score_threshold)
-	* [storage_zone](#storage_zone)
+	* [req_tid_header](#req_tid_header)
 	* [res_body_max_size](#res_body_max_size)
 	* [res_body_mime_types](#res_body_mime_types)
-	* [req_tid_header](#req_tid_header)
 	* [res_tid_header](#res_tid_header)
+	* [score_threshold](#score_threshold)
+	* [storage_zone](#storage_zone)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
 * [Rule Definitions](#rule-definitions)
@@ -393,6 +399,22 @@ Sets the nginx log level constant used for debug logging.
 	}
 ```
 
+###deny_status
+
+*Default*: ngx.HTTP_FORBIDDEN
+
+Sets the status to use when denying requests.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("deny_status", ngx.HTTP_NOT_FOUND)
+		';
+	}
+```
+
 ###disable_pcre_optimization
 
 *Default*: false
@@ -521,11 +543,27 @@ When set to true, the log entries contain the request arguments under the `uri_a
 	}
 ```
 
+###event_log_request_body
+
+*Default*: false
+
+When set to true, the log entries contain the request body under the `request_body` key.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_request_arguments", true)
+		';
+	}
+```
+
 ###event_log_request_headers
 
 *Default*: false
 
-The headers of the HTTP request is copied to the log event, under the `request_headers` key. 
+The headers of the HTTP request is copied to the log event, under the `request_headers` key.
 
 *Example*:
 
@@ -546,6 +584,54 @@ The resulting event has these extra items:
 		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
 	}
 }
+```
+
+###event_log_ssl
+
+*Default*: false
+
+Enable SSL connections when logging via TCP/UDP.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl", true)
+		';
+	}
+```
+
+###event_log_ssl_sni_host
+
+*Default*: none
+
+Set the SNI host for `lua-resty-logger-socket` connections.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl_sni_host", "loghost.example.com")
+		';
+	}
+```
+
+###event_log_ssl_verify
+
+*Default*: false
+
+Enable certification verification for SSL connections when logging via TCP/UDP.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl_verify", true)
+		';
+	}
 ```
 
 ###event_log_socket_proto
@@ -737,6 +823,75 @@ Enable processing of multipart/form-data request bodies (when present), using th
 	}
 ```
 
+###req_tid_header
+
+*Default*: false
+
+Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("req_tid_header", true)
+		';
+	}
+```
+
+###res_body_max_size
+
+*Default*: 1048576 (1 MB)
+
+Defines the content length threshold beyond which response bodies will not be processed. This size of the response body is determined by the Content-Length response header. If this header does not exist in the response, the response body will never be processed.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- increase the max response size to 2 MB
+			waf:set_option("res_body_max_size", 1024 * 1024 * 2)
+		';
+	}
+```
+Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
+
+###res_body_mime_types
+
+*Default*: "text/plain", "text/html"
+
+Defines the MIME types with which lua-resty-waf will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			-- mime types that will be processed are now text/plain, text/html, and text/json
+			waf:set_option("res_body_mime_types", "text/json")
+		';
+	}
+```
+
+Multiple MIME types can be added by passing a table of types to `set_option`.
+
+###res_tid_header
+
+*Default*: false
+
+Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("res_tid_header", true)
+		';
+	}
+```
+
 ###score_threshold
 
 *Default*: 5
@@ -777,75 +932,6 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
 
 `Could not add key to persistent storage, increase the size of the lua_shared_dict`
-
-###res_body_max_size
-
-*Default*: 1048576 (1 MB)
-
-Defines the content length threshold beyond which response bodies will not be processed. This size of the response body is determined by the Content-Length response header. If this header does not exist in the response, the response body will never be processed.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			-- increase the max response size to 2 MB
-			waf:set_option("res_body_max_size", 1024 * 1024 * 2)
-		';
-	}
-```
-Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
-
-###res_body_mime_types
-
-*Default*: "text/plain", "text/html"
-
-Defines the MIME types with which lua-resty-waf will process the response body. This value is determined by the Content-Type header. If this header does not exist, or the response type is not in this list, the response body will not be processed. Setting this option will add the given MIME type to the existing defaults of `text/plain` and `text/html`.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			-- mime types that will be processed are now text/plain, text/html, and text/json
-			waf:set_option("res_body_mime_types", "text/json")
-		';
-	}
-```
-
-Multiple MIME types can be added by passing a table of types to `set_option`.
-
-###req_tid_header
-
-*Default*: false
-
-Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			waf:set_option("req_tid_header", true)
-		';
-	}
-```
-
-###res_tid_header
-
-*Default*: false
-
-Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the value as the transaction ID. This ID will correlate with the transaction ID present in the debug logs (if set). This can be useful for request tracking or debug purposes.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			waf:set_option("res_tid_header", true)
-		';
-	}
-```
 
 ##Phase Handling
 

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.0"
+_M.version = "0.7.1"
 
 local calc    = require "lib.rule_calc"
 local logger  = require("lib.log")
@@ -467,7 +467,14 @@ function _M.exec(self)
 				end
 			else
 				logger.log(self, "Ignoring rule " .. id)
-				offset = offset + rule.offset_nomatch
+
+				local rule_nomatch = rule.offset_nomatch
+
+				if (rule_nomatch) then
+					offset = offset + rule_nomatch
+				else
+					offset = nil
+				end
 			end
 
 			if not offset then break end

@@ -13,15 +13,15 @@ local tostring              = tostring
 local debug                 = ngx.config.debug
 
 local DEBUG                 = ngx.DEBUG
-local NOTICE                = ngx.NOTICE
-local WARN                  = ngx.WARN
-local ERR                   = ngx.ERR
 local CRIT                  = ngx.CRIT
 
+local MAX_PORT              = 65535
 
-local ok, new_tab = pcall(require, "table.new")
-if not ok then
-    new_tab = function (narr, nrec) return {} end
+
+-- table.new(narr, nrec)
+local succ, new_tab = pcall(require, "table.new")
+if not succ then
+    new_tab = function () return {} end
 end
 
 local _M = new_tab(0, 5)
@@ -50,12 +50,15 @@ local drop_limit            = 1048576      -- 1MB
 local timeout               = 1000         -- 1 sec
 local host
 local port
+local ssl                   = false
+local ssl_verify            = true
+local sni_host
 local path
 local max_buffer_reuse      = 10000        -- reuse buffer for at most 10000
                                            -- times
 local periodic_flush        = nil
 local need_periodic_flush   = nil
-local sock_type             = 'udp'
+local sock_type             = 'tcp'
 
 -- internal variables
 local buffer_size           = 0
@@ -79,7 +82,7 @@ local pool_size             = 10
 local flushing
 local logger_initted
 local counter               = 0
-
+local ssl_session
 
 local function _write_error(msg)
     last_error = msg
@@ -89,11 +92,12 @@ local function _do_connect()
     local ok, err, sock
 
     if not connected then
-		if (sock_type == 'udp') then
-	        sock, err = udp()
-		else
-			sock, err = tcp()
-		end
+        if (sock_type == 'udp') then
+            sock, err = udp()
+        else
+            sock, err = tcp()
+        end
+
         if not sock then
             _write_error(err)
             return nil, err
@@ -104,23 +108,34 @@ local function _do_connect()
 
     -- "host"/"port" and "path" have already been checked in init()
     if host and port then
-		if (sock_type == 'udp') then
-	        ok, err =  sock:setpeername(host, port)
-		else
-			ok, err =  sock:connect(host, port)
-		end
+        if (sock_type == 'udp') then
+            ok, err = sock:setpeername(host, port)
+        else
+            ok, err = sock:connect(host, port)
+        end
     elseif path then
-		if (sock_type == 'udp') then
-	        ok, err =  sock:setpeername("unix:" .. path)
-		else
-			ok, err =  sock:connect("unix:" .. path)
-		end
+        ok, err = sock:connect("unix:" .. path)
     end
 
     if not ok then
         return nil, err
     end
 
+    return sock
+end
+
+local function _do_handshake(sock)
+    if not ssl then
+        return sock
+    end
+
+    local session, err = sock:sslhandshake(ssl_session, sni_host or host,
+                                           ssl_verify)
+    if not session then
+        return nil, err
+    end
+
+    ssl_session = session
     return sock
 end
 
@@ -143,8 +158,11 @@ local function _connect()
         sock, err = _do_connect()
 
         if sock then
-            connected = true
-            break
+            sock, err = _do_handshake(sock)
+            if sock then
+                connected = true
+                break
+            end
         end
 
         if debug then
@@ -185,13 +203,15 @@ local function _prepare_stream_buffer()
 end
 
 local function _do_flush()
+    local ok, err, sock, bytes
     local packet = send_buffer
-    local sock, err = _connect()
+
+    sock, err = _connect()
     if not sock then
         return nil, err
     end
 
-    local bytes, err = sock:send(packet)
+    bytes, err = sock:send(packet)
     if not bytes then
         -- "sock:send" always closes current connection on error
         return nil, err
@@ -202,12 +222,12 @@ local function _do_flush()
         ngx_log(DEBUG, ngx.now(), ":log flush:" .. bytes .. ":" .. packet)
     end
 
-	if (sock_type ~= 'udp') then
-	    local ok, err = sock:setkeepalive(0, pool_size)
-		if not ok then
-			return nil, err
-	    end
-	end
+    if (sock_type ~= 'udp') then
+        ok, err = sock:setkeepalive(0, pool_size)
+        if not ok then
+            return nil, err
+        end
+    end
 
     return bytes
 end
@@ -239,7 +259,7 @@ local function _flush_unlock()
 end
 
 local function _flush()
-    local ok, err
+    local err
 
     -- pre check
     if not _flush_lock() then
@@ -354,30 +374,87 @@ function _M.init(user_config)
 
     for k, v in pairs(user_config) do
         if k == "host" then
+            if type(v) ~= "string" then
+                return nil, '"host" must be a string'
+            end
             host = v
         elseif k == "port" then
+            if type(v) ~= "number" then
+                return nil, '"port" must be a number'
+            end
+            if v < 0 or v > MAX_PORT then
+                return nil, ('"port" out of range 0~%s'):format(MAX_PORT)
+            end
             port = v
         elseif k == "path" then
+            if type(v) ~= "string" then
+                return nil, '"path" must be a string'
+            end
             path = v
+        elseif k == "sock_type" then
+            if type(v) ~= "string" then
+                return nil, '"sock_type" must be a string'
+            end
+            if v ~= "tcp" and v ~= "udp" then
+                return nil, '"sock_type" must be "tcp" or "udp"'
+            end
+            sock_type = v
         elseif k == "flush_limit" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "flush_limit"'
+            end
             flush_limit = v
         elseif k == "drop_limit" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "drop_limit"'
+            end
             drop_limit = v
         elseif k == "timeout" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "timeout"'
+            end
             timeout = v
         elseif k == "max_retry_times" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "max_retry_times"'
+            end
             max_retry_times = v
         elseif k == "retry_interval" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "retry_interval"'
+            end
             -- ngx.sleep time is in seconds
             retry_interval = v
         elseif k == "pool_size" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "pool_size"'
+            end
             pool_size = v
         elseif k == "max_buffer_reuse" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "max_buffer_reuse"'
+            end
             max_buffer_reuse = v
         elseif k == "periodic_flush" then
+            if type(v) ~= "number" or v < 0 then
+                return nil, 'invalid "periodic_flush"'
+            end
             periodic_flush = v
-		elseif k == "sock_type" then
-			sock_type = v
+        elseif k == "ssl" then
+            if type(v) ~= "boolean" then
+                return nil, '"ssl" must be a boolean value'
+            end
+            ssl = v
+        elseif k == "ssl_verify" then
+            if type(v) ~= "boolean" then
+                return nil, '"ssl_verify" must be a boolean value'
+            end
+            ssl_verify = v
+        elseif k == "sni_host" then
+            if type(v) ~= "string" then
+                return nil, '"sni_host" must be a string'
+            end
+            sni_host = v
         end
     end
 

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.0"
+_M.version = "0.7.1"
 
 local cjson         = require("cjson")
 local file_logger   = require("inc.resty.logger.file")
@@ -146,7 +146,7 @@ _M.actions = {
 	DENY = function(waf, ctx)
 		logger.log(waf, "Rule action was DENY, so telling nginx to quit (from the lib!)")
 		if (waf._mode == "ACTIVE") then
-			ngx.exit(ngx.HTTP_FORBIDDEN)
+			ngx.exit(waf._deny_status)
 		end
 	end,
 	IGNORE = function(waf)
@@ -265,6 +265,9 @@ _M.write_log_events = {
 				host           = waf._event_log_target_host,
 				port           = waf._event_log_target_port,
 				sock_type      = waf._event_log_socket_proto,
+				ssl            = waf._event_log_ssl,
+				ssl_verify     = waf._event_log_ssl_verify,
+				sni_host       = waf._event_log_ssl_sni_host,
 				flush_limit    = waf._event_log_buffer_size,
 				periodic_flush = waf._event_log_periodic_flush
 			})

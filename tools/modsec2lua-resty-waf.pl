@@ -142,9 +142,7 @@ sub valid_line {
 
 	# the directive must be the first element in the line
 	# so if this does not match our whitelist we can't process it
-	return if none { $line =~ m/^$_ / } @valid_directives;
-
-	return 1;
+	return any { $line =~ m/^$_ / } @valid_directives;
 }
 
 sub clean_input {
@@ -340,9 +338,9 @@ sub parse_options {
 		#
 		# - we could have split but we know we're done
 		# (we know this if the last member of the chunk is a ')
-		$sentinal = 1 if (($chunk !~ m/'/ || $chunk !~ m/:/) &&
-			! (scalar @opt_buf > 1 && $opt_buf[0] =~ m/'/)) ||
-			$chunk =~ m/'$/;
+		$sentinal = 1 if (($chunk !~ m/'/ || $chunk !~ m/:/)
+			&& ! (scalar @opt_buf > 1 && $opt_buf[0] =~ m/'/))
+			|| $chunk =~ m/'$/;
 
 		if ($sentinal) {
 			push @tokens, join ',', @opt_buf;
@@ -477,11 +475,13 @@ sub translate_chain {
 		# these opts exist in the chain starter in ModSecurity
 		# but they belong in the final rule in lua-resty-waf
 		for my $opt (@end_opts) {
-			if ($translation->{$opt}) {
-				$chain_opt->{$opt} = delete $translation->{$opt};
-			}
+			$chain_opt->{$opt} = delete $translation->{$opt} if $translation->{$opt};
 		}
 
+		# if we've reached the end of the chain, assign our values that
+		# had to be pushed from the chain starter, or assign the default
+		# if the chain starter didn't specify. otherwise, we're at the start
+		# or middle of a chain, so the only thing we know to do is set the CHAIN action
 		if (++$ctr == scalar @chain) {
 			for my $opt (@end_opts) {
 				if ($chain_opt->{$opt}) {
@@ -637,10 +637,10 @@ sub translate_options {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
 			$translation->{description} = $value;
-		} elsif ($key eq 'noauditlog') {
+		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
-		} elsif ($key eq 'nolog') {
-			$translation->{opts}->{nolog} = 1;
+		} elsif ($key =~ m/^(?:audit)?log$/) {
+			delete $translation->{opts}->{nolog};
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
