@@ -35,6 +35,9 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_request_arguments](#event_log_request_arguments)
 	* [event_log_request_body](#event_log_request_body)
 	* [event_log_request_headers](#event_log_request_headers)
+	* [event_log_ssl](#event_log_ssl)
+	* [event_log_ssl_sni_host](*event_log_ssl_sni_host)
+	* [event_log_ssl_verify](*event_log_ssl_verify)
 	* [event_log_socket_proto](#event_log_socket_proto)
 	* [event_log_target](#event_log_target)
 	* [event_log_target_host](#event_log_target_host)
@@ -581,6 +584,54 @@ The resulting event has these extra items:
 		"user-agent": "curl/7.22.0 (x86_64-pc-linux-gnu) libcurl/7.22.0 OpenSSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3"
 	}
 }
+```
+
+###event_log_ssl
+
+*Default*: false
+
+Enable SSL connections when logging via TCP/UDP.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl", true)
+		';
+	}
+```
+
+###event_log_ssl_sni_host
+
+*Default*: none
+
+Set the SNI host for `lua-resty-logger-socket` connections.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl_sni_host", "loghost.example.com")
+		';
+	}
+```
+
+###event_log_ssl_verify
+
+*Default*: false
+
+Enable certification verification for SSL connections when logging via TCP/UDP.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("event_log_ssl_verify", true)
+		';
+	}
 ```
 
 ###event_log_socket_proto

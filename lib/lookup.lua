@@ -265,6 +265,9 @@ _M.write_log_events = {
 				host           = waf._event_log_target_host,
 				port           = waf._event_log_target_port,
 				sock_type      = waf._event_log_socket_proto,
+				ssl            = waf._event_log_ssl,
+				ssl_verify     = waf._event_log_ssl_verify,
+				sni_host       = waf._event_log_ssl_sni_host,
 				flush_limit    = waf._event_log_buffer_size,
 				periodic_flush = waf._event_log_periodic_flush
 			})
