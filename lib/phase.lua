@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.0"
+_M.version = "0.7.1"
 
 local util = require "lib.util"
 

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.0"
+_M.version = "0.7.1"
 
 local function _transform_collection_key(transform)
 	if (not transform) then
