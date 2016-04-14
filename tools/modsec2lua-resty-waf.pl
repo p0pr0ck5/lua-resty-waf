@@ -91,6 +91,7 @@ my $valid_transforms = {
 	trimLeft           => 'trim_left',
 	trimRight          => 'trim_right',
 	urlDecode          => 'uri_decode',
+	urlDecodeUni       => 'uri_decode',
 };
 
 my $action_lookup = {
