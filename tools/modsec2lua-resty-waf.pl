@@ -173,10 +173,8 @@ sub clean_input {
 		#   setvar:tx.foo=bar, \
 		#   expirevar:tx.foo=60"
 		#
-		if ($line =~ m/\s*\\\s*$/) {
-			# strip the multi-line ecape and surrounding whitespace
-			$line =~ s/\s*\\\s*$//;
-
+		# strip the multi-line ecape and surrounding whitespace
+		if ($line =~ s/\s*\\\s*$//) {
 			push @line_buf, $line;
 		} else {
 			# either the end of a multi line directive or a standalone line
@@ -685,7 +683,7 @@ sub figure_phase {
 	# phase must be defined in the first rule of the chain
 	my $phase = delete $translation->{phase};
 
-	return $phase ? $phase_lookup->{$phase} : $defaults->{phase};
+	return $phase && defined $phase_lookup->{$phase} ? $phase_lookup->{$phase} : $defaults->{phase};
 }
 
 # because we don't maintain a strict 1-1 mapping of collection names
@@ -705,7 +703,7 @@ sub translate_macro {
 
 			$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
 
-			$replacement .= ".$specific" if length $specific;
+			$replacement .= ".$specific" if $specific;
 		} else {
 			$replacement = $macro;
 		}
