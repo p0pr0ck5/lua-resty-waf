@@ -235,3 +235,60 @@ GET /t
 [error]
 Bad dynamic parse, no collection key REMOTE_ADDRP
 
+=== TEST 13: Parse single lowercase key
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{remote_addr}"
+			local coll   = { REMOTE_ADDR = ngx.var.remote_addr }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+127.0.0.1
+--- no_error_log
+[error]
+
+=== TEST 14: Parse multiple string values as lowercase key
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{remote_addr} - %{request_line}"
+			local coll   = { REMOTE_ADDR = ngx.var.remote_addr, REQUEST_LINE = ngx.var.request }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+127.0.0.1 - GET /t HTTP/1.1
+--- no_error_log
+[error]
+
+=== TEST 15: Parse specific table value as lowercase key
+--- config
+	location /t {
+		content_by_lua '
+			local util   = require "lib.util"
+			local key    = "%{uri_args.foo}"
+			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
+			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
+			ngx.say(parsed)
+		';
+	}
+--- request
+GET /t?foo=bar
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+

@@ -95,7 +95,7 @@ end
 -- pick out dynamic data from storage key definitions
 function _M.parse_dynamic_value(waf, key, collections)
 	local lookup = function(m)
-		local val      = collections[m[1]]
+		local val      = collections[string.upper(m[1])]
 		local specific = m[2]
 
 		if (not val) then
@@ -118,7 +118,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 	-- grab something that looks like
 	-- %{VAL} or %{VAL.foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [[%{([A-Z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([A-Za-z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
 	logger.log(waf, "Parsed dynamic value is " .. str)
 
