@@ -74,6 +74,7 @@ my $valid_transforms = {
 	base64DecodeExt    => 'base64_decode',
 	base64Encode       => 'base64_encode',
 	compressWhitespace => 'compress_whitespace',
+	compressWhiteSpace => 'compress_whitespace',
 	hexDecode          => 'hex_decode',
 	hexEncode          => 'hex_encode',
 	htmlEntityDecode   => 'html_decode',
