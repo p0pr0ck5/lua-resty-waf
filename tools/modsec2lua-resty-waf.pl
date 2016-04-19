@@ -651,7 +651,9 @@ sub translate_options {
 			$translation->{skip_after} = $value;
 		} elsif ($key eq 'setvar') {
 			my ($var, $val)            = split /=/, $value;
-			my ($collection, $element) = split /\./, $var;
+			my ($collection, @elements) = split /\./, $var;
+
+			my $element = join '.', @elements;
 
 			my $setvar = { col => $collection, key => $element };
 
