@@ -354,6 +354,9 @@ sub parse_options {
 	for my $token (@tokens) {
 		my ($opt, @value) = split /:/, $token;
 
+		# trim whitespace (this is necessary for multi-line rules)
+		$opt =~ s/^\s*|\s*$//;
+
 		my $parsed = {};
 
 		$parsed->{opt}   = $opt;
