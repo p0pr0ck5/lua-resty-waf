@@ -134,6 +134,7 @@ Translate ModSecurity configs to lua-resty-waf rulesets, reading from standard i
   -s|--silent    Be silent when translating (do not print any information apart from translated rules)
   -p|--path      Provide an optional path to search for *FromFile data files. If not given, the current dir will be used
   -P|--pretty    Pretty-print translated rulesets
+  -f|--force     Do not die on failed collection translations
 
 _EOF
 	exit 1;
@@ -406,6 +407,7 @@ sub translate_chains {
 	my @chains = @{$args->{chains}};
 	my $quiet  = $args->{quiet};
 	my $silent = $args->{silent};
+	my $force  = $args->{force};
 	my $path   = $args->{path};
 
 	my $lua_resty_waf_chains = {
@@ -419,6 +421,7 @@ sub translate_chains {
 			my @translation = translate_chain({
 				chain  => $chain,
 				silent => $silent,
+				force  => $force,
 				path   => $path,
 			});
 
@@ -441,6 +444,7 @@ sub translate_chain {
 	my ($args) = @_;
 	my @chain  = @{$args->{chain}};
 	my $silent = $args->{silent};
+	my $force  = $args->{force};
 	my $path   = $args->{path};
 
 	my (@lua_resty_waf_chain, $chain_id, $chain_opt, $ctr);
@@ -451,7 +455,7 @@ sub translate_chain {
 		my $translation = {};
 
 		if ($rule->{directive} eq 'SecRule') {
-			translate_vars($rule, $translation);
+			translate_vars($rule, $translation, $force);
 			translate_operator($rule, $translation, $path);
 		} elsif ($rule->{directive} =~ m/Sec(?:Action|Marker)/) {
 			push @{$translation->{vars}}, { unconditional => 1 };
@@ -504,7 +508,7 @@ sub translate_chain {
 }
 
 sub translate_vars {
-	my ($rule, $translation) = @_;
+	my ($rule, $translation, $force) = @_;
 
 	# maintain a 1-1 translation of modsec vars to lua-resty-waf vars
 	# this necessitates that a lua-resty-waf rule vars key is an array
@@ -512,7 +516,8 @@ sub translate_vars {
 		my $original_var = $var->{variable};
 		my $lookup_var   = clone($valid_vars->{$original_var});
 
-		die "Cannot translate variable $original_var" if !$lookup_var;
+		die "Cannot translate variable $original_var" if !$lookup_var && !$force;
+		next if !$lookup_var;
 
 		die "Cannot have a specific attribute when the lookup table already provided one"
 			if ($var->{specific} && $lookup_var->{parse}->{specific});
@@ -723,13 +728,14 @@ sub translate_macro {
 }
 
 sub main {
-	my ($path, $quiet, $silent, $pretty);
+	my ($path, $quiet, $silent, $pretty, $force);
 
 	GetOptions(
 		'q|quiet'  => \$quiet,
 		's|silent' => \$silent,
 		'p|path=s' => \$path,
 		'P|pretty' => \$pretty,
+		'f|force'  => \$force,
 		'h|help'   => sub { usage(); },
 	) or usage();
 
@@ -753,6 +759,7 @@ sub main {
 		path   => $path,
 		quiet  => $quiet,
 		silent => $silent,
+		force  => $force,
 	});
 
 	print to_json($lua_resty_waf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
