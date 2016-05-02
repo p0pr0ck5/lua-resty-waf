@@ -285,7 +285,7 @@ Write any audit log entries that were generated from the transaction. This shoul
 ```lua
 	location / {
 		log_by_lua '
-			local lua_resty_waf = require "awf"
+			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
 
