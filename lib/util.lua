@@ -174,4 +174,21 @@ function _M.hex_decode(str)
 	end
 end
 
+-- build an RBLDNS query by reversing the octets of an IPv4 address and prepending that to the rbl server name
+function _M.build_rbl_query(ip, rbl_srv)
+	if (type(ip) ~= 'string') then
+		return false
+	end
+
+	local o1, o2, o3, o4 = ip:match("(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)")
+
+	if (not o1 and not o2 and not o3 and not o4) then
+		return false
+	end
+
+	local t = { o4, o3, o2, o1, rbl_srv }
+
+	return table.concat(t, '.')
+end
+
 return _M

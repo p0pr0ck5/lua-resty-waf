@@ -63,6 +63,7 @@ my $valid_operators = {
 	pm               => "PM",
 	pmf              => "PM",
 	pmFromFile       => "PM",
+	rbl              => "RBL_LOOKUP",
 	rx               => 'REGEX',
 	streq            => "EQUALS",
 	within           => "STR_EXISTS",

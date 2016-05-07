@@ -47,6 +47,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
+	* [nameservers] (#nameservers)
 	* [process_multipart_body](#process_multipart_body)
 	* [req_tid_header](#req_tid_header)
 	* [res_body_max_size](#res_body_max_size)
@@ -801,6 +802,22 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 	location / {
 		access_by_lua '
 			waf:set_option("mode", "ACTIVE")
+		';
+	}
+```
+
+###nameservers
+
+*Default*: none
+
+Sets the DNS resolver(s) to be used for RBL lookups. Currently only UDP/53 traffic is supported. This option must be defined as a numeric address, not a hostname. If this option is not defined, all RBL lookup rules will return false.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("nameservers", "10.10.10.10")
 		';
 	}
 ```

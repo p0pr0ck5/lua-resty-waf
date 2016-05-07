@@ -29,6 +29,7 @@ _M.defaults = {
 	_ignore_rule                 = {},
 	_ignore_ruleset              = {},
 	_mode                        = 'SIMULATE',
+	_nameservers                 = {},
 	_pcre_flags                  = 'oij',
 	_process_multipart_body      = true,
 	_req_tid_header              = false,
