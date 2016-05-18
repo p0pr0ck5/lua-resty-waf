@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 local calc    = require "lib.rule_calc"
 local logger  = require("lib.log")

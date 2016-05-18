@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 local ac        = require("inc.load_ac")
 local dns       = require("inc.resty.dns.resolver")

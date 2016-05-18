@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 local cjson         = require("cjson")
 local file_logger   = require("inc.resty.logger.file")
