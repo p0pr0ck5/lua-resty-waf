@@ -293,6 +293,7 @@ _M.operators = {
 	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return operators.rbl_lookup(collection, pattern, ctx) end,
 	DETECT_SQLI  = function(waf, collection, pattern) return operators.detect_sqli(collection) end,
 	DETECT_XSS   = function(waf, collection, pattern) return operators.detect_xss(collection) end,
+	STR_MATCH    = function(waf, collection, pattern) return operators.str_match(collection, pattern) end,
 }
 
 _M.set_option = {

@@ -68,6 +68,7 @@ my $valid_operators = {
 	rbl              => "RBL_LOOKUP",
 	rx               => 'REGEX',
 	streq            => "EQUALS",
+	strmatch         => 'STR_MATCH',
 	within           => "STR_EXISTS",
 };
 

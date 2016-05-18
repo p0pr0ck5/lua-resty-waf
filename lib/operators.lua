@@ -360,4 +360,46 @@ function _M.detect_xss(input)
 	return false, nil
 end
 
+function _M.str_match(input, pattern)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			local match, value = _M.str_match(v, pattern)
+
+			if (match) then
+				return match, value
+			end
+		end
+	else
+		local n, m = #input, #pattern
+
+		if m > n then
+			return
+		end
+
+		local char = {}
+
+		for k = 0, 255 do char[k] = m end
+		for k = 1, m-1 do char[pattern:sub(k, k):byte()] = m - k end
+
+		local k = m
+		while k <= n do
+			local i, j = k, m
+
+			while j >= 1 and input:sub(i, i) == pattern:sub(j, j) do
+				i, j = i - 1, j - 1
+			end
+
+			if j == 0 then
+				return true, input
+			end
+
+			k = k + char[input:sub(k, k):byte()]
+		end
+
+		return false, nil
+	end
+
+	return false, nil
+end
+
 return _M
