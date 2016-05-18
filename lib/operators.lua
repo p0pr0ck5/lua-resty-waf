@@ -2,11 +2,12 @@ local _M = {}
 
 _M.version = "0.7.1"
 
-local ac      = require("inc.load_ac")
-local dns     = require("inc.resty.dns.resolver")
-local iputils = require("inc.resty.iputils")
-local logger  = require("lib.log")
-local util    = require("lib.util")
+local ac        = require("inc.load_ac")
+local dns       = require("inc.resty.dns.resolver")
+local iputils   = require("inc.resty.iputils")
+local libinject = require ("inc.resty.libinjection")
+local logger    = require("lib.log")
+local util      = require("lib.util")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -316,6 +317,47 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 		local i, answer = next(answers)
 		return true, answer.address or answer.cname
 	end
+end
+
+function _M.detect_sqli(input)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			ngx.log(ngx.WARN, "Doing " .. v)
+			local match, value = _M.detect_sqli(v)
+
+			if match then
+				return match, value
+			end
+		end
+	else
+		-- yes this is really just one line
+		-- libinjection.sqli has the same return values that lookup.operators expects
+		return libinject.sqli(input)
+	end
+
+	return false, nil
+end
+
+function _M.detect_xss(input)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			local match, value = _M.detect_xss(v)
+
+			if match then
+				return match, value
+			end
+		end
+	else
+		-- this function only returns a boolean value
+		-- so we'll wrap the return values ourselves
+		if (libinject.xss(input)) then
+			return true, input
+		else
+			return false, nil
+		end
+	end
+
+	return false, nil
 end
 
 return _M

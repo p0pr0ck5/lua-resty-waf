@@ -291,6 +291,8 @@ _M.operators = {
 	PM           = function(waf, collection, pattern, ctx) return operators.ac_lookup(collection, pattern, ctx) end,
 	CIDR_MATCH   = function(waf, collection, pattern) return operators.cidr_match(collection, pattern) end,
 	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return operators.rbl_lookup(collection, pattern, ctx) end,
+	DETECT_SQLI  = function(waf, collection, pattern) return operators.detect_sqli(collection) end,
+	DETECT_XSS   = function(waf, collection, pattern) return operators.detect_xss(collection) end,
 }
 
 _M.set_option = {

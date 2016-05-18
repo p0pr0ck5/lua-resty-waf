@@ -51,6 +51,8 @@ my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
 	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
+	detectSQLi       => 'DETECT_SQLI',
+	detectXSS        => 'DETECT_XSS',
 	endsWith         => sub { my $pattern = shift; return('REGEX', $pattern . '$'); },
 	eq               => 'EQUALS',
 	ge               => 'GREATER_EQ',
@@ -295,7 +297,10 @@ sub parse_operator {
 	# is not single space separated from the pattern, and splitting
 	# on \s+ isn't possible because that could break the pattern
 	# when joining back together
-	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s+)?(.*)$/;
+	#
+	# note that some operators (i'm looking at you, libinjection wrapper)
+	# do not require a pattern, so we need to account for such cases
+	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s*)?(.*)$/;
 	$operator ||= 'rx';
 
 	my $parsed = {};
