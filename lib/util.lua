@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 local cjson  = require("cjson")
 local logger = require("lib.log")
@@ -95,7 +95,7 @@ end
 -- pick out dynamic data from storage key definitions
 function _M.parse_dynamic_value(waf, key, collections)
 	local lookup = function(m)
-		local val      = collections[m[1]]
+		local val      = collections[string.upper(m[1])]
 		local specific = m[2]
 
 		if (not val) then
@@ -118,7 +118,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 	-- grab something that looks like
 	-- %{VAL} or %{VAL.foo}
 	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [[%{([A-Z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
+	local str = ngx.re.gsub(key, [[%{([A-Za-z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
 	logger.log(waf, "Parsed dynamic value is " .. str)
 
@@ -172,6 +172,23 @@ function _M.hex_decode(str)
 	else
 		return str
 	end
+end
+
+-- build an RBLDNS query by reversing the octets of an IPv4 address and prepending that to the rbl server name
+function _M.build_rbl_query(ip, rbl_srv)
+	if (type(ip) ~= 'string') then
+		return false
+	end
+
+	local o1, o2, o3, o4 = ip:match("(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)")
+
+	if (not o1 and not o2 and not o3 and not o4) then
+		return false
+	end
+
+	local t = { o4, o3, o2, o1, rbl_srv }
+
+	return table.concat(t, '.')
 end
 
 return _M

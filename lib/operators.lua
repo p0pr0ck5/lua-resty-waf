@@ -1,11 +1,13 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
-local ac      = require("inc.load_ac")
-local iputils = require("inc.resty.iputils")
-local logger  = require("lib.log")
-local util    = require("lib.util")
+local ac        = require("inc.load_ac")
+local dns       = require("inc.resty.dns.resolver")
+local iputils   = require("inc.resty.iputils")
+local libinject = require ("inc.resty.libinjection")
+local logger    = require("lib.log")
+local util      = require("lib.util")
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -269,6 +271,135 @@ function _M.cidr_match(ip, cidr_pattern)
 	end
 
 	return iputils.ip_in_cidrs(ip, t), ip
+end
+
+function _M.rbl_lookup(ip, rbl_srv, ctx)
+	local nameservers = ctx.nameservers
+
+	if (type(nameservers) ~= 'table') then
+		-- user probably didnt configure nameservers via set_option
+		return false, nil
+	end
+
+	local resolver, err = dns:new({
+		nameservers = nameservers
+	})
+
+	if (not resolver) then
+		ngx.log(ngx.WARN, err)
+		return false, nil
+	end
+
+	local rbl_query = util.build_rbl_query(ip, rbl_srv)
+
+	if (not rbl_query) then
+		-- we were handed something that didn't look like an IPv4
+		return false, nil
+	end
+
+	local answers, err = resolver:query(rbl_query)
+
+	if (not answers) then
+		ngx.log(ngx.WARN, err)
+		return false, nil
+	end
+
+	if (answers.errcode == 3) then
+		-- errcode 3 means no lookup, so return false
+		return false, nil
+	elseif (answers.errcode) then
+		-- we had some other type of err that we should know about
+		ngx.log(ngx.WARN, "rbl lookup failure: " .. answers.errstr ..
+			" (" .. answers.errcode .. ")")
+		return false, nil
+	else
+		-- we got a dns response, for now we're only going to return the first entry
+		local i, answer = next(answers)
+		return true, answer.address or answer.cname
+	end
+end
+
+function _M.detect_sqli(input)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			ngx.log(ngx.WARN, "Doing " .. v)
+			local match, value = _M.detect_sqli(v)
+
+			if match then
+				return match, value
+			end
+		end
+	else
+		-- yes this is really just one line
+		-- libinjection.sqli has the same return values that lookup.operators expects
+		return libinject.sqli(input)
+	end
+
+	return false, nil
+end
+
+function _M.detect_xss(input)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			local match, value = _M.detect_xss(v)
+
+			if match then
+				return match, value
+			end
+		end
+	else
+		-- this function only returns a boolean value
+		-- so we'll wrap the return values ourselves
+		if (libinject.xss(input)) then
+			return true, input
+		else
+			return false, nil
+		end
+	end
+
+	return false, nil
+end
+
+function _M.str_match(input, pattern)
+	if (type(input) == 'table') then
+		for _, v in ipairs(input) do
+			local match, value = _M.str_match(v, pattern)
+
+			if (match) then
+				return match, value
+			end
+		end
+	else
+		local n, m = #input, #pattern
+
+		if m > n then
+			return
+		end
+
+		local char = {}
+
+		for k = 0, 255 do char[k] = m end
+		for k = 1, m-1 do char[pattern:sub(k, k):byte()] = m - k end
+
+		local k = m
+		while k <= n do
+			local i, j = k, m
+
+			while j >= 1 and input:sub(i, i) == pattern:sub(j, j) do
+				i, j = i - 1, j - 1
+			end
+
+			if j == 0 then
+				return true, input
+			end
+
+			k = k + char[input:sub(k, k):byte()]
+		end
+
+		return false, nil
+	end
+
+	return false, nil
 end
 
 return _M

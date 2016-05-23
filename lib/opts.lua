@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 _M.defaults = {
 	_add_ruleset                 = {},
@@ -29,6 +29,7 @@ _M.defaults = {
 	_ignore_rule                 = {},
 	_ignore_ruleset              = {},
 	_mode                        = 'SIMULATE',
+	_nameservers                 = {},
 	_pcre_flags                  = 'oij',
 	_process_multipart_body      = true,
 	_req_tid_header              = false,

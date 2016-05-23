@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 -- debug logger
 function _M.log(waf, msg)

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.1"
+_M.version = "0.7.2"
 
 local calc    = require "lib.rule_calc"
 local logger  = require("lib.log")
@@ -403,6 +403,7 @@ function _M.exec(self)
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.phase         = phase
 	ctx.match_n       = ctx.match_n or 0
+	ctx.nameservers   = self._nameservers
 
 	-- pre-initialize the TX collection
 	ctx.storage["TX"]    = ctx.storage["TX"] or {}
