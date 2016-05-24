@@ -24,5 +24,5 @@ install: all
 	$(INSTALL) lib/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/lib/
 	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules
 	$(INSTALL) rules/*.json $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules/
-	$(INSTALL) -d $(DESTDIR)/bin
-	$(INSTALL) tools/modsec2lua-resty-waf.pl $(DESTDIR)/bin/
+	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/tools/
+	$(INSTALL) tools/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/tools/
