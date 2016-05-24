@@ -20,6 +20,8 @@ install: all
 	$(INSTALL) inc/resty/dns/*.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/dns/
 	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/logger
 	$(INSTALL) inc/resty/logger/*.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/logger/
+	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/lib
+	$(INSTALL) lib/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/lib/
 	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules
 	$(INSTALL) rules/*.json $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules/
 	$(INSTALL) -d $(DESTDIR)/bin
