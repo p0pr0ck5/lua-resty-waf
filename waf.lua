@@ -392,6 +392,7 @@ function _M.exec(self)
 		_load(self, ctx.opts)
 	end
 
+	ctx.lrw_initted   = true
 	ctx.altered       = ctx.altered or {}
 	ctx.col_lookup    = ctx.col_lookup or {}
 	ctx.log_entries   = ctx.log_entries or {}
@@ -581,6 +582,12 @@ function _M.write_log_events(self)
 	local ctx = ngx.ctx
 	if (ctx.opts) then
 		_load(self, ctx.opts)
+	end
+
+	if (not ctx.lrw_initted) then
+		-- we never ran. this could happen due to something like #157
+		ngx.log(ngx.DEBUG, "Not attempting to write log as lua-resty-waf was never exec'd")
+		return
 	end
 
 	if (table.getn(util.table_keys(ctx.altered)) == 0 and self._event_log_altered_only) then
