@@ -154,6 +154,14 @@ local function _handle_storage(self, opts, ctx, collections)
 			storage.set_var(self, ctx, element, element.time + ngx.time())
 		end
 	end
+
+	if (opts.deletevar) then
+		for k in ipairs(opts.deletevar) do
+			local element = opts.deletevar[k]
+
+			storage.delete_var(self, ctx, element)
+		end
+	end
 end
 
 -- use the lookup table to figure out what to do

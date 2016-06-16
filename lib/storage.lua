@@ -75,6 +75,21 @@ function _M.set_var(waf, ctx, element, value)
 	storage[col]["__altered"] = true
 end
 
+function _M.delete_var(waf, ctx, element)
+	local col     = ctx.col_lookup[string.upper(element.col)]
+	local key     = element.key
+	local storage = ctx.storage
+
+	logger.log(waf, "Deleting " .. col .. ":" .. key)
+
+	if (storage[col][key]) then
+		storage[col][key]         = nil
+		storage[col]["__altered"] = true
+	else
+		logger.log(waf, key .. " was not found in " .. col)
+	end
+end
+
 function _M.persist(waf, storage)
 	if (not waf._storage_zone) then
 		return
