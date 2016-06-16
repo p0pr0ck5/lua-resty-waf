@@ -640,8 +640,11 @@ sub translate_options {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
 
+			# dont cast as an int if this is a macro
+			$time = $time =~ m/^\d+$/ ? $time * 1 : translate_macro($time);
+
 			push @{$translation->{opts}->{expirevar}},
-				{ col => $collection, key => "__expire_$element", time => $time * 1 };
+				{ col => $collection, key => "__expire_$element", time => $time };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {
@@ -667,6 +670,19 @@ sub translate_options {
 			my ($collection, @elements) = split /\./, $var;
 
 			my $element = join '.', @elements;
+
+			# no $val, perhaps a delete?
+			if (!$val) {
+				if ($var =~ m/^\!/) {
+					substr $collection, 0, 1, '';
+
+					my $deletevar = { col => $collection, key => $element };
+					push @{$translation->{opts}->{deletevar}}, $deletevar;
+				} else {
+					warn "No assignment in setvar, but not a delete?\n";
+				}
+				next;
+			}
 
 			my $setvar = { col => $collection, key => $element };
 
