@@ -148,10 +148,11 @@ local function _handle_storage(self, opts, ctx, collections)
 	if (opts.expirevar) then
 		for k in ipairs(opts.expirevar) do
 			local element = opts.expirevar[k]
+			local time    = util.parse_dynamic_value(self, element.time, collections)
 
-			logger.log(self, "Expiring " .. element.col .. ":" .. element.key .. " in " .. element.time)
+			logger.log(self, "Expiring " .. element.col .. ":" .. element.key .. " in " .. time)
 
-			storage.set_var(self, ctx, element, element.time + ngx.time())
+			storage.set_var(self, ctx, element, time + ngx.time())
 		end
 	end
 
