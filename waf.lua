@@ -53,7 +53,7 @@ local function _log_event(self, rule, value, ctx)
 	}
 
 	if (self._event_log_verbosity > 1) then
-		t.description = rule.description
+		t.msg = rule.msg
 	end
 
 	if (self._event_log_verbosity > 2) then

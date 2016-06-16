@@ -654,7 +654,7 @@ sub translate_options {
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
-			$translation->{description} = $value;
+			$translation->{msg} = $value;
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
