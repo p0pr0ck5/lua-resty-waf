@@ -6,16 +6,16 @@ notifications:
   irc: "chat.freenode.net#lua-resty-waf"
   webhooks: https://www.cryptobells.com/endpoint
 env:
-    - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=unit
-    - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=acceptance
-    - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=regression
+    - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=unit
+    - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=acceptance
+    - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=regression
 install:
     - cpanm -v --notest Test::Nginx
 before_script:
     - sudo apt-get update -q
     - sudo apt-get install libssl-dev lua5.1 -y
     - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
-    - sudo tar -jxvf openresty-1.9.7.4-20160418.tar.bz2 -C /usr/local/
+    - sudo tar -jxvf openresty-$V_OPENRESTY-$DATE.tar.bz2 -C /usr/local/
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
   - ./tools/lua-releng -L
