@@ -8,6 +8,7 @@ notifications:
 env:
     - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=unit
     - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=acceptance
+    - V_OPENRESTY=1.9.7.4 DATE=20160418 TEST=regression
 install:
     - cpanm -v --notest Test::Nginx
 before_script:
