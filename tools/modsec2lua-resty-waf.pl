@@ -51,21 +51,25 @@ my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
 	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
-	endsWith         => sub { my $pattern = shift; return('REGEX', $pattern . '$'); },
+	detectSQLi       => 'DETECT_SQLI',
+	detectXSS        => 'DETECT_XSS',
+	endsWith         => sub { my $pattern = shift; return('REGEX', "$pattern\$"); },
 	eq               => 'EQUALS',
 	ge               => 'GREATER_EQ',
 	gt               => 'GREATER',
-	ipMatch          => "CIDR_MATCH",
-	ipMatchF         => "CIDR_MATCH",
-	ipMatchFromFile  => "CIDR_MATCH",
+	ipMatch          => 'CIDR_MATCH',
+	ipMatchF         => 'CIDR_MATCH',
+	ipMatchFromFile  => 'CIDR_MATCH',
 	le               => 'LESS_EQ',
 	lt               => 'LESS',
-	pm               => "PM",
-	pmf              => "PM",
-	pmFromFile       => "PM",
+	pm               => 'PM',
+	pmf              => 'PM',
+	pmFromFile       => 'PM',
+	rbl              => 'RBL_LOOKUP',
 	rx               => 'REGEX',
-	streq            => "EQUALS",
-	within           => "STR_EXISTS",
+	streq            => 'EQUALS',
+	strmatch         => 'STR_MATCH',
+	within           => 'STR_EXISTS',
 };
 
 my $valid_transforms = {
@@ -74,6 +78,7 @@ my $valid_transforms = {
 	base64DecodeExt    => 'base64_decode',
 	base64Encode       => 'base64_encode',
 	compressWhitespace => 'compress_whitespace',
+	compressWhiteSpace => 'compress_whitespace',
 	hexDecode          => 'hex_decode',
 	hexEncode          => 'hex_encode',
 	htmlEntityDecode   => 'html_decode',
@@ -91,6 +96,7 @@ my $valid_transforms = {
 	trimLeft           => 'trim_left',
 	trimRight          => 'trim_right',
 	urlDecode          => 'uri_decode',
+	urlDecodeUni       => 'uri_decode',
 };
 
 my $action_lookup = {
@@ -132,6 +138,7 @@ Translate ModSecurity configs to lua-resty-waf rulesets, reading from standard i
   -s|--silent    Be silent when translating (do not print any information apart from translated rules)
   -p|--path      Provide an optional path to search for *FromFile data files. If not given, the current dir will be used
   -P|--pretty    Pretty-print translated rulesets
+  -f|--force     Do not die on failed collection translations
 
 _EOF
 	exit 1;
@@ -172,10 +179,8 @@ sub clean_input {
 		#   setvar:tx.foo=bar, \
 		#   expirevar:tx.foo=60"
 		#
-		if ($line =~ m/\s*\\\s*$/) {
-			# strip the multi-line ecape and surrounding whitespace
-			$line =~ s/\s*\\\s*$//;
-
+		# strip the multi-line ecape and surrounding whitespace
+		if ($line =~ s/\s*\\\s*$//) {
 			push @line_buf, $line;
 		} else {
 			# either the end of a multi line directive or a standalone line
@@ -204,7 +209,7 @@ sub tokenize {
 	# - tokens must be quoted with " if they contain spaces
 	# - " chars within quoted tokens must be escaped with \
 	my $re_quoted   = qr/^"(.*?(?<!\\))"/;
-	my $re_unquoted = qr/([^ ]+)/;
+	my $re_unquoted = qr/([^\s]+)/;
 
 	# walk the given string and grab the next token
 	# which may be either quoted or unquoted
@@ -293,7 +298,10 @@ sub parse_operator {
 	# is not single space separated from the pattern, and splitting
 	# on \s+ isn't possible because that could break the pattern
 	# when joining back together
-	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s+)?(.*)$/;
+	#
+	# note that some operators (i'm looking at you, libinjection wrapper)
+	# do not require a pattern, so we need to account for such cases
+	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s*)?(.*)$/;
 	$operator ||= 'rx';
 
 	my $parsed = {};
@@ -355,6 +363,9 @@ sub parse_options {
 	for my $token (@tokens) {
 		my ($opt, @value) = split /:/, $token;
 
+		# trim whitespace (this is necessary for multi-line rules)
+		$opt =~ s/^\s*|\s*$//;
+
 		my $parsed = {};
 
 		$parsed->{opt}   = $opt;
@@ -403,6 +414,7 @@ sub translate_chains {
 	my @chains = @{$args->{chains}};
 	my $quiet  = $args->{quiet};
 	my $silent = $args->{silent};
+	my $force  = $args->{force};
 	my $path   = $args->{path};
 
 	my $lua_resty_waf_chains = {
@@ -416,6 +428,7 @@ sub translate_chains {
 			my @translation = translate_chain({
 				chain  => $chain,
 				silent => $silent,
+				force  => $force,
 				path   => $path,
 			});
 
@@ -438,6 +451,7 @@ sub translate_chain {
 	my ($args) = @_;
 	my @chain  = @{$args->{chain}};
 	my $silent = $args->{silent};
+	my $force  = $args->{force};
 	my $path   = $args->{path};
 
 	my (@lua_resty_waf_chain, $chain_id, $chain_opt, $ctr);
@@ -448,7 +462,7 @@ sub translate_chain {
 		my $translation = {};
 
 		if ($rule->{directive} eq 'SecRule') {
-			translate_vars($rule, $translation);
+			translate_vars($rule, $translation, $force);
 			translate_operator($rule, $translation, $path);
 		} elsif ($rule->{directive} =~ m/Sec(?:Action|Marker)/) {
 			push @{$translation->{vars}}, { unconditional => 1 };
@@ -501,7 +515,7 @@ sub translate_chain {
 }
 
 sub translate_vars {
-	my ($rule, $translation) = @_;
+	my ($rule, $translation, $force) = @_;
 
 	# maintain a 1-1 translation of modsec vars to lua-resty-waf vars
 	# this necessitates that a lua-resty-waf rule vars key is an array
@@ -509,7 +523,8 @@ sub translate_vars {
 		my $original_var = $var->{variable};
 		my $lookup_var   = clone($valid_vars->{$original_var});
 
-		die "Cannot translate variable $original_var" if !$lookup_var;
+		die "Cannot translate variable $original_var" if !$lookup_var && !$force;
+		next if !$lookup_var;
 
 		die "Cannot have a specific attribute when the lookup table already provided one"
 			if ($var->{specific} && $lookup_var->{parse}->{specific});
@@ -649,7 +664,9 @@ sub translate_options {
 			$translation->{skip_after} = $value;
 		} elsif ($key eq 'setvar') {
 			my ($var, $val)            = split /=/, $value;
-			my ($collection, $element) = split /\./, $var;
+			my ($collection, @elements) = split /\./, $var;
+
+			my $element = join '.', @elements;
 
 			my $setvar = { col => $collection, key => $element };
 
@@ -684,7 +701,7 @@ sub figure_phase {
 	# phase must be defined in the first rule of the chain
 	my $phase = delete $translation->{phase};
 
-	return $phase ? $phase_lookup->{$phase} : $defaults->{phase};
+	return $phase && defined $phase_lookup->{$phase} ? $phase_lookup->{$phase} : $defaults->{phase};
 }
 
 # because we don't maintain a strict 1-1 mapping of collection names
@@ -704,7 +721,7 @@ sub translate_macro {
 
 			$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
 
-			$replacement .= ".$specific" if length $specific;
+			$replacement .= ".$specific" if $specific;
 		} else {
 			$replacement = $macro;
 		}
@@ -718,13 +735,14 @@ sub translate_macro {
 }
 
 sub main {
-	my ($path, $quiet, $silent, $pretty);
+	my ($path, $quiet, $silent, $pretty, $force);
 
 	GetOptions(
 		'q|quiet'  => \$quiet,
 		's|silent' => \$silent,
 		'p|path=s' => \$path,
 		'P|pretty' => \$pretty,
+		'f|force'  => \$force,
 		'h|help'   => sub { usage(); },
 	) or usage();
 
@@ -748,6 +766,7 @@ sub main {
 		path   => $path,
 		quiet  => $quiet,
 		silent => $silent,
+		force  => $force,
 	});
 
 	print to_json($lua_resty_waf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
