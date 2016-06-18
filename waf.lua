@@ -176,7 +176,11 @@ local function _rule_action(self, action, ctx, collections)
 		_finalize(self, ctx)
 	end
 
-	lookup.actions[action](self, ctx, collections)
+	if (self._hook_actions[action]) then
+		self._hook_actions[action](self, ctx)
+	else
+		lookup.actions[action](self, ctx)
+	end
 end
 
 -- transform collection values based on rule opts
@@ -515,14 +519,14 @@ function _M.new(self)
 end
 
 -- configuraton wrapper for per-instance options
-function _M.set_option(self, option, value)
+function _M.set_option(self, option, value, data)
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
-			_M.set_option(self, option, v)
+			_M.set_option(self, option, v, data)
 		end
 	else
 		if (lookup.set_option[option]) then
-			lookup.set_option[option](self, value)
+			lookup.set_option[option](self, value, data)
 		else
 			local _option = "_" .. option
 			self[_option] = value
@@ -531,14 +535,14 @@ function _M.set_option(self, option, value)
 end
 
 -- configuraton wrapper for default options
-function _M.default_option(option, value)
+function _M.default_option(option, value, data)
 	if (type(value) == "table") then
 		for _, v in ipairs(value) do
-			_M.default_option(option, v)
+			_M.default_option(option, v, data)
 		end
 	else
 		if (lookup.set_option[option]) then
-			lookup.set_option[option](default_opts, value)
+			lookup.set_option[option](default_opts, value, data)
 		else
 			local _option = "_" .. option
 			default_opts[_option] = value

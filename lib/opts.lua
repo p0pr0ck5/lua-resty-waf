@@ -26,6 +26,7 @@ _M.defaults = {
 	_event_log_target_path       = '',
 	_event_log_target_port       = '',
 	_event_log_verbosity         = 1,
+	_hook_actions                = {},
 	_ignore_rule                 = {},
 	_ignore_ruleset              = {},
 	_mode                        = 'SIMULATE',

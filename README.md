@@ -44,6 +44,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_target_path](#event_log_target_path)
 	* [event_log_target_port](#event_log_target_port)
 	* [event_log_verbosity](#event_log_verbosity)
+	* [hook_action](#hook_action)
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
@@ -752,6 +753,29 @@ Sets the verbosity used in writing event log notification. The higher the verbos
 			waf:set_option("event_log_verbosity", 4)
 		';
 	}
+```
+
+###hook_action
+
+*Default*: none
+
+Override the functionality of actions taken when a rule is matched. See the example for more details
+
+*Example*:
+
+```lua
+
+		location / {
+			access_by_lua '
+				local deny_override = function(waf, ctx)
+					ngx.log(ngx.INFO, "Overriding DENY action")
+					ngx.status = 404
+				end
+
+				-- override the DENY action with the function defined above
+				waf:set_option("hook_action", "DENY", deny_override)
+			';
+		}
 ```
 
 ###ignore_rule

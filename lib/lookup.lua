@@ -330,6 +330,17 @@ _M.set_option = {
 	end,
 	nameservers = function(waf, value)
 		waf._nameservers[#waf._nameservers + 1] = value
+	end,
+	hook_action = function(waf, value, hook)
+		if (not util.table_has_key(value, _M.actions)) then
+			logger.fatal_fail(value .. " is not a valid action to override")
+		end
+
+		if (type(hook) ~= "function") then
+			logger.fatal_fail("hook_action must be defined as a function")
+		end
+
+		waf._hook_actions[value] = hook
 	end
 }
 
