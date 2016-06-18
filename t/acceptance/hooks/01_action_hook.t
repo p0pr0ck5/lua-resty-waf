@@ -35,7 +35,7 @@ GET /t?a=alert(1)
 Accept: */*
 --- error_code: 403
 --- error_log
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 --- no_error_log
 [error]
 
@@ -75,7 +75,7 @@ Accept: */*
 Override DENY action
 --- no_error_log
 [error]
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 
 === TEST 3: Override DENY action for valid request
 --- config
@@ -111,7 +111,7 @@ Accept: */*
 --- error_code: 200
 --- no_error_log
 [error]
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 4: Override invalid action
@@ -149,7 +149,7 @@ Accept: */*
 --- error_log
 FOO is not a valid action to override
 --- no_error_log
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 5: No override, default ACCEPT behavior
@@ -224,7 +224,7 @@ Accept: */*
 Override ACCEPT action
 --- no_error_log
 [error]
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 7: Check waf object in hook
@@ -265,7 +265,7 @@ waf mode is ACTIVE
 Override DENY action
 --- no_error_log
 [error]
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 
 === TEST 8: Action hooks run in SIMULATE mode
 --- config
@@ -305,7 +305,7 @@ waf mode is SIMULATE
 Override DENY action
 --- no_error_log
 [error]
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 
 === TEST 9: Non-function passed as hook
 --- config
@@ -339,5 +339,5 @@ Accept: */*
 --- error_log
 hook_action must be defined as a function
 --- no_error_log
-Rule action was DENY, so telling nginx to quit (from the lib!)
+Rule action was DENY, so telling nginx to quit
 

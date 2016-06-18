@@ -144,7 +144,7 @@ _M.actions = {
 		ctx.score = new_score
 	end,
 	DENY = function(waf, ctx)
-		logger.log(waf, "Rule action was DENY, so telling nginx to quit (from the lib!)")
+		logger.log(waf, "Rule action was DENY, so telling nginx to quit")
 		if (waf._mode == "ACTIVE") then
 			ngx.exit(waf._deny_status)
 		end
