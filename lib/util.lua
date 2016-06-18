@@ -130,7 +130,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 end
 
 -- find a rule file with a .json prefix, read it, and return a ruleset table
-function _M.load_ruleset(name)
+function _M.load_ruleset_file(name)
 	for k, v in string.gmatch(package.path, "[^;]+") do
 		local path = string.match(k, "(.*/)")
 

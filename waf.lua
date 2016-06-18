@@ -453,7 +453,7 @@ function _M.exec(self)
 
 		if (not rs) then
 			local err
-			rs, err = util.load_ruleset(ruleset)
+			rs, err = util.load_ruleset_file(ruleset)
 
 			if (err) then
 				logger.fatal_fail(err)
@@ -571,7 +571,7 @@ function _M.init()
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
 	for _, ruleset in ipairs(default_opts._active_rulesets) do
-		local rs, err = util.load_ruleset(ruleset)
+		local rs, err = util.load_ruleset_file(ruleset)
 
 		if (err) then
 			ngx.log(ngx.ERR, err)
