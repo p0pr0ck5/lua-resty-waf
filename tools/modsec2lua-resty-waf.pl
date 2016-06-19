@@ -672,7 +672,7 @@ sub translate_options {
 			my $element = join '.', @elements;
 
 			# no $val, perhaps a delete?
-			if (!$val) {
+			if (!defined($val)) {
 				if ($var =~ m/^\!/) {
 					substr $collection, 0, 1, '';
 
