@@ -63,7 +63,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [Community](#community)
 	* [Pull Requests](#pull-requests)
 * [Roadmap](#roadmap)
-* [Limitaions](#limitations)
+* [Limitations](#limitations)
 * [License](#license)
 * [Bugs](#bugs)
 * [See Also](#see-also)
