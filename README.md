@@ -55,6 +55,9 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [res_body_mime_types](#res_body_mime_types)
 	* [res_tid_header](#res_tid_header)
 	* [score_threshold](#score_threshold)
+	* [storage_backend](#storage_backend)
+	* [storage_memcached_host](#storage_memcached_host)
+	* [storage_memcached_port](#storage_memcached_port)
 	* [storage_zone](#storage_zone)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
@@ -949,13 +952,61 @@ Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty
 	}
 ```
 
+###storage_backend
+
+*Default*: dict
+
+Define an engine to use for persistent variable storage. Current available options are *dict* (ngx_lua shared memory zone) and *memcached*.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_backend", "memcached")
+		';
+	}
+```
+
+###storage_memcached_host
+
+*Default*: 127.0.0.1
+
+Define a host to use when using memcached as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_host", "10.10.10.10")
+		';
+	}
+```
+
+###storage_memcached_port
+
+*Default*: 11211
+
+Define a port to use when using memcached as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_port", 11221)
+		';
+	}
+```
+
 ###storage_zone
 
 *Default*: none
 
 Defines the `lua_shared_dict` that will be used to hold persistent storage data. This zone must be defined in the `http{}` block of the configuration.
 
-*Example*:
+*Example*:_
 
 ```lua
 	http {
