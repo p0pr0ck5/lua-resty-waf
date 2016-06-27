@@ -6,41 +6,19 @@ local cjson  = require("cjson")
 local logger = require("lib.log")
 local util   = require("lib.util")
 
+local _valid_backends = { dict = true, memcached = true }
+
 function _M.initialize(waf, storage, col)
-	if (not waf._storage_zone) then
-		return
+	local backend   = waf._storage_backend
+	if (not util.table_has_key(backend, _valid_backends)) then
+		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
-	local altered, serialized, shm
-	shm        = ngx.shared[waf._storage_zone]
-	serialized = shm:get(col)
-	altered    = false
+	local backend_m = require("lib.storage." .. backend)
 
-	if (not serialized) then
-		logger.log(waf, "Initializing an empty collection for " .. col)
-		storage[col] = {}
-	else
-		local data = cjson.decode(serialized)
+	logger.log(waf, "Initializing storage type " .. backend)
 
-		-- because we're serializing out the contents of the collection
-		-- we need to roll our own expire handling. lua_shared_dict's
-		-- internal expiry can't act on individual collection elements
-		for key in pairs(data) do
-			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
-				logger.log(waf, "checking " .. key)
-				if (data["__expire_" .. key] < ngx.time()) then
-					logger.log(waf, "Removing expired key: " .. key)
-					data["__expire_" .. key] = nil
-					data[key] = nil
-					altered = true
-				end
-			end
-		end
-
-		storage[col] = data
-	end
-
-	storage[col]["__altered"] = altered
+	backend_m.initialize(waf, storage, col)
 end
 
 function _M.set_var(waf, ctx, element, value)
@@ -75,6 +53,17 @@ function _M.set_var(waf, ctx, element, value)
 	storage[col]["__altered"] = true
 end
 
+function _M.expire_var(waf, ctx, element, value)
+	local col     = ctx.col_lookup[string.upper(element.col)]
+	local key     = element.key
+	local storage = ctx.storage
+
+	logger.log(waf, "Expiring " .. element.col .. ":" .. element.key .. " in " .. value)
+
+	storage[col]["__expire_" .. key] = ngx.time() + value
+	storage[col]["__altered"]        = true
+end
+
 function _M.delete_var(waf, ctx, element)
 	local col     = ctx.col_lookup[string.upper(element.col)]
 	local key     = element.key
@@ -85,28 +74,38 @@ function _M.delete_var(waf, ctx, element)
 	if (storage[col][key]) then
 		storage[col][key]         = nil
 		storage[col]["__altered"] = true
+
+		-- redis cant expire specific keys in a hash so we track them for hdel when persisting
+		if (waf._storage_backend == 'redis') then
+			waf._storage_redis_delkey_n = waf._storage_redis_delkey_n + 1
+			waf._storage_redis_delkey[waf._storage_redis_delkey_n] = key
+		end
 	else
 		logger.log(waf, key .. " was not found in " .. col)
 	end
 end
 
 function _M.persist(waf, storage)
-	if (not waf._storage_zone) then
-		return
+	local backend   = waf._storage_backend
+	if (not util.table_has_key(backend, _valid_backends)) then
+		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
-	local shm = ngx.shared[waf._storage_zone]
+	local backend_m = require("lib.storage." .. backend)
+
+	if (not util.table_has_key(backend, _valid_backends)) then
+		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
+	end
+
+	logger.log(waf, 'Persisting storage type ' .. backend)
 
 	for col in pairs(storage) do
 		if (col ~= 'TX') then
 			logger.log(waf, 'Examining ' .. col)
 
 			if (storage[col]["__altered"]) then
-				local serialized = cjson.encode(storage[col])
-
-				logger.log(waf, 'Persisting value: ' .. tostring(serialized))
-
-				shm:set(col, serialized)
+				storage[col]["__altered"] = nil -- dont need to persist this flag
+				backend_m.persist(waf, col, storage[col])
 			else
 				logger.log(waf, "Not persisting a collection that wasn't altered")
 			end
