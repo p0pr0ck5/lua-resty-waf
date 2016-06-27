@@ -38,6 +38,9 @@ _M.defaults = {
 	_res_body_mime_types         = { ["text/plain"] = true, ["text/html"] = true },
 	_res_tid_header              = false,
 	_score_threshold             = 5,
+	_storage_backend             = 'dict',
+	_storage_memcached_host      = '127.0.0.1',
+	_storage_memcached_port      = 11211,
 	_storage_zone                = nil,
 }
 

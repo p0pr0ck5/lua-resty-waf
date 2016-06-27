@@ -9,6 +9,8 @@ env:
     - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=unit
     - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=acceptance
     - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=regression
+services:
+    - memcached
 install:
     - cpanm -v --notest Test::Nginx
 before_script:
