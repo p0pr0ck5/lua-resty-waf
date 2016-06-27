@@ -644,7 +644,7 @@ sub translate_options {
 			$time = $time =~ m/^\d+$/ ? $time * 1 : translate_macro($time);
 
 			push @{$translation->{opts}->{expirevar}},
-				{ col => $collection, key => "__expire_$element", time => $time };
+				{ col => $collection, key => $element, time => $time };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {

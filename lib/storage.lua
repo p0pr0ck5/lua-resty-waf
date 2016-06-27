@@ -53,6 +53,17 @@ function _M.set_var(waf, ctx, element, value)
 	storage[col]["__altered"] = true
 end
 
+function _M.expire_var(waf, ctx, element, value)
+	local col     = ctx.col_lookup[string.upper(element.col)]
+	local key     = element.key
+	local storage = ctx.storage
+
+	logger.log(waf, "Expiring " .. element.col .. ":" .. element.key .. " in " .. value)
+
+	storage[col]["__expire_" .. key] = ngx.time() + value
+	storage[col]["__altered"]        = true
+end
+
 function _M.delete_var(waf, ctx, element)
 	local col     = ctx.col_lookup[string.upper(element.col)]
 	local key     = element.key
