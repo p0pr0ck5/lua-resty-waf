@@ -18,14 +18,14 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
+
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
 
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:flush_all()
-
-			local lua_resty_waf = require "waf"
-			local waf           = lua_resty_waf:new()
 
 			local data = {}
 
@@ -61,7 +61,7 @@ Initializing an empty collection for FOO
 			local var = require("cjson").encode({ a = "b" })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local data = {}
@@ -110,7 +110,7 @@ Removing expired key:
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local data = {}
@@ -160,7 +160,7 @@ Initializing an empty collection for FOO
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local data = {}

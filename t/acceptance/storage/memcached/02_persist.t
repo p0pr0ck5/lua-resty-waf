@@ -26,7 +26,7 @@ __DATA__
 			local var = require("cjson").encode({ COUNT = 5 })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local storage = require "lib.storage"
@@ -69,7 +69,7 @@ Not persisting a collection that wasn't altered
 			local var = require("cjson").encode({ COUNT = 5 })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local storage = require "lib.storage"
@@ -108,7 +108,7 @@ Persisting value: {"
 			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10, BAR = 1 })
 
 			local memcached = memcached_m:new()
-			memcached:connect("127.0.0.1", 11211)
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:set("FOO", var)
 
 			local storage = require "lib.storage"
