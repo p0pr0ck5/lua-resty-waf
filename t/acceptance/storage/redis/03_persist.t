@@ -32,6 +32,7 @@ __DATA__
 
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
+			redis:flushall()
 			redis:hmset("FOO", var)
 
 			local storage = require "lib.storage"
@@ -80,6 +81,7 @@ Not persisting a collection that wasn't altered
 
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
+			redis:flushall()
 			redis:hmset("FOO", var)
 
 			local storage = require "lib.storage"
@@ -124,6 +126,7 @@ Persisting value: {"
 
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
+			redis:flushall()
 			redis:hmset("FOO", var)
 
 			local storage = require "lib.storage"

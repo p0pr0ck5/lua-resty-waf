@@ -96,6 +96,11 @@ Initializing an empty collection for FOO
 
 			local data = {}
 
+			local memcached_m = require "resty.memcached"
+			local memcached   = memcached_m:new()
+			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
+			memcached:flush_all()
+
 			local storage = require "lib.storage"
 			storage.initialize(waf, data, "FOO")
 		';
@@ -122,12 +127,20 @@ Initializing an empty collection for FOO
 --- config
     location = /t {
         access_by_lua '
+
 			local lua_resty_waf = require "waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "redis")
 
 			local data = {}
+
+			local redis_m = require "resty.redis"
+			local redis   = redis_m:new()
+			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
+			redis:flushall()
+			waf._storage_redis_delkey_n = 0
+			waf._storage_redis_delkey   = {}
 
 			local storage = require "lib.storage"
 			storage.initialize(waf, data, "FOO")
