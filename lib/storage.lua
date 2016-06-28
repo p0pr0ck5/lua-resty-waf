@@ -6,7 +6,7 @@ local cjson  = require("cjson")
 local logger = require("lib.log")
 local util   = require("lib.util")
 
-local _valid_backends = { dict = true, memcached = true }
+local _valid_backends = { dict = true, memcached = true, redis = true }
 
 function _M.initialize(waf, storage, col)
 	local backend   = waf._storage_backend
@@ -51,17 +51,31 @@ function _M.set_var(waf, ctx, element, value)
 	-- data not in the TX col will be persisted at the end of the phase
 	storage[col][key]         = value
 	storage[col]["__altered"] = true
+
+	-- track which keys to write to redis
+	if (waf._storage_backend == 'redis') then
+		waf._storage_redis_setkey[key] = value
+		waf._storage_redis_setkey_t    = true
+	end
 end
 
 function _M.expire_var(waf, ctx, element, value)
 	local col     = ctx.col_lookup[string.upper(element.col)]
 	local key     = element.key
 	local storage = ctx.storage
+	local expire  = ngx.time() + value
 
 	logger.log(waf, "Expiring " .. element.col .. ":" .. element.key .. " in " .. value)
 
-	storage[col]["__expire_" .. key] = ngx.time() + value
+
+	storage[col]["__expire_" .. key] = expire
 	storage[col]["__altered"]        = true
+
+	-- track which keys to write to redis
+	if (waf._storage_backend == 'redis') then
+		waf._storage_redis_setkey['__expire_' .. key] = expire
+		logger.log(waf, cjson.encode(waf._storage_redis_setkey))
+	end
 end
 
 function _M.delete_var(waf, ctx, element)

@@ -111,7 +111,40 @@ Initializing an empty collection for FOO
 --- no_error_log
 [error]
 
-=== TEST 4: Default invalid storage backend
+=== TEST 4: Define redis storage backend
+--- http_config
+	lua_shared_dict store 10m;
+	init_by_lua '
+		local lua_resty_waf = require "waf"
+		lua_resty_waf.default_option("storage_zone", "store")
+		lua_resty_waf.default_option("debug", true)
+	';
+--- config
+    location = /t {
+        access_by_lua '
+			local lua_resty_waf = require "waf"
+			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+
+			local data = {}
+
+			local storage = require "lib.storage"
+			storage.initialize(waf, data, "FOO")
+		';
+
+		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+	}
+--- request
+GET /t
+--- error_code: 200
+--- error_log
+Initializing storage type redis
+Initializing an empty collection for FOO
+--- no_error_log
+[error]
+
+=== TEST 5: Default invalid storage backend
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '

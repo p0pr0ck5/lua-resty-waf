@@ -41,6 +41,8 @@ _M.defaults = {
 	_storage_backend             = 'dict',
 	_storage_memcached_host      = '127.0.0.1',
 	_storage_memcached_port      = 11211,
+	_storage_redis_host          = '127.0.0.1',
+	_storage_redis_port          = 6379,
 	_storage_zone                = nil,
 }
 

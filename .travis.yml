@@ -11,6 +11,7 @@ env:
     - V_OPENRESTY=1.9.15.1 DATE=20160617 TEST=regression
 services:
     - memcached
+    - redis
 install:
     - cpanm -v --notest Test::Nginx
 before_script:

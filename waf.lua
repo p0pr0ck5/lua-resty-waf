@@ -442,6 +442,14 @@ function _M.exec(self)
 		_merge_rulesets(self)
 	end
 
+	-- set up tracking tables and flags if we're using redis for persistent storage
+	if (self._storage_backend == 'redis') then
+		self._storage_redis_delkey_n = 0
+		self._storage_redis_setkey_t = false
+		self._storage_redis_delkey   = {}
+		self._storage_redis_setkey   = {}
+	end
+
 	logger.log(self, "Beginning run of phase " .. phase)
 
 	for _, ruleset in ipairs(self._active_rulesets) do
