@@ -58,6 +58,8 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [storage_backend](#storage_backend)
 	* [storage_memcached_host](#storage_memcached_host)
 	* [storage_memcached_port](#storage_memcached_port)
+	* [storage_redis_host](#storage_redis_host)
+	* [storage_redis_port](#storage_redis_port)
 	* [storage_zone](#storage_zone)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
@@ -956,7 +958,7 @@ Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty
 
 *Default*: dict
 
-Define an engine to use for persistent variable storage. Current available options are *dict* (ngx_lua shared memory zone) and *memcached*.
+Define an engine to use for persistent variable storage. Current available options are *dict* (ngx_lua shared memory zone), *memcached*, amd *redis*.
 
 *Example*:
 
@@ -996,6 +998,38 @@ Define a port to use when using memcached as a persistent variable storage engin
 	location / {
 		acccess_by_lua '
 			waf:set_option("storage_port", 11221)
+		';
+	}
+```
+
+###storage_redis_host
+
+*Default*: 127.0.0.1
+
+Define a host to use when using redis as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_host", "10.10.10.10")
+		';
+	}
+```
+
+###storage_redis_port
+
+*Default*: 11211
+
+Define a port to use when using redis as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_port", 6397)
 		';
 	}
 ```
