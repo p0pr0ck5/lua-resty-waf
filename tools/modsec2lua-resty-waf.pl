@@ -49,6 +49,7 @@ my $valid_vars = {
 
 my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
+	cmdLine          => 'cmd_line',
 	contains         => 'STR_CONTAINS',
 	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
 	detectSQLi       => 'DETECT_SQLI',

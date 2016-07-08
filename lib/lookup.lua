@@ -172,6 +172,15 @@ _M.transform = {
 		logger.log(waf, "Encoded value is " .. t_val)
 		return t_val
 	end,
+	cmd_line = function(waf, value)
+		local str = tostring(value)
+		str = ngx.re.gsub(str, [=[[\\'"^]]=], '',  waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[\s+/]=],    '/', waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[\s+[(]]=],  '(', waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[[,;]]=],    ' ', waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[\s+]=],     ' ', waf._pcre_flags)
+		return string.lower(str)
+	end,
 	compress_whitespace = function(waf, value)
 		return ngx.re.gsub(value, [=[\s+]=], ' ', waf._pcre_flags)
 	end,
