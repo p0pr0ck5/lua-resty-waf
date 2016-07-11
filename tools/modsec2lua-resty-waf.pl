@@ -217,7 +217,7 @@ sub tokenize {
 	# - tokens are whitespace separated
 	# - tokens must be quoted with " if they contain spaces
 	# - " chars within quoted tokens must be escaped with \
-	my $re_quoted   = qr/^"(.*?(?<!\\))"/;
+	my $re_quoted   = qr/^"((?:[^"\\]+|\\.)*)"/;
 	my $re_unquoted = qr/([^\s]+)/;
 
 	# walk the given string and grab the next token
