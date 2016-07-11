@@ -17,7 +17,7 @@ add_response_body_check(sub {
 
 		is(
 			$body,
-			sprintf("%d:%d:%d\n%02d\n%d\n%d\n%d\n%02d\n%d\n%d\n",
+			sprintf("%d:%d:%d\n%02d\n%d\n%02d\n%02d\n%02d\n%02d\n%d\n",
 				$hour, $min, $sec, $mday, $epoch, $hour, $min, $mon + 1, $sec, $year),
 			"$name - TIME collection elements are correct (req $repeated_req_idx)"
 		);
