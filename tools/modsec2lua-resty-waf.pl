@@ -794,7 +794,14 @@ sub main {
 		force  => $force,
 	});
 
-	print to_json($lua_resty_waf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
+	printf "%s\n",
+		to_json(
+			$lua_resty_waf_chains,
+			{
+				pretty    => $pretty ? 1 : 0,
+				canonical => 1,
+			}
+		);
 }
 
 main();
