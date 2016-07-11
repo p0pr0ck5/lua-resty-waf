@@ -44,6 +44,18 @@ _M.collections = {
 		collections.MATCHED_VAR_NAMES = {}
 		collections.SCORE             = function() return ctx.score end
 		collections.SCORE_THRESHOLD   = function(waf) return waf._score_threshold end
+
+		local year, month, day, hour, minute, second = string.match(ngx.localtime(),
+			"(%d%d%d%d)-(%d%d)-(%d%d) (%d%d):(%d%d):(%d%d)")
+
+		collections.TIME              = string.format("%d:%d:%d", hour, minute, second)
+		collections.TIME_DAY          = day
+		collections.TIME_EPOCH        = ngx.time()
+		collections.TIME_HOUR         = hour
+		collections.TIME_MIN          = minute
+		collections.TIME_MON          = month
+		collections.TIME_SEC          = second
+		collections.TIME_YEAR         = year
 	end,
 	header_filter = function(waf, collections)
 		local response_headers = ngx.resp.get_headers()
