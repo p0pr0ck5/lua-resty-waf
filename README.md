@@ -21,6 +21,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [add_ruleset](#add_ruleset)
+	* [add_ruleset_string](#add_ruleset_string)
 	* [allow_unknown_content_types](#allow_unknown_content_types)
 	* [allowed_content_types](#allowed_content_types)
 	* [debug](#debug)
@@ -331,9 +332,25 @@ Adds an additional ruleset to be used during processing. This allows users to im
 	}
 ```
 
-Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names must be numeric, as they are sorted for processing in numeric order. This also implies some level of control on the users part; because rulesets are processed in increasing numeric order, the order with which rulesets are passed to `set_option` does not matter. Note only that rulesets of a higher numeric value are processed after those of a lower value.
+Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names are sorted before processing. Rulesets are processed in a low-to-high sorted order.
 
-**NOTE: It is STRONGLY recommend avoiding adding rulesets via `set_option`. It is much safer to add rulesets globally via `default_option`, and ignore rulesets in necessary scopes. Loading a ruleset requires reading the rule from disk on first load; when done outside the `init` phase, this can block the nginx event loop. Caveat emptor.**
+###add_ruleset_string
+
+*Default*: none
+
+Adds an additional ruleset to be used during processing. This allows users to implement custom rulesets without stomping over the included rules directory. Rulesets are defined inline as a Lua string, in the form of a translated ruleset JSON structure.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("add_ruleset_string", "70000", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+		';
+	}
+```
+
+Note that ruleset names are sorted before processing, and must be given as strings. Rulesets are processed in a low-to-high sorted order.
 
 ###allow_unknown_content_types
 
