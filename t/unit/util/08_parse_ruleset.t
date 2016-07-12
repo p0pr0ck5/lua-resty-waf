@@ -34,7 +34,7 @@ nil
 --- no_error_log
 [error]
 
-=== TEST 2: Parse a JSON string successfully
+=== TEST 2: Parse a bad JSON string
 --- config
     location = /t {
         content_by_lua '
