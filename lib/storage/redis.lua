@@ -2,10 +2,10 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson   = require("cjson")
-local logger  = require("lib.log")
-local redis_m = require("resty.redis")
-local util    = require("lib.util")
+local cjson   = require "cjson"
+local logger  = require "lib.log"
+local redis_m = require "resty.redis"
+local util    = require "lib.util"
 
 function _M.initialize(waf, storage, col)
 	local redis = redis_m:new()

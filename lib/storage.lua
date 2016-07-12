@@ -2,9 +2,9 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson  = require("cjson")
-local logger = require("lib.log")
-local util   = require("lib.util")
+local cjson  = require "cjson"
+local logger = require "lib.log"
+local util   = require "lib.util"
 
 local _valid_backends = { dict = true, memcached = true, redis = true }
 

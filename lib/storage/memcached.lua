@@ -2,9 +2,9 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson       = require("cjson")
-local logger      = require("lib.log")
-local memcached_m = require("resty.memcached")
+local cjson       = require "cjson"
+local logger      = require "lib.log"
+local memcached_m = require "resty.memcached"
 
 function _M.initialize(waf, storage, col)
 	local memcached = memcached_m:new()

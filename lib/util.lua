@@ -2,8 +2,8 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson  = require("cjson")
-local logger = require("lib.log")
+local cjson  = require "cjson"
+local logger = require "lib.log"
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table

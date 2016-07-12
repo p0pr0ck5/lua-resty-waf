@@ -2,8 +2,8 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson  = require("cjson")
-local logger = require("lib.log")
+local cjson  = require "cjson"
+local logger = require "lib.log"
 
 function _M.initialize(waf, storage, col)
 	if (not waf._storage_zone) then

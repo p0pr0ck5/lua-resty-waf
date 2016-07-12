@@ -2,8 +2,8 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local random = require "inc.resty.random"
-local string = require "inc.resty.string"
+local random = require "resty.random"
+local string = require "resty.string"
 
 function _M.random_bytes(len)
 	return string.to_hex(random.bytes(len))

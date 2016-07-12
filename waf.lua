@@ -3,13 +3,13 @@ local _M = {}
 _M.version = "0.7.2"
 
 local calc    = require "lib.rule_calc"
-local logger  = require("lib.log")
-local lookup  = require("lib.lookup")
-local opts    = require("lib.opts")
-local phase_t = require("lib.phase")
-local random  = require("lib.random")
-local storage = require("lib.storage")
-local util    = require("lib.util")
+local logger  = require "lib.log"
+local lookup  = require "lib.lookup"
+local opts    = require "lib.opts"
+local phase_t = require "lib.phase"
+local random  = require "lib.random"
+local storage = require "lib.storage"
+local util    = require "lib.util"
 
 local mt = { __index = _M }
 

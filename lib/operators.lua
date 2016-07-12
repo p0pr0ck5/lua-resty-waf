@@ -2,12 +2,12 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local ac        = require("inc.load_ac")
-local dns       = require("inc.resty.dns.resolver")
-local iputils   = require("inc.resty.iputils")
-local libinject = require ("inc.resty.libinjection")
-local logger    = require("lib.log")
-local util      = require("lib.util")
+local ac        = require "inc.load_ac"
+local dns       = require "resty.dns.resolver"
+local iputils   = require "inc.resty.iputils"
+local libinject = require "inc.resty.libinjection"
+local logger    = require "lib.log"
+local util      = require "lib.util"
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}

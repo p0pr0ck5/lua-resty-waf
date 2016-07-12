@@ -2,11 +2,11 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cookiejar = require("inc.resty.cookie")
-local upload	= require("inc.resty.upload")
+local cookiejar = require "inc.resty.cookie"
+local upload	= require "resty.upload"
 
-local logger = require("lib.log")
-local util   = require("lib.util")
+local logger = require "lib.log"
+local util   = require "lib.util"
 
 function _M.parse_request_body(waf, request_headers)
 	local content_type_header = request_headers["content-type"]

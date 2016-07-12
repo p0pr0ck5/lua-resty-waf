@@ -2,15 +2,15 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local cjson         = require("cjson")
-local file_logger   = require("inc.resty.logger.file")
-local socket_logger = require("inc.resty.logger.socket")
+local cjson         = require"cjson"
+local file_logger   = require "inc.resty.logger.file"
+local socket_logger = require "inc.resty.logger.socket"
 
-local logger    = require("lib.log")
-local operators = require("lib.operators")
-local request   = require("lib.request")
-local storage   = require("lib.storage")
-local util      = require("lib.util")
+local logger    = require "lib.log"
+local operators = require "lib.operators"
+local request   = require "lib.request"
+local storage   = require "lib.storage"
+local util      = require "lib.util"
 
 _M.alter_actions = { ACCEPT = true, DENY = true }
 
