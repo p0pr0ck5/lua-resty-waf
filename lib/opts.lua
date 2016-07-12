@@ -4,6 +4,7 @@ _M.version = "0.7.2"
 
 _M.defaults = {
 	_add_ruleset                 = {},
+	_add_ruleset_string          = {},
 	_allow_unknown_content_types = false,
 	_allowed_content_types       = {},
 	_debug                       = false,

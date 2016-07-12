@@ -129,7 +129,18 @@ function _M.parse_dynamic_value(waf, key, collections)
 	end
 end
 
--- find a rule file with a .json prefix, read it, and return a ruleset table
+-- safely attempt to parse a JSON string as a ruleset
+function _M.parse_ruleset(data)
+	local jdata
+
+	if pcall(function() jdata = cjson.decode(data) end) then
+		return jdata, nil
+	else
+		return nil, "could not decode " .. data
+	end
+end
+
+-- find a rule file with a .json prefix, read it, and return a JSON string
 function _M.load_ruleset_file(name)
 	for k, v in string.gmatch(package.path, "[^;]+") do
 		local path = string.match(k, "(.*/)")
@@ -138,14 +149,11 @@ function _M.load_ruleset_file(name)
 
 		local f = io.open(full_name)
 		if (f ~= nil) then
-			local data  = f:read("*all")
-			local jdata
+			local data = f:read("*all")
 
-			if pcall(function() jdata = cjson.decode(data) end) then
-				return jdata, nil
-			else
-				return nil, "could not decode " .. data
-			end
+			f:close()
+
+			return _M.parse_ruleset(data)
 		end
 	end
 

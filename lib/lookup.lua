@@ -326,6 +326,10 @@ _M.set_option = {
 		waf._add_ruleset[#waf._add_ruleset + 1] = value
 		waf.need_merge = true
 	end,
+	add_ruleset_string = function(waf, value, ruleset)
+		waf._add_ruleset_string[value] = ruleset
+		waf.need_merge = true
+	end,
 	ignore_rule = function(waf, value)
 		waf._ignore_rule[value] = true
 	end,

@@ -354,6 +354,7 @@ end
 local function _merge_rulesets(self)
 	local default = _global_rulesets
 	local added   = self._add_ruleset
+	local added_s = self._add_ruleset_string
 	local ignored = self._ignore_ruleset
 
 	local t = {}
@@ -365,6 +366,25 @@ local function _merge_rulesets(self)
 	for k, v in ipairs(added) do
 		logger.log(self, "Adding ruleset " .. v)
 		t[v] = true
+	end
+
+	for k, v in pairs(added_s) do
+		logger.log(self, "Adding ruleset string " .. k)
+
+		if (not _ruleset_defs[k]) then
+			local rs, err = util.parse_ruleset(v)
+
+			if (err) then
+				logger.fatal_fail("Could not load " .. k)
+			else
+				logger.log(self, "Doing offset calculation of " .. k)
+				_calculate_offset(rs)
+
+				_ruleset_defs[k] = rs
+			end
+		end
+
+		t[k] = true
 	end
 
 	for k, v in ipairs(ignored) do
@@ -577,11 +597,16 @@ function _M.init()
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
 	for _, ruleset in ipairs(default_opts._active_rulesets) do
-		local rs, err = util.load_ruleset_file(ruleset)
+		local rs, err, calc
+
+		if (not _ruleset_defs[ruleset]) then
+			rs, err = util.load_ruleset_file(ruleset)
+			calc = true
+		end
 
 		if (err) then
 			ngx.log(ngx.ERR, err)
-		else
+		elseif (calc) then
 			_calculate_offset(rs)
 
 			_ruleset_defs[ruleset] = rs
