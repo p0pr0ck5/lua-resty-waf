@@ -3,8 +3,8 @@ local _M = {}
 _M.version = "0.7.2"
 
 local cjson  = require "cjson"
-local logger = require "lib.log"
-local util   = require "lib.util"
+local logger = require "resty.waf.log"
+local util   = require "resty.waf.util"
 
 local _valid_backends = { dict = true, memcached = true, redis = true }
 
@@ -14,7 +14,7 @@ function _M.initialize(waf, storage, col)
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
-	local backend_m = require("lib.storage." .. backend)
+	local backend_m = require("resty.waf.storage." .. backend)
 
 	logger.log(waf, "Initializing storage type " .. backend)
 
@@ -105,7 +105,7 @@ function _M.persist(waf, storage)
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
-	local backend_m = require("lib.storage." .. backend)
+	local backend_m = require("resty.waf.storage." .. backend)
 
 	if (not util.table_has_key(backend, _valid_backends)) then
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")

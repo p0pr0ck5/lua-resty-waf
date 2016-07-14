@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, { "bang", "bash", "qux" })
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "far")
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, { "bang", "bash", "quz" })
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(match)
 			ngx.say(value)
@@ -99,7 +99,7 @@ foo
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.contains({ "foo", "bar", "baz", "qux" }, "foo")
 			ngx.say(type(match))
 			ngx.say(type(value))

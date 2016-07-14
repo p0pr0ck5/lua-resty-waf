@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util    = require "lib.util"
+			local util    = require "resty.waf.util"
 			local ip      = "127.0.0.1"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -31,7 +31,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util    = require "lib.util"
+			local util    = require "resty.waf.util"
 			local ip      = { "127.0.0.1" }
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -50,7 +50,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util    = require "lib.util"
+			local util    = require "resty.waf.util"
 			local ip      = "im.not.an.ip"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -70,7 +70,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util    = require "lib.util"
+			local util    = require "resty.waf.util"
 			local ip      = "999.999.999.999"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 

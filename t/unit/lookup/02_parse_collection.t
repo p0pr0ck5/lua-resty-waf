@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			ngx.say(specific)
@@ -30,7 +30,7 @@ bar
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			for i in ipairs(specific) do
@@ -51,7 +51,7 @@ bat
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local ignore     = lookup.parse_collection["ignore"]({}, collection, "foo")
 			for k, v in pairs(ignore) do
@@ -71,7 +71,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local ignore     = lookup.parse_collection["ignore"]({}, collection, "foo")
 			for k, v in pairs(ignore) do
@@ -91,7 +91,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
@@ -112,7 +112,7 @@ baz
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
@@ -133,7 +133,7 @@ baz
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
@@ -154,7 +154,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
@@ -176,7 +176,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do
@@ -199,7 +199,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "lib.lookup"
+			local lookup     = require "resty.waf.lookup"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do

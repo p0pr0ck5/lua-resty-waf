@@ -2,14 +2,14 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local calc    = require "lib.rule_calc"
-local logger  = require "lib.log"
-local lookup  = require "lib.lookup"
-local opts    = require "lib.opts"
-local phase_t = require "lib.phase"
-local random  = require "lib.random"
-local storage = require "lib.storage"
-local util    = require "lib.util"
+local calc    = require "resty.waf.rule_calc"
+local logger  = require "resty.waf.log"
+local lookup  = require "resty.waf.lookup"
+local opts    = require "resty.waf..opts"
+local phase_t = require "resty.waf.phase"
+local random  = require "resty.waf.random"
+local storage = require "resty.waf.storage"
+local util    = require "resty.waf.util"
 
 local mt = { __index = _M }
 

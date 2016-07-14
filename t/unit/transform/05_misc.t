@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#41;&quot;]]
 			local transform = lookup.transform["html_decode"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "%22%3E%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 			local transform = lookup.transform["uri_decode"]({}, value)
 			ngx.say(transform)
@@ -48,7 +48,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "/a//b///c"
 			local transform = lookup.transform["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -66,7 +66,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "/a/b/./c"
 			local transform = lookup.transform["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -84,7 +84,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "/a/d/../b/c"
 			local transform = lookup.transform["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -102,7 +102,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "/a///b/d/../c/./e/../"
 			local transform = lookup.transform["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)

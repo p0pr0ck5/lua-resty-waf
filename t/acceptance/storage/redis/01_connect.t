@@ -11,14 +11,14 @@ __DATA__
 === TEST 1: Connect with defaults
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "redis")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local redis_m = require "resty.redis"
@@ -29,7 +29,7 @@ __DATA__
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -47,7 +47,7 @@ Error in connecting to redis
 === TEST 2: Connect with invalid host
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "redis")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -55,7 +55,7 @@ Error in connecting to redis
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local redis_m = require "resty.redis"
@@ -68,7 +68,7 @@ Error in connecting to redis
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 

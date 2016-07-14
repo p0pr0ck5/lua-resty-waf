@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello \\ wor\\l\\\\d]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -32,7 +32,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello " wor"l""d]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -52,7 +52,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello \' wor\'l\'\'d]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -72,7 +72,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello ^ wor^l^^d]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -92,7 +92,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[\'hello \\ wor"l^d\']=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -112,7 +112,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello /wo   /rld]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -132,7 +132,7 @@ hello/wo/rld
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello (wo   (rld]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -152,7 +152,7 @@ hello(wo(rld
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello,world]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -172,7 +172,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello;world]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -192,7 +192,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[hello,wo;rld]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -212,7 +212,7 @@ hello wo rld
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[how      are you    doing]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -232,7 +232,7 @@ how are you doing
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[HeLLo wORlD]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
@@ -252,7 +252,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = [=[ThIs    IS th\\e	s^\'on"g th,At  / never ( ends;]=]
 			local transform = lookup.transform["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)

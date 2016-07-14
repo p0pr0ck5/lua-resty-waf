@@ -14,7 +14,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -39,7 +39,7 @@ Processing rule 73
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -64,13 +64,13 @@ Processing rule 73
 === TEST 3: Add an inline ruleset via default_option
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("add_ruleset_string", "10100", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"patte    rn":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -93,13 +93,13 @@ Processing rule 73
 === TEST 4: Add an inline ruleset via default_option, then ignore a rule in the ruleset
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("add_ruleset_string", "10100", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"patte    rn":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)

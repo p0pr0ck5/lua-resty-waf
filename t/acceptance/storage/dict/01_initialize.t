@@ -12,7 +12,7 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
 		lua_resty_waf.default_option("debug", true)
@@ -20,12 +20,12 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -44,7 +44,7 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
 		lua_resty_waf.default_option("debug", true)
@@ -52,7 +52,7 @@ Initializing an empty collection for FOO
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b" })
@@ -61,7 +61,7 @@ Initializing an empty collection for FOO
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -92,7 +92,7 @@ Removing expired key:
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
 		lua_resty_waf.default_option("debug", true)
@@ -100,7 +100,7 @@ Removing expired key:
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
@@ -109,7 +109,7 @@ Removing expired key:
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -141,7 +141,7 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
 		lua_resty_waf.default_option("debug", true)
@@ -149,7 +149,7 @@ Initializing an empty collection for FOO
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
@@ -158,7 +158,7 @@ Initializing an empty collection for FOO
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]

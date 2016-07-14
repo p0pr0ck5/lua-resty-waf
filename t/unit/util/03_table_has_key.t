@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_key("foo", t)
 			ngx.say(val)
@@ -30,7 +30,7 @@ true
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local t    = { "foo", "bar", "qux", "frob" }
 			local val  = util.table_has_key(1, t)
 			ngx.say(val)
@@ -48,7 +48,7 @@ true
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_key("baz", t)
 			ngx.say(val)
@@ -66,7 +66,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local t    = { "foo", "bar", "qux", "frob" }
 			local val  = util.table_has_key(0, t)
 			ngx.say(val)
@@ -84,7 +84,7 @@ false
 --- config
 	location /t {
 		content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local t    = "foo, bar"
 			local val  = util.table_has_key("foo", t)
 			ngx.say(val)

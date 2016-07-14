@@ -2,12 +2,12 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local ac        = require "inc.load_ac"
+local ac        = require "resty.waf.load_ac"
 local dns       = require "resty.dns.resolver"
-local iputils   = require "inc.resty.iputils"
-local libinject = require "inc.resty.libinjection"
-local logger    = require "lib.log"
-local util      = require "lib.util"
+local iputils   = require "resty.iputils"
+local libinject = require "resty.libinjection"
+local logger    = require "resty.waf.log"
+local util      = require "resty.waf.util"
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}

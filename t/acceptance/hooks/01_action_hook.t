@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -23,7 +23,7 @@ __DATA__
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -48,7 +48,7 @@ Rule action was DENY, so telling nginx to quit
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -60,7 +60,7 @@ Rule action was DENY, so telling nginx to quit
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -86,7 +86,7 @@ Rule action was DENY, so telling nginx to quit
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -98,7 +98,7 @@ Rule action was DENY, so telling nginx to quit
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -123,7 +123,7 @@ Override DENY action
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -135,7 +135,7 @@ Override DENY action
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -156,7 +156,7 @@ Override DENY action
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -167,7 +167,7 @@ Override DENY action
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -196,7 +196,7 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -209,7 +209,7 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -237,7 +237,7 @@ Override DENY action
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -249,7 +249,7 @@ Override DENY action
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -277,7 +277,7 @@ Rule action was DENY, so telling nginx to quit
 				ngx.status = ngx.HTTP_NOT_FOUND
 			end
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "SIMULATE") -- explicitly set
@@ -289,7 +289,7 @@ Rule action was DENY, so telling nginx to quit
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -313,7 +313,7 @@ Rule action was DENY, so telling nginx to quit
 		access_by_lua '
 			local deny_override = 42
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
@@ -325,7 +325,7 @@ Rule action was DENY, so telling nginx to quit
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()

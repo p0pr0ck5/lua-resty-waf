@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local value  = "48656c6c6f2c20776f726c6421"
 			ngx.say(util.hex_decode(value))
 		';
@@ -29,7 +29,7 @@ Hello, world!
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local value  = "this is not hex"
 			ngx.say(util.hex_decode(value))
 		';
@@ -46,7 +46,7 @@ this is not hex
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local value  = "Hello, world!"
 			ngx.say(util.hex_encode(value))
 		';

@@ -12,14 +12,14 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -27,7 +27,7 @@ __DATA__
 			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT" }
@@ -54,14 +54,14 @@ Deleting FOO:COUNT
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -69,7 +69,7 @@ Deleting FOO:COUNT
 			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT" }
@@ -96,14 +96,14 @@ Deleting FOO:COUNT
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -111,7 +111,7 @@ Deleting FOO:COUNT
 			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "BAR" }
@@ -138,14 +138,14 @@ BAR was not found in FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -153,7 +153,7 @@ BAR was not found in FOO
 			local shm = ngx.shared[waf._storage_zone]
 			shm:set("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "BAR" }

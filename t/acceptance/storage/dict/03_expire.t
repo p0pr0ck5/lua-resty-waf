@@ -13,7 +13,7 @@ __DATA__
 --- http_config
     lua_shared_dict store 10m;
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_zone", "store")
         lua_resty_waf.default_option("storage_backend", "dict")
         lua_resty_waf.default_option("debug", true)
@@ -21,12 +21,12 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -40,12 +40,12 @@ __DATA__
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -79,7 +79,7 @@ Not persisting a collection that wasn't altered
 --- http_config
     lua_shared_dict store 10m;
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_zone", "store")
         lua_resty_waf.default_option("storage_backend", "dict")
         lua_resty_waf.default_option("debug", true)
@@ -87,12 +87,12 @@ Not persisting a collection that wasn't altered
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -111,12 +111,12 @@ Not persisting a collection that wasn't altered
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -152,7 +152,7 @@ Not persisting a collection that wasn't altered
 --- http_config
     lua_shared_dict store 10m;
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_zone", "store")
         lua_resty_waf.default_option("storage_backend", "dict")
         lua_resty_waf.default_option("debug", true)
@@ -160,12 +160,12 @@ Not persisting a collection that wasn't altered
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -184,12 +184,12 @@ Not persisting a collection that wasn't altered
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -224,7 +224,7 @@ Not persisting a collection that wasn't altered
 --- http_config
     lua_shared_dict store 10m;
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_zone", "store")
         lua_resty_waf.default_option("storage_backend", "dict")
         lua_resty_waf.default_option("debug", true)
@@ -232,12 +232,12 @@ Not persisting a collection that wasn't altered
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -261,12 +261,12 @@ Not persisting a collection that wasn't altered
     location = /s {
 		access_by_lua '
 			ngx.sleep(3)
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
