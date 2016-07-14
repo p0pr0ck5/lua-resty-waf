@@ -19,9 +19,9 @@ before_script:
     - sudo apt-get install libssl-dev lua5.1 -y
     - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
     - sudo tar -jxvf openresty-$V_OPENRESTY-$DATE.tar.bz2 -C /usr/local/
-    - sudo ln -fs $(pwd)/lib/resty/* /usr/local/openresty/lualib/resty/
-    - sudo ln -fs $(pwd)/lib/*.so /usr/local/openresty/lualib/
-    - sudo ln -fs $(pwd)/rules /usr/local/openresty/lualib/
+    - sudo ln -s $(pwd)/lib/resty/* /usr/local/openresty/lualib/resty/
+    - sudo ln -s $(pwd)/lib/*.so /usr/local/openresty/lualib/
+    - sudo ln -s $(pwd)/rules /usr/local/openresty/lualib/
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
   - ./tools/lua-releng -L
