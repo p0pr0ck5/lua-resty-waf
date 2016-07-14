@@ -18,6 +18,7 @@ local string_match = string.match
 local ac_lib = nil
 local ac_create = nil
 local ac_match = nil
+local ac_free = nil
 
 --[[ Find shared object file package.cpath, obviating the need of setting
    LD_LIBRARY_PATH
