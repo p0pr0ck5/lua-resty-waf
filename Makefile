@@ -1,11 +1,11 @@
-OPENRESTY_PREFIX=/usr/local/openresty
-LUA_LIB_DIR ?= $(OPENRESTY_PREFIX)/lualib
-INSTALL ?= ln -s
-PWD=`pwd`
+OPENRESTY_PREFIX ?= /usr/local/openresty
+LUA_LIB_DIR      ?= $(OPENRESTY_PREFIX)/lualib
+INSTALL          ?= ln -s
+PWD               = `pwd`
 
-LIBS = cookie.lua iputils.lua logger libinjection.lua waf waf.lua
+LIBS    = cookie.lua iputils.lua logger libinjection.lua waf waf.lua
 SO_LIBS = libac.so libinjection.so
-RULES = rules
+RULES   = rules
 
 .PHONY: all test install clean
 
