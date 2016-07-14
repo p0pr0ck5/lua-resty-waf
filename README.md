@@ -108,7 +108,17 @@ lua-resty-waf workload is almost exclusively CPU bound. Memory footprint in the 
 
 ##Installation
 
-Clone the lua-resty-waf repo into Nginx/OpenResty's Lua package path. Module setup and configuration is detailed in the synopsis.
+A simple Makefile is provided. Simply run `make install`:
+
+```
+	# make install
+```
+
+Alternatively, install via Luarocks:
+
+```
+	# luarocks install lua-resty-waf
+```
 
 Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
