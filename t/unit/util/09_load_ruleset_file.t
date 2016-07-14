@@ -20,7 +20,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 
 			local ruleset, err = util.load_ruleset_file("extra")
 
@@ -42,7 +42,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 
 			local parse, err = util.load_ruleset_file("dne")
 
@@ -64,7 +64,7 @@ could not find dne
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 
 			local parse, err = util.load_ruleset_file("extra_broken")
 

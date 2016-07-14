@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op   = require "lib.operators"
+			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)
@@ -31,7 +31,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
 			local match, value = op.cidr_match("192.168.0.1", cidrs)
@@ -50,7 +50,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op   = require "lib.operators"
+			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("172.16.31.255", cidr)
@@ -69,7 +69,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
 			local match, value = op.cidr_match("172.16.31.255", cidrs)
@@ -88,7 +88,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op   = require "lib.operators"
+			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("foobar", cidr)
@@ -107,7 +107,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op   = require "lib.operators"
+			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)
@@ -128,7 +128,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op   = require "lib.operators"
+			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)

@@ -11,7 +11,7 @@ __DATA__
 === TEST 1: Persist a collection
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "redis")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -19,7 +19,7 @@ __DATA__
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -35,7 +35,7 @@ __DATA__
 			redis:flushall()
 			redis:hmset("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -60,7 +60,7 @@ Not persisting a collection that wasn't altered
 === TEST 2: Don't persist an unaltered collection
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "redis")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -68,7 +68,7 @@ Not persisting a collection that wasn't altered
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -84,7 +84,7 @@ Not persisting a collection that wasn't altered
 			redis:flushall()
 			redis:hmset("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
@@ -105,7 +105,7 @@ Persisting value: {"
 === TEST 3: Persist an unaltered collection with expired keys
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "redis")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -113,7 +113,7 @@ Persisting value: {"
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
@@ -129,7 +129,7 @@ Persisting value: {"
 			redis:flushall()
 			redis:hmset("FOO", var)
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
@@ -150,14 +150,14 @@ Not persisting a collection that wasn't altered
 === TEST 4: Don't persist the TX collection
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local ctx = { storage = { TX = {} }, col_lookup = { TX = "TX" } }
@@ -168,7 +168,7 @@ Not persisting a collection that wasn't altered
 			waf._storage_redis_setkey_f = true
 			waf._storage_redis_setkey   = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 
 			local element = { col = "TX", key = "COUNT", value = 1 }
 			storage.set_var(waf, ctx, element, element.value)

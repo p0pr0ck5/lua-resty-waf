@@ -12,9 +12,9 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "lib.lookup"
+			local lookup  = require "resty.waf.lookup"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")
@@ -42,9 +42,9 @@ A response is sent
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "lib.lookup"
+			local lookup  = require "resty.waf.lookup"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")
@@ -75,9 +75,9 @@ A response is sent
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "lib.lookup"
+			local lookup  = require "resty.waf.lookup"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")

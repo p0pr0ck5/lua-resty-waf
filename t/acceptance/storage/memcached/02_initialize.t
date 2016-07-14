@@ -11,14 +11,14 @@ __DATA__
 === TEST 1: Initialize empty collection
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local memcached_m = require "resty.memcached"
@@ -29,7 +29,7 @@ __DATA__
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -47,7 +47,7 @@ Initializing an empty collection for FOO
 === TEST 2: Initialize pre-populated collection
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -55,7 +55,7 @@ Initializing an empty collection for FOO
     location = /t {
         access_by_lua '
 			local memcached_m   = require "resty.memcached"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b" })
@@ -66,7 +66,7 @@ Initializing an empty collection for FOO
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -96,7 +96,7 @@ Removing expired key:
 === TEST 3: Initialize pre-populated collection with expired keys
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -104,7 +104,7 @@ Removing expired key:
     location = /t {
         access_by_lua '
 			local memcached_m   = require "resty.memcached"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
@@ -115,7 +115,7 @@ Removing expired key:
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -146,7 +146,7 @@ Initializing an empty collection for FOO
 === TEST 4: Initialize pre-populated collection with only some expired keys
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -154,7 +154,7 @@ Initializing an empty collection for FOO
     location = /t {
         access_by_lua '
 			local memcached_m   = require "resty.memcached"
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
@@ -165,7 +165,7 @@ Initializing an empty collection for FOO
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]

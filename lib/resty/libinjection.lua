@@ -86,7 +86,7 @@ local lib, loaded
 local function _loadlib()
 	if (not loaded) then
 		local path, so_path
-		local libname = "inc/libinjection.so"
+		local libname = "libinjection.so"
 
 		for k, v in string.gmatch(package.cpath, "[^;]+") do
 			so_path = string.match(k, "(.*/)")

@@ -2,7 +2,7 @@ local _M = {}
 
 _M.version = "0.7.2"
 
-local util = require "lib.util"
+local util = require "resty.waf.util"
 
 _M.phases = { access = 1, header_filter = 2, body_filter = 3 }
 

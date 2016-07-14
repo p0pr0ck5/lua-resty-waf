@@ -1,28 +1,23 @@
-OPENRESTY_PREFIX=/usr/local/openresty
+OPENRESTY_PREFIX ?= /usr/local/openresty
+LUA_LIB_DIR      ?= $(OPENRESTY_PREFIX)/lualib
+INSTALL          ?= ln -s
+PWD               = `pwd`
 
-PREFIX ?=          /usr/local
-LUA_INCLUDE_DIR ?= $(PREFIX)/include
-LUA_LIB_DIR ?=     $(PREFIX)/lib/lua/$(LUA_VERSION)
-INSTALL ?= install
+LIBS    = cookie.lua iputils.lua logger libinjection.lua waf waf.lua
+SO_LIBS = libac.so libinjection.so
+RULES   = rules
 
-.PHONY: all test install
+.PHONY: all test install clean
 
 all: ;
 
+clean:
+	cd $(LUA_LIB_DIR) && rm $(RULES) && rm $(SO_LIBS) && cd resty/ && rm $(LIBS)
+
+test:
+	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/
+
 install: all
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf
-	$(INSTALL) waf.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/waf.lua
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc
-	$(INSTALL) inc/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty
-	$(INSTALL) inc/resty/*.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/dns
-	$(INSTALL) inc/resty/dns/*.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/dns/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/logger
-	$(INSTALL) inc/resty/logger/*.lua $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/inc/resty/logger/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/lib
-	$(INSTALL) lib/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/lib/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules
-	$(INSTALL) rules/*.json $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/rules/
-	$(INSTALL) -d $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/tools/
-	$(INSTALL) tools/*.* $(DESTDIR)$(LUA_LIB_DIR)/lua_resty_waf/tools/
+	$(INSTALL) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
+	$(INSTALL) $(PWD)/lib/*.so $(LUA_LIB_DIR)
+	$(INSTALL) $(PWD)/rules/ $(LUA_LIB_DIR)

@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local str  = [=[{"foo":"bar","baz":["bat","qux"]}]=]
 
 			local parse, err = util.parse_ruleset(str)
@@ -38,7 +38,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local str  = [=[{"foo":"bar","baz":["bat","qux]}]=]
 
 			local parse, err = util.parse_ruleset(str)

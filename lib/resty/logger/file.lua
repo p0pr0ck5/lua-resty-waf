@@ -31,6 +31,8 @@ _M._VERSION = '0.01'
 local flush_limit           = 4096         -- 4KB
 local drop_limit            = 1048576      -- 1MB
 local timeout               = 1000         -- 1 sec
+local host
+local port
 local path
 local max_buffer_reuse      = 10000        -- reuse buffer for at most 10000
                                            -- times
@@ -242,8 +244,6 @@ local function _flush()
 
     buffer_size = buffer_size - #send_buffer
     send_buffer = ""
-
-    return bytes
 end
 
 local function _periodic_flush()

@@ -12,7 +12,7 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -25,12 +25,12 @@ __DATA__
 			memcached:connect("127.0.0.1", 11211)
 			memcached:flush_all()
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -49,21 +49,21 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "dict")
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -82,14 +82,14 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "memcached")
@@ -101,7 +101,7 @@ Initializing an empty collection for FOO
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
 			memcached:flush_all()
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -120,7 +120,7 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
@@ -128,7 +128,7 @@ Initializing an empty collection for FOO
     location = /t {
         access_by_lua '
 
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "redis")
@@ -142,7 +142,7 @@ Initializing an empty collection for FOO
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 
@@ -161,21 +161,21 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
 --- config
     location = /t {
         access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "unicorn_dreams")
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 		';
 

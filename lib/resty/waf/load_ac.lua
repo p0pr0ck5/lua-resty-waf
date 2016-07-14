@@ -18,6 +18,7 @@ local string_match = string.match
 local ac_lib = nil
 local ac_create = nil
 local ac_match = nil
+local ac_free = nil
 
 --[[ Find shared object file package.cpath, obviating the need of setting
    LD_LIBRARY_PATH
@@ -44,7 +45,7 @@ function _M.load_ac_lib()
     if ac_lib ~= nil then
         return ac_lib
     else
-        local so_path = find_shared_obj(package.cpath, "inc/libac.so")
+        local so_path = find_shared_obj(package.cpath, "libac.so")
         if so_path ~= nil then
             ac_lib = ffi.load(so_path)
             ac_create = ac_lib.ac_create

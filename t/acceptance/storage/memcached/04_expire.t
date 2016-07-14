@@ -12,14 +12,14 @@ __DATA__
 === TEST 1: Initialize empty, persist and re-initialize a collection
 --- http_config
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "memcached")
         lua_resty_waf.default_option("debug", true)
     ';
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local memcached_m = require "resty.memcached"
@@ -29,7 +29,7 @@ __DATA__
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -43,12 +43,12 @@ __DATA__
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -81,14 +81,14 @@ Not persisting a collection that wasn't altered
 === TEST 2: Initialize empty, set with future expiry, persist, delay, and re-initialize a collection
 --- http_config
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "memcached")
         lua_resty_waf.default_option("debug", true)
     ';
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local memcached_m = require "resty.memcached"
@@ -98,7 +98,7 @@ Not persisting a collection that wasn't altered
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -115,12 +115,12 @@ Not persisting a collection that wasn't altered
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -155,14 +155,14 @@ Not persisting a collection that wasn't altered
 === TEST 3: Initialize empty, set with expiry, persist, delay, re-initialize, and re-persist
 --- http_config
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "memcached")
         lua_resty_waf.default_option("debug", true)
     ';
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local memcached_m = require "resty.memcached"
@@ -172,7 +172,7 @@ Not persisting a collection that wasn't altered
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -189,12 +189,12 @@ Not persisting a collection that wasn't altered
 
     location = /s {
 		access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -228,14 +228,14 @@ Not persisting a collection that wasn't altered
 === TEST 4: Initialize empty, set some with expiry, persist, delay, re-initialize, and re-persist
 --- http_config
     init_by_lua '
-        local lua_resty_waf = require "waf"
+        local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "memcached")
         lua_resty_waf.default_option("debug", true)
     ';
 --- config
     location = /t {
         access_by_lua '
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local memcached_m = require "resty.memcached"
@@ -245,7 +245,7 @@ Not persisting a collection that wasn't altered
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "lib.storage"
+            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
@@ -265,12 +265,12 @@ Not persisting a collection that wasn't altered
     location = /s {
 		access_by_lua '
 			ngx.sleep(3)
-            local lua_resty_waf = require "waf"
+            local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			local data = {}
 
-			local storage = require "lib.storage"
+			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]

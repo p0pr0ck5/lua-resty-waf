@@ -11,14 +11,14 @@ __DATA__
 === TEST 1: Call init with no options
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -36,7 +36,7 @@ GET /t
 === TEST 2: Inherit init options
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.default_option("debug_log_level", ngx.DEBUG)
@@ -45,7 +45,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()

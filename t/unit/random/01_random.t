@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local random = require "lib.random"
+			local random = require "resty.waf.random"
 			local string = random.random_bytes(8)
 
 			ngx.say(string)
@@ -30,7 +30,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local random = require "lib.random"
+			local random = require "resty.waf.random"
 			local string = random.random_bytes(16)
 
 			ngx.say(string)
@@ -48,7 +48,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local random = require "lib.random"
+			local random = require "resty.waf.random"
 			local str1   = random.random_bytes(8)
 			local str2   = random.random_bytes(8)
 

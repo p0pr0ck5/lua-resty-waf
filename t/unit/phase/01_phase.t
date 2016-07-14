@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(type(phase.phases))
 		';
 	}
@@ -28,8 +28,8 @@ table
 --- config
 	location /t {
 		content_by_lua '
-			local phase = require "lib.phase"
-			local util  = require "lib.util"
+			local phase = require "resty.waf.phase"
+			local util  = require "resty.waf.util"
 			ngx.say(table.getn(util.table_keys(phase.phases)))
 		';
 	}
@@ -45,7 +45,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("init"))
 		';
 	}
@@ -61,7 +61,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("init_worker"))
 		';
 	}
@@ -77,7 +77,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("set"))
 		';
 	}
@@ -93,7 +93,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("rewrite"))
 		';
 	}
@@ -109,7 +109,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("access"))
 		';
 	}
@@ -125,7 +125,7 @@ true
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("content"))
 		';
 	}
@@ -141,7 +141,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("header_filter"))
 		';
 	}
@@ -157,7 +157,7 @@ true
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("body_filter"))
 		';
 	}
@@ -173,7 +173,7 @@ true
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("log"))
 		';
 	}
@@ -189,7 +189,7 @@ false
 --- config
 	location /t {
 		access_by_lua '
-			local phase = require "lib.phase"
+			local phase = require "resty.waf.phase"
 			ngx.say(phase.is_valid_phase("timer"))
 		';
 	}
