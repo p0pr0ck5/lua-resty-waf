@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -20,7 +20,7 @@ __DATA__
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local lua_resty_waf     = require "waf"
+			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 
 			ngx.say(collections.SCORE_THRESHOLD(waf))
@@ -38,7 +38,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -62,7 +62,7 @@ function
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -70,7 +70,7 @@ function
 
 		content_by_lua '
 			local collections = ngx.ctx.collections
-			local lua_resty_waf     = require "waf"
+			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 
 			ngx.say(type(collections.SCORE_THRESHOLD(waf)))

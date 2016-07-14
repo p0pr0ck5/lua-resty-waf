@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "aGVsbG8gd29ybGQ="
 			local transform = lookup.transform["base64_decode"]({}, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "goodbye world"
 			local transform = lookup.transform["base64_encode"]({}, value)
 			ngx.say(transform)

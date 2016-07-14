@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "UNI/*1*/ON SELECT"
 			local transform = lookup.transform["remove_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ UNION SELECT
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "UNION/* */SELECT"
 			local transform = lookup.transform["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -48,7 +48,7 @@ UNION SELECT
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "; DROP TABLE bobby--"
 			local transform = lookup.transform["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -66,7 +66,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "; DROP TABLE bobby#"
 			local transform = lookup.transform["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -84,7 +84,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "UNION/***/SELECT"
 			local transform = lookup.transform["replace_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
