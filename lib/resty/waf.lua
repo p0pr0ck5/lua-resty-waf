@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.2"
+_M.version = "0.8"
 
 local calc    = require "resty.waf.rule_calc"
 local logger  = require "resty.waf.log"

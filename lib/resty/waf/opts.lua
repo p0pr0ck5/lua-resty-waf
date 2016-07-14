@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.7.2"
+_M.version = "0.8"
 
 _M.defaults = {
 	_add_ruleset                 = {},
