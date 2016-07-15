@@ -160,7 +160,6 @@ function _M.common_args(waf, collections)
 						t[k] = { _v, v }
 					end
 				end
-				logger.log(waf, "t[" .. k .. "] contains " .. tostring(t[k]))
 			end
 		end
 	end
