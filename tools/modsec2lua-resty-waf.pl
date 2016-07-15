@@ -83,29 +83,27 @@ my $valid_operators = {
 
 my $valid_transforms = {
 	base64decode       => 'base64_decode',
-	base64Decode       => 'base64_decode',
-	base64DecodeExt    => 'base64_decode',
-	base64Encode       => 'base64_encode',
-	compressWhitespace => 'compress_whitespace',
-	compressWhiteSpace => 'compress_whitespace',
-	hexDecode          => 'hex_decode',
-	hexEncode          => 'hex_encode',
-	htmlEntityDecode   => 'html_decode',
+	base64decodeext    => 'base64_decode',
+	base64encode       => 'base64_encode',
+	compresswhitespace => 'compress_whitespace',
+	hexdecode          => 'hex_decode',
+	hexencode          => 'hex_encode',
+	htmlentitydecode   => 'html_decode',
 	length             => 'length',
 	lowercase          => 'lowercase',
 	md5                => 'md5',
-	normalisePath      => 'normalise_path',
-	removeWhitespace   => 'remove_whitespace',
-	removeComments     => 'remove_comments',
-	removeCommentsChar => 'remove_comments_char',
-	replaceComments    => 'replace_comments',
+	normalisepath      => 'normalise_path',
+	removewhitespace   => 'remove_whitespace',
+	removecomments     => 'remove_comments',
+	removecommentschar => 'remove_comments_char',
+	replacecomments    => 'replace_comments',
 	sha1               => 'sha1',
-	sqlHexDecode       => 'sql_hex_decode',
+	sqlhexdecode       => 'sql_hex_decode',
 	trim               => 'trim',
-	trimLeft           => 'trim_left',
-	trimRight          => 'trim_right',
-	urlDecode          => 'uri_decode',
-	urlDecodeUni       => 'uri_decode',
+	trimleft           => 'trim_left',
+	trimright          => 'trim_right',
+	urldecode          => 'uri_decode',
+	urldecodeuni       => 'uri_decode',
 };
 
 my $action_lookup = {
@@ -706,7 +704,7 @@ sub translate_options {
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
-			my $transform = $valid_transforms->{$value};
+			my $transform = $valid_transforms->{lc $value};
 
 			if (!$transform) {
 				warn "Cannot perform transform $value" if !$silent;
