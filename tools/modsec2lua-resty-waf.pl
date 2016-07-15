@@ -85,6 +85,7 @@ my $valid_transforms = {
 	base64decode       => 'base64_decode',
 	base64decodeext    => 'base64_decode',
 	base64encode       => 'base64_encode',
+	cmdline            => 'cmd_line',
 	compresswhitespace => 'compress_whitespace',
 	hexdecode          => 'hex_decode',
 	hexencode          => 'hex_encode',
