@@ -290,6 +290,9 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 		return false, nil
 	end
 
+	-- id for unit test
+	resolver._id = ctx._r_id or nil
+
 	local rbl_query = util.build_rbl_query(ip, rbl_srv)
 
 	if (not rbl_query) then
@@ -298,6 +301,8 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	end
 
 	local answers, err = resolver:query(rbl_query)
+
+	ngx.log(ngx.INFO, require("cjson").encode(answers))
 
 	if (not answers) then
 		ngx.log(ngx.WARN, err)
@@ -315,7 +320,12 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	else
 		-- we got a dns response, for now we're only going to return the first entry
 		local i, answer = next(answers)
-		return true, answer.address or answer.cname
+		if (answer and type(answer) == 'table') then
+			return true, answer.address or answer.cname
+		else
+			-- we didnt have any valid answers
+			return false, nil
+		end
 	end
 end
 
