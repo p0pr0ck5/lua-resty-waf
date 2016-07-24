@@ -1,0 +1,57 @@
+v0.8                                                               July 14, 2016
+
+    * Distribution: Added rockspec (luarocks.org/modules/p0pr0ck5/lua-resty-waf)
+
+    * Distribution: Refactor layout structure of modules and includes
+
+    * Maintenance: Clean up required modules to make better use of existing
+      OpenResty libraries
+
+    * Feature: Add option to declare rulesets directly via JSON string
+
+    * Bugfix/Translation: Handle cases where setvar set a variable to 0
+
+    * Improvement/Translation: Use a saner regex to capture quoted string tokens
+
+    * Feature: Add TIME_* collections
+
+    * Feature/Translation: Add cmdLine transform translation
+
+    * Feature: Implement memcached and redis support for persistent storage
+
+    * Distribution: Add Makefile (thanks tperalta82)
+
+    * Feature: Implement action overrides, allowing customized handling of
+      actions on rule match
+
+    * Maintenance/Translation: Rename 'description' field to 'msg'
+
+    * Bugfix: Ensure write_log_events doesn't cause a thread abort in some cases
+
+
+v 0.7.2                                                             May 23, 2016
+
+    * Feature: Add strmatch operator
+
+    * Feature: Add rbl lookup operator
+
+    * Bugfix: Allow dynamic parse strings to contain lowercase chars
+
+    * Bugfix/Translation: Handle case where setvar opts contained multiple '.'
+      chars
+
+    * Bugfix/Translation: Trim problematic extra whitespace chars
+
+    * Feature/Translation: Add translation for urlDecodeUni transform
+
+
+v0.7.1                                                            April 12, 2016
+
+    * Feature: Add support for TLS in socket event logging
+
+    * Feature: Implement deny_status option
+
+    * Improvement: Optimize dynamic parse regex
+
+    * Bugfix: Properly set the return offset for ignored rules
+
