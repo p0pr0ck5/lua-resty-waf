@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
         ';
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
     }
@@ -27,7 +27,7 @@ __DATA__
 --- config
     location = /t {
         access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
         ';
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';

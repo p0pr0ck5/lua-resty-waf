@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op      = require "lib.operators"
+			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -40,7 +40,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op      = require "lib.operators"
+			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.1"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -68,7 +68,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op      = require "lib.operators"
+			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
@@ -96,7 +96,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op      = require "lib.operators"
+			local op      = require "resty.waf.operators"
 			local ip      = nil
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 

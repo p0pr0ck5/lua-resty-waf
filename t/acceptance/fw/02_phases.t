@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -34,7 +34,7 @@ lua_resty_waf should not be run in phase access
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -42,7 +42,7 @@ lua_resty_waf should not be run in phase access
 		';
 
 		header_filter_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -64,7 +64,7 @@ lua_resty_waf should not be run in phase header_filter
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -72,7 +72,7 @@ lua_resty_waf should not be run in phase header_filter
 		';
 
 		header_filter_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -80,7 +80,7 @@ lua_resty_waf should not be run in phase header_filter
 		';
 
 		body_filter_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -102,7 +102,7 @@ lua_resty_waf should not be run in phase body_filter
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -110,14 +110,14 @@ lua_resty_waf should not be run in phase body_filter
 		';
 
 		header_filter_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
 		';
 
 		body_filter_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -139,7 +139,7 @@ Beginning run of phase body_filter
 --- config
 	location /t {
 		rewrite_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)

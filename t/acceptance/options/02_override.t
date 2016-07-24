@@ -11,14 +11,14 @@ __DATA__
 === TEST 1: Local set_option overrides implicit default
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -38,7 +38,7 @@ GET /t
 === TEST 2: Local set_option overrides explicit default_option
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
@@ -46,7 +46,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", false)
@@ -65,14 +65,14 @@ GET /t
 === TEST 3: Override of implicit default only affects defined scope
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -84,7 +84,7 @@ GET /t
 
 	location /s {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -103,14 +103,14 @@ GET /t
 === TEST 4: Override of implicit default only affects defined scope (part 2)
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -122,7 +122,7 @@ GET /t
 
 	location /s {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -140,7 +140,7 @@ GET /s
 === TEST 5: Override of explicit default only affects defined scope
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
@@ -148,7 +148,7 @@ GET /s
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", false)
@@ -160,7 +160,7 @@ GET /s
 
 	location /s {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -178,7 +178,7 @@ GET /t
 === TEST 6: Override of explicit default only affects defined scope (part 2)
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
@@ -186,7 +186,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", false)
@@ -198,7 +198,7 @@ GET /t
 
 	location /s {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
@@ -217,7 +217,7 @@ GET /s
 === TEST 7: Append to a table value option
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)
 		lua_resty_waf.init()
@@ -225,7 +225,7 @@ GET /s
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)

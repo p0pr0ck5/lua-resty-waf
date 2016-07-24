@@ -12,8 +12,8 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
-			local util      = require "lib.util"
+			local lookup    = require "resty.waf.lookup"
+			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.transform["md5"]({}, value)
 			ngx.say(util.hex_encode(transform))
@@ -31,8 +31,8 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
-			local util      = require "lib.util"
+			local lookup    = require "resty.waf.lookup"
+			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.transform["md5"]({}, value)
 			ngx.say(util.hex_encode(transform) == ngx.md5(value))
@@ -50,8 +50,8 @@ true
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
-			local util      = require "lib.util"
+			local lookup    = require "resty.waf.lookup"
+			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.transform["sha1"]({}, value)
 			ngx.say(util.hex_encode(transform))

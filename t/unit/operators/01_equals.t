@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local equals = require "lib.operators"
+			local equals = require "resty.waf.operators"
         ';
     }
 --- request
@@ -26,7 +26,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals(1, 1)
 			ngx.say(equals)
         ';
@@ -43,7 +43,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals(1, 2)
 			ngx.say(equals)
         ';
@@ -60,7 +60,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(equals)
         ';
@@ -77,7 +77,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "bar")
 			ngx.say(equals)
         ';
@@ -94,7 +94,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals({3, 2, 1}, 1)
 			ngx.say(equals)
         ';
@@ -111,7 +111,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals({3, 2, 0}, 1)
 			ngx.say(equals)
         ';
@@ -128,7 +128,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals({"bar", "foo"}, "foo")
 			ngx.say(equals)
         ';
@@ -145,7 +145,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals({"bar", "baz"}, "foo")
 			ngx.say(equals)
         ';
@@ -162,7 +162,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("nil", nil)
 			ngx.say(equals)
         ';
@@ -179,7 +179,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("7", 7)
 			ngx.say(equals)
         ';
@@ -196,7 +196,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(equals)
 			ngx.say(value)
@@ -215,7 +215,7 @@ foo
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(type(equals))
 			ngx.say(type(value))

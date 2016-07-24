@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -22,7 +22,7 @@ __DATA__
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -49,7 +49,7 @@ qr/"id":"[a-f0-9]{20}"/
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -59,7 +59,7 @@ qr/"id":"[a-f0-9]{20}"/
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -86,7 +86,7 @@ qr/"id":"[a-f0-9]{20}"/
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -97,7 +97,7 @@ qr/"id":"[a-f0-9]{20}"/
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()

@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, "hello, 1234", "hello")
 			ngx.say(value)
 		';
@@ -29,7 +29,7 @@ hello
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "hello, 1234"}, "hello")
 			ngx.say(value)
 		';
@@ -46,7 +46,7 @@ hello
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, "HELLO, 1234", "hello")
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "HELLO, 1234"}, "hello")
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, "hello, 1234", "hello")
 			ngx.say(match)
 			ngx.say(value)
@@ -99,7 +99,7 @@ hello
 --- config
     location = /t {
         content_by_lua '
-			local op    = require "lib.operators"
+			local op    = require "resty.waf.operators"
 			local match, value = op.str_find({ _pcre_flags = "" }, "hello, 1234", "hello")
 			ngx.say(type(match))
 			ngx.say(type(value))

@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO" } }, action = "DENY" },
 			}
@@ -34,7 +34,7 @@ FOO|nil|nil
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, action = "DENY" },
 			}
@@ -56,7 +56,7 @@ FOO|keys|1|nil|nil
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, action = "DENY" },
 			}
@@ -78,7 +78,7 @@ FOO|specific|bar|nil|nil
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = "bar" }, action = "DENY" },
 			}
@@ -100,7 +100,7 @@ FOO|bar|nil
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = { "bar", "bat" } }, action = "DENY" },
 			}
@@ -122,7 +122,7 @@ FOO|bar,bat|nil
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = { { type = "FOO", length = 1 } }, action = "DENY" },
 			}

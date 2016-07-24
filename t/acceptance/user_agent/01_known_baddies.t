@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("ignore_rule", 11001)
@@ -25,7 +25,7 @@ __DATA__
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -44,7 +44,7 @@ Accept: */*
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("ignore_rule", 11001)
@@ -57,7 +57,7 @@ Accept: */*
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -77,7 +77,7 @@ Accept: */*
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("ignore_rule", 11001)
@@ -90,7 +90,7 @@ Accept: */*
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -111,7 +111,7 @@ Accept: */*
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("ignore_rule", 11001)
@@ -124,7 +124,7 @@ Accept: */*
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()

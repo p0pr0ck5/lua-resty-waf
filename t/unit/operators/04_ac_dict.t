@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup("far", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ nil
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(match)
 			ngx.say(value)
@@ -99,7 +99,7 @@ foo
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.ac_lookup("foo", { "foo", "bar", "baz", "qux" }, { id = 1 })
 			ngx.say(type(match))
 			ngx.say(type(value))

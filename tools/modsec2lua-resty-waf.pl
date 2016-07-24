@@ -43,12 +43,21 @@ my $valid_vars = {
 	RESPONSE_PROTOCOL       => { type => 'PROTOCOL' },
 	RESPONSE_STATUS         => { type => 'STATUS' },
 	SERVER_NAME             => { type => 'REQUEST_HEADERS', parse => { specific => 'Host' } },
+	TIME                    => { type => 'TIME' },
+	TIME_DAY                => { type => 'TIME_DAY' },
+	TIME_EPOCH              => { type => 'TIME_EPOCH' },
+	TIME_HOUR               => { type => 'TIME_HOUR' },
+	TIME_MIN                => { type => 'TIME_MIN' },
+	TIME_MON                => { type => 'TIME_MON' },
+	TIME_SEC                => { type => 'TIME_SEC' },
+	TIME_YEAR               => { type => 'TIME_YEAR' },
 	TX                      => { type => 'TX', storage => 1 },
 	IP                      => { type => 'IP', storage => 1 },
 };
 
 my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
+	cmdLine          => 'cmd_line',
 	contains         => 'STR_CONTAINS',
 	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
 	detectSQLi       => 'DETECT_SQLI',
@@ -208,7 +217,7 @@ sub tokenize {
 	# - tokens are whitespace separated
 	# - tokens must be quoted with " if they contain spaces
 	# - " chars within quoted tokens must be escaped with \
-	my $re_quoted   = qr/^"(.*?(?<!\\))"/;
+	my $re_quoted   = qr/^"((?:[^"\\]+|\\.)*)"/;
 	my $re_unquoted = qr/([^\s]+)/;
 
 	# walk the given string and grab the next token
@@ -640,8 +649,11 @@ sub translate_options {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
 
+			# dont cast as an int if this is a macro
+			$time = $time =~ m/^\d+$/ ? $time * 1 : translate_macro($time);
+
 			push @{$translation->{opts}->{expirevar}},
-				{ col => $collection, key => "__expire_$element", time => $time * 1 };
+				{ col => $collection, key => $element, time => $time };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {
@@ -651,7 +663,7 @@ sub translate_options {
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
-			$translation->{description} = $value;
+			$translation->{msg} = $value;
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
@@ -667,6 +679,19 @@ sub translate_options {
 			my ($collection, @elements) = split /\./, $var;
 
 			my $element = join '.', @elements;
+
+			# no $val, perhaps a delete?
+			if (! defined $val) {
+				if ($var =~ m/^\!/) {
+					substr $collection, 0, 1, '';
+
+					my $deletevar = { col => $collection, key => $element };
+					push @{$translation->{opts}->{deletevar}}, $deletevar;
+				} else {
+					warn "No assignment in setvar, but not a delete?\n";
+				}
+				next;
+			}
 
 			my $setvar = { col => $collection, key => $element };
 
@@ -769,7 +794,14 @@ sub main {
 		force  => $force,
 	});
 
-	print to_json($lua_resty_waf_chains, { pretty => $pretty ? 1 : 0 }) . "\n";
+	printf "%s\n",
+		to_json(
+			$lua_resty_waf_chains,
+			{
+				pretty    => $pretty ? 1 : 0,
+				canonical => 1,
+			}
+		);
 }
 
 main();

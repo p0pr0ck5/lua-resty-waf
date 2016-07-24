@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "how  	are	you    doing?"
 			local transform = lookup.transform["compress_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ how are you doing?
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "how  	are	you    doing?"
 			local transform = lookup.transform["remove_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)

@@ -12,7 +12,7 @@ __DATA__
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
-		lua_resty_waf = require "waf"
+		lua_resty_waf = require "resty.waf"
 	';
 --- config
     location = /t {
@@ -32,7 +32,7 @@ GET /t
 === TEST 2: Set invalid storage zone
 --- http_config
 	init_by_lua '
-		lua_resty_waf = require "waf"
+		lua_resty_waf = require "resty.waf"
 	';
 --- config
     location = /t {
