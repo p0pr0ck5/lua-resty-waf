@@ -13,8 +13,18 @@ local util    = require "resty.waf.util"
 
 local mt = { __index = _M }
 
--- default list of rulesets (global here to have offsets precomputed)
-local _global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
+-- default list of rulesets
+local _global_rulesets = {
+	"11000_whitelist",
+	"20000_http_violation",
+	"21000_http_anomaly",
+	"35000_user_agent",
+	"40000_generic_attack",
+	"41000_sqli",
+	"42000_xss",
+	"90000_custom",
+	"99000_scoring"
+}
 
 -- ruleset table cache
 local _ruleset_defs = {}

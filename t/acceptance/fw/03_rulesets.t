@@ -32,18 +32,18 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log
-Beginning ruleset 11000,
-Beginning ruleset 20000,
-Beginning ruleset 21000,
-Beginning ruleset 35000,
-Beginning ruleset 40000,
-Beginning ruleset 41000,
-Beginning ruleset 42000,
-Beginning ruleset 90000,
-Beginning ruleset 99000,
+Beginning ruleset 11000_whitelist,
+Beginning ruleset 20000_http_violation,
+Beginning ruleset 21000_http_anomaly,
+Beginning ruleset 35000_user_agent,
+Beginning ruleset 40000_generic_attack,
+Beginning ruleset 41000_sqli,
+Beginning ruleset 42000_xss,
+Beginning ruleset 90000_custom,
+Beginning ruleset 99000_scoring,
 --- no_error_log
 [error]
-Beginning ruleset 1000,
+Beginning ruleset extra,
 Adding ruleset
 Ignoring ruleset
 
@@ -55,7 +55,7 @@ Ignoring ruleset
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("ignore_ruleset", 90000)
+			waf:set_option("ignore_ruleset", "90000_custom")
 			waf:exec()
 		';
 
@@ -65,19 +65,19 @@ Ignoring ruleset
 GET /t
 --- error_code: 200
 --- error_log
-Ignoring ruleset 90000,
-Beginning ruleset 11000,
-Beginning ruleset 20000,
-Beginning ruleset 21000,
-Beginning ruleset 35000,
-Beginning ruleset 40000,
-Beginning ruleset 41000,
-Beginning ruleset 42000,
-Beginning ruleset 99000,
+Ignoring ruleset 90000_custom,
+Beginning ruleset 11000_whitelist,
+Beginning ruleset 20000_http_violation,
+Beginning ruleset 21000_http_anomaly,
+Beginning ruleset 35000_user_agent,
+Beginning ruleset 40000_generic_attack,
+Beginning ruleset 41000_sqli,
+Beginning ruleset 42000_xss,
+Beginning ruleset 99000_scoring,
 --- no_error_log
 [error]
-Beginning ruleset 1000,
-Beginning ruleset 90000,
+Beginning ruleset extra,
+Beginning ruleset 90000_custom,
 Adding ruleset
 
 === TEST 3: Add a custom ruleset
@@ -89,7 +89,7 @@ Adding ruleset
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("add_ruleset", 1000)
+			waf:set_option("add_ruleset", "extra")
 			waf:exec()
 		';
 
@@ -99,16 +99,16 @@ Adding ruleset
 GET /t
 --- error_code: 200
 --- error_log
-Adding ruleset 1000
-Beginning ruleset 1000,
-Beginning ruleset 11000,
-Beginning ruleset 20000,
-Beginning ruleset 21000,
-Beginning ruleset 35000,
-Beginning ruleset 40000,
-Beginning ruleset 41000,
-Beginning ruleset 42000,
-Beginning ruleset 99000,
+Beginning ruleset 11000_whitelist,
+Beginning ruleset 20000_http_violation,
+Beginning ruleset 21000_http_anomaly,
+Beginning ruleset 35000_user_agent,
+Beginning ruleset 40000_generic_attack,
+Beginning ruleset 41000_sqli,
+Beginning ruleset 42000_xss,
+Beginning ruleset 99000_scoring,
+Adding ruleset extra
+Beginning ruleset extra,
 --- no_error_log
 [error]
 Ignoring ruleset

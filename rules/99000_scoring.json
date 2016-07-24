@@ -1,0 +1,53 @@
+{
+   "access" : [
+      {
+         "action" : "DENY",
+         "id" : 99001,
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "type" : "SCORE"
+            }
+         ]
+      }
+   ],
+   "body_filter" : [
+      {
+         "action" : "IGNORE",
+         "id" : 99003,
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "type" : "SCORE"
+            }
+         ]
+      }
+   ],
+   "header_filter" : [
+      {
+         "action" : "DENY",
+         "id" : 99002,
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "type" : "SCORE"
+            }
+         ]
+      }
+   ]
+}

@@ -89,7 +89,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- error_log
-Beginning ruleset 11000,
+Beginning ruleset 11000_whitelist,
 --- no_error_log
 [error]
 
@@ -98,7 +98,7 @@ Beginning ruleset 11000,
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
 
-		lua_resty_waf.default_option("ignore_ruleset", 11000)
+		lua_resty_waf.default_option("ignore_ruleset", "11000_whitelist")
 		lua_resty_waf.init()
 	';
 --- config
@@ -109,7 +109,7 @@ Beginning ruleset 11000,
 
 			waf:set_option("debug", true)
 			waf:reset_option("ignore_ruleset")
-			waf:set_option("ignore_ruleset", 10000)
+			waf:set_option("ignore_ruleset", "extra")
 			waf:exec()
 		';
 
@@ -119,8 +119,8 @@ Beginning ruleset 11000,
 GET /t
 --- error_code: 200
 --- error_log
-Beginning ruleset 11000,
+Beginning ruleset 11000_whitelist,
 --- no_error_log
 [error]
-Beginning ruleset 10000,
+Beginning ruleset extra,
 

@@ -1,0 +1,425 @@
+{
+   "access" : [
+      {
+         "action" : "SCORE",
+         "id" : 90001,
+         "msg" : "Dummy lua-resty-waf signature",
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 3
+         },
+         "pattern" : "lua-resty-waf Dummy",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "user-agent"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90002,
+         "msg" : "SSH key scan (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)",
+         "operator" : "REGEX",
+         "pattern" : "^\\/(?:(?:id_)?[dr]sa(?:\\.old)?|key(?:\\.priv)?)$",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90003,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/checknfurl123",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90004,
+         "msg" : "SSH key scan signature (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)",
+         "operator" : "EQUALS",
+         "pattern" : "HEAD",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90005,
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/((?:tim)?thumb|img)\\.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90006,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "webshot",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90007,
+         "msg" : "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)",
+         "operator" : "REGEX",
+         "pattern" : "\\$\\(.*\\)",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "src"
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90008,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/xmlrpc.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90009,
+         "msg" : "Brute force botnet affecting Wordpress domains",
+         "operator" : "REGEX",
+         "pattern" : "WinHttp\\.WinHttpRequest\\.5",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "user-agent"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90010,
+         "msg" : "Known *Coin miner worm (https://isc.sans.edu/forums/diary/Multi+Platform+Coin+Miner+Attacking+Routers+on+Port+32764/18353)",
+         "operator" : "REGEX",
+         "pattern" : "Mozilla/5\\.0 \\(compatible; Zollard; Linux\\)",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "user-agent"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90011,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/wp-login.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 90012,
+         "msg" : "Client attempted to register a Wordpress user, but user registration is disabled.",
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 5
+         },
+         "pattern" : "disabled",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "registration"
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90013,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/wp-login.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90014,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "POST",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90015,
+         "msg" : "Wordpress login attempted with no Referer",
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "pattern" : "referer",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90016,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/wp-admin/admin-ajax.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90017,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "revslider_show_image",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "action"
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90018,
+         "msg" : "Slider Revolution WordPress Plugin LFI Vulnerability",
+         "operator" : "REGEX",
+         "pattern" : "^\\.\\./wp-*|\\.php$",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "img"
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90019,
+         "msg" : "Bash environmental variable injection (CVE-2014-6271)",
+         "operator" : "REGEX",
+         "pattern" : "^\\(\\)",
+         "vars" : [
+            {
+               "parse" : {
+                  "all" : 1
+               },
+               "type" : "REQUEST_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90020,
+         "msg" : "Bash environmental variable injection (CVE-2014-6271)",
+         "operator" : "REGEX",
+         "pattern" : "^\\(\\)",
+         "vars" : [
+            {
+               "parse" : {
+                  "all" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90021,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "/wp-login.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90022,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "POST",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90023,
+         "msg" : "Emerging fake Googlebot wp-login bruteforce",
+         "operator" : "EQUALS",
+         "pattern" : "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+         "vars" : [
+            {
+               "type" : "USER_AGENT"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90024,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "nolog" : true,
+            "transform" : "lowercase"
+         },
+         "pattern" : "mfbfw",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_BODY"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90025,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true,
+            "transform" : "lowercase"
+         },
+         "pattern" : "update",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "action"
+               },
+               "type" : "REQUEST_BODY"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90026,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true,
+            "transform" : "lowercase"
+         },
+         "pattern" : "fancybox-for-wordpress",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "page"
+               },
+               "type" : "URI_ARGS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 90027,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true,
+            "transform" : "lowercase"
+         },
+         "pattern" : "/wp-admin/admin-post.php",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "DENY",
+         "id" : 90028,
+         "msg" : "FancyBox for Wordpress access control vulnerability (https://www.cryptobells.com/fancybox-for-wordpress-zero-day-and-broken-patch/)",
+         "operator" : "EQUALS",
+         "pattern" : "POST",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      }
+   ],
+   "body_filter" : {},
+   "header_filter" : {}
+}

@@ -1,0 +1,268 @@
+{
+   "access" : [
+      {
+         "action" : "CHAIN",
+         "id" : 20001,
+         "msg" : "GET/HEAD request with a body",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "^(?:GET|HEAD)$",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20002,
+         "msg" : "GET/HEAD request with a body",
+         "op_negated" : 1,
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "0",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "content-length"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 20003,
+         "msg" : "POST request does not have a Content-Length Header",
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "POST",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20004,
+         "msg" : "POST request does not have a Content-Length Header",
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "content-length",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20005,
+         "msg" : "Identity should not be used in Content-Encoding, only in Accept-Encoding",
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 2,
+            "transform" : "lowercase"
+         },
+         "pattern" : "identity",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "content-encoding"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 20006,
+         "msg" : "Expect header sent in non-HTTP/1.1 request",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "100-continue",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "expect"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20007,
+         "msg" : "Expect header sent in non-HTTP/1.1 request",
+         "op_negated" : 1,
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : 1.1,
+         "vars" : [
+            {
+               "type" : "HTTP_VERSION"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 20008,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "pragma",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 20009,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true,
+            "transform" : "lowercase"
+         },
+         "pattern" : "no-cache",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "pragma"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 20010,
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "cache-control",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20011,
+         "msg" : "HTTP/1.1 request sent with a Pragma:no-cache header, but no corresponding Cache-Control header",
+         "op_negated" : 1,
+         "operator" : "EQUALS",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "1.1",
+         "vars" : [
+            {
+               "type" : "HTTP_VERSION"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20012,
+         "msg" : "Request sent with abnormal Range header",
+         "operator" : "REGEX",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "^bytes=0-",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "range"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20013,
+         "msg" : "Excessive number of byte range fields within one request",
+         "operator" : "REGEX",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "range"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20014,
+         "msg" : "Excessive number of byte range fields within one request",
+         "operator" : "REGEX",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "request-range"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 20015,
+         "msg" : "Duplicate/broken connection header",
+         "operator" : "REGEX",
+         "opts" : {
+            "score" : 2
+         },
+         "pattern" : "\\b(keep-alive|close),\\s?(keep-alive|close)\\b",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "connection"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      }
+   ],
+   "body_filter" : {},
+   "header_filter" : {}
+}
