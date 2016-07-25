@@ -57,7 +57,6 @@ my $valid_vars = {
 
 my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
-	cmdLine          => 'cmd_line',
 	contains         => 'STR_CONTAINS',
 	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
 	detectSQLi       => 'DETECT_SQLI',
@@ -775,8 +774,7 @@ sub main {
 
 	# ModSecurity ruleset parsing
 	# clean the input and build an array of tokens
-	my @cleaned_lines = clean_input(*STDIN);
-	my @parsed_lines  = map { parse_tokens(tokenize($_)) } @cleaned_lines;
+	my @parsed_lines  = map { parse_tokens(tokenize($_)) } clean_input(*STDIN);
 
 	# ModSecurity knows where it lives in a chain
 	# via pointer arithmetic and internal state handling
