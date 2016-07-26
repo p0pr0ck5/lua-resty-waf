@@ -5,7 +5,7 @@
          "id" : 99001,
          "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
-         "operator" : "GREATER",
+         "operator" : "GREATER_EQ",
          "opts" : {
             "parsepattern" : true
          },
@@ -23,11 +23,10 @@
    ],
    "body_filter" : [
       {
-         "action" : "DENY",
          "id" : 99003,
          "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
-         "operator" : "GREATER",
+         "operator" : "GREATER_EQ",
          "opts" : {
             "parsepattern" : true
          },
@@ -49,7 +48,7 @@
          "id" : 99002,
          "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
-         "operator" : "GREATER",
+         "operator" : "GREATER_EQ",
          "opts" : {
             "parsepattern" : true
          },
