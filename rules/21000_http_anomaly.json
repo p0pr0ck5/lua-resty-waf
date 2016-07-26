@@ -7,7 +7,14 @@
          "op_negated" : 1,
          "operator" : "CONTAINS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "host",
          "vars" : [
@@ -41,7 +48,14 @@
          "op_negated" : 1,
          "operator" : "CONTAINS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "accept",
          "vars" : [
@@ -74,7 +88,14 @@
          "msg" : "Accept header has no value",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^$",
          "vars" : [
@@ -93,7 +114,14 @@
          "op_negated" : 1,
          "operator" : "CONTAINS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "user-agent",
          "vars" : [
@@ -111,7 +139,14 @@
          "msg" : "User-Agent header has no value",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^$",
          "vars" : [
@@ -148,7 +183,14 @@
          "op_negated" : 1,
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^0$",
          "vars" : [
@@ -166,7 +208,14 @@
          "msg" : "Host header contains an IP address",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^[\\d.:]+$",
          "vars" : [

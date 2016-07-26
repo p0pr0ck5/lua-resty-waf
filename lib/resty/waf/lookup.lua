@@ -42,8 +42,7 @@ _M.collections = {
 		collections.NGX_VAR           = ngx.var
 		collections.MATCHED_VARS      = {}
 		collections.MATCHED_VAR_NAMES = {}
-		collections.SCORE             = function() return ctx.score end
-		collections.SCORE_THRESHOLD   = function(waf) return waf._score_threshold end
+		collections.SCORE_THRESHOLD   = waf._score_threshold
 
 		local year, month, day, hour, minute, second = string.match(ngx.localtime(),
 			"(%d%d%d%d)-(%d%d)-(%d%d) (%d%d):(%d%d):(%d%d)")
@@ -151,9 +150,7 @@ _M.actions = {
 		logger.log(waf, "Chaining (pre-processed)")
 	end,
 	SCORE = function(waf, ctx)
-		local new_score = ctx.score + ctx.rule_score
-		logger.log(waf, "New score is " .. new_score)
-		ctx.score = new_score
+		logger.log(waf, "Score isn't a thing anymore, see TX.anomaly_score")
 	end,
 	DENY = function(waf, ctx)
 		logger.log(waf, "Rule action was DENY, so telling nginx to quit")

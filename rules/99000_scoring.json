@@ -3,6 +3,7 @@
       {
          "action" : "DENY",
          "id" : 99001,
+         "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
          "operator" : "GREATER",
          "opts" : {
@@ -11,15 +12,20 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "type" : "SCORE"
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
             }
          ]
       }
    ],
    "body_filter" : [
       {
-         "action" : "IGNORE",
+         "action" : "DENY",
          "id" : 99003,
+         "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
          "operator" : "GREATER",
          "opts" : {
@@ -28,7 +34,11 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "type" : "SCORE"
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
             }
          ]
       }
@@ -37,6 +47,7 @@
       {
          "action" : "DENY",
          "id" : 99002,
+         "logdata": "%{TX.anomaly_score}",
          "msg" : "Request score greater than score threshold",
          "operator" : "GREATER",
          "opts" : {
@@ -45,7 +56,11 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "type" : "SCORE"
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
             }
          ]
       }

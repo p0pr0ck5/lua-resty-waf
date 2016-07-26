@@ -108,8 +108,6 @@ function _M.parse_dynamic_value(waf, key, collections)
 			else
 				return m[1]
 			end
-		elseif (type(val) == "function") then
-			return val(waf)
 		else
 			return val
 		end

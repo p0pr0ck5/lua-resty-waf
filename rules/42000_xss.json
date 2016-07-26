@@ -82,7 +82,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -104,7 +111,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -126,7 +140,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -148,7 +169,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -170,7 +198,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -192,7 +227,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -214,7 +256,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -236,7 +285,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -258,7 +314,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -280,7 +343,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -302,7 +372,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -324,7 +401,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -346,7 +430,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -368,7 +459,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -390,7 +488,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -412,7 +517,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -434,7 +546,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -456,7 +575,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -478,7 +604,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -500,7 +633,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -522,7 +662,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -544,7 +691,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -566,7 +720,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -588,7 +749,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -610,7 +778,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -632,7 +807,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -654,7 +836,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -676,7 +865,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -698,7 +894,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -720,7 +923,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -742,7 +952,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -764,7 +981,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -786,7 +1010,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -808,7 +1039,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -830,7 +1068,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -852,7 +1097,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -874,7 +1126,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -896,7 +1155,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -918,7 +1184,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -940,7 +1213,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -962,7 +1242,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -984,7 +1271,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1006,7 +1300,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1028,7 +1329,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1050,7 +1358,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1072,7 +1387,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1094,7 +1416,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1116,7 +1445,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1138,7 +1474,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1160,7 +1503,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1182,7 +1532,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1204,7 +1561,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1226,7 +1590,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1248,7 +1619,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1270,7 +1648,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1292,7 +1677,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1314,7 +1706,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1336,7 +1735,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1358,7 +1764,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1380,7 +1793,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1402,7 +1822,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1424,7 +1851,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1446,7 +1880,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1468,7 +1909,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1490,7 +1938,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1512,7 +1967,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1534,7 +1996,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [ 
+               {   
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4 
+               }   
+            ]
          },
          "pattern" : "\\.fromcharcode\\b",
          "vars" : [
@@ -1552,7 +2021,14 @@
          "msg" : "XSS (Cross-Site Scripting) - HTML Tag Handler",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1574,7 +2050,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1596,7 +2079,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1618,7 +2108,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1640,7 +2137,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1662,7 +2166,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1684,7 +2195,14 @@
          "msg" : "XSS (Cross-Site Scripting) - Style Tag Manipulation",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1706,7 +2224,14 @@
          "msg" : "XSS (Cross-Site Scripting) - JS Fragments",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1728,7 +2253,14 @@
          "msg" : "XSS (Cross-Site Scripting) - CSS Fragments",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1750,7 +2282,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1772,7 +2311,14 @@
          "msg" : "XSS (Cross-Site Scripting) - xss testing alert",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1794,7 +2340,14 @@
          "msg" : "XSS (Cross-Site Scripting) - ASCII alert",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1816,7 +2369,14 @@
          "msg" : "XSS (Cross-Site Scripting) - xss testing alert",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1838,7 +2398,14 @@
          "msg" : "XSS (Cross-Site Scripting)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1860,7 +2427,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1882,7 +2456,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1904,7 +2485,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1926,7 +2514,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1948,7 +2543,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1970,7 +2572,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -1992,7 +2601,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2014,7 +2630,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2036,7 +2659,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2058,7 +2688,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2080,7 +2717,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2102,7 +2746,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2124,7 +2775,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2146,7 +2804,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"
@@ -2168,7 +2833,14 @@
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : [
                "html_decode",
                "compress_whitespace"

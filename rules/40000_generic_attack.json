@@ -6,7 +6,14 @@
          "msg" : "OS Command Injection detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:(?:[\\;\\|\\`]\\W*?\\bcc|\\b(wget|curl))\\b|\\/cc(?:[\\'\\\"\\|\\;\\`\\-\\s]|$))",
          "vars" : [
@@ -24,7 +31,14 @@
          "msg" : "Repetative non-word characters anomaly detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : "uri_decode"
          },
          "pattern" : "[^\\w\\r\\n]{4,}",
@@ -43,7 +57,14 @@
          "msg" : "Coldfusion injection detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "\\bcf(?:usion_(?:d(?:bconnections_flush|ecrypt)|set(?:tings_refresh|odbcini)|getodbc(?:dsn|ini)|verifymail|encrypt)|_(?:(?:iscoldfusiondatasourc|getdatasourceusernam)e|setdatasource(?:password|username))|newinternal(?:adminsecurit|registr)y|admin_registry_(?:delete|set)|internaldebug|execute)\\b",
          "vars" : [
@@ -61,7 +82,14 @@
          "msg" : "LDAP Injection detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\((?:\\W*?(?:objectc(?:ategory|lass)|homedirectory|[gu]idnumber|cn)\\b\\W*?=|[^\\w\\x80-\\xFF]*?[\\!\\&\\|][^\\w\\x80-\\xFF]*?\\()|\\)[^\\w\\x80-\\xFF]*?\\([^\\w\\x80-\\xFF]*?[\\!\\&\\|])",
          "vars" : [
@@ -79,7 +107,14 @@
          "msg" : "SSI injection detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "<!--\\W*?#\\W*?(?:e(?:cho|xec)|printenv|include|cmd)",
          "vars" : [
@@ -97,7 +132,14 @@
          "msg" : "UPDF XSS",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "http:\\/\\/[\\w\\.]+?\\/.*?\\.pdf\\b[^\\x0d\\x0a]*#",
          "vars" : [
@@ -115,7 +157,14 @@
          "msg" : "E-mail injection",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "[\\n\\r]\\s*\\b(?:to|b?cc)\\b\\s*:.*?\\@",
          "vars" : [
@@ -133,7 +182,14 @@
          "msg" : "HTTP Request Smuggling",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : ",",
          "vars" : [
@@ -151,7 +207,14 @@
          "msg" : "HTTP Request Smuggling",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : ",",
          "vars" : [
@@ -169,7 +232,14 @@
          "msg" : "HTTP Response Splitting",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "[\\n\\r](?:content-(type|length)|set-cookie|location):",
          "vars" : [
@@ -187,7 +257,14 @@
          "msg" : "HTTP Response Splitting",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\bhttp\\/(?:0\\.9|1\\.[01])|<(?:html|meta)\\b)",
          "vars" : [
@@ -205,7 +282,14 @@
          "msg" : "Remote File Inclusion - URL in request argument",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "^(?:ht|f)tps?:\\/\\/(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})",
          "vars" : [
@@ -223,7 +307,14 @@
          "msg" : "Remote File Inclusion - PHP include() function",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : "uri_decode"
          },
          "pattern" : "(?:(\\binclude\\s*\\([^)]*|mosConfig_absolute_path|_CONF\\[path\\]|_SERVER\\[DOCUMENT_ROOT\\]|GALLERY_BASEDIR|path\\[docroot\\]|appserv_root|config\\[root_dir\\])=(ht|f)tps?:\\/\\/)",
@@ -242,7 +333,14 @@
          "msg" : "Remote File Inclusion - RFI data ends with question mark",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "^(?:ft|htt)ps?(.*?)\\?+$",
          "vars" : [
@@ -260,7 +358,14 @@
          "msg" : "Session fixation attack detected",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : "uri_decode"
          },
          "pattern" : "(?:\\.cookie\\b.*?;\\W*?(?:expires|domain)\\W*?=|\\bhttp-equiv\\W+set-cookie\\b)",
@@ -279,7 +384,14 @@
          "msg" : "System file access attempt",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\b(?:\\.(?:ht(?:access|passwd|group)|www_?acl)|global\\.asa|httpd\\.conf|boot\\.ini)\\b|\\/etc\\/)",
          "vars" : [
@@ -297,7 +409,14 @@
          "msg" : "System command access attempt",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "\\b(?:(?:n(?:map|et|c)|w(?:guest|sh)|telnet|rcmd|ftp)\\.exe\\b|cmd(?:(?:32)?\\.exe\\b|\\b\\W*?\\/c))",
          "vars" : [
@@ -315,7 +434,14 @@
          "msg" : "System command injection attempt",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\b(?:(?:n(?:et(?:\\b\\W+?\\blocalgroup|\\.exe)|(?:map|c)\\.exe)|t(?:racer(?:oute|t)|elnet\\.exe|clsh8?|ftp)|(?:w(?:guest|sh)|rcmd|ftp)\\.exe|echo\\b\\W*?\\by+)\\b|c(?:md(?:(?:\\.exe|32)\\b|\\b\\W*?\\/c)|d(?:\\b\\W*?[\\\\/]|\\W*?\\.\\.)|hmod.{0,40}?\\+.{0,3}x))|[\\;\\|\\`]\\W*?\\b(?:(?:c(?:h(?:grp|mod|own|sh)|md|pp)|p(?:asswd|ython|erl|ing|s)|n(?:asm|map|c)|f(?:inger|tp)|(?:kil|mai)l|(?:xte)?rm|ls(?:of)?|telnet|uname|echo|id)\\b|g(?:\\+\\+|cc\\b)))",
          "vars" : [
@@ -333,7 +459,14 @@
          "msg" : "PHP Injection",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "<\\?(?!xml)",
          "vars" : [
@@ -351,7 +484,14 @@
          "msg" : "PHP Injection",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\b(?:f(?:tp_(?:nb_)?f?(?:ge|pu)t|get(?:s?s|c)|scanf|write|open|read)|gz(?:(?:encod|writ)e|compress|open|read)|s(?:ession_start|candir)|read(?:(?:gz)?file|dir)|move_uploaded_file|(?:proc_|bz)open|call_user_func)|\\$_(?:(?:pos|ge)t|session))\\b",
          "vars" : [
@@ -369,7 +509,14 @@
          "msg" : "PHP Injection",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ],
             "transform" : "uri_decode"
          },
          "pattern" : "(?:(?:(?:(?:a(?:llow_url_includ|uto_prepend_fil)e|s(?:uhosin.simulation|afe_mode)|disable_functions|open_basedir)=|php://input)))",
@@ -388,7 +535,14 @@
          "msg" : "Directory traversal (volatile match)",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "(?:\\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\\/))(?:%(?:2(?:(?:52)?e|%45)|(?:e0%8|c)0%ae|u(?:002e|2024)|%32(?:%45|E))|\\.){2}(?:\\x5c|(?:%(?:2(?:5(?:2f|5c)|%46|f)|c(?:0%(?:9v|af)|1%1c)|u(?:221[56]|002f)|%32(?:%46|F)|e0%80%af|1u|5c)|\\/))",
          "vars" : [
@@ -406,7 +560,14 @@
          "msg" : "Null byte at end of URI",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 4
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 4
+               }
+            ]
          },
          "pattern" : "%00+$",
          "vars" : [

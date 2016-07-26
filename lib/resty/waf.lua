@@ -232,7 +232,6 @@ local function _process_rule(self, rule, collections, ctx)
 	local offset
 
 	ctx.id = id
-	ctx.rule_score = opts.score
 
 	for k, v in ipairs(vars) do
 		local collection, var
@@ -441,7 +440,6 @@ function _M.exec(self)
 	ctx.storage       = ctx.storage or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
-	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.phase         = phase
 	ctx.match_n       = ctx.match_n or 0
@@ -660,7 +658,6 @@ function _M.write_log_events(self)
 		method    = ctx.collections["METHOD"],
 		uri       = ctx.collections["URI"],
 		alerts    = ctx.log_entries,
-		score     = ctx.score,
 		id        = self.transaction_id,
 	}
 

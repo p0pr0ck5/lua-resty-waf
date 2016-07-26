@@ -6,7 +6,14 @@
          "msg" : "Dummy lua-resty-waf signature",
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 3
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 3
+               }
+            ]
          },
          "pattern" : "lua-resty-waf Dummy",
          "vars" : [
@@ -166,7 +173,14 @@
          "msg" : "Client attempted to register a Wordpress user, but user registration is disabled.",
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 5
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 5
+               }
+            ]
          },
          "pattern" : "disabled",
          "vars" : [

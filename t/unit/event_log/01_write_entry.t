@@ -1,7 +1,7 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 3 * blocks() + 15;
+plan tests => repeat_each() * 3 * blocks() + 12;
 
 no_shuffle();
 run_tests();
@@ -16,6 +16,7 @@ __DATA__
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
+			waf:set_option("event_log_altered_only", false)
 			waf:exec()
 		';
 
@@ -31,7 +32,7 @@ __DATA__
 --- request
 GET /t
 --- more_headers
-User-Agent: lua_resty_waf Dummy
+User-Agent: lua-resty-waf Dummy
 --- error_code: 200
 --- error_log eval
 [
@@ -39,7 +40,6 @@ qr/"client":"127.0.0.1",/,
 qr/"method":"GET",/,
 qr/"uri":"\\\/t",/,
 qr/"alerts":\[/,
-qr/"score":/,
 qr/"id":"[a-f0-9]{20}"/
 ]
 --- no_error_log
@@ -76,7 +76,6 @@ qr/"client":"127.0.0.1",/,
 qr/"method":"GET",/,
 qr/"uri":"\\\/t",/,
 qr/"alerts":\[/,
-qr/"score":/,
 qr/"id":"[a-f0-9]{20}"/
 ]
 --- no_error_log
@@ -117,7 +116,6 @@ qr/"client":"127.0.0.1",/,
 qr/"method":"GET",/,
 qr/"uri":"\\\/t",/,
 qr/"alerts":\[/,
-qr/"score":/,
 qr/"id":"[a-f0-9]{20}"/
 ]
 --- no_error_log

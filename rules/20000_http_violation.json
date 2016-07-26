@@ -22,7 +22,14 @@
          "op_negated" : 1,
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "0",
          "vars" : [
@@ -56,7 +63,14 @@
          "op_negated" : 1,
          "operator" : "CONTAINS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "content-length",
          "vars" : [
@@ -74,7 +88,14 @@
          "msg" : "Identity should not be used in Content-Encoding, only in Accept-Encoding",
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 2,
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ],
             "transform" : "lowercase"
          },
          "pattern" : "identity",
@@ -112,7 +133,14 @@
          "op_negated" : 1,
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : 1.1,
          "vars" : [
@@ -181,7 +209,14 @@
          "op_negated" : 1,
          "operator" : "EQUALS",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "1.1",
          "vars" : [
@@ -196,7 +231,14 @@
          "msg" : "Request sent with abnormal Range header",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^bytes=0-",
          "vars" : [
@@ -214,7 +256,14 @@
          "msg" : "Excessive number of byte range fields within one request",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
@@ -232,7 +281,14 @@
          "msg" : "Excessive number of byte range fields within one request",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
@@ -250,7 +306,14 @@
          "msg" : "Duplicate/broken connection header",
          "operator" : "REGEX",
          "opts" : {
-            "score" : 2
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
          },
          "pattern" : "\\b(keep-alive|close),\\s?(keep-alive|close)\\b",
          "vars" : [
