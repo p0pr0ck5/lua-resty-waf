@@ -1,4 +1,4 @@
--- Copyright (C) 2013 Jiale Zhi (calio), Cloudflare Inc.
+-- Copyright (C) 2013-2016 Jiale Zhi (calio), CloudFlare Inc.
 -- See RFC6265 http://tools.ietf.org/search/rfc6265
 -- require "luacov"
 
@@ -8,6 +8,7 @@ local sub           = string.sub
 local format        = string.format
 local log           = ngx.log
 local ERR           = ngx.ERR
+local WARN          = ngx.WARN
 local ngx_header    = ngx.header
 
 local EQUAL         = byte("=")
@@ -15,10 +16,10 @@ local SEMICOLON     = byte(";")
 local SPACE         = byte(" ")
 local HTAB          = byte("\t")
 
-
+-- table.new(narr, nrec)
 local ok, new_tab = pcall(require, "table.new")
 if not ok then
-    new_tab = function (narr, nrec) return {} end
+    new_tab = function () return {} end
 end
 
 local ok, clear_tab = pcall(require, "table.clear")
@@ -29,9 +30,6 @@ end
 local _M = new_tab(0, 2)
 
 _M._VERSION = '0.01'
-
-
-local mt = { __index = _M }
 
 
 local function get_cookie_table(text_cookie)
@@ -105,7 +103,7 @@ function _M.new(self)
         --return nil, "no cookie found in current request"
     --end
     return setmetatable({ _cookie = _cookie, set_cookie_table = new_tab(4, 0) },
-        mt)
+        { __index = self })
 end
 
 function _M.get(self, key)
@@ -120,8 +118,6 @@ function _M.get(self, key)
 end
 
 function _M.get_all(self)
-    local err
-
     if not self._cookie then
         return nil, "no cookie found in the current request"
     end
@@ -141,6 +137,17 @@ local function bake(cookie)
     if cookie["max-age"] then
         cookie.max_age = cookie["max-age"]
     end
+
+    if (cookie.samesite) then
+        local samesite = cookie.samesite
+
+        -- if we dont have a valid-looking attribute, ignore the attribute
+        if (samesite ~= "Strict" and samesite ~= "Lax") then
+            log(WARN, "SameSite value must be 'Strict' or 'Lax'")
+            cookie.samesite = nil
+        end
+    end
+
     local str = cookie.key .. "=" .. cookie.value
         .. (cookie.expires and "; Expires=" .. cookie.expires or "")
         .. (cookie.max_age and "; Max-Age=" .. cookie.max_age or "")
@@ -148,6 +155,7 @@ local function bake(cookie)
         .. (cookie.path and "; Path=" .. cookie.path or "")
         .. (cookie.secure and "; Secure" or "")
         .. (cookie.httponly and "; HttpOnly" or "")
+        .. (cookie.samesite and "; SameSite=" .. cookie.samesite or "")
         .. (cookie.extension and "; " .. cookie.extension or "")
     return str
 end
