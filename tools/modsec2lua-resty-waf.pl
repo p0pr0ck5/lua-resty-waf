@@ -696,6 +696,7 @@ sub translate_options {
 			if ($val =~ m/^\+/) {
 				substr $val, 0, 1, '';
 				$setvar->{inc} = 1;
+				$val *= 1;
 			}
 
 			$setvar->{value}  = $val;
