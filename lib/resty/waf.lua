@@ -239,8 +239,6 @@ local function _process_rule(self, rule, collections, ctx)
 
 		if (var.unconditional) then
 			collection = true
-		elseif (type(collections[var.type]) == "function") then
-			collection = collections[var.type](self)
 		else
 			local collection_key = var.collection_key
 
