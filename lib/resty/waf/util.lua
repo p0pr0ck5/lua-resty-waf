@@ -5,6 +5,15 @@ _M.version = "0.8"
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 
+
+local string_byte   = string.byte
+local string_char   = string.char
+local string_format = string.format
+local string_gmatch = string.gmatch
+local string_match  = string.match
+local string_upper  = string.upper
+local table_concat  = table.concat
+
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table
 function _M.table_copy(orig)
@@ -95,7 +104,7 @@ end
 -- pick out dynamic data from storage key definitions
 function _M.parse_dynamic_value(waf, key, collections)
 	local lookup = function(m)
-		local val      = collections[string.upper(m[1])]
+		local val      = collections[string_upper(m[1])]
 		local specific = m[2]
 
 		if (not val) then
@@ -140,8 +149,8 @@ end
 
 -- find a rule file with a .json prefix, read it, and return a JSON string
 function _M.load_ruleset_file(name)
-	for k, v in string.gmatch(package.path, "[^;]+") do
-		local path = string.match(k, "(.*/)")
+	for k, v in string_gmatch(package.path, "[^;]+") do
+		local path = string_match(k, "(.*/)")
 
 		local full_name = path .. "rules/" .. name .. ".json"
 
@@ -161,7 +170,7 @@ end
 -- encode a given string as hex
 function _M.hex_encode(str)
 	return (str:gsub('.', function (c)
-		return string.format('%02x', string.byte(c))
+		return string_format('%02x', string_byte(c))
 	end))
 end
 
@@ -171,7 +180,7 @@ function _M.hex_decode(str)
 
 	if (pcall(function()
 		value = str:gsub('..', function (cc)
-			return string.char(tonumber(cc, 16))
+			return string_char(tonumber(cc, 16))
 		end)
 	end)) then
 		return value
@@ -194,7 +203,7 @@ function _M.build_rbl_query(ip, rbl_srv)
 
 	local t = { o4, o3, o2, o1, rbl_srv }
 
-	return table.concat(t, '.')
+	return table_concat(t, '.')
 end
 
 return _M

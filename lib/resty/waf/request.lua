@@ -8,6 +8,9 @@ local upload	= require "resty.upload"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
+local table_concat = table.concat
+local table_insert = table.insert
+
 function _M.parse_request_body(waf, request_headers)
 	local content_type_header = request_headers["content-type"]
 
@@ -126,7 +129,7 @@ function _M.request_uri()
 		request_line[3] = ngx.var.query_string
 	end
 
-	return table.concat(request_line, '')
+	return table_concat(request_line, '')
 end
 
 function _M.basename(waf, uri)
@@ -154,7 +157,7 @@ function _M.common_args(waf, collections)
 					t[k] = v
 				else
 					if (type(t[k]) == "table") then
-						table.insert(t[k], v)
+						table_insert(t[k], v)
 					else
 						local _v = t[k]
 						t[k] = { _v, v }

@@ -9,6 +9,9 @@ local libinject = require "resty.libinjection"
 local logger    = require "resty.waf.log"
 local util      = require "resty.waf.util"
 
+local string_find = string.find
+local string_sub  = string.sub
+
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
 
@@ -176,11 +179,11 @@ function _M.str_find(waf, subject, pattern)
 			end
 		end
 	else
-		from, to = string.find(subject, pattern, 1, true)
+		from, to = string_find(subject, pattern, 1, true)
 
 		if from then
 			match = true
-			value = string.sub(subject, from, to)
+			value = string_sub(subject, from, to)
 		end
 	end
 

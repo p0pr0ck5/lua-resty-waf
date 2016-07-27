@@ -12,6 +12,15 @@ local request   = require "resty.waf.request"
 local storage   = require "resty.waf.storage"
 local util      = require "resty.waf.util"
 
+local string_char   = string.char
+local string_find   = string.find
+local string_format = string.format
+local string_len    = string.len
+local string_lower  = string.lower
+local string_match  = string.match
+local string_sub    = string.sub
+local table_concat  = table.concat
+
 _M.alter_actions = { ACCEPT = true, DENY = true }
 
 _M.collections = {
@@ -44,10 +53,10 @@ _M.collections = {
 		collections.MATCHED_VAR_NAMES = {}
 		collections.SCORE_THRESHOLD   = waf._score_threshold
 
-		local year, month, day, hour, minute, second = string.match(ngx.localtime(),
+		local year, month, day, hour, minute, second = string_match(ngx.localtime(),
 			"(%d%d%d%d)-(%d%d)-(%d%d) (%d%d):(%d%d):(%d%d)")
 
-		collections.TIME              = string.format("%d:%d:%d", hour, minute, second)
+		collections.TIME              = string_format("%d:%d:%d", hour, minute, second)
 		collections.TIME_DAY          = day
 		collections.TIME_EPOCH        = ngx.time()
 		collections.TIME_HOUR         = hour
@@ -98,7 +107,7 @@ _M.collections = {
 			ctx.short_circuit = true
 			return
 		else
-			collections.RESPONSE_BODY = table.concat(ctx.buffers, '')
+			collections.RESPONSE_BODY = table_concat(ctx.buffers, '')
 			ngx.arg[1] = collections.RESPONSE_BODY
 		end
 	end
@@ -188,7 +197,7 @@ _M.transform = {
 		str = ngx.re.gsub(str, [=[\s+[(]]=],  '(', waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[[,;]]=],    ' ', waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[\s+]=],     ' ', waf._pcre_flags)
-		return string.lower(str)
+		return string_lower(str)
 	end,
 	compress_whitespace = function(waf, value)
 		return ngx.re.gsub(value, [=[\s+]=], ' ', waf._pcre_flags)
@@ -204,17 +213,17 @@ _M.transform = {
 		str = ngx.re.gsub(str, [=[&gt;]=], '>', waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[&quot;]=], '"', waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[&apos;]=], "'", waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&#(\d+);]=], function(n) return string.char(n[1]) end, waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&#x(\d+);]=], function(n) return string.char(tonumber(n[1],16)) end, waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[&#(\d+);]=], function(n) return string_char(n[1]) end, waf._pcre_flags)
+		str = ngx.re.gsub(str, [=[&#x(\d+);]=], function(n) return string_char(tonumber(n[1],16)) end, waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[&amp;]=], '&', waf._pcre_flags)
 		logger.log(waf, "html decoded value is " .. str)
 		return str
 	end,
 	length = function(waf, value)
-		return string.len(tostring(value))
+		return string_len(tostring(value))
 	end,
 	lowercase = function(waf, value)
-		return string.lower(tostring(value))
+		return string_lower(tostring(value))
 	end,
 	md5 = function(waf, value)
 		return ngx.md5_bin(value)
@@ -241,8 +250,8 @@ _M.transform = {
 		return ngx.sha1_bin(value)
 	end,
 	sql_hex_decode = function(waf, value)
-		if (string.find(value, '0x', 1, true)) then
-			value = string.sub(value, 3)
+		if (string_find(value, '0x', 1, true)) then
+			value = string_sub(value, 3)
 			return util.hex_decode(value)
 		else
 			return value

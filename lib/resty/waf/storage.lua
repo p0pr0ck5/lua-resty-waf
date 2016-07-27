@@ -6,6 +6,8 @@ local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
+local string_upper = string.upper
+
 local _valid_backends = { dict = true, memcached = true, redis = true }
 
 function _M.initialize(waf, storage, col)
@@ -22,7 +24,7 @@ function _M.initialize(waf, storage, col)
 end
 
 function _M.set_var(waf, ctx, element, value)
-	local col     = ctx.col_lookup[string.upper(element.col)]
+	local col     = ctx.col_lookup[string_upper(element.col)]
 	local key     = element.key
 	local inc     = element.inc
 	local storage = ctx.storage
@@ -60,7 +62,7 @@ function _M.set_var(waf, ctx, element, value)
 end
 
 function _M.expire_var(waf, ctx, element, value)
-	local col     = ctx.col_lookup[string.upper(element.col)]
+	local col     = ctx.col_lookup[string_upper(element.col)]
 	local key     = element.key
 	local storage = ctx.storage
 	local expire  = ngx.time() + value
@@ -79,7 +81,7 @@ function _M.expire_var(waf, ctx, element, value)
 end
 
 function _M.delete_var(waf, ctx, element)
-	local col     = ctx.col_lookup[string.upper(element.col)]
+	local col     = ctx.col_lookup[string_upper(element.col)]
 	local key     = element.key
 	local storage = ctx.storage
 

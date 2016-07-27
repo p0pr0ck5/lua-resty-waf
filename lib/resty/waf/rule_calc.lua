@@ -1,5 +1,7 @@
 local _M = {}
 
+local table_concat = table.concat
+
 _M.version = "0.8"
 
 local function _transform_collection_key(transform)
@@ -10,7 +12,7 @@ local function _transform_collection_key(transform)
 	if (type(transform) ~= 'table') then
 		return tostring(transform)
 	else
-		return table.concat(transform, ',')
+		return table_concat(transform, ',')
 	end
 end
 
@@ -30,7 +32,7 @@ local function _build_collection_key(var, transform)
 		key[3] = tostring(var.length)
 	end
 
-	return table.concat(key, "|")
+	return table_concat(key, "|")
 end
 
 local function _write_chain_offsets(chain, max, cur_offset)

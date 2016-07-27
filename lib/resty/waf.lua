@@ -11,6 +11,9 @@ local random  = require "resty.waf.random"
 local storage = require "resty.waf.storage"
 local util    = require "resty.waf.util"
 
+local table_sort   = table.sort
+local string_lower = string.lower
+
 local mt = { __index = _M }
 
 -- default list of rulesets
@@ -402,8 +405,8 @@ local function _merge_rulesets(self)
 	t = util.table_keys(t)
 
 	-- rulesets will be processed in numeric order
-	table.sort(t, function(a, b)
-		return string.lower(a) < string.lower(b)
+	table_sort(t, function(a, b)
+		return string_lower(a) < string_lower(b)
 	end)
 
 	self._active_rulesets = t

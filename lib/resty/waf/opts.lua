@@ -1,5 +1,8 @@
 local _M = {}
 
+local ngx_INFO = ngx.INFO
+local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
+
 _M.version = "0.8"
 
 _M.defaults = {
@@ -8,11 +11,11 @@ _M.defaults = {
 	_allow_unknown_content_types = false,
 	_allowed_content_types       = {},
 	_debug                       = false,
-	_debug_log_level             = ngx.INFO,
-	_deny_status                 = ngx.HTTP_FORBIDDEN,
+	_debug_log_level             = ngx_INFO,
+	_deny_status                 = ngx_HTTP_FORBIDDEN,
 	_event_log_altered_only      = true,
 	_event_log_buffer_size       = 4096,
-	_event_log_level             = ngx.INFO,
+	_event_log_level             = ngx_INFO,
 	_event_log_ngx_vars          = {},
 	_event_log_periodic_flush    = nil,
 	_event_log_request_arguments = false,
