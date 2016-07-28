@@ -236,7 +236,7 @@ sub tokenize {
 sub parse_tokens {
 	my (@tokens) = @_;
 
-	my ($entry, $directive, $vars, $operator, $opts);
+	my ($entry, $directive, $vars, $operator, $actions);
 	$entry = {};
 
 	# save this for later debugging / warning
@@ -247,14 +247,14 @@ sub parse_tokens {
 		$vars     = shift @tokens;
 		$operator = shift @tokens;
 	}
-	$opts = shift @tokens;
+	$actions = shift @tokens;
 
 	die "Uh oh! We shouldn't have any fields left but we still have @tokens\n" if @tokens;
 
 	$entry->{directive} = $directive;
 	$entry->{vars}      = parse_vars($vars) if $vars;
 	$entry->{operator}  = parse_operator($operator) if $operator;
-	$entry->{opts}      = parse_options($opts) if $opts;
+	$entry->{actions}   = parse_actions($actions) if $actions;
 
 	return $entry;
 }
@@ -320,13 +320,13 @@ sub parse_operator {
 	return $parsed;
 }
 
-sub parse_options {
-	my ($raw_options) = @_;
+sub parse_actions {
+	my ($raw_actions) = @_;
 
-	my (@tokens, @parsed_options, @opt_buf, $sentinal);
-	my @split_options = split ',', $raw_options;
+	my (@tokens, @parsed_actions, @action_buf, $sentinal);
+	my @split_actions = split ',', $raw_actions;
 
-	# options may take one of a few forms
+	# actions may take one of a few forms
 	# standalone: deny
 	# express a value: phase:1
 	# express a quoted value: msg:'foo bar'
@@ -334,13 +334,13 @@ sub parse_options {
 	# because the quoted value in something like msg or logdata
 	# may have commas, we cant simply split on comma
 	# so we need to loop through and piece together tokens
-	while (@split_options) {
+	while (@split_actions) {
 		# take a chunk and add it the buffer array
 		# once we know we've reached the end of an
-		# option, we'll put the buffer elements
+		# action, we'll put the buffer elements
 		# back together and add it to the final array
-		my $chunk = shift @split_options;
-		push @opt_buf, $chunk;
+		my $chunk = shift @split_actions;
+		push @action_buf, $chunk;
 
 		# we're done chaining together chunks if:
 		#
@@ -354,12 +354,12 @@ sub parse_options {
 		# - we could have split but we know we're done
 		# (we know this if the last member of the chunk is a ')
 		$sentinal = 1 if (($chunk !~ m/'/ || $chunk !~ m/:/)
-			&& ! (scalar @opt_buf > 1 && $opt_buf[0] =~ m/'/))
+			&& ! (scalar @action_buf > 1 && $action_buf[0] =~ m/'/))
 			|| $chunk =~ m/'$/;
 
 		if ($sentinal) {
-			push @tokens, join ',', @opt_buf;
-			@opt_buf  = ();
+			push @tokens, join ',', @action_buf;
+			@action_buf  = ();
 			$sentinal = 0;
 		}
 	}
@@ -368,20 +368,20 @@ sub parse_options {
 	# we can split any potential key value pairs
 	# and add them to the final array
 	for my $token (@tokens) {
-		my ($opt, @value) = split /:/, $token;
+		my ($action, @value) = split /:/, $token;
 
 		# trim whitespace (this is necessary for multi-line rules)
-		$opt =~ s/^\s*|\s*$//;
+		$action =~ s/^\s*|\s*$//;
 
 		my $parsed = {};
 
-		$parsed->{opt}   = $opt;
+		$parsed->{action}   = $action;
 		$parsed->{value} = strip_encap_quotes(join ':', @value) if @value;
 
-		push @parsed_options, $parsed;
+		push @parsed_actions, $parsed;
 	}
 
-	return \@parsed_options;
+	return \@parsed_actions;
 }
 
 # strip encapsulating single or double quotes from a string
@@ -403,9 +403,9 @@ sub build_chains {
 		push @chain, $rule;
 
 		# figure if this rule is part of a chain
-		next if grep { $_ eq 'chain' } map { $_->{opt} } @{$rule->{opts}};
+		next if grep { $_ eq 'chain' } map { $_->{action} } @{$rule->{actions}};
 
-		# if the chain opt isnt set, we're either a standalone rule
+		# if the chain action isnt set, we're either a standalone rule
 		# or at the end of a chain; either way, push this chain
 		# to our array of chains and empty the current chain buffer
 		push @chains, [ @chain ];
@@ -461,9 +461,9 @@ sub translate_chain {
 	my $force  = $args->{force};
 	my $path   = $args->{path};
 
-	my (@lua_resty_waf_chain, $chain_id, $chain_opt, $ctr);
+	my (@lua_resty_waf_chain, $chain_id, $chain_action, $ctr);
 
-	my @end_opts = qw(action skip skip_after);
+	my @end_actions = qw(action skip skip_after);
 
 	for my $rule (@chain) {
 		my $translation = {};
@@ -475,15 +475,15 @@ sub translate_chain {
 			push @{$translation->{vars}}, { unconditional => 1 };
 
 			# SecMarker is a rule that never matches
-			# with its only option representing its ID
+			# with its only action representing its ID
 			if ($rule->{directive} eq 'SecMarker') {
 				$translation->{op_negated} = 1;
-				my $marker = pop @{$rule->{opts}};
-				$translation->{id} = $marker->{opt};
+				my $marker = pop @{$rule->{actions}};
+				$translation->{id} = $marker->{action};
 			}
 		}
 
-		translate_options($rule, $translation, $silent);
+		translate_actions($rule, $translation, $silent);
 
 		# assign the same ID to each rule in the chain
 		# it is guaranteed that the first rule in a
@@ -493,10 +493,10 @@ sub translate_chain {
 		$chain_id = $translation->{id} if $translation->{id};
 		$translation->{id} = $chain_id if ! $translation->{id};
 
-		# these opts exist in the chain starter in ModSecurity
+		# these actions exist in the chain starter in ModSecurity
 		# but they belong in the final rule in lua-resty-waf
-		for my $opt (@end_opts) {
-			$chain_opt->{$opt} = delete $translation->{$opt} if $translation->{$opt};
+		for my $action (@end_actions) {
+			$chain_action->{$action} = delete $translation->{$action} if $translation->{$action};
 		}
 
 		# if we've reached the end of the chain, assign our values that
@@ -504,11 +504,11 @@ sub translate_chain {
 		# if the chain starter didn't specify. otherwise, we're at the start
 		# or middle of a chain, so the only thing we know to do is set the CHAIN action
 		if (++$ctr == scalar @chain) {
-			for my $opt (@end_opts) {
-				if ($chain_opt->{$opt}) {
-					$translation->{$opt} = $chain_opt->{$opt};
-				} elsif ($defaults->{$opt}) {
-					$translation->{$opt} = $defaults->{$opt};
+			for my $action (@end_actions) {
+				if ($chain_action->{$action}) {
+					$translation->{$action} = $chain_action->{$action};
+				} elsif ($defaults->{$action}) {
+					$translation->{$action} = $defaults->{$action};
 				}
 			}
 		} else {
@@ -626,19 +626,19 @@ sub translate_operator {
 
 	# automatically expand the rule pattern for certain operators
 	if (any { $_ eq $original_operator } @auto_expand_operators) {
-		$translation->{opts}->{parsepattern} = 1;
+		$translation->{actions}->{parsepattern} = 1;
 		$translation->{pattern} = translate_macro($translation->{pattern});
 	}
 
 	return;
 }
 
-sub translate_options {
+sub translate_actions {
 	my ($rule, $translation, $silent) = @_;
 
-	for my $opt (@{$rule->{opts}}) {
-		my $key   = $opt->{opt};
-		my $value = $opt->{value};
+	for my $action (@{$rule->{actions}}) {
+		my $key   = $action->{action};
+		my $value = $action->{value};
 
 		# easier to do this than a lookup table
 		if (grep { $_ eq $key } qw(allow block deny pass)) {
@@ -650,22 +650,22 @@ sub translate_options {
 			# dont cast as an int if this is a macro
 			$time = $time =~ m/^\d+$/ ? $time * 1 : translate_macro($time);
 
-			push @{$translation->{opts}->{expirevar}},
+			push @{$translation->{actions}->{expirevar}},
 				{ col => $collection, key => $element, time => $time };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {
 			my ($col, $val) = split /=/, $value;
 
-			$translation->{opts}->{initcol}->{uc $col} = $val;
+			$translation->{actions}->{initcol}->{uc $col} = $val;
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
 			$translation->{msg} = $value;
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
-			$translation->{opts}->{nolog} = 1;
+			$translation->{actions}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
-			delete $translation->{opts}->{nolog};
+			delete $translation->{actions}->{nolog};
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
@@ -684,7 +684,7 @@ sub translate_options {
 					substr $collection, 0, 1, '';
 
 					my $deletevar = { col => $collection, key => $element };
-					push @{$translation->{opts}->{deletevar}}, $deletevar;
+					push @{$translation->{actions}->{deletevar}}, $deletevar;
 				} else {
 					warn "No assignment in setvar, but not a delete?\n";
 				}
@@ -696,12 +696,12 @@ sub translate_options {
 			if ($val =~ m/^\+/) {
 				substr $val, 0, 1, '';
 				$setvar->{inc} = 1;
-				$val *= 1;
+				$val *= 1 if $val =~ m/^\d+$/;
 			}
 
 			$setvar->{value}  = $val;
 
-			push @{$translation->{opts}->{setvar}}, $setvar;
+			push @{$translation->{actions}->{setvar}}, $setvar;
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
@@ -712,7 +712,7 @@ sub translate_options {
 				next;
 			}
 
-			push @{$translation->{opts}->{transform}}, $transform;
+			push @{$translation->{actions}->{transform}}, $transform;
 		}
 	}
 
@@ -775,7 +775,7 @@ sub main {
 
 	# ModSecurity ruleset parsing
 	# clean the input and build an array of tokens
-	my @parsed_lines  = map { parse_tokens(tokenize($_)) } clean_input(*STDIN);
+	my @parsed_lines = map { parse_tokens(tokenize($_)) } clean_input(*STDIN);
 
 	# ModSecurity knows where it lives in a chain
 	# via pointer arithmetic and internal state handling
