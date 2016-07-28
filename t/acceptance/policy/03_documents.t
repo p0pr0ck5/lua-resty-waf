@@ -11,7 +11,7 @@ __DATA__
 === TEST 1: Whitelist .doc
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -29,7 +29,7 @@ Rule action was ACCEPT
 === TEST 2: Whitelist .pdf
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -47,7 +47,7 @@ Rule action was ACCEPT
 === TEST 3: Whitelist .txt
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -65,7 +65,7 @@ Rule action was ACCEPT
 === TEST 4: Whitelist .xls
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -83,7 +83,7 @@ Rule action was ACCEPT
 === TEST 5: Do not whitelist unmatched extension (.ppt)
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -101,7 +101,7 @@ Rule action was ACCEPT
 === TEST 6: Do not whitelist non-final extension
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)

@@ -29,7 +29,7 @@ You've entered the following: 'bar'
 --- config
 	location /t {
 		access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -43,7 +43,7 @@ You've entered the following: 'bar'
 		';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -66,7 +66,7 @@ You've entered the following: 'bar'
 --- config
 	location /t {
 		access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -81,7 +81,7 @@ You've entered the following: 'bar'
 		';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -121,7 +121,7 @@ You've entered the following: '<script>alert(1)</script>'
 --- config
 	location /t {
 		access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -135,7 +135,7 @@ You've entered the following: '<script>alert(1)</script>'
 		';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
@@ -160,7 +160,7 @@ You've entered the following: '<script>alert(1)</script>'
 --- config
 	location /t {
 		access_by_lua '
-			lua_resty_waf = require "waf"
+			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -175,7 +175,7 @@ You've entered the following: '<script>alert(1)</script>'
 		';
 
 		log_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()

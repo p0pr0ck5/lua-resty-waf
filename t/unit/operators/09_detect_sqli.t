@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_sqli("\'; DROP TABLES foo --")
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_sqli({"this string has the word DROP and SELECT", "\'; DROP TABLES foo --"})
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_sqli("this string has the word DROP and SELECT")
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_sqli({"this string has the word DROP and SELECT", "so does DROP this SELECT one"})
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_sqli("; DROP TABLES foo --")
 			ngx.say(type(match))
 			ngx.say(type(value))

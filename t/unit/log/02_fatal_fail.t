@@ -11,7 +11,7 @@ __DATA__
 === TEST 1: Handle a fatal failure
 --- http_config
 	init_by_lua '
-		logger = require "lib.log"
+		logger = require "resty.waf.log"
 	';
 --- config
 	location /t {
@@ -28,7 +28,7 @@ GET /t
 === TEST 2: Handle a fatal failure with warn error log level
 --- http_config
 	init_by_lua '
-		logger = require "lib.log"
+		logger = require "resty.waf.log"
 	';
 --- config
 	location /t {

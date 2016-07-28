@@ -11,7 +11,7 @@ __DATA__
 === TEST 1: Reset a simple value
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
@@ -19,7 +19,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:reset_option("debug")
@@ -38,7 +38,7 @@ GET /t
 === TEST 2: Reset a simple value and set it again
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
@@ -46,7 +46,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:reset_option("debug")
@@ -67,7 +67,7 @@ GET /t
 === TEST 3: Reset a table value
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)
 		lua_resty_waf.init()
@@ -75,7 +75,7 @@ GET /t
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -96,7 +96,7 @@ Beginning ruleset 11000,
 === TEST 4: Reset a table value and set it again
 --- http_config
 	init_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)
 		lua_resty_waf.init()
@@ -104,7 +104,7 @@ Beginning ruleset 11000,
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)

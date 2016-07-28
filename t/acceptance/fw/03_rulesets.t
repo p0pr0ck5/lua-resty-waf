@@ -1,7 +1,14 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
 
 repeat_each(3);
 plan tests => repeat_each() * 14 * blocks() - 3;
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/t/?.lua;;";
+};
 
 no_shuffle();
 run_tests();
@@ -12,7 +19,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -44,7 +51,7 @@ Ignoring ruleset
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
@@ -74,10 +81,11 @@ Beginning ruleset 90000,
 Adding ruleset
 
 === TEST 3: Add a custom ruleset
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)

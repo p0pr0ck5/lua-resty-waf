@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "  hello world   "
 			local transform = lookup.transform["trim"]({}, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "hello world"
 			local transform = lookup.transform["trim"]({}, value)
 			ngx.say(transform)
@@ -48,7 +48,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "  hello world"
 			local transform = lookup.transform["trim_left"]({}, value)
 			ngx.say(transform)
@@ -66,7 +66,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "  hello world   "
 			local transform = lookup.transform["trim_left"]({}, value)
 			ngx.say(transform)
@@ -84,7 +84,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "hello world   "
 			local transform = lookup.transform["trim_right"]({}, value)
 			ngx.say(transform)
@@ -102,7 +102,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "  hello world   "
 			local transform = lookup.transform["trim_right"]({}, value)
 			ngx.say(transform)
