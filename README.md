@@ -141,6 +141,11 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			lua_resty_waf.default_option("debug", true)
 			lua_resty_waf.default_option("mode", "ACTIVE")
 
+			-- this may be desirable for low-traffic or testing sites
+			-- by default, event logs are not written until the buffer is full
+			-- for testing, flush the log buffer every 5 seconds
+			lua_resty_waf.default_option("event_log_periodic_flush", 5)
+
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
 		';
