@@ -6,7 +6,8 @@ local actions = require "resty.waf.actions"
 local calc    = require "resty.waf.rule_calc"
 local logger  = require "resty.waf.log"
 local lookup  = require "resty.waf.lookup"
-local opts    = require "resty.waf..opts"
+local options = require "resty.waf.options"
+local opts    = require "resty.waf.opts"
 local phase_t = require "resty.waf.phase"
 local random  = require "resty.waf.random"
 local storage = require "resty.waf.storage"
@@ -561,8 +562,8 @@ function _M.set_option(self, option, value, data)
 			_M.set_option(self, option, v, data)
 		end
 	else
-		if (lookup.set_option[option]) then
-			lookup.set_option[option](self, value, data)
+		if (options.lookup[option]) then
+			options.lookup[option](self, value, data)
 		else
 			local _option = "_" .. option
 			self[_option] = value
@@ -577,8 +578,8 @@ function _M.default_option(option, value, data)
 			_M.default_option(option, v, data)
 		end
 	else
-		if (lookup.set_option[option]) then
-			lookup.set_option[option](default_opts, value, data)
+		if (options.lookup[option]) then
+			options.lookup[option](default_opts, value, data)
 		else
 			local _option = "_" .. option
 			default_opts[_option] = value
