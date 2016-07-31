@@ -2,6 +2,7 @@ local _M = {}
 
 _M.version = "0.8"
 
+local actions = require "resty.waf.actions"
 local calc    = require "resty.waf.rule_calc"
 local logger  = require "resty.waf.log"
 local lookup  = require "resty.waf.lookup"
@@ -182,7 +183,7 @@ local function _rule_action(self, action, ctx, collections)
 		return
 	end
 
-	if (util.table_has_key(action, lookup.alter_actions)) then
+	if (util.table_has_key(action, actions.alter_actions)) then
 		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
 	end
@@ -190,7 +191,7 @@ local function _rule_action(self, action, ctx, collections)
 	if (self._hook_actions[action]) then
 		self._hook_actions[action](self, ctx)
 	else
-		lookup.actions[action](self, ctx)
+		actions.lookup[action](self, ctx)
 	end
 end
 

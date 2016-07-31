@@ -6,6 +6,7 @@ local cjson         = require "cjson"
 local file_logger   = require "resty.logger.file"
 local socket_logger = require "resty.logger.socket"
 
+local actions   = require "resty.waf.actions"
 local logger    = require "resty.waf.log"
 local operators = require "resty.waf.operators"
 local request   = require "resty.waf.request"
@@ -20,8 +21,6 @@ local string_lower  = string.lower
 local string_match  = string.match
 local string_sub    = string.sub
 local table_concat  = table.concat
-
-_M.alter_actions = { ACCEPT = true, DENY = true }
 
 _M.collections = {
 	access = function(waf, collections, ctx)
@@ -146,30 +145,6 @@ _M.parse_collection = {
 		end
 		return _collection
 	end
-}
-
-_M.actions = {
-	ACCEPT = function(waf, ctx)
-		logger.log(waf, "Rule action was ACCEPT, so ending this phase with ngx.OK")
-		if (waf._mode == "ACTIVE") then
-			ngx.exit(ngx.OK)
-		end
-	end,
-	CHAIN = function(waf, ctx)
-		logger.log(waf, "Chaining (pre-processed)")
-	end,
-	SCORE = function(waf, ctx)
-		logger.log(waf, "Score isn't a thing anymore, see TX.anomaly_score")
-	end,
-	DENY = function(waf, ctx)
-		logger.log(waf, "Rule action was DENY, so telling nginx to quit")
-		if (waf._mode == "ACTIVE") then
-			ngx.exit(waf._deny_status)
-		end
-	end,
-	IGNORE = function(waf)
-		logger.log(waf, "Ignoring rule for now")
-	end,
 }
 
 _M.transform = {
@@ -363,7 +338,7 @@ _M.set_option = {
 		waf._nameservers[#waf._nameservers + 1] = value
 	end,
 	hook_action = function(waf, value, hook)
-		if (not util.table_has_key(value, _M.actions)) then
+		if (not util.table_has_key(value, actions.lookup)) then
 			logger.fatal_fail(value .. " is not a valid action to override")
 		end
 
