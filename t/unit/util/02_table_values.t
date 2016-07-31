@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local a = { foo = "bar" }
 			local b = util.table_values(a)
 			table.sort(b)
@@ -33,7 +33,7 @@ bar
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local a = { foo = "bar", baz = "bat", qux = "frob" }
 			local b = util.table_values(a)
 			table.sort(b)
@@ -56,7 +56,7 @@ frob
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local a = { foo = { "bar", "baz", "bat" }, qux = { "frob" } }
 			local b = util.table_values(a)
 			table.sort(b)
@@ -81,7 +81,7 @@ frob
 --- config
     location = /t {
         content_by_lua '
-            local util = require "lib.util"
+            local util = require "resty.waf.util"
             local a = { foo = "bar", foo = "baz" }
             local b = util.table_values(a)
 			table.sort(b)
@@ -102,7 +102,7 @@ baz
 --- config
     location = /t {
         content_by_lua '
-			local util = require "lib.util"
+			local util = require "resty.waf.util"
 			local a = "foo, bar"
 			local b = util.table_values(a)
 			table.sort(b)

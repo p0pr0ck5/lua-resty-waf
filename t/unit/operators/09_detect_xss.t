@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("\'><script><alert(1)</script>")
 			ngx.say(match)
 		';
@@ -29,7 +29,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss({"this string has the word select and alert", "\'><script><alert(1)</script>"})
 			ngx.say(match)
 		';
@@ -46,7 +46,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("this string has the word select and alert")
 			ngx.say(match)
 		';
@@ -63,7 +63,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss({"this string has the word select and alert", "so does select this alert one"})
 			ngx.say(match)
 		';
@@ -80,7 +80,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("\'><script><alert(1)</script>")
 			ngx.say(type(match))
 			ngx.say(type(value))

@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, action = "DENY" },
 				{ id = 2, vars = {}, action = "DENY" },
@@ -38,7 +38,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, action = "DENY" },
 				{ id = 2, vars = {}, action = "DENY" },
@@ -64,7 +64,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local rule_calc  = require "lib.rule_calc"
+			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, action = "DENY" },
 				{ id = 2, vars = {}, action = "DENY" },

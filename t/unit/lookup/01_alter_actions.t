@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		access_by_lua '
-			local lookup = require "lib.lookup"
+			local lookup = require "resty.waf.lookup"
 			local alter_actions = lookup.alter_actions
 			for action in pairs(alter_actions) do
 				ngx.say(action)

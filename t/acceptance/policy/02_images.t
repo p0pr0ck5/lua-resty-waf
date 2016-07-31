@@ -11,7 +11,7 @@ __DATA__
 === TEST 1: Skip whitelisting of non-passive requests
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("debug", true)
@@ -36,7 +36,7 @@ Match of rule 11003
 === TEST 2: Whitelist .jpg
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -54,7 +54,7 @@ Rule action was ACCEPT
 === TEST 3: Whitelist .jpeg
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -72,7 +72,7 @@ Rule action was ACCEPT
 === TEST 4: Whitelist .png
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -90,7 +90,7 @@ Rule action was ACCEPT
 === TEST 5: Whitelist .gif
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -108,7 +108,7 @@ Rule action was ACCEPT
 === TEST 6: Whitelist .ico
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -126,7 +126,7 @@ Rule action was ACCEPT
 === TEST 7: Do not whitelist unmatched extension (.tiff)
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)
@@ -144,7 +144,7 @@ Rule action was ACCEPT
 === TEST 8: Do not whitelist non-final extension
 --- config
 	access_by_lua '
-		local lua_resty_waf = require "waf"
+		local lua_resty_waf = require "resty.waf"
 		local waf           = lua_resty_waf:new()
 
 		waf:set_option("ignore_rule", 11001)

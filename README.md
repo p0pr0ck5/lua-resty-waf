@@ -21,6 +21,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [add_ruleset](#add_ruleset)
+	* [add_ruleset_string](#add_ruleset_string)
 	* [allow_unknown_content_types](#allow_unknown_content_types)
 	* [allowed_content_types](#allowed_content_types)
 	* [debug](#debug)
@@ -44,6 +45,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_target_path](#event_log_target_path)
 	* [event_log_target_port](#event_log_target_port)
 	* [event_log_verbosity](#event_log_verbosity)
+	* [hook_action](#hook_action)
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
@@ -54,6 +56,11 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [res_body_mime_types](#res_body_mime_types)
 	* [res_tid_header](#res_tid_header)
 	* [score_threshold](#score_threshold)
+	* [storage_backend](#storage_backend)
+	* [storage_memcached_host](#storage_memcached_host)
+	* [storage_memcached_port](#storage_memcached_port)
+	* [storage_redis_host](#storage_redis_host)
+	* [storage_redis_port](#storage_redis_port)
 	* [storage_zone](#storage_zone)
 * [Phase Handling](#phase-handling)
 * [Included Rulesets](#included-rulesets)
@@ -101,7 +108,17 @@ lua-resty-waf workload is almost exclusively CPU bound. Memory footprint in the 
 
 ##Installation
 
-Clone the lua-resty-waf repo into Nginx/OpenResty's Lua package path. Module setup and configuration is detailed in the synopsis.
+A simple Makefile is provided. Simply run `make install`:
+
+```
+	# make install
+```
+
+Alternatively, install via Luarocks:
+
+```
+	# luarocks install lua-resty-waf
+```
 
 Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
@@ -330,9 +347,25 @@ Adds an additional ruleset to be used during processing. This allows users to im
 	}
 ```
 
-Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names must be numeric, as they are sorted for processing in numeric order. This also implies some level of control on the users part; because rulesets are processed in increasing numeric order, the order with which rulesets are passed to `set_option` does not matter. Note only that rulesets of a higher numeric value are processed after those of a lower value.
+Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names are sorted before processing. Rulesets are processed in a low-to-high sorted order.
 
-**NOTE: It is STRONGLY recommend avoiding adding rulesets via `set_option`. It is much safer to add rulesets globally via `default_option`, and ignore rulesets in necessary scopes. Loading a ruleset requires reading the rule from disk on first load; when done outside the `init` phase, this can block the nginx event loop. Caveat emptor.**
+###add_ruleset_string
+
+*Default*: none
+
+Adds an additional ruleset to be used during processing. This allows users to implement custom rulesets without stomping over the included rules directory. Rulesets are defined inline as a Lua string, in the form of a translated ruleset JSON structure.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			waf:set_option("add_ruleset_string", "70000", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+		';
+	}
+```
+
+Note that ruleset names are sorted before processing, and must be given as strings. Rulesets are processed in a low-to-high sorted order.
 
 ###allow_unknown_content_types
 
@@ -759,6 +792,29 @@ Sets the verbosity used in writing event log notification. The higher the verbos
 	}
 ```
 
+###hook_action
+
+*Default*: none
+
+Override the functionality of actions taken when a rule is matched. See the example for more details
+
+*Example*:
+
+```lua
+
+		location / {
+			access_by_lua '
+				local deny_override = function(waf, ctx)
+					ngx.log(ngx.INFO, "Overriding DENY action")
+					ngx.status = 404
+				end
+
+				-- override the DENY action with the function defined above
+				waf:set_option("hook_action", "DENY", deny_override)
+			';
+		}
+```
+
 ###ignore_rule
 
 *Default*: none
@@ -930,13 +986,93 @@ Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty
 	}
 ```
 
+###storage_backend
+
+*Default*: dict
+
+Define an engine to use for persistent variable storage. Current available options are *dict* (ngx_lua shared memory zone), *memcached*, amd *redis*.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_backend", "memcached")
+		';
+	}
+```
+
+###storage_memcached_host
+
+*Default*: 127.0.0.1
+
+Define a host to use when using memcached as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_host", "10.10.10.10")
+		';
+	}
+```
+
+###storage_memcached_port
+
+*Default*: 11211
+
+Define a port to use when using memcached as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_port", 11221)
+		';
+	}
+```
+
+###storage_redis_host
+
+*Default*: 127.0.0.1
+
+Define a host to use when using redis as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_host", "10.10.10.10")
+		';
+	}
+```
+
+###storage_redis_port
+
+*Default*: 11211
+
+Define a port to use when using redis as a persistent variable storage engine.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_port", 6397)
+		';
+	}
+```
+
 ###storage_zone
 
 *Default*: none
 
 Defines the `lua_shared_dict` that will be used to hold persistent storage data. This zone must be defined in the `http{}` block of the configuration.
 
-*Example*:
+*Example*:_
 
 ```lua
 	http {
@@ -1006,7 +1142,6 @@ Please target all pull requests towards the development branch, or a feature bra
 * **Expanded virtual patch ruleset**: Increase coverage of emerging threats.
 * **Expanded integration/acceptance testing**: Increase coverage of common threats and usage scenarios.
 * **Expanded ModSecurity syntax translations**: Support more operators, variables, and actions.
-* **Support for different/multiple persistent storage engines**: Memcached, redis, etc (in addition to ngx.shared).
 * **Common application profiles**: Tuned rulesets for common CMS/applications.
 * **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project.
 

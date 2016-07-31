@@ -12,7 +12,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local greater = require "lib.operators"
+			local greater = require "resty.waf.operators"
         ';
     }
 --- request
@@ -26,7 +26,7 @@ __DATA__
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater(2, 1)
 			ngx.say(greater)
         ';
@@ -43,7 +43,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater(1, 1)
 			ngx.say(greater)
         ';
@@ -60,7 +60,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater(1, 2)
 			ngx.say(greater)
         ';
@@ -77,7 +77,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater({0, 1, 2}, 1)
 			ngx.say(greater)
         ';
@@ -94,7 +94,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = (op.greater({-1, 0, 1}, 1))
 			ngx.say(greater)
         ';
@@ -111,7 +111,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater({-1, 0, 1}, 2)
 			ngx.say(greater)
         ';
@@ -128,7 +128,7 @@ false
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater(1, 0)
 			ngx.say(greater)
 			ngx.say(value)
@@ -147,7 +147,7 @@ true
 --- config
     location = /t {
         content_by_lua '
-			local op = require "lib.operators"
+			local op = require "resty.waf.operators"
 			local greater, value = op.greater(1, 0)
 			ngx.say(type(greater))
 			ngx.say(type(value))

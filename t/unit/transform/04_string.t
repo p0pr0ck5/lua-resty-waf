@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "HELLO WORLD"
 			local transform = lookup.transform["lowercase"]({}, value)
 			ngx.say(transform)
@@ -30,7 +30,7 @@ hello world
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = "hello world"
 			local transform = lookup.transform["length"]({}, value)
 			ngx.say(transform)
@@ -48,7 +48,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = 8001
 			local transform = lookup.transform["length"]({}, value)
 			ngx.say(transform)
@@ -66,7 +66,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "lib.lookup"
+			local lookup    = require "resty.waf.lookup"
 			local value     = true
 			local transform = lookup.transform["length"]({}, value)
 			ngx.say(transform)

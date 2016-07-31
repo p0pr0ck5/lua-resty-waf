@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "foo"
 			local coll   = {}
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -31,7 +31,7 @@ foo
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{REMOTE_ADDR}"
 			local coll   = { REMOTE_ADDR = ngx.var.remote_addr }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -50,7 +50,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{URI}"
 			local coll   = { URI = ngx.var.uri }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -69,7 +69,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{SCORE}"
 			local coll   = { SCORE = 5 }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -88,7 +88,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{SCORE_THRESHOLD}"
 			local coll   = { SCORE_THRESHOLD = 10 }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -107,7 +107,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{URI_ARGS}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -126,7 +126,7 @@ URI_ARGS
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{URI_ARGS.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -145,7 +145,7 @@ bar
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{URI_ARGS.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -164,7 +164,7 @@ nil
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{REMOTE_ADDR} - %{REQUEST_LINE}"
 			local coll   = { REMOTE_ADDR = ngx.var.remote_addr, REQUEST_LINE = ngx.var.request }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -183,7 +183,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{URI_ARGS.foo} - %{REQUEST_LINE}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args(), REQUEST_LINE = ngx.var.request }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -202,7 +202,7 @@ bar - GET /t?foo=bar HTTP/1.1
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{REQUEST_LINE} - %{URI_ARGS.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args(), REQUEST_LINE = ngx.var.request }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -221,7 +221,7 @@ GET /t?foo=bar HTTP/1.1 - bar
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{REMOTE_ADDRP}"
 			local coll   = { REMOTE_ADDR = "127.0.0.1" }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -239,7 +239,7 @@ Bad dynamic parse, no collection key REMOTE_ADDRP
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{remote_addr}"
 			local coll   = { REMOTE_ADDR = ngx.var.remote_addr }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -258,7 +258,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{remote_addr} - %{request_line}"
 			local coll   = { REMOTE_ADDR = ngx.var.remote_addr, REQUEST_LINE = ngx.var.request }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
@@ -277,7 +277,7 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local util   = require "lib.util"
+			local util   = require "resty.waf.util"
 			local key    = "%{uri_args.foo}"
 			local coll   = { URI_ARGS = ngx.req.get_uri_args() }
 			local parsed = util.parse_dynamic_value({ _pcre_flags = "" }, key, coll)
