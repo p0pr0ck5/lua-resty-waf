@@ -684,7 +684,7 @@ function _M.write_log_events(self)
 		end
 	end
 
-	lookup.write_log_events[self._event_log_target](self, entry)
+	logger.write_log_events[self._event_log_target](self, entry)
 end
 
 return _M

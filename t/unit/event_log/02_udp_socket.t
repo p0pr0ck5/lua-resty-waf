@@ -14,7 +14,7 @@ __DATA__
 		access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "resty.waf.lookup"
+			local logger  = require "resty.waf.log"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")
@@ -22,7 +22,7 @@ __DATA__
 			waf:set_option("event_log_socket_proto", "udp")
 			waf:set_option("event_log_buffer_size", 32)
 
-			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
+			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -44,7 +44,7 @@ A response is sent
 		access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "resty.waf.lookup"
+			local logger  = require "resty.waf.log"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")
@@ -53,7 +53,7 @@ A response is sent
 			waf:set_option("event_log_buffer_size", 64)
 			waf:set_option("event_log_periodic_flush", 1)
 
-			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
+			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(2)
 		';
@@ -77,7 +77,7 @@ A response is sent
 		access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
-			local lookup  = require "resty.waf.lookup"
+			local logger  = require "resty.waf.log"
 
 			waf:set_option("event_log_target", "socket")
 			waf:set_option("event_log_target_host", "127.0.0.1")
@@ -85,7 +85,7 @@ A response is sent
 			waf:set_option("event_log_socket_proto", "udp")
 			waf:set_option("event_log_buffer_size", 64)
 
-			lookup.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
+			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(2)
 		';

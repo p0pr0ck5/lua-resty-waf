@@ -31,7 +31,7 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 --- no_error_log
 [error]
 
@@ -60,7 +60,7 @@ GET /t
 --- error_code: 200
 --- no_error_log
 [error]
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 
 === TEST 3: Override of implicit default only affects defined scope
 --- http_config
@@ -96,7 +96,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- error_log
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 --- no_error_log
 [error]
 
@@ -135,7 +135,7 @@ GET /s
 --- error_code: 200
 --- no_error_log
 [error]
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 
 === TEST 5: Override of explicit default only affects defined scope
 --- http_config
@@ -173,7 +173,7 @@ GET /t
 --- error_code: 200
 --- no_error_log
 [error]
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 
 === TEST 6: Override of explicit default only affects defined scope (part 2)
 --- http_config
@@ -210,7 +210,7 @@ GET /t
 GET /s
 --- error_code: 200
 --- error_log
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 --- no_error_log
 [error]
 
