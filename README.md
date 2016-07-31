@@ -993,6 +993,10 @@ Note that there are several limitations in the translation script, with respect 
 
 There is a Freenode IRC channel `#lua-resty-waf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
 
+Additionally, Q/A is available on CodeWake:
+
+[![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/lua-resty-waf)
+
 ###Pull Requests
 
 Please target all pull requests towards the development branch, or a feature branch if the PR is a significant change. Commits to master should only come in the form of documentation updates or other changes that have no impact of the module itself (and can be cleanly merged into development).
