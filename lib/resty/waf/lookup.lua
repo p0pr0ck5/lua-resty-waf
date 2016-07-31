@@ -279,23 +279,4 @@ _M.write_log_events = {
 	end
 }
 
-_M.operators = {
-	REGEX        = function(waf, collection, pattern) return operators.regex(waf, collection, pattern) end,
-	EQUALS       = function(waf, collection, pattern) return operators.equals(collection, pattern) end,
-	GREATER      = function(waf, collection, pattern) return operators.greater(collection, pattern) end,
-	LESS         = function(waf, collection, pattern) return operators.less(collection, pattern) end,
-	GREATER_EQ   = function(waf, collection, pattern) return operators.greater_equals(collection, pattern) end,
-	LESS_EQ      = function(waf, collection, pattern) return operators.less_equals(collection, pattern) end,
-	EXISTS       = function(waf, collection, pattern) return operators.exists(collection, pattern) end,
-	CONTAINS     = function(waf, collection, pattern) return operators.contains(collection, pattern) end,
-	STR_EXISTS   = function(waf, collection, pattern) return operators.str_find(waf, pattern, collection) end,
-	STR_CONTAINS = function(waf, collection, pattern) return operators.str_find(waf, collection, pattern) end,
-	PM           = function(waf, collection, pattern, ctx) return operators.ac_lookup(collection, pattern, ctx) end,
-	CIDR_MATCH   = function(waf, collection, pattern) return operators.cidr_match(collection, pattern) end,
-	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return operators.rbl_lookup(collection, pattern, ctx) end,
-	DETECT_SQLI  = function(waf, collection, pattern) return operators.detect_sqli(collection) end,
-	DETECT_XSS   = function(waf, collection, pattern) return operators.detect_xss(collection) end,
-	STR_MATCH    = function(waf, collection, pattern) return operators.str_match(collection, pattern) end,
-}
-
 return _M

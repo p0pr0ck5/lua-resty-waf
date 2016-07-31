@@ -6,6 +6,7 @@ local actions = require "resty.waf.actions"
 local calc    = require "resty.waf.rule_calc"
 local logger  = require "resty.waf.log"
 local lookup  = require "resty.waf.lookup"
+local operators = require "resty.waf.operators"
 local options = require "resty.waf.options"
 local opts    = require "resty.waf.opts"
 local phase_t = require "resty.waf.phase"
@@ -288,7 +289,7 @@ local function _process_rule(self, rule, collections, ctx)
 				match = true
 				value = 1
 			else
-				match, value = lookup.operators[operator](self, collection, pattern, ctx)
+				match, value = operators.lookup[operator](self, collection, pattern, ctx)
 			end
 
 			if (rule.op_negated) then
