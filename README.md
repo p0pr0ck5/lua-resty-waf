@@ -77,6 +77,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 ##Status
 
 [![Build Status](https://travis-ci.org/p0pr0ck5/lua-resty-waf.svg?branch=development)](https://travis-ci.org/p0pr0ck5/lua-resty-waf)
+[![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/lua-resty-waf)
 
 lua-resty-waf is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
 
