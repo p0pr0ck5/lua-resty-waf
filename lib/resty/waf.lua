@@ -2,18 +2,18 @@ local _M = {}
 
 _M.version = "0.8"
 
-local actions = require "resty.waf.actions"
-local calc    = require "resty.waf.rule_calc"
+local actions       = require "resty.waf.actions"
+local calc          = require "resty.waf.rule_calc"
 local collections_t = require "resty.waf.collections"
-local logger  = require "resty.waf.log"
-local operators = require "resty.waf.operators"
-local options = require "resty.waf.options"
-local opts    = require "resty.waf.opts"
-local phase_t = require "resty.waf.phase"
-local random  = require "resty.waf.random"
-local storage = require "resty.waf.storage"
-local transform_t = require "resty.waf.transform"
-local util    = require "resty.waf.util"
+local logger        = require "resty.waf.log"
+local operators     = require "resty.waf.operators"
+local options       = require "resty.waf.options"
+local opts          = require "resty.waf.opts"
+local phase_t       = require "resty.waf.phase"
+local random        = require "resty.waf.random"
+local storage       = require "resty.waf.storage"
+local transform_t   = require "resty.waf.transform"
+local util          = require "resty.waf.util"
 
 local table_sort   = table.sort
 local string_lower = string.lower
