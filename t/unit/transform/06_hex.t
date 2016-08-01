@@ -12,9 +12,9 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "resty.waf.lookup"
+			local lookup    = require "resty.waf.transform"
 			local value     = "0x48656c6c6f2c20776f726c6421"
-			local transform = lookup.transform["sql_hex_decode"]({}, value)
+			local transform = lookup.lookup["sql_hex_decode"]({}, value)
 			ngx.say(transform)
 		';
 	}
@@ -30,9 +30,9 @@ Hello, world!
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "resty.waf.lookup"
+			local lookup    = require "resty.waf.transform"
 			local value     = "48656c6c6f2c20776f726c6421"
-			local transform = lookup.transform["sql_hex_decode"]({}, value)
+			local transform = lookup.lookup["sql_hex_decode"]({}, value)
 			ngx.say(transform)
 		';
 	}
@@ -48,9 +48,9 @@ GET /t
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "resty.waf.lookup"
+			local lookup    = require "resty.waf.transform"
 			local value     = "48656c6c6f2c20776f726c6421"
-			local transform = lookup.transform["hex_decode"]({}, value)
+			local transform = lookup.lookup["hex_decode"]({}, value)
 			ngx.say(transform)
 		';
 	}
@@ -83,9 +83,9 @@ this is not hex
 --- config
 	location /t {
 		content_by_lua '
-			local lookup    = require "resty.waf.lookup"
+			local lookup    = require "resty.waf.transform"
 			local value     = "Hello, world!"
-			local transform = lookup.transform["hex_encode"]({}, value)
+			local transform = lookup.lookup["hex_encode"]({}, value)
 			ngx.say(transform)
 		';
 	}

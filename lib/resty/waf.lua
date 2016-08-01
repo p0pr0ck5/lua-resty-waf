@@ -12,6 +12,7 @@ local opts    = require "resty.waf.opts"
 local phase_t = require "resty.waf.phase"
 local random  = require "resty.waf.random"
 local storage = require "resty.waf.storage"
+local transform_t = require "resty.waf.transform"
 local util    = require "resty.waf.util"
 
 local table_sort   = table.sort
@@ -220,7 +221,7 @@ local function _do_transform(self, collection, transform)
 			end
 
 			logger.log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
-			return lookup.transform[transform](self, collection)
+			return transform_t.lookup[transform](self, collection)
 		end
 	end
 
