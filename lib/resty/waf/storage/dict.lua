@@ -55,7 +55,7 @@ function _M.persist(waf, col, data)
 	local ok, err = shm:set(col, serialized)
 
 	if (not ok) then
-		ngx.log(ngx.WARN, "Could not add key to persistent storage, increase the size of the lua_shared_dict " .. waf._storage_zone)
+		ngx.log(ngx.WARN, "Error adding key to persistent storage, increase the size of the lua_shared_dict " .. waf._storage_zone)
 	end
 end
 

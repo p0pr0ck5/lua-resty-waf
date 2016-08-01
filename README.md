@@ -1090,7 +1090,7 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 
 Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
 
-`Could not add key to persistent storage, increase the size of the lua_shared_dict`
+`Error adding key to persistent storage, increase the size of the lua_shared_dict`
 
 ##Phase Handling
 
