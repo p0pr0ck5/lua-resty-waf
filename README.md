@@ -1053,7 +1053,7 @@ Define a host to use when using redis as a persistent variable storage engine.
 
 ###storage_redis_port
 
-*Default*: 11211
+*Default*: 6379
 
 Define a port to use when using redis as a persistent variable storage engine.
 
