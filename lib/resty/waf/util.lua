@@ -206,4 +206,40 @@ function _M.build_rbl_query(ip, rbl_srv)
 	return table_concat(t, '.')
 end
 
+-- parse collection elements based on a given directive
+_M.parse_collection = {
+	specific = function(waf, collection, value)
+		logger.log(waf, "Parse collection is getting a specific value: " .. value)
+		return collection[value]
+	end,
+	ignore = function(waf, collection, value)
+		logger.log(waf, "Parse collection is ignoring a value: " .. value)
+		local _collection = {}
+		_collection = _M.table_copy(collection)
+		_collection[value] = nil
+		return _collection
+	end,
+	keys = function(waf, collection)
+		logger.log(waf, "Parse collection is getting the keys")
+		return _M.table_keys(collection)
+	end,
+	values = function(waf, collection)
+		logger.log(waf, "Parse collection is getting the values")
+		return _M.table_values(collection)
+	end,
+	all = function(waf, collection)
+		local n = 0
+		local _collection = {}
+		for _, key in ipairs(_M.table_keys(collection)) do
+			n = n + 1
+			_collection[n] = key
+		end
+		for _, value in ipairs(_M.table_values(collection)) do
+			n = n + 1
+			_collection[n] = value
+		end
+		return _collection
+	end
+}
+
 return _M

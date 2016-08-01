@@ -415,4 +415,23 @@ function _M.str_match(input, pattern)
 	return false, nil
 end
 
+_M.lookup = {
+	REGEX        = function(waf, collection, pattern) return _M.regex(waf, collection, pattern) end,
+	EQUALS       = function(waf, collection, pattern) return _M.equals(collection, pattern) end,
+	GREATER      = function(waf, collection, pattern) return _M.greater(collection, pattern) end,
+	LESS         = function(waf, collection, pattern) return _M.less(collection, pattern) end,
+	GREATER_EQ   = function(waf, collection, pattern) return _M.greater_equals(collection, pattern) end,
+	LESS_EQ      = function(waf, collection, pattern) return _M.less_equals(collection, pattern) end,
+	EXISTS       = function(waf, collection, pattern) return _M.exists(collection, pattern) end,
+	CONTAINS     = function(waf, collection, pattern) return _M.contains(collection, pattern) end,
+	STR_EXISTS   = function(waf, collection, pattern) return _M.str_find(waf, pattern, collection) end,
+	STR_CONTAINS = function(waf, collection, pattern) return _M.str_find(waf, collection, pattern) end,
+	PM           = function(waf, collection, pattern, ctx) return _M.ac_lookup(collection, pattern, ctx) end,
+	CIDR_MATCH   = function(waf, collection, pattern) return _M.cidr_match(collection, pattern) end,
+	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return _M.rbl_lookup(collection, pattern, ctx) end,
+	DETECT_SQLI  = function(waf, collection, pattern) return _M.detect_sqli(collection) end,
+	DETECT_XSS   = function(waf, collection, pattern) return _M.detect_xss(collection) end,
+	STR_MATCH    = function(waf, collection, pattern) return _M.str_match(collection, pattern) end,
+}
+
 return _M
