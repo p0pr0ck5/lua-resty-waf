@@ -191,7 +191,7 @@ Persisting value: {"
 			storage.persist(waf, ctx.storage)
 
 			local d = shm:get("FOO")
-			ngx.log(ngx.DEBUG, require("cjson").encode(d))
+			ngx.log(ngx.DEBUG, "re-read: " .. require("cjson").encode(d))
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -204,8 +204,8 @@ Persisting storage type dict
 Examining FOO
 Persisting value: {"COUNT":
 Error adding key to persistent storage, increase the size of the lua_shared_dict
-[lua] access_by_lua(nginx.conf:65):19: null
+re-read: null
 --- no_error_log
 [error]
 Not persisting a collection that wasn't altered
-[lua] access_by_lua(nginx.conf:65):19: "{\"COUNT\":\"aaaaa
+re-read: "{\"COUNT\":\"aaaaa
