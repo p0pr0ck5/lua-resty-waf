@@ -4,8 +4,8 @@ _M.version = "0.8"
 
 local actions = require "resty.waf.actions"
 local calc    = require "resty.waf.rule_calc"
+local collections_t = require "resty.waf.collections"
 local logger  = require "resty.waf.log"
-local lookup  = require "resty.waf.lookup"
 local operators = require "resty.waf.operators"
 local options = require "resty.waf.options"
 local opts    = require "resty.waf.opts"
@@ -56,7 +56,7 @@ local function _parse_collection(self, collection, parse)
 	-- get the next (first)(only) k/v pair in the parse table
 	local key, value = next(parse)
 
-	return lookup.parse_collection[key](self, collection, value)
+	return util.parse_collection[key](self, collection, value)
 end
 
 -- buffer a single log event into the per-request ctx table
@@ -461,7 +461,7 @@ function _M.exec(self)
 	end
 
 	-- populate the collections table
-	lookup.collections[phase](self, collections, ctx)
+	collections_t.lookup[phase](self, collections, ctx)
 
 	-- don't run through the rulesets if we're going to be here again
 	-- (e.g. multiple chunks are going through body_filter)

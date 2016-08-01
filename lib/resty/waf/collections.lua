@@ -2,27 +2,15 @@ local _M = {}
 
 _M.version = "0.8"
 
-local cjson         = require "cjson"
-local file_logger   = require "resty.logger.file"
-local socket_logger = require "resty.logger.socket"
-
-local actions   = require "resty.waf.actions"
 local logger    = require "resty.waf.log"
-local operators = require "resty.waf.operators"
 local request   = require "resty.waf.request"
-local storage   = require "resty.waf.storage"
 local util      = require "resty.waf.util"
 
-local string_char   = string.char
-local string_find   = string.find
 local string_format = string.format
-local string_len    = string.len
-local string_lower  = string.lower
 local string_match  = string.match
-local string_sub    = string.sub
 local table_concat  = table.concat
 
-_M.collections = {
+_M.lookup = {
 	access = function(waf, collections, ctx)
 		local request_headers     = ngx.req.get_headers()
 		local request_uri_args    = ngx.req.get_uri_args()
@@ -109,41 +97,6 @@ _M.collections = {
 			collections.RESPONSE_BODY = table_concat(ctx.buffers, '')
 			ngx.arg[1] = collections.RESPONSE_BODY
 		end
-	end
-}
-
-_M.parse_collection = {
-	specific = function(waf, collection, value)
-		logger.log(waf, "Parse collection is getting a specific value: " .. value)
-		return collection[value]
-	end,
-	ignore = function(waf, collection, value)
-		logger.log(waf, "Parse collection is ignoring a value: " .. value)
-		local _collection = {}
-		_collection = util.table_copy(collection)
-		_collection[value] = nil
-		return _collection
-	end,
-	keys = function(waf, collection)
-		logger.log(waf, "Parse collection is getting the keys")
-		return util.table_keys(collection)
-	end,
-	values = function(waf, collection)
-		logger.log(waf, "Parse collection is getting the values")
-		return util.table_values(collection)
-	end,
-	all = function(waf, collection)
-		local n = 0
-		local _collection = {}
-		for _, key in ipairs(util.table_keys(collection)) do
-			n = n + 1
-			_collection[n] = key
-		end
-		for _, value in ipairs(util.table_values(collection)) do
-			n = n + 1
-			_collection[n] = value
-		end
-		return _collection
 	end
 }
 
