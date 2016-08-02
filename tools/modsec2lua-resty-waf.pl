@@ -540,11 +540,21 @@ sub translate_vars {
 		my $modifier       = $var->{modifier};
 		my $specific       = $var->{specific};
 
+		my $specific_regex;
+		if ($specific =~ m/^\//) {
+			$specific =~ s/^\/(.*)\//$1/;
+			$specific_regex = 1;
+		}
+
 		if (defined $modifier && $modifier eq '!') {
-			$translated_var->{parse}->{ignore} = $specific;
+			my $key = $specific_regex ? 'ignore_regex' : 'ignore';
+
+			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
 		} elsif (length $specific) {
-			$translated_var->{parse}->{specific} = $specific;
+			my $key = $specific_regex ? 'regex' : 'ignore';
+
+			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
 		}
 

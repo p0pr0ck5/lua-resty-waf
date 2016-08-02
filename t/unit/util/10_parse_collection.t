@@ -219,3 +219,101 @@ qux
 --- no_error_log
 [error]
 
+=== TEST 11: Regex (individual)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			ngx.say(specific)
+		';
+	}
+--- request
+GET /t?foo=bar&baz=qux
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+
+=== TEST 12: Regex (table)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
+bar
+bat
+--- no_error_log
+[error]
+
+=== TEST 13: Ignore regex (individual)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[.[az]+]=])
+			ngx.say(specific)
+		';
+	}
+--- request
+GET /t?foo=bar&baz=qux
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+
+=== TEST 14: Ignore regex (table) (1/2)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[b]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
+bar
+bat
+--- no_error_log
+[error]
+
+=== TEST 14: Ignore regex (table) (2/2)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
+qux
+--- no_error_log
+[error]
+

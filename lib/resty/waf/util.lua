@@ -212,6 +212,46 @@ _M.parse_collection = {
 		logger.log(waf, "Parse collection is getting a specific value: " .. value)
 		return collection[value]
 	end,
+	regex = function(waf, collection, value)
+		local v
+		local n = 0
+		local _collection = {}
+		for k, _ in pairs(collection) do
+			if (ngx.re.find(k, value, waf._pcre_flags)) then
+				v = collection[k]
+				if (type(v) == "table") then
+					for __, _v in pairs(v) do
+						n = n + 1
+						_collection[n] = _v
+					end
+				else
+					n = n + 1
+					_collection[n] = v
+				end
+			end
+		end
+		return _collection
+	end,
+	ignore_regex = function(waf, collection, value)
+		local v
+		local n = 0
+		local _collection = {}
+		for k, _ in pairs(collection) do
+			if (not ngx.re.find(k, value, waf._pcre_flags)) then
+				v = collection[k]
+				if (type(v) == "table") then
+					for __, _v in pairs(v) do
+						n = n + 1
+						_collection[n] = _v
+					end
+				else
+					n = n + 1
+					_collection[n] = v
+				end
+			end
+		end
+		return _collection
+	end,
 	ignore = function(waf, collection, value)
 		logger.log(waf, "Parse collection is ignoring a value: " .. value)
 		local _collection = {}
