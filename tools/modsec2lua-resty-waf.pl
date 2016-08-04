@@ -552,7 +552,7 @@ sub translate_vars {
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
 		} elsif (length $specific) {
-			my $key = $specific_regex ? 'regex' : 'ignore';
+			my $key = $specific_regex ? 'regex' : 'specific';
 
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
