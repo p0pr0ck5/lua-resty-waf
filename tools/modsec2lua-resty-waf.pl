@@ -660,20 +660,20 @@ sub translate_actions {
 			# dont cast as an int if this is a macro
 			$time = $time =~ m/^\d+$/ ? $time * 1 : translate_macro($time);
 
-			push @{$translation->{actions}->{expirevar}},
+			push @{$translation->{opts}->{expirevar}},
 				{ col => $collection, key => $element, time => $time };
 		} elsif ($key eq 'id') {
 			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {
 			my ($col, $val) = split /=/, $value;
 
-			$translation->{actions}->{initcol}->{uc $col} = $val;
+			$translation->{opts}->{initcol}->{uc $col} = $val;
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
 			$translation->{msg} = $value;
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
-			$translation->{actions}->{nolog} = 1;
+			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
 			delete $translation->{actions}->{nolog};
 		} elsif ($key eq 'phase') {
@@ -694,7 +694,7 @@ sub translate_actions {
 					substr $collection, 0, 1, '';
 
 					my $deletevar = { col => $collection, key => $element };
-					push @{$translation->{actions}->{deletevar}}, $deletevar;
+					push @{$translation->{opts}->{deletevar}}, $deletevar;
 				} else {
 					warn "No assignment in setvar, but not a delete?\n";
 				}
@@ -711,7 +711,7 @@ sub translate_actions {
 
 			$setvar->{value}  = $val;
 
-			push @{$translation->{actions}->{setvar}}, $setvar;
+			push @{$translation->{opts}->{setvar}}, $setvar;
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
@@ -722,7 +722,7 @@ sub translate_actions {
 				next;
 			}
 
-			push @{$translation->{actions}->{transform}}, $transform;
+			push @{$translation->{opts}->{transform}}, $transform;
 		}
 	}
 
