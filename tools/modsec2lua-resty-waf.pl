@@ -675,7 +675,7 @@ sub translate_actions {
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
-			delete $translation->{actions}->{nolog};
+			delete $translation->{opts}->{nolog} if defined $translation->{opts};
 		} elsif ($key eq 'phase') {
 			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
 		} elsif ($key eq 'skip') {
