@@ -19,9 +19,14 @@ test:
 	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/
 
 install: all
-	$(INSTALL) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
-	$(INSTALL) $(PWD)/lib/*.so $(LUA_LIB_DIR)
-	$(INSTALL) $(PWD)/rules/ $(LUA_LIB_DIR)
+        $(INSTALL) -d $(LUA_LIB_DIR)/resty
+        $(INSTALL) -d $(LUA_LIB_DIR)/resty/logger
+        $(INSTALL) -d $(LUA_LIB_DIR)/resty/waf
+        $(INSTALL)  $(PWD)/lib/resty/*.lua $(LUA_LIB_DIR)/resty/
+        $(INSTALL)  $(PWD)/lib/resty/logger/*.lua $(LUA_LIB_DIR)/resty/logger/
+        $(INSTALL)  $(PWD)/lib/resty/waf/*.lua $(LUA_LIB_DIR)/resty/waf/
+        $(INSTALL) $(PWD)/lib/*.so $(LUA_LIB_DIR)
+        $(INSTALL) $(PWD)/rules/* $(LUA_LIB_DIR)
 
 install-hard: all
 	$(INSTALL_HARD) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
