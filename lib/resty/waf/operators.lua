@@ -305,8 +305,6 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 
 	local answers, err = resolver:query(rbl_query)
 
-	ngx.log(ngx.INFO, require("cjson").encode(answers))
-
 	if (not answers) then
 		ngx.log(ngx.WARN, err)
 		return false, nil
