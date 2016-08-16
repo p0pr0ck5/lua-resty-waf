@@ -500,8 +500,12 @@ sub translate_chains {
 
 			push @{$lua_resty_waf_chains->{$phase}}, @translation;
 		} catch {
-			warn "$_" if !$silent;
-			warn join ("\n", map { $_->{original} } @{$chain} ) . "\n\n" if !$quiet;
+			warn $_ if !$silent;
+
+			if (!$quiet) {
+				warn $_->{original} . "\n" for @{$chain};
+				print "\n\n";
+			}
 		};
 	}
 

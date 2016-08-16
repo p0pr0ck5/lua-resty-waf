@@ -225,6 +225,8 @@ is_deeply(
 				},
 			]
 		],
+		silent => 1,
+		quiet  => 1,
 	}),
 	{
 		access        => [],
@@ -234,39 +236,35 @@ is_deeply(
 	'a chain with two rules does not add to the final output when it dies'
 );
 
-TODO: {
-	local $TODO = "each original needs to be a separate warn statement";
-
-	warnings_like
-		{
-			translate_chains({
-				chains => [
-					[
-						{
-							id       => '12345',
-							foo      => 'bar',
-							phase    => 'access',
-							original => 'original 12345'
-						},
-						{
-							id       => '12346',
-							foo      => 'bar',
-							phase    => 'access',
-							mockfail => 1,
-							original => 'original 12346'
-						}
-					]
-				],
-			})
-		}
-		[
-			qr/translate_chain died a translation death/,
-			qr/original 12345/,
-			qr/original 12346/,
-		],
-		'chain translation with multiple rules fails when one rule dies'
-	;
-}
+warnings_like
+	{
+		translate_chains({
+			chains => [
+				[
+					{
+						id       => '12345',
+						foo      => 'bar',
+						phase    => 'access',
+						original => 'original 12345'
+					},
+					{
+						id       => '12346',
+						foo      => 'bar',
+						phase    => 'access',
+						mockfail => 1,
+						original => 'original 12346'
+					}
+				]
+			],
+		})
+	}
+	[
+		qr/translate_chain died a translation death/,
+		qr/original 12345/,
+		qr/original 12346/,
+	],
+	'chain translation with multiple rules fails when one rule dies'
+;
 
 warning_is
 	{
@@ -353,7 +351,9 @@ is_deeply(
 					phase => 'access',
 				}
 			]
-		]
+		],
+		silent => 1,
+		quiet  => 1,
 	}),
 	{
 		access => [
