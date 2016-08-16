@@ -780,6 +780,8 @@ sub translate_actions {
 			}
 
 			push @{$translation->{opts}->{transform}}, $transform;
+		} else {
+			warn "Cannot translate action $key\n" if !$silent;
 		}
 	}
 

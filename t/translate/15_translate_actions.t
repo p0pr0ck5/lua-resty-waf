@@ -669,45 +669,41 @@ is_deeply(
 	'once transform translation failure does not prevent another'
 );
 
-TODO: {
-	local $TODO = "warn on invalid action (unless silent)";
+$translation = {};
+warning_like
+	{
+		translate_actions(
+			{
+				actions => [
+					{
+						action => 'foo',
+					}
+				]
+			},
+			$translation,
+			undef
+		);
+	}
+	qr/Cannot translate action foo/,
+	'warn on invalid action'
+;
 
-	$translation = {};
-	warning_like
-		{
-			translate_actions(
-				{
-					actions => [
-						{
-							action => 'foo',
-						}
-					]
-				},
-				$translation,
-				undef
-			);
-		}
-		qr/Invalid action foo/,
-		'warn on invalid action'
-	;
-
-	$translation = {};
-	translate_actions(
-		{
-			actions => [
-				{
-					action => 'foo',
-				}
-			]
-		},
-		$translation,
-		1
-	);
-	is_deeply(
-		$translation,
-		{},
-		'do not warn on translation fail when silent is set'
-	);
-}
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'foo',
+			}
+		]
+	},
+	$translation,
+	1
+);
+is_deeply(
+	$translation,
+	{},
+	'do not warn on translation fail when silent is set'
+);
 
 done_testing;
