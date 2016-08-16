@@ -9,11 +9,12 @@ env:
     - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=unit
     - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=acceptance
     - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=regression
+    - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=translate
 services:
     - memcached
     - redis
 install:
-    - cpanm -v --notest Test::Nginx
+    - cpanm -v --notest Test::Nginx Test::More Exporter::Declare Test::Exception Test::MockModule;
 before_script:
     - sudo apt-get update -q
     - sudo apt-get install libssl-dev lua5.1 -y

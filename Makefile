@@ -8,15 +8,26 @@ LIBS    = cookie.lua iputils.lua logger libinjection.lua waf waf.lua
 SO_LIBS = libac.so libinjection.so
 RULES   = rules
 
-.PHONY: all test install clean
+.PHONY: all test install clean test-unit test-acceptance test-regression test-translate
 
 all: ;
 
 clean:
 	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm $(SO_LIBS) && cd resty/ && rm -rf $(LIBS)
 
-test:
-	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/
+test-unit:
+	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/unit
+
+test-acceptance:
+	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/acceptance
+
+test-regression:
+	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/regression
+
+test-translate:
+	prove -r ./t/translate/
+
+test: test-unit test-acceptance test-regression test-translate
 
 install: all
 	$(INSTALL) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
