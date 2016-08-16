@@ -21,7 +21,7 @@ __DATA__
 
 			local ctx = { nameservers = { { "127.0.0.1", 2053 } }, _r_id = 12345 }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -55,7 +55,7 @@ true
 
 			local ctx = { nameservers = { { "127.0.0.1", 2053 } }, _r_id = 12345 }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -88,7 +88,7 @@ nil
 
 			local ctx = { nameservers = nil }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -114,7 +114,7 @@ nil
 
 			local ctx = { nameservers = { "127.0.0.1" } }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
