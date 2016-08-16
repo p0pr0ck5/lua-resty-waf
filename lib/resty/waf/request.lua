@@ -42,7 +42,7 @@ function _M.parse_request_body(waf, request_headers)
 
 		local form, err = upload:new()
 		if not form then
-			ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
+			logger.warn(waf, "failed to parse multipart request: ", err)
 			ngx.exit(400) -- may move this into a ruleset along with other strict checking
 		end
 

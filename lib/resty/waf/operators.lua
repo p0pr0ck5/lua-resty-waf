@@ -206,7 +206,7 @@ function _M.regex(waf, subject, pattern)
 		captures, err = ngx.re.match(subject, pattern, opts)
 
 		if err then
-			ngx.log(ngx.WARN, "error in ngx.re.match: " .. err)
+			logger.warn(waf, "error in ngx.re.match: " .. err)
 		end
 
 		if captures then
@@ -276,7 +276,7 @@ function _M.cidr_match(ip, cidr_pattern)
 	return iputils.ip_in_cidrs(ip, t), ip
 end
 
-function _M.rbl_lookup(ip, rbl_srv, ctx)
+function _M.rbl_lookup(waf, ip, rbl_srv, ctx)
 	local nameservers = ctx.nameservers
 
 	if (type(nameservers) ~= 'table') then
@@ -289,7 +289,7 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	})
 
 	if (not resolver) then
-		ngx.log(ngx.WARN, err)
+		logger.warn(waf, err)
 		return false, nil
 	end
 
@@ -306,7 +306,7 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	local answers, err = resolver:query(rbl_query)
 
 	if (not answers) then
-		ngx.log(ngx.WARN, err)
+		logger.warn(waf, err)
 		return false, nil
 	end
 
@@ -315,7 +315,7 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 		return false, nil
 	elseif (answers.errcode) then
 		-- we had some other type of err that we should know about
-		ngx.log(ngx.WARN, "rbl lookup failure: " .. answers.errstr ..
+		logger.warn(waf, "rbl lookup failure: " .. answers.errstr ..
 			" (" .. answers.errcode .. ")")
 		return false, nil
 	else
@@ -333,7 +333,6 @@ end
 function _M.detect_sqli(input)
 	if (type(input) == 'table') then
 		for _, v in ipairs(input) do
-			ngx.log(ngx.WARN, "Doing " .. v)
 			local match, value = _M.detect_sqli(v)
 
 			if match then
@@ -426,7 +425,7 @@ _M.lookup = {
 	STR_CONTAINS = function(waf, collection, pattern) return _M.str_find(waf, collection, pattern) end,
 	PM           = function(waf, collection, pattern, ctx) return _M.ac_lookup(collection, pattern, ctx) end,
 	CIDR_MATCH   = function(waf, collection, pattern) return _M.cidr_match(collection, pattern) end,
-	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return _M.rbl_lookup(collection, pattern, ctx) end,
+	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return _M.rbl_lookup(waf, collection, pattern, ctx) end,
 	DETECT_SQLI  = function(waf, collection, pattern) return _M.detect_sqli(collection) end,
 	DETECT_XSS   = function(waf, collection, pattern) return _M.detect_xss(collection) end,
 	STR_MATCH    = function(waf, collection, pattern) return _M.str_match(collection, pattern) end,

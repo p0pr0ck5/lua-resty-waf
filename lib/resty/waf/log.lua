@@ -13,6 +13,11 @@ function _M.log(waf, msg)
 	end
 end
 
+-- warn logger
+function _M.warn(waf, msg)
+	ngx.log(ngx.WARN, '[', waf.transaction_id, '] ', msg)
+end
+
 -- fatal failure logger
 function _M.fatal_fail(msg)
 	ngx.log(ngx.ERR, error(msg))
