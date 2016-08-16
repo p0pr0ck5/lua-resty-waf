@@ -84,7 +84,7 @@ my $valid_vars = {
 my $valid_operators = {
 	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
-	containsWord     => sub { my $pattern = shift; return('REGEX', "\b$pattern\b"); },
+	containsWord     => sub { my $pattern = shift; return('REGEX', "\\b$pattern\\b"); },
 	detectSQLi       => 'DETECT_SQLI',
 	detectXSS        => 'DETECT_XSS',
 	endsWith         => sub { my $pattern = shift; return('REGEX', "$pattern\$"); },

@@ -54,29 +54,25 @@ dies_ok(
 	'dies on invalid operator'
 );
 
-TODO: {
-	local $TODO = "containsWord replacement sub needs \\b to be \\\\b";
-
-	$translation = {};
-	translate_operator(
-		{
-			operator => {
-				operator => 'containsWord',
-				pattern  => 'foo',
-			},
+$translation = {};
+translate_operator(
+	{
+		operator => {
+			operator => 'containsWord',
+			pattern  => 'foo',
 		},
-		$translation,
-		undef
-	);
-	is_deeply(
-		$translation,
-		{
-			operator => 'REGEX',
-			pattern  => '\bfoo\b',
-		},
-		'translate an operator that modifies the pattern'
-	);
-}
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		operator => 'REGEX',
+		pattern  => '\bfoo\b',
+	},
+	'translate an operator that modifies the pattern'
+);
 
 $translation = {};
 translate_operator(
