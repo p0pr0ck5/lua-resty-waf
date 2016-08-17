@@ -365,7 +365,7 @@ sub parse_operator {
 	#
 	# note that some operators (i'm looking at you, libinjection wrapper)
 	# do not require a pattern, so we need to account for such cases
-	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?\@([a-zA-Z]+)\s*)?(.*)$/;
+	my ($negated, $operator, $pattern) = $raw_operator =~ m/^\s*(?:(\!)?(?:\@([a-zA-Z]+)\s*)?)?(.*)$/;
 	$operator ||= 'rx';
 
 	my $parsed = {};

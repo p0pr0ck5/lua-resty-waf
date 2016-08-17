@@ -68,48 +68,44 @@ is_deeply(
 	'negated operator with no pattern'
 );
 
-TODO: {
-	local $TODO = "regex does not allow this behavior";
+is_deeply(
+	parse_operator('!foo'),
+	{
+		operator => 'rx',
+		pattern  => 'foo',
+		negated  => '!'
+	},
+	'negated operator is defined when operator is implied'
+);
 
-	is_deeply(
-		parse_operator('!foo'),
-		{
-			operator => 'rx',
-			pattern  => 'foo',
-			negated  => '!'
-		},
-		'negated operator is defined when operator is implied'
-	);
+is_deeply(
+	parse_operator('! foo'),
+	{
+		operator => 'rx',
+		pattern  => ' foo',
+		negated  => '!',
+	},
+	'space after negation with implicity defined operator'
+);
 
-	is_deeply(
-		parse_operator('! foo'),
-		{
-			operator => 'rx',
-			pattern  => 'foo',
-			negated  => '!',
-		},
-		'space after negation with implicity defined operator'
-	);
+is_deeply(
+	parse_operator('! @rx foo'),
+	{
+		operator => 'rx',
+		pattern  => ' @rx foo',
+		negated  => '!',
+	},
+	'space after negation with explicity defined operator'
+);
 
-	is_deeply(
-		parse_operator('! @rx foo'),
-		{
-			operator => 'rx',
-			pattern  => '@rx foo',
-			negated  => '!',
-		},
-		'space after negation with explicity defined operator'
-	);
-
-	is_deeply(
-		parse_operator('! @detectSQLi'),
-		{
-			operator => 'rx',
-			pattern  => '@detectSQLi',
-			negated  => '!',
-		},
-		'space after negation with no pattern'
-	);
-}
+is_deeply(
+	parse_operator('! @detectSQLi'),
+	{
+		operator => 'rx',
+		pattern  => ' @detectSQLi',
+		negated  => '!',
+	},
+	'space after negation with no pattern'
+);
 
 done_testing;
