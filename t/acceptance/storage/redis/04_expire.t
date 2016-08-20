@@ -118,11 +118,11 @@ Not persisting a collection that wasn't altered
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
             storage.set_var(waf, ctx, element, element.value)
-            storage.expire_var(waf, ctx, element, 10)
+            storage.expire_var(waf, ctx, element, 1)
 
             storage.persist(waf, ctx.storage)
 
-			ngx.sleep(3)
+			ngx.sleep(.5)
         ';
 
         content_by_lua 'ngx.say("OK")';
@@ -202,11 +202,11 @@ Not persisting a collection that wasn't altered
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
             storage.set_var(waf, ctx, element, element.value)
-            storage.expire_var(waf, ctx, element, 1)
+            storage.expire_var(waf, ctx, element, .2)
 
             storage.persist(waf, ctx.storage)
 
-			ngx.sleep(3)
+			ngx.sleep(.5)
         ';
 
         content_by_lua 'ngx.say("OK")';
@@ -285,11 +285,11 @@ Not persisting a collection that wasn't altered
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
             storage.set_var(waf, ctx, element, element.value)
-            storage.expire_var(waf, ctx, element, 1)
+            storage.expire_var(waf, ctx, element, .2)
 
             local element = { col = "FOO", key = "COUNT_OTHER", value = 2 }
             storage.set_var(waf, ctx, element, element.value)
-            storage.expire_var(waf, ctx, element, 10)
+            storage.expire_var(waf, ctx, element, 1)
 
             storage.persist(waf, ctx.storage)
         ';
@@ -299,7 +299,7 @@ Not persisting a collection that wasn't altered
 
     location = /s {
 		access_by_lua '
-			ngx.sleep(3)
+			ngx.sleep(.5)
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 

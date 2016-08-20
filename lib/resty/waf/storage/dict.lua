@@ -27,7 +27,7 @@ function _M.initialize(waf, storage, col)
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
 				logger.log(waf, "checking " .. key)
-				if (data["__expire_" .. key] < ngx.time()) then
+				if (data["__expire_" .. key] < ngx.now()) then
 					logger.log(waf, "Removing expired key: " .. key)
 					data["__expire_" .. key] = nil
 					data[key] = nil

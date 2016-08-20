@@ -124,7 +124,65 @@ is_deeply(
 			]
 		}
 	},
-	'translate expirevar with numeric expire time'
+	'translate expirevar with integer expire time'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'expirevar',
+				value  => 'foo.bar=.2',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		opts => {
+			expirevar => [
+				{
+					col  => 'foo',
+					key  => 'bar',
+					time => .2,
+				}
+			]
+		}
+	},
+	'translate expirevar with decimal expire time'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'expirevar',
+				value  => 'foo.bar=baz',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		opts => {
+			expirevar => [
+				{
+					col  => 'foo',
+					key  => 'bar',
+					time => 'baz-mocked',
+				}
+			]
+		}
+	},
+	'translate expirevar with non-numeric expire time'
 );
 
 $translation = {};
@@ -475,13 +533,72 @@ is_deeply(
 				{
 					col   => 'IP',
 					key   => 'foo',
-					value => '60',
+					value => 60,
 					inc   => 1,
 				}
 			]
 		}
 	},
-	'translate setvar with string value'
+	'increment setvar with integer value'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'setvar',
+				value  => 'IP.foo=.2',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		opts => {
+			setvar => [
+				{
+					col   => 'IP',
+					key   => 'foo',
+					value => '.2',
+				}
+			]
+		}
+	},
+	'translate setvar with decimal (string) value'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'setvar',
+				value  => 'IP.foo=+.2',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		opts => {
+			setvar => [
+				{
+					col   => 'IP',
+					key   => 'foo',
+					value => 0.2,
+					inc   => 1,
+				}
+			]
+		}
+	},
+	'increment setvar with decimal value'
 );
 
 $translation = {};

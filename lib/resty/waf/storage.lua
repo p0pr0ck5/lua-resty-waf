@@ -65,7 +65,7 @@ function _M.expire_var(waf, ctx, element, value)
 	local col     = ctx.col_lookup[string_upper(element.col)]
 	local key     = element.key
 	local storage = ctx.storage
-	local expire  = ngx.time() + value
+	local expire  = ngx.now() + value
 
 	logger.log(waf, "Expiring " .. element.col .. ":" .. element.key .. " in " .. value)
 

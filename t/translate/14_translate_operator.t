@@ -113,7 +113,27 @@ is_deeply(
 		operator => 'GREATER',
 		pattern  => 5,
 	},
-	'caste a pattern that looks like an integer to an int'
+	'caste a pattern that looks like an integer to a number'
+);
+
+$translation = {};
+translate_operator(
+	{
+		operator => {
+			operator => 'gt',
+			pattern  => '.2',
+		},
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		operator => 'GREATER',
+		pattern  => 0.2,
+	},
+	'caste a pattern that looks like a decimal to a number'
 );
 
 $translation = {};
