@@ -62,17 +62,17 @@ function _M.parse_request_body(waf, request_headers)
 
 			if (typ == "header") then
 				chunk = res[3] -- form:read() returns { key, value, line } here
-				ngx.req.append_body("\n" .. chunk)
+				ngx.req.append_body("\r\n" .. chunk)
 			elseif (typ == "body") then
 				chunk = res
 				if (lasttype == "header") then
-					ngx.req.append_body("\n\n")
+					ngx.req.append_body("\r\n\r\n")
 				end
 				ngx.req.append_body(chunk)
 			elseif (typ == "part_end") then
-				ngx.req.append_body("\n--" .. form.boundary)
+				ngx.req.append_body("\r\n--" .. form.boundary)
 			elseif (typ == "eof") then
-				ngx.req.append_body("--\n")
+				ngx.req.append_body("--\r\n")
 				break
 			end
 
