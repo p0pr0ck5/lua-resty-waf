@@ -26,9 +26,19 @@ function _M.initialize(waf, storage, col)
 		return
 	end
 
-	local ok, err = redis:set_keepalive(10000, 100)
-	if (not ok) then
-		logger.log(waf, "Error setting redis keepalive: " .. err)
+	if (waf._storage_keepalive) then
+		local timeout = waf._storage_keepalive_timeout
+		local size    = waf._storage_keepalive_pool_size
+
+		local ok, err = redis:set_keepalive(timeout, size)
+		if (not ok) then
+			logger.warn(waf, "Error setting redis keepalive: " .. err)
+		end
+	else
+		local ok, err = redis:close()
+		if (not ok) then
+			logger.warn(waf, "Error closing redis socket: " .. err)
+		end
 	end
 
 	local altered = false
@@ -111,9 +121,19 @@ function _M.persist(waf, col, data)
 		logger.log(waf, "Error in redis pipelining: " .. err)
 	end
 
-	local ok, err = redis:set_keepalive(10000, 100)
-	if (not ok) then
-		logger.log(waf, "Error setting redis keepalive: " .. err)
+	if (waf._storage_keepalive) then
+		local timeout = waf._storage_keepalive_timeout
+		local size    = waf._storage_keepalive_pool_size
+
+		local ok, err = redis:set_keepalive(timeout, size)
+		if (not ok) then
+			logger.warn(waf, "Error setting redis keepalive: " .. err)
+		end
+	else
+		local ok, err = redis:close()
+		if (not ok) then
+			logger.warn(waf, "Error closing redis socket: " .. err)
+		end
 	end
 end
 
