@@ -3,27 +3,6 @@ use Test::Nginx::Socket::Lua;
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
 
-add_response_body_check(sub {
-	my ($block, $body, $req_idx, $repeated_req_idx, $dry_run) = @_;
-
-	my $name = $block->name;
-
-	my $epoch = time;
-	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime;
-	$year += 1900;
-
-	SKIP: {
-		skip "$name - tests skipped due to $dry_run", 1 if $dry_run;
-
-		is(
-			$body,
-			sprintf("%d:%d:%d\n%02d\n%d\n%02d\n%02d\n%02d\n%02d\n%d\n",
-				$hour, $min, $sec, $mday, $epoch, $hour, $min, $mon + 1, $sec, $year),
-			"$name - TIME collection elements are correct (req $repeated_req_idx)"
-		);
-	}
-});
-
 no_shuffle();
 run_tests();
 
@@ -35,6 +14,14 @@ __DATA__
 		access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			-- mock out ngx.localtime as a global function for testing
+			localtime = function() return "1991-09-13 16:21:59" end
+			ngx.localtime = localtime
+
+			--ngx.time as well
+			time = function() return "684793319" end
+			ngx.time = time
 
 			waf:exec()
 		';
@@ -59,6 +46,15 @@ __DATA__
 --- request
 GET /t
 --- error_code: 200
+--- response_body
+16:21:59
+13
+684793319
+16
+21
+09
+59
+1991
 --- no_error_log
 [error]
 
