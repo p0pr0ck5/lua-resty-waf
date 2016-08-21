@@ -103,6 +103,111 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'accuracy',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		accuracy => 7
+	},
+	'translate accuracy'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'maturity',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		maturity => 7
+	},
+	'translate maturity'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'rev',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		rev => 7
+	},
+	'translate rev'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'severity',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		severity => 7
+	},
+	'translate severity'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ver',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		ver => 7
+	},
+	'translate ver'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'expirevar',
 				value  => 'foo.bar=60',
 			}
@@ -757,6 +862,57 @@ is_deeply(
 	$translation,
 	{},
 	'do not warn on translation fail when silent is set'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'tag',
+				value  => 'foo',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		tag => [
+			'foo-mocked'
+		]
+	},
+	'translate one tag'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'tag',
+				value  => 'foo',
+			},
+			{
+				action => 'tag',
+				value  => 'bar',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		tag => [
+			'foo-mocked',
+			'bar-mocked',
+		]
+	},
+	'translate two tags'
 );
 
 $translation = {};

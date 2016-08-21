@@ -714,6 +714,8 @@ sub translate_actions {
 		# easier to do this than a lookup table
 		if (grep { $_ eq $key } qw(allow block deny pass)) {
 			$translation->{action} = uc $action_lookup->{$key};
+		} elsif (grep { $_ eq $key } qw(accuracy maturity rev severity ver)) {
+			$translation->{$key} = $value;
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
@@ -784,6 +786,8 @@ sub translate_actions {
 			}
 
 			push @{$translation->{opts}->{transform}}, $transform;
+		} elsif ($key eq 'tag') {
+			push @{$translation->{tag}}, translate_macro($value);
 		} else {
 			warn "Cannot translate action $key\n" if !$silent;
 		}
