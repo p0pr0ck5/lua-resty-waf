@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local ac        = require "resty.waf.load_ac"
 local dns       = require "resty.dns.resolver"

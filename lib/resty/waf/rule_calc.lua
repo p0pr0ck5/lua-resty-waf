@@ -2,7 +2,7 @@ local _M = {}
 
 local table_concat = table.concat
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local function _transform_collection_key(transform)
 	if (not transform) then

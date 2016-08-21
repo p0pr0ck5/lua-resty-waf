@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local logger    = require "resty.waf.log"
 local request   = require "resty.waf.request"
