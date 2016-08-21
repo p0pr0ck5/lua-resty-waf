@@ -1006,6 +1006,54 @@ Define an engine to use for persistent variable storage. Current available optio
 	}
 ```
 
+###storage_keepalive
+
+*Default*: true
+
+Enable or disable TCP keepalive for connections to remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive", false)
+		';
+	}
+```
+
+###storage_keepalive_timeout
+
+*Default*: 10000
+
+Configure (in milliseconds) the timeout for the cosocket keepalive pool for remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive_timeout", 30000)
+		';
+	}
+```
+
+###storage_keepalive_pool_size
+
+*Default*: 100
+
+Configure the pool size for the cosocket keepalive pool for remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive_pool_size", 50)
+		';
+	}
+```
+
 ###storage_memcached_host
 
 *Default*: 127.0.0.1
