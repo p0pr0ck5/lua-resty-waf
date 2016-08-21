@@ -1,5 +1,8 @@
 use Test::Nginx::Socket::Lua;
 
+use lib 't';
+use TestDNS;
+
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks();
 
@@ -16,11 +19,9 @@ __DATA__
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
-			-- this makes this test very fragile
-			-- this is one record for 0.ns.spamhaus.org.
-			local ctx = { nameservers = { "194.104.0.140" } }
+			local ctx = { nameservers = { { "127.0.0.1", 2053 } }, _r_id = 12345 }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -28,6 +29,14 @@ __DATA__
 	}
 --- request
 GET /t
+--- udp_listen: 2053
+--- udp_reply dns
+{
+	id     => 12345,
+	opcode => 0,
+	qname  => "4.0.0.127.sbl-xbl.spamhaus.org",
+	answer => [{ name => "4.0.0.127.sbl-xbl.spamhaus.org", ipv4 => "127.0.0.4", ttl =>3600 }]
+}
 --- error_code: 200
 --- response_body
 true
@@ -44,11 +53,9 @@ true
 			local ip      = "127.0.0.1"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
-			-- this makes this test very fragile
-			-- this is one record for 0.ns.spamhaus.org.
-			local ctx = { nameservers = { "194.104.0.140" } }
+			local ctx = { nameservers = { { "127.0.0.1", 2053 } }, _r_id = 12345 }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -56,6 +63,13 @@ true
 	}
 --- request
 GET /t
+--- udp_listen: 2053
+--- udp_reply dns
+{
+	id     => 12345,
+	opcode => 0,
+	qname  => "1.0.0.127.sbl-xbl.spamhaus.org",
+}
 --- error_code: 200
 --- response_body
 false
@@ -72,11 +86,9 @@ nil
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
-			-- this makes this test very fragile
-			-- this is one record for 0.ns.spamhaus.org.
 			local ctx = { nameservers = nil }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)
@@ -100,11 +112,9 @@ nil
 			local ip      = nil
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
-			-- this makes this test very fragile
-			-- this is one record for 0.ns.spamhaus.org.
-			local ctx = { nameservers = { "194.104.0.140" } }
+			local ctx = { nameservers = { "127.0.0.1" } }
 
-			local match, value = op.rbl_lookup(ip, rbl_srv, ctx)
+			local match, value = op.rbl_lookup({}, ip, rbl_srv, ctx)
 
 			ngx.say(match)
 			ngx.say(value)

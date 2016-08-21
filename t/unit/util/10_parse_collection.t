@@ -12,7 +12,7 @@ __DATA__
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			ngx.say(specific)
@@ -30,7 +30,7 @@ bar
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			for i in ipairs(specific) do
@@ -51,7 +51,7 @@ bat
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local ignore     = lookup.parse_collection["ignore"]({}, collection, "foo")
 			for k, v in pairs(ignore) do
@@ -71,7 +71,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local ignore     = lookup.parse_collection["ignore"]({}, collection, "foo")
 			for k, v in pairs(ignore) do
@@ -91,7 +91,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
@@ -112,7 +112,7 @@ baz
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
@@ -133,7 +133,7 @@ baz
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
@@ -154,7 +154,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
@@ -176,7 +176,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do
@@ -199,7 +199,7 @@ qux
 --- config
 	location /t {
 		content_by_lua '
-			local lookup     = require "resty.waf.lookup"
+			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do
@@ -215,6 +215,104 @@ foo
 baz
 bar
 bat
+qux
+--- no_error_log
+[error]
+
+=== TEST 11: Regex (individual)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			ngx.say(specific)
+		';
+	}
+--- request
+GET /t?foo=bar&baz=qux
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+
+=== TEST 12: Regex (table)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
+bar
+bat
+--- no_error_log
+[error]
+
+=== TEST 13: Ignore regex (individual)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[.[az]+]=])
+			ngx.say(specific)
+		';
+	}
+--- request
+GET /t?foo=bar&baz=qux
+--- error_code: 200
+--- response_body
+bar
+--- no_error_log
+[error]
+
+=== TEST 14: Ignore regex (table) (1/2)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[b]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
+bar
+bat
+--- no_error_log
+[error]
+
+=== TEST 14: Ignore regex (table) (2/2)
+--- config
+	location /t {
+		content_by_lua '
+			local lookup     = require "resty.waf.util"
+			local collection = ngx.req.get_uri_args()
+			local specific   = lookup.parse_collection["ignore_regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
+			for i in ipairs(specific) do
+				ngx.say(specific[i])
+			end
+		';
+	}
+--- request
+GET /t?foo=bar&foo=bat&baz=qux
+--- error_code: 200
+--- response_body
 qux
 --- no_error_log
 [error]

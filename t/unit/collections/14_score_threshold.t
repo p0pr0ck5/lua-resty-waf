@@ -23,7 +23,7 @@ __DATA__
 			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 
-			ngx.say(collections.SCORE_THRESHOLD(waf))
+			ngx.say(collections.SCORE_THRESHOLD)
 		';
 	}
 --- request
@@ -54,7 +54,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- response_body
-function
+number
 --- no_error_log
 [error]
 
@@ -73,7 +73,7 @@ function
 			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 
-			ngx.say(type(collections.SCORE_THRESHOLD(waf)))
+			ngx.say(type(collections.SCORE_THRESHOLD))
 		';
 	}
 --- request

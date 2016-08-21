@@ -1,0 +1,233 @@
+{
+   "access" : [
+      {
+         "action" : "SCORE",
+         "id" : 21001,
+         "msg" : "No valid Host header",
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "host",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 21002,
+         "op_negated" : 1,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "OPTIONS",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21003,
+         "msg" : "No valid Accept header",
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "accept",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 21004,
+         "op_negated" : 1,
+         "operator" : "EQUALS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "OPTIONS",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21005,
+         "msg" : "Accept header has no value",
+         "operator" : "REGEX",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "^$",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "accept"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21006,
+         "msg" : "No valid User-Agent header",
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "user-agent",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21007,
+         "msg" : "User-Agent header has no value",
+         "operator" : "REGEX",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "^$",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "user-agent"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "CHAIN",
+         "id" : 21008,
+         "op_negated" : 1,
+         "operator" : "CONTAINS",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "content-type",
+         "vars" : [
+            {
+               "parse" : {
+                  "keys" : 1
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21009,
+         "msg" : "Request contains content, but missing Content-Type header",
+         "op_negated" : 1,
+         "operator" : "REGEX",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "^0$",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "content-length"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      },
+      {
+         "action" : "SCORE",
+         "id" : 21010,
+         "msg" : "Host header contains an IP address",
+         "operator" : "REGEX",
+         "opts" : {
+            "setvar" : [
+               {
+                  "col" : "TX",
+                  "inc" : 1,
+                  "key" : "anomaly_score",
+                  "value" : 2
+               }
+            ]
+         },
+         "pattern" : "^[\\d.:]+$",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "host"
+               },
+               "type" : "REQUEST_HEADERS"
+            }
+         ]
+      }
+   ],
+   "body_filter" : {},
+   "header_filter" : {}
+}

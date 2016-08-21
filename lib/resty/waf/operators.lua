@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local ac        = require "resty.waf.load_ac"
 local dns       = require "resty.dns.resolver"
@@ -8,6 +8,9 @@ local iputils   = require "resty.iputils"
 local libinject = require "resty.libinjection"
 local logger    = require "resty.waf.log"
 local util      = require "resty.waf.util"
+
+local string_find = string.find
+local string_sub  = string.sub
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -176,11 +179,11 @@ function _M.str_find(waf, subject, pattern)
 			end
 		end
 	else
-		from, to = string.find(subject, pattern, 1, true)
+		from, to = string_find(subject, pattern, 1, true)
 
 		if from then
 			match = true
-			value = string.sub(subject, from, to)
+			value = string_sub(subject, from, to)
 		end
 	end
 
@@ -203,7 +206,7 @@ function _M.regex(waf, subject, pattern)
 		captures, err = ngx.re.match(subject, pattern, opts)
 
 		if err then
-			ngx.log(ngx.WARN, "error in ngx.re.match: " .. err)
+			logger.warn(waf, "error in ngx.re.match: " .. err)
 		end
 
 		if captures then
@@ -273,7 +276,7 @@ function _M.cidr_match(ip, cidr_pattern)
 	return iputils.ip_in_cidrs(ip, t), ip
 end
 
-function _M.rbl_lookup(ip, rbl_srv, ctx)
+function _M.rbl_lookup(waf, ip, rbl_srv, ctx)
 	local nameservers = ctx.nameservers
 
 	if (type(nameservers) ~= 'table') then
@@ -286,9 +289,12 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	})
 
 	if (not resolver) then
-		ngx.log(ngx.WARN, err)
+		logger.warn(waf, err)
 		return false, nil
 	end
+
+	-- id for unit test
+	resolver._id = ctx._r_id or nil
 
 	local rbl_query = util.build_rbl_query(ip, rbl_srv)
 
@@ -300,7 +306,7 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 	local answers, err = resolver:query(rbl_query)
 
 	if (not answers) then
-		ngx.log(ngx.WARN, err)
+		logger.warn(waf, err)
 		return false, nil
 	end
 
@@ -309,20 +315,24 @@ function _M.rbl_lookup(ip, rbl_srv, ctx)
 		return false, nil
 	elseif (answers.errcode) then
 		-- we had some other type of err that we should know about
-		ngx.log(ngx.WARN, "rbl lookup failure: " .. answers.errstr ..
+		logger.warn(waf, "rbl lookup failure: " .. answers.errstr ..
 			" (" .. answers.errcode .. ")")
 		return false, nil
 	else
 		-- we got a dns response, for now we're only going to return the first entry
 		local i, answer = next(answers)
-		return true, answer.address or answer.cname
+		if (answer and type(answer) == 'table') then
+			return true, answer.address or answer.cname
+		else
+			-- we didnt have any valid answers
+			return false, nil
+		end
 	end
 end
 
 function _M.detect_sqli(input)
 	if (type(input) == 'table') then
 		for _, v in ipairs(input) do
-			ngx.log(ngx.WARN, "Doing " .. v)
 			local match, value = _M.detect_sqli(v)
 
 			if match then
@@ -401,5 +411,24 @@ function _M.str_match(input, pattern)
 
 	return false, nil
 end
+
+_M.lookup = {
+	REGEX        = function(waf, collection, pattern) return _M.regex(waf, collection, pattern) end,
+	EQUALS       = function(waf, collection, pattern) return _M.equals(collection, pattern) end,
+	GREATER      = function(waf, collection, pattern) return _M.greater(collection, pattern) end,
+	LESS         = function(waf, collection, pattern) return _M.less(collection, pattern) end,
+	GREATER_EQ   = function(waf, collection, pattern) return _M.greater_equals(collection, pattern) end,
+	LESS_EQ      = function(waf, collection, pattern) return _M.less_equals(collection, pattern) end,
+	EXISTS       = function(waf, collection, pattern) return _M.exists(collection, pattern) end,
+	CONTAINS     = function(waf, collection, pattern) return _M.contains(collection, pattern) end,
+	STR_EXISTS   = function(waf, collection, pattern) return _M.str_find(waf, pattern, collection) end,
+	STR_CONTAINS = function(waf, collection, pattern) return _M.str_find(waf, collection, pattern) end,
+	PM           = function(waf, collection, pattern, ctx) return _M.ac_lookup(collection, pattern, ctx) end,
+	CIDR_MATCH   = function(waf, collection, pattern) return _M.cidr_match(collection, pattern) end,
+	RBL_LOOKUP   = function(waf, collection, pattern, ctx) return _M.rbl_lookup(waf, collection, pattern, ctx) end,
+	DETECT_SQLI  = function(waf, collection, pattern) return _M.detect_sqli(collection) end,
+	DETECT_XSS   = function(waf, collection, pattern) return _M.detect_xss(collection) end,
+	STR_MATCH    = function(waf, collection, pattern) return _M.str_match(collection, pattern) end,
+}
 
 return _M

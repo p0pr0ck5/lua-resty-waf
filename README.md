@@ -57,6 +57,9 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [res_tid_header](#res_tid_header)
 	* [score_threshold](#score_threshold)
 	* [storage_backend](#storage_backend)
+	* [storage_keepalive](#storage_keepalive)
+	* [storage_keepalive_timeout](#storage_keepalive_timeout)
+	* [storage_keepalive_pool_size](#storage_keepalive_pool_size)
 	* [storage_memcached_host](#storage_memcached_host)
 	* [storage_memcached_port](#storage_memcached_port)
 	* [storage_redis_host](#storage_redis_host)
@@ -1003,6 +1006,54 @@ Define an engine to use for persistent variable storage. Current available optio
 	}
 ```
 
+###storage_keepalive
+
+*Default*: true
+
+Enable or disable TCP keepalive for connections to remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive", false)
+		';
+	}
+```
+
+###storage_keepalive_timeout
+
+*Default*: 10000
+
+Configure (in milliseconds) the timeout for the cosocket keepalive pool for remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive_timeout", 30000)
+		';
+	}
+```
+
+###storage_keepalive_pool_size
+
+*Default*: 100
+
+Configure the pool size for the cosocket keepalive pool for remote persistent storage hosts.
+
+*Example*:
+
+```lua
+	location / {
+		acccess_by_lua '
+			waf:set_option("storage_keepalive_pool_size", 50)
+		';
+	}
+```
+
 ###storage_memcached_host
 
 *Default*: 127.0.0.1
@@ -1090,7 +1141,7 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 
 Multiple shared zones can be defined and used, though only one zone can be defined per configuration location. If a zone becomes full and the shared dictionary interface cannot add additional keys, the following will be entered into the error log:
 
-`Could not add key to persistent storage, increase the size of the lua_shared_dict`
+`Error adding key to persistent storage, increase the size of the lua_shared_dict`
 
 ##Phase Handling
 

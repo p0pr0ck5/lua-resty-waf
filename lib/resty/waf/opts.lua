@@ -1,6 +1,9 @@
 local _M = {}
 
-_M.version = "0.8"
+local ngx_INFO = ngx.INFO
+local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
+
+_M.version = "0.8.1"
 
 _M.defaults = {
 	_add_ruleset                 = {},
@@ -8,11 +11,11 @@ _M.defaults = {
 	_allow_unknown_content_types = false,
 	_allowed_content_types       = {},
 	_debug                       = false,
-	_debug_log_level             = ngx.INFO,
-	_deny_status                 = ngx.HTTP_FORBIDDEN,
+	_debug_log_level             = ngx_INFO,
+	_deny_status                 = ngx_HTTP_FORBIDDEN,
 	_event_log_altered_only      = true,
 	_event_log_buffer_size       = 4096,
-	_event_log_level             = ngx.INFO,
+	_event_log_level             = ngx_INFO,
 	_event_log_ngx_vars          = {},
 	_event_log_periodic_flush    = nil,
 	_event_log_request_arguments = false,
@@ -40,6 +43,9 @@ _M.defaults = {
 	_res_tid_header              = false,
 	_score_threshold             = 5,
 	_storage_backend             = 'dict',
+	_storage_keepalive           = true,
+	_storage_keepalive_pool_size = 100,
+	_storage_keepalive_timeout   = 10000,
 	_storage_memcached_host      = '127.0.0.1',
 	_storage_memcached_port      = 11211,
 	_storage_redis_host          = '127.0.0.1',

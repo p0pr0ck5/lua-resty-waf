@@ -1,0 +1,67 @@
+{
+   "access" : [
+      {
+         "action" : "DENY",
+         "id" : 99001,
+         "logdata": "%{TX.anomaly_score}",
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER_EQ",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
+            }
+         ]
+      }
+   ],
+   "body_filter" : [
+      {
+         "id" : 99003,
+         "logdata": "%{TX.anomaly_score}",
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER_EQ",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
+            }
+         ]
+      }
+   ],
+   "header_filter" : [
+      {
+         "action" : "DENY",
+         "id" : 99002,
+         "logdata": "%{TX.anomaly_score}",
+         "msg" : "Request score greater than score threshold",
+         "operator" : "GREATER_EQ",
+         "opts" : {
+            "parsepattern" : true
+         },
+         "pattern" : "%{SCORE_THRESHOLD}",
+         "vars" : [
+            {
+               "parse" : {
+                  "specific" : "anomaly_score"
+               },
+               "storage" : 1,
+               "type" : "TX"
+            }
+         ]
+      }
+   ]
+}

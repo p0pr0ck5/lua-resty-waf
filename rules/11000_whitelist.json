@@ -1,0 +1,116 @@
+{
+   "access" : [
+      {
+         "action" : "CHAIN",
+         "id" : 11001,
+         "msg" : "Ignore passive requests with no arguments",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "^(?:GET|HEAD)$",
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "ACCEPT",
+         "id" : 11002,
+         "msg" : "Ignore passive requests with no arguments",
+         "op_negated" : 1,
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : ".*",
+         "vars" : [
+            {
+               "parse" : {
+                  "all" : 1
+               },
+               "type" : "REQUEST_ARGS"
+            }
+         ]
+      },
+      {
+         "id" : 11003,
+         "msg" : "Skip whitelisting of some extensions for non-passive requests",
+         "op_negated" : 1,
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "^(?:GET|HEAD)$",
+         "skip" : 4,
+         "vars" : [
+            {
+               "type" : "METHOD"
+            }
+         ]
+      },
+      {
+         "action" : "ACCEPT",
+         "id" : 11004,
+         "msg" : "Whitelisting extensions - images",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "\\.(?:(?:jpe?|pn)g|gif|ico)$",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "ACCEPT",
+         "id" : 11005,
+         "msg" : "Whitelisting extensions - documents",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "\\.(?:doc|pdf|txt|xls)$",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "ACCEPT",
+         "id" : 11006,
+         "msg" : "Whitelisting extensions - HTML",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "\\.(?:(?:cs|j)s|html?)$",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      },
+      {
+         "action" : "ACCEPT",
+         "id" : 11007,
+         "msg" : "Whitelisting extensions - media",
+         "operator" : "REGEX",
+         "opts" : {
+            "nolog" : true
+         },
+         "pattern" : "\\.(?:mp(?:e?g|(?:3|4))|avi|flv|swf|wma)$",
+         "vars" : [
+            {
+               "type" : "URI"
+            }
+         ]
+      }
+   ],
+   "body_filter" : {},
+   "header_filter" : {}
+}

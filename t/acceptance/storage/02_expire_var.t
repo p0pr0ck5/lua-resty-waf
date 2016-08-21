@@ -3,18 +3,6 @@ use Test::Nginx::Socket::Lua;
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks() + 3;
 
-add_response_body_check(sub {
-	my ($block, $body, $req_idx, $repeated_req_idx, $dry_run) = @_;
-
-	my $name = $block->name;
-
-	SKIP: {
-		skip "$name - resp_title - tests skipped due to $dry_run", 1 if $dry_run;
-
-		is($body, sprintf("%s\n%d\n", 'true', time + 10), "$name - expire time is set (req $repeated_req_idx)" );
-	}
-});
-
 no_shuffle();
 run_tests();
 
@@ -48,12 +36,15 @@ __DATA__
 
 		content_by_lua '
 			ngx.say(ngx.ctx["__altered"])
-			ngx.say(ngx.ctx["__expire_COUNT"])
+			ngx.say(ngx.ctx["__expire_COUNT"] == ngx.now() + 10)
 		';
 	}
 --- request
 GET /t
 --- error_code: 200
+--- response_body
+true
+true
 --- error_log
 Setting FOO:COUNT to 1
 Expiring FOO:COUNT in 10

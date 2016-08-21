@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local cjson       = require "cjson"
 local logger      = require "resty.waf.log"
@@ -25,9 +25,19 @@ function _M.initialize(waf, storage, col)
 		return
 	end
 
-	local ok, err = memcached:set_keepalive(10000, 100)
-	if (not ok) then
-		logger.log(waf, "Error setting memcached keepalive: " .. err)
+	if (waf._storage_keepalive) then
+		local timeout = waf._storage_keepalive_timeout
+		local size    = waf._storage_keepalive_pool_size
+
+		local ok, err = memcached:set_keepalive(timeout, size)
+		if (not ok) then
+			logger.warn(waf, "Error setting memcached keepalive: " .. err)
+		end
+	else
+		local ok, err = memcached:close()
+		if (not ok) then
+			logger.warn("Error closing memcached socket: " .. err)
+		end
 	end
 
 	local altered = false
@@ -43,7 +53,7 @@ function _M.initialize(waf, storage, col)
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
 				logger.log(waf, "checking " .. key)
-				if (data["__expire_" .. key] < ngx.time()) then
+				if (data["__expire_" .. key] < ngx.now()) then
 					logger.log(waf, "Removing expired key: " .. key)
 					data["__expire_" .. key] = nil
 					data[key] = nil
@@ -77,9 +87,19 @@ function _M.persist(waf, col, data)
 		logger.log(waf, "Error persisting storage data: " .. err)
 	end
 
-	local ok, err = memcached:set_keepalive(10000, 100)
-	if (not ok) then
-		logger.log(waf, "Error setting memcached keepalive: " .. err)
+	if (waf._storage_keepalive) then
+		local timeout = waf._storage_keepalive_timeout
+		local size    = waf._storage_keepalive_pool_size
+
+		local ok, err = memcached:set_keepalive(timeout, size)
+		if (not ok) then
+			logger.warn(waf, "Error setting memcached keepalive: " .. err)
+		end
+	else
+		local ok, err = memcached:close()
+		if (not ok) then
+			logger.warn("Error closing memcached socket: " .. err)
+		end
 	end
 end
 

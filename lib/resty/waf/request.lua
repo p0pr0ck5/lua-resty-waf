@@ -1,12 +1,15 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local cookiejar = require "resty.cookie"
 local upload	= require "resty.upload"
 
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
+
+local table_concat = table.concat
+local table_insert = table.insert
 
 function _M.parse_request_body(waf, request_headers)
 	local content_type_header = request_headers["content-type"]
@@ -39,7 +42,7 @@ function _M.parse_request_body(waf, request_headers)
 
 		local form, err = upload:new()
 		if not form then
-			ngx.log(ngx.ERR, "failed to parse multipart request: ", err)
+			logger.warn(waf, "failed to parse multipart request: ", err)
 			ngx.exit(400) -- may move this into a ruleset along with other strict checking
 		end
 
@@ -59,17 +62,17 @@ function _M.parse_request_body(waf, request_headers)
 
 			if (typ == "header") then
 				chunk = res[3] -- form:read() returns { key, value, line } here
-				ngx.req.append_body("\n" .. chunk)
+				ngx.req.append_body("\r\n" .. chunk)
 			elseif (typ == "body") then
 				chunk = res
 				if (lasttype == "header") then
-					ngx.req.append_body("\n\n")
+					ngx.req.append_body("\r\n\r\n")
 				end
 				ngx.req.append_body(chunk)
 			elseif (typ == "part_end") then
-				ngx.req.append_body("\n--" .. form.boundary)
+				ngx.req.append_body("\r\n--" .. form.boundary)
 			elseif (typ == "eof") then
-				ngx.req.append_body("--\n")
+				ngx.req.append_body("--\r\n")
 				break
 			end
 
@@ -126,7 +129,7 @@ function _M.request_uri()
 		request_line[3] = ngx.var.query_string
 	end
 
-	return table.concat(request_line, '')
+	return table_concat(request_line, '')
 end
 
 function _M.basename(waf, uri)
@@ -154,13 +157,12 @@ function _M.common_args(waf, collections)
 					t[k] = v
 				else
 					if (type(t[k]) == "table") then
-						table.insert(t[k], v)
+						table_insert(t[k], v)
 					else
 						local _v = t[k]
 						t[k] = { _v, v }
 					end
 				end
-				logger.log(waf, "t[" .. k .. "] contains " .. tostring(t[k]))
 			end
 		end
 	end

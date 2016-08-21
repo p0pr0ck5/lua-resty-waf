@@ -31,7 +31,7 @@ GET /t
 --- error_code: 200
 --- no_error_log
 [error]
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 
 === TEST 2: Inherit init options
 --- http_config
@@ -57,7 +57,7 @@ GET /t
 GET /t
 --- error_code: 200
 --- error_log
-[lua] log.lua:8: log()
+[lua] log.lua:12: log()
 --- no_error_log
 [error]
 

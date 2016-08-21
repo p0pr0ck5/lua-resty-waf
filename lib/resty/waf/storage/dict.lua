@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
@@ -27,7 +27,7 @@ function _M.initialize(waf, storage, col)
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
 				logger.log(waf, "checking " .. key)
-				if (data["__expire_" .. key] < ngx.time()) then
+				if (data["__expire_" .. key] < ngx.now()) then
 					logger.log(waf, "Removing expired key: " .. key)
 					data["__expire_" .. key] = nil
 					data[key] = nil
@@ -49,8 +49,14 @@ function _M.persist(waf, col, data)
 
 	local shm        = ngx.shared[waf._storage_zone]
 	local serialized = cjson.encode(data)
+
 	logger.log(waf, 'Persisting value: ' .. tostring(serialized))
-	shm:set(col, serialized)
+
+	local ok, err = shm:set(col, serialized)
+
+	if (not ok) then
+		logger.warn(waf, "Error adding key to persistent storage, increase the size of the lua_shared_dict " .. waf._storage_zone)
+	end
 end
 
 

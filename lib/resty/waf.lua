@@ -1,20 +1,37 @@
 local _M = {}
 
-_M.version = "0.8"
+_M.version = "0.8.1"
 
-local calc    = require "resty.waf.rule_calc"
-local logger  = require "resty.waf.log"
-local lookup  = require "resty.waf.lookup"
-local opts    = require "resty.waf..opts"
-local phase_t = require "resty.waf.phase"
-local random  = require "resty.waf.random"
-local storage = require "resty.waf.storage"
-local util    = require "resty.waf.util"
+local actions       = require "resty.waf.actions"
+local calc          = require "resty.waf.rule_calc"
+local collections_t = require "resty.waf.collections"
+local logger        = require "resty.waf.log"
+local operators     = require "resty.waf.operators"
+local options       = require "resty.waf.options"
+local opts          = require "resty.waf.opts"
+local phase_t       = require "resty.waf.phase"
+local random        = require "resty.waf.random"
+local storage       = require "resty.waf.storage"
+local transform_t   = require "resty.waf.transform"
+local util          = require "resty.waf.util"
+
+local table_sort   = table.sort
+local string_lower = string.lower
 
 local mt = { __index = _M }
 
--- default list of rulesets (global here to have offsets precomputed)
-local _global_rulesets = { 11000, 20000, 21000, 35000, 40000, 41000, 42000, 90000, 99000 }
+-- default list of rulesets
+local _global_rulesets = {
+	"11000_whitelist",
+	"20000_http_violation",
+	"21000_http_anomaly",
+	"35000_user_agent",
+	"40000_generic_attack",
+	"41000_sqli",
+	"42000_xss",
+	"90000_custom",
+	"99000_scoring"
+}
 
 -- ruleset table cache
 local _ruleset_defs = {}
@@ -39,7 +56,7 @@ local function _parse_collection(self, collection, parse)
 	-- get the next (first)(only) k/v pair in the parse table
 	local key, value = next(parse)
 
-	return lookup.parse_collection[key](self, collection, value)
+	return util.parse_collection[key](self, collection, value)
 end
 
 -- buffer a single log event into the per-request ctx table
@@ -169,7 +186,7 @@ local function _rule_action(self, action, ctx, collections)
 		return
 	end
 
-	if (util.table_has_key(action, lookup.alter_actions)) then
+	if (util.table_has_key(action, actions.alter_actions)) then
 		ctx.altered[ctx.phase] = true
 		_finalize(self, ctx)
 	end
@@ -177,7 +194,7 @@ local function _rule_action(self, action, ctx, collections)
 	if (self._hook_actions[action]) then
 		self._hook_actions[action](self, ctx)
 	else
-		lookup.actions[action](self, ctx)
+		actions.lookup[action](self, ctx)
 	end
 end
 
@@ -204,7 +221,7 @@ local function _do_transform(self, collection, transform)
 			end
 
 			logger.log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
-			return lookup.transform[transform](self, collection)
+			return transform_t.lookup[transform](self, collection)
 		end
 	end
 
@@ -222,7 +239,6 @@ local function _process_rule(self, rule, collections, ctx)
 	local offset
 
 	ctx.id = id
-	ctx.rule_score = opts.score
 
 	for k, v in ipairs(vars) do
 		local collection, var
@@ -230,8 +246,6 @@ local function _process_rule(self, rule, collections, ctx)
 
 		if (var.unconditional) then
 			collection = true
-		elseif (type(collections[var.type]) == "function") then
-			collection = collections[var.type](self)
 		else
 			local collection_key = var.collection_key
 
@@ -276,7 +290,7 @@ local function _process_rule(self, rule, collections, ctx)
 				match = true
 				value = 1
 			else
-				match, value = lookup.operators[operator](self, collection, pattern, ctx)
+				match, value = operators.lookup[operator](self, collection, pattern, ctx)
 			end
 
 			if (rule.op_negated) then
@@ -395,8 +409,8 @@ local function _merge_rulesets(self)
 	t = util.table_keys(t)
 
 	-- rulesets will be processed in numeric order
-	table.sort(t, function(a, b)
-		return string.lower(a) < string.lower(b)
+	table_sort(t, function(a, b)
+		return string_lower(a) < string_lower(b)
 	end)
 
 	self._active_rulesets = t
@@ -431,7 +445,6 @@ function _M.exec(self)
 	ctx.storage       = ctx.storage or {}
 	ctx.transform     = ctx.transform or {}
 	ctx.transform_key = ctx.transform_key or {}
-	ctx.score         = ctx.score or 0
 	ctx.t_header_set  = ctx.t_header_set or false
 	ctx.phase         = phase
 	ctx.match_n       = ctx.match_n or 0
@@ -448,7 +461,7 @@ function _M.exec(self)
 	end
 
 	-- populate the collections table
-	lookup.collections[phase](self, collections, ctx)
+	collections_t.lookup[phase](self, collections, ctx)
 
 	-- don't run through the rulesets if we're going to be here again
 	-- (e.g. multiple chunks are going through body_filter)
@@ -551,8 +564,8 @@ function _M.set_option(self, option, value, data)
 			_M.set_option(self, option, v, data)
 		end
 	else
-		if (lookup.set_option[option]) then
-			lookup.set_option[option](self, value, data)
+		if (options.lookup[option]) then
+			options.lookup[option](self, value, data)
 		else
 			local _option = "_" .. option
 			self[_option] = value
@@ -567,8 +580,8 @@ function _M.default_option(option, value, data)
 			_M.default_option(option, v, data)
 		end
 	else
-		if (lookup.set_option[option]) then
-			lookup.set_option[option](default_opts, value, data)
+		if (options.lookup[option]) then
+			options.lookup[option](default_opts, value, data)
 		else
 			local _option = "_" .. option
 			default_opts[_option] = value
@@ -650,7 +663,6 @@ function _M.write_log_events(self)
 		method    = ctx.collections["METHOD"],
 		uri       = ctx.collections["URI"],
 		alerts    = ctx.log_entries,
-		score     = ctx.score,
 		id        = self.transaction_id,
 	}
 
@@ -673,7 +685,7 @@ function _M.write_log_events(self)
 		end
 	end
 
-	lookup.write_log_events[self._event_log_target](self, entry)
+	logger.write_log_events[self._event_log_target](self, entry)
 end
 
 return _M

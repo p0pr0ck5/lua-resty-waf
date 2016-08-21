@@ -1,3 +1,24 @@
+v0.8.1                                                              Aug 21, 2016
+
+    * Feature: Configurable cosocket keepalive pools for remote persistent
+      storage hosts
+
+    * Translation: Refactor translation functions into separate library
+
+    * Translation: Add tests for translation functions
+
+    * Translation: Various bugfixes and cleanup improvements
+
+    * Feature: Regular expression-enabled collection parsers
+
+    * Distribution: Hoist lookup tables to their respective modules
+
+    * Improvement: Localize some core library calls
+
+    * Maintenance: Replace SCORE mechanism with ephemeral variable tracking
+
+    * Distribution: Update third-party resty.cookie library
+
 v0.8                                                               July 14, 2016
 
     * Distribution: Added rockspec (luarocks.org/modules/p0pr0ck5/lua-resty-waf)
