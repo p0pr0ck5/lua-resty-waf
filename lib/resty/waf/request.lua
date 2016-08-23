@@ -147,7 +147,7 @@ end
 -- return a single table from multiple tables containing request data
 -- note that collections that are not a table (e.g. REQUEST_BODY with
 -- a non application/x-www-form-urlencoded content type) are ignored
-function _M.common_args(waf, collections)
+function _M.common_args(collections)
 	local t = {}
 
 	for _, collection in pairs(collections) do

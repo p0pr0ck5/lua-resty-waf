@@ -18,7 +18,7 @@ _M.lookup = {
 		local request_basename    = request.basename(waf, ngx.var.uri)
 		local request_body        = request.parse_request_body(waf, request_headers)
 		local request_cookies     = request.cookies() or {}
-		local request_common_args = request.common_args(waf, { request_uri_args, request_body, request_cookies })
+		local request_common_args = request.common_args({ request_uri_args, request_body, request_cookies })
 
 		collections.REMOTE_ADDR       = ngx.var.remote_addr
 		collections.HTTP_VERSION      = ngx.req.http_version()
