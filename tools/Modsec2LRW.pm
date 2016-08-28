@@ -170,14 +170,13 @@ sub valid_line {
 }
 
 sub clean_input {
-	my ($fh) = @_;
+	my (@input) = @_;
 
 	my (@lines, @line_buf);
 
-	while (my $line = <$fh>) {
-		chomp $line;
-
+	for my $line (@input) {
 		# ignore comments and blank lines
+		next if ! $line;
 		next if $line =~ m/^\s*$/;
 		next if $line =~ m/^\s*#/;
 
