@@ -6,10 +6,10 @@ notifications:
   irc: "chat.freenode.net#lua-resty-waf"
   webhooks: https://www.cryptobells.com/endpoint
 env:
-    - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=unit
-    - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=acceptance
-    - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=regression
-    - V_OPENRESTY=1.9.15.1 DATE=20160714 TEST=translate
+    - V_OPENRESTY=1.11.2.1 DATE=20160902 TEST=unit
+    - V_OPENRESTY=1.11.2.1 DATE=20160902 TEST=acceptance
+    - V_OPENRESTY=1.11.2.1 DATE=20160902 TEST=regression
+    - V_OPENRESTY=1.11.2.1 DATE=20160902 TEST=translate
 services:
     - memcached
     - redis
