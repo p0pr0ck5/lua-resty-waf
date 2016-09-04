@@ -208,6 +208,42 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'capture',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{},
+	'translate capture (no warning)'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'chain',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{},
+	'translate chain (no warning)'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'expirevar',
 				value  => 'foo.bar=60',
 			}

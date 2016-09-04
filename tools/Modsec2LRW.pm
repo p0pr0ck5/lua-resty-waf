@@ -706,9 +706,18 @@ sub translate_operator {
 sub translate_actions {
 	my ($rule, $translation, $silent) = @_;
 
+	my @silent_actions = qw(
+		capture
+		chain
+	);
+
 	for my $action (@{$rule->{actions}}) {
 		my $key   = $action->{action};
 		my $value = $action->{value};
+
+		# these values have no direct translation,
+		# but we don't need to warn about them
+		next if grep { $_ eq $key } @silent_actions;
 
 		# easier to do this than a lookup table
 		if (grep { $_ eq $key } qw(allow block deny pass)) {
