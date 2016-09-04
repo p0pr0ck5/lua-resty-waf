@@ -711,6 +711,25 @@ sub translate_actions {
 		chain
 	);
 
+	my @disruptive_actions = qw(
+		allow
+		block
+		deny
+		pass
+	);
+
+	my @direct_translation_actions = qw(
+		accuracy
+		id
+		maturity
+		msg
+		phase
+		rev
+		severity
+		skip
+		ver
+	);
+
 	for my $action (@{$rule->{actions}}) {
 		my $key   = $action->{action};
 		my $value = $action->{value};
@@ -720,9 +739,9 @@ sub translate_actions {
 		next if grep { $_ eq $key } @silent_actions;
 
 		# easier to do this than a lookup table
-		if (grep { $_ eq $key } qw(allow block deny pass)) {
+		if (grep { $_ eq $key } @disruptive_actions) {
 			$translation->{action} = uc $action_lookup->{$key};
-		} elsif (grep { $_ eq $key } qw(accuracy maturity rev severity ver)) {
+		} elsif (grep { $_ eq $key } @direct_translation_actions) {
 			$translation->{$key} = $value;
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
@@ -733,24 +752,16 @@ sub translate_actions {
 
 			push @{$translation->{opts}->{expirevar}},
 				{ col => $collection, key => $element, time => $time };
-		} elsif ($key eq 'id') {
-			$translation->{id} = $value;
 		} elsif ($key eq 'initcol') {
 			my ($col, $val) = split /=/, $value;
 
 			$translation->{opts}->{initcol}->{uc $col} = $val;
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
-		} elsif ($key eq 'msg') {
-			$translation->{msg} = $value;
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
 			delete $translation->{opts}->{nolog} if defined $translation->{opts};
-		} elsif ($key eq 'phase') {
-			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
-		} elsif ($key eq 'skip') {
-			$translation->{skip} = $value;
 		} elsif ($key eq 'skipAfter') {
 			$translation->{skip_after} = $value;
 		} elsif ($key eq 'setvar') {
