@@ -1,7 +1,9 @@
 {
    "access" : [
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20001,
          "msg" : "GET/HEAD request with a body",
          "operator" : "REGEX",
@@ -16,21 +18,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 20002,
          "msg" : "GET/HEAD request with a body",
          "op_negated" : 1,
          "operator" : "EQUALS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "0",
          "vars" : [
             {
@@ -42,7 +47,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20003,
          "msg" : "POST request does not have a Content-Length Header",
          "operator" : "EQUALS",
@@ -57,21 +64,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 20004,
          "msg" : "POST request does not have a Content-Length Header",
          "op_negated" : 1,
          "operator" : "CONTAINS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "content-length",
          "vars" : [
             {
@@ -83,19 +93,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 20005,
          "msg" : "Identity should not be used in Content-Encoding, only in Accept-Encoding",
          "operator" : "EQUALS",
          "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ],
             "transform" : "lowercase"
          },
          "pattern" : "identity",
@@ -109,7 +124,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20006,
          "msg" : "Expect header sent in non-HTTP/1.1 request",
          "operator" : "REGEX",
@@ -127,21 +144,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 20007,
          "msg" : "Expect header sent in non-HTTP/1.1 request",
          "op_negated" : 1,
          "operator" : "EQUALS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : 1.1,
          "vars" : [
             {
@@ -150,7 +170,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20008,
          "operator" : "CONTAINS",
          "opts" : {
@@ -167,7 +189,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20009,
          "operator" : "EQUALS",
          "opts" : {
@@ -185,7 +209,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 20010,
          "op_negated" : 1,
          "operator" : "CONTAINS",
@@ -203,21 +229,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 20011,
          "msg" : "HTTP/1.1 request sent with a Pragma:no-cache header, but no corresponding Cache-Control header",
          "op_negated" : 1,
          "operator" : "EQUALS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "1.1",
          "vars" : [
             {
@@ -226,20 +255,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 20012,
-         "msg" : "Request sent with abnormal Range header",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 20012,
+         "msg" : "Request sent with abnormal Range header",
+         "operator" : "REGEX",
          "pattern" : "^bytes=0-",
          "vars" : [
             {
@@ -251,20 +283,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 20013,
-         "msg" : "Excessive number of byte range fields within one request",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 20013,
+         "msg" : "Excessive number of byte range fields within one request",
+         "operator" : "REGEX",
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
@@ -276,20 +311,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 20014,
-         "msg" : "Excessive number of byte range fields within one request",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 20014,
+         "msg" : "Excessive number of byte range fields within one request",
+         "operator" : "REGEX",
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
@@ -301,20 +339,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 20015,
-         "msg" : "Duplicate/broken connection header",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 20015,
+         "msg" : "Duplicate/broken connection header",
+         "operator" : "REGEX",
          "pattern" : "\\b(keep-alive|close),\\s?(keep-alive|close)\\b",
          "vars" : [
             {

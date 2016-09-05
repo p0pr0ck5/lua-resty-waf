@@ -46,7 +46,9 @@ is_deeply(
 	\@out,
 	[
 		{
-			action    => 'DENY',
+			actions   => {
+				disrupt => 'DENY'
+			},
 			id        => 12345,
 			phase     => 'access',
 			operator  => '@rx',
@@ -74,7 +76,9 @@ is_deeply(
 	\@out,
 	[
 		{
-			action    => 'DENY',
+			actions   => {
+				disrupt => 'DENY'
+			},
 			id        => 12345,
 			phase     => 'access',
 			vars      => [
@@ -99,11 +103,13 @@ is_deeply(
 	\@out,
 	[
 		{
-			action     => 'DENY',
+			actions   => {
+				disrupt => 'DENY'
+			},
 			id         => 'mark',
 			op_negated => 1,
 			vars       => [
-				{ 
+				{
 					unconditional => 1,
 				},
 			],
@@ -142,7 +148,9 @@ is_deeply(
 	\@out,
 	[
 		{
-			action    => 'CHAIN',
+			actions   => {
+				disrupt => 'CHAIN'
+			},
 			id        => 12345,
 			phase     => 'access',
 			operator  => '@rx',
@@ -151,7 +159,9 @@ is_deeply(
 			],
 		},
 		{
-			action    => 'DENY',
+			actions   => {
+				disrupt => 'DENY'
+			},
 			id        => 12345,
 			phase     => 'access',
 			operator  => '@rx',
@@ -194,7 +204,9 @@ is_deeply(
 	\@out,
 	[
 		{
-			action    => 'CHAIN',
+			actions   => {
+				disrupt => 'CHAIN'
+			},
 			id        => 12345,
 			phase     => 'access',
 			operator  => '@rx',
@@ -203,7 +215,9 @@ is_deeply(
 			],
 		},
 		{
-			action    => 'DENY',
+			actions   => {
+				disrupt => 'DENY'
+			},
 			id        => 12345,
 			phase     => 'access',
 			operator  => '@rx',

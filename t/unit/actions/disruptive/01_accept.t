@@ -8,13 +8,13 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: DENY exits the phase with waf._deny_status
+=== TEST 1: ACCEPT exits the phase with ngx.OK
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE", _deny_status = 403 }, {})
+			actions.disruptive_lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should not see this")
 		';
@@ -23,20 +23,20 @@ __DATA__
 	}
 --- request
 GET /t
---- error_code: 403
+--- error_code: 200
 --- error_log
-Rule action was DENY, so telling nginx to quit
+Rule action was ACCEPT, so ending this phase with ngx.OK
 --- no_error_log
 [error]
 We should not see this
 
-=== TEST 2: DENY does not exit the phase when mode is not ACTIVE
+=== TEST 2: ACCEPT does not exit the phase when mode is not ACTIVE
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE", _deny_status = 403 }, {})
+			actions.disruptive_lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';
@@ -47,7 +47,7 @@ We should not see this
 GET /t
 --- error_code: 200
 --- error_log
-Rule action was DENY, so telling nginx to quit
+Rule action was ACCEPT, so ending this phase with ngx.OK
 We should see this
 --- no_error_log
 [error]

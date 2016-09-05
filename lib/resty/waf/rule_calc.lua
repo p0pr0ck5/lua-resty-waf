@@ -44,7 +44,7 @@ local function _write_chain_offsets(chain, max, cur_offset)
 
 		if (offset + cur_offset >= max) then
 			rule.offset_nomatch = nil
-			if (rule.action == "CHAIN") then
+			if (rule.actions.disrupt == "CHAIN") then
 				rule.offset_match = 1
 			else
 				rule.offset_match = nil
@@ -87,7 +87,7 @@ function _M.calculate(ruleset)
 			var.collection_key = _build_collection_key(var, rule.opts.transform)
 		end
 
-		if (rule.action ~= "CHAIN") then
+		if (rule.actions.disrupt ~= "CHAIN") then
 			_write_chain_offsets(chain, max, i - #chain)
 
 			if (rule.skip) then

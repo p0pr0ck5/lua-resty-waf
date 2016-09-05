@@ -255,14 +255,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
 					col  => 'foo',
 					key  => 'bar',
 					time => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with integer expire time'
@@ -284,14 +286,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
 					col  => 'foo',
 					key  => 'bar',
 					time => .2,
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with decimal expire time'
@@ -313,14 +317,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
 					col  => 'foo',
 					key  => 'bar',
 					time => 'baz-mocked',
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with non-numeric expire time'
@@ -363,8 +369,17 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			initcol => { IP => '%{REMOTE_ADDR}' }
+		actions => {
+			nondisrupt => [
+				{
+					action => 'initcol',
+					data   =>
+					{
+						col   => 'IP',
+						value => '%{REMOTE_ADDR}'
+					}
+				}
+			]
 		}
 	},
 	'translate initcol'
@@ -611,14 +626,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
 					value => 'bar',
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with string value'
@@ -640,14 +657,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
 					value => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with integer value'
@@ -669,15 +688,17 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
 					value => 60,
 					inc   => 1,
 				}
-			]
+			} ]
 		}
 	},
 	'increment setvar with integer value'
@@ -699,14 +720,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
 					value => '.2',
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with decimal (string) value'
@@ -728,15 +751,17 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
-					value => 0.2,
+					value => '0.2',
 					inc   => 1,
 				}
-			]
+			} ]
 		}
 	},
 	'increment setvar with decimal value'
@@ -758,14 +783,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo.bar',
 					value => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with key having a dot'
@@ -787,16 +814,18 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			deletevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'deletevar',
+				data   =>
 				{
 					col   => 'IP',
 					key   => 'foo',
 				}
-			]
+			} ]
 		}
 	},
-	'translate setvar with integer value'
+	'translate setvar into deletevar'
 );
 
 $translation = {};

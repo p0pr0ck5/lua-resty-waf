@@ -46,7 +46,7 @@ _M.lookup = {
 		waf._nameservers[#waf._nameservers + 1] = value
 	end,
 	hook_action = function(waf, value, hook)
-		if (not util.table_has_key(value, actions.lookup)) then
+		if (not util.table_has_key(value, actions.disruptive_lookup)) then
 			logger.fatal_fail(value .. " is not a valid action to override")
 		end
 

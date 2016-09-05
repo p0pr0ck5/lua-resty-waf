@@ -8,13 +8,13 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: IGNORE logs and does not exit
+=== TEST 1: SCORE logs and does not exit
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["IGNORE"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
+			actions.disruptive_lookup["SCORE"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';
@@ -25,7 +25,7 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log
-Ignoring rule for now
+Score isn't a thing anymore, see TX.anomaly_score
 We should see this
 --- no_error_log
 [error]

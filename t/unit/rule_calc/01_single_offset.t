@@ -14,9 +14,9 @@ __DATA__
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -40,9 +40,9 @@ GET /t
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -66,9 +66,9 @@ GET /t
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)

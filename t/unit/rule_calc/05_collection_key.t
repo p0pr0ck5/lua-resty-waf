@@ -14,7 +14,7 @@ __DATA__
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -36,7 +36,7 @@ FOO|nil|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -58,7 +58,7 @@ FOO|keys|1|nil|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -80,7 +80,7 @@ FOO|specific|bar|nil|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = "bar" }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = "bar" }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -102,7 +102,7 @@ FOO|bar|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = { "bar", "bat" } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = { "bar", "bat" } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -124,7 +124,7 @@ FOO|bar,bat|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", length = 1 } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", length = 1 } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)

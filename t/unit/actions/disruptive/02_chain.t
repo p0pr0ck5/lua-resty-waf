@@ -14,7 +14,7 @@ __DATA__
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["CHAIN"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
+			actions.disruptive_lookup["CHAIN"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';

@@ -575,6 +575,8 @@ sub translate_chain {
 			$translation->{action} = 'CHAIN';
 		}
 
+		$translation->{actions}->{disrupt} = delete $translation->{action};
+
 		push @lua_resty_waf_chain, $translation;
 	}
 
@@ -750,12 +752,26 @@ sub translate_actions {
 			# dont cast as an int if this is a macro
 			$time = $time =~ m/^\d*(?:\.\d+)?$/ ? $time + 0 : translate_macro($time);
 
-			push @{$translation->{opts}->{expirevar}},
-				{ col => $collection, key => $element, time => $time };
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'expirevar',
+					data   => {
+						col  => $collection,
+						key  => $element,
+						time => $time,
+					}
+				};
 		} elsif ($key eq 'initcol') {
 			my ($col, $val) = split /=/, $value;
 
-			$translation->{opts}->{initcol}->{uc $col} = $val;
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'initcol',
+					data   => {
+						col   => uc $col,
+						value => $val,
+					}
+				};
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
@@ -775,8 +791,13 @@ sub translate_actions {
 				if ($var =~ m/^\!/) {
 					substr $collection, 0, 1, '';
 
-					my $deletevar = { col => $collection, key => $element };
-					push @{$translation->{opts}->{deletevar}}, $deletevar;
+					push @{$translation->{actions}->{nondisrupt}}, {
+						action => 'deletevar',
+						data   => {
+							col => $collection,
+							key => $element,
+						}
+					};
 				} else {
 					warn "No assignment in setvar, but not a delete?\n";
 				}
@@ -793,7 +814,11 @@ sub translate_actions {
 
 			$setvar->{value}  = $val;
 
-			push @{$translation->{opts}->{setvar}}, $setvar;
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'setvar',
+					data   => $setvar
+				};
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
