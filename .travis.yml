@@ -10,10 +10,10 @@ env:
     - V_OPENRESTY=1.11.2.1
     - DATE=20160902
   matrix:
-    - test=unit
-    - test=acceptance
-    - test=regression
-    - test=translate
+    - TEST=unit
+    - TEST=acceptance
+    - TEST=regression
+    - TEST=translate
 services:
     - memcached
     - redis
