@@ -12,6 +12,13 @@ __DATA__
 --- http_config
 	lua_shared_dict storage 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 	';
 --- config
@@ -32,6 +39,13 @@ GET /t
 === TEST 2: Set invalid storage zone
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 	';
 --- config

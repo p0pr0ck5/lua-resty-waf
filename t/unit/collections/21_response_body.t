@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: RESPONSE_BODY collections variable (valid type, one chunk)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -54,6 +63,15 @@ Hello, world!
 [error]
 
 === TEST 2: RESPONSE_BODY collections variable (valid type, multiple chunks)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -106,6 +124,15 @@ world!
 [error]
 
 === TEST 3: RESPONSE_BODY collections variable (invalid type, one chunk)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -153,6 +180,15 @@ Hello, world!
 [error]
 
 === TEST 4: RESPONSE_BODY collections variable type (valid type, one chunk)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Specific (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -27,6 +36,15 @@ bar
 [error]
 
 === TEST 2: Specific (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -48,6 +66,15 @@ bat
 [error]
 
 === TEST 3: Ignore (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -68,6 +95,15 @@ qux
 [error]
 
 === TEST 4: Ignore (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -88,6 +124,15 @@ qux
 [error]
 
 === TEST 5: Keys (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -109,6 +154,15 @@ baz
 [error]
 
 === TEST 6: Keys (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -130,6 +184,15 @@ baz
 [error]
 
 === TEST 7: Values (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -151,6 +214,15 @@ qux
 [error]
 
 === TEST 8: Values (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -173,6 +245,15 @@ qux
 [error]
 
 === TEST 9: All (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -196,6 +277,15 @@ qux
 [error]
 
 === TEST 10: All (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -220,6 +310,15 @@ qux
 [error]
 
 === TEST 11: Regex (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -238,6 +337,15 @@ bar
 [error]
 
 === TEST 12: Regex (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -259,6 +367,15 @@ bat
 [error]
 
 === TEST 13: Ignore regex (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -277,6 +394,15 @@ bar
 [error]
 
 === TEST 14: Ignore regex (table) (1/2)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -298,6 +424,15 @@ bat
 [error]
 
 === TEST 14: Ignore regex (table) (2/2)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

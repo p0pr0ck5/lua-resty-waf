@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Default threshold doesn't deny benign request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -31,6 +40,15 @@ GET /t?foo=bar
 [error]
 
 === TEST 2: Lowered threshold denies dummy request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -54,6 +72,15 @@ GET /t?foo=bar
 [error]
 
 === TEST 3: Default threshold denies suspicious request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -75,6 +102,15 @@ GET /t?foo=bar
 [error]
 
 === TEST 4: Raised threshold does not deny suspicious request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

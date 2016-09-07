@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: load module
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         access_by_lua '
@@ -24,6 +33,15 @@ __DATA__
 [error]
 
 === TEST 2: new instance
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         access_by_lua '
@@ -40,6 +58,15 @@ __DATA__
 [error]
 
 === TEST 3:do not load invalid module
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         access_by_lua '

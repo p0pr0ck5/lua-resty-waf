@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Delete all backslashes
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -29,6 +38,15 @@ hello world
 [error]
 
 === TEST 2: Delete all double quotes
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -49,6 +67,15 @@ hello world
 [error]
 
 === TEST 3: Delete all single quotes
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -69,6 +96,15 @@ hello world
 [error]
 
 === TEST 4: Delete all carets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -89,6 +125,15 @@ hello world
 [error]
 
 === TEST 5: All characters that should be deleted
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -109,6 +154,15 @@ hello world
 [error]
 
 === TEST 6: Delete spaces before a slash
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -129,6 +183,15 @@ hello/wo/rld
 [error]
 
 === TEST 7: Delete spaces before an open parenthesis
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -149,6 +212,15 @@ hello(wo(rld
 [error]
 
 === TEST 8: Replace all commas with a space
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -169,6 +241,15 @@ hello world
 [error]
 
 === TEST 9: Replace all semicolons with a space
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -189,6 +270,15 @@ hello world
 [error]
 
 === TEST 10: Replace all commas and semicolons with a space
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -209,6 +299,15 @@ hello wo rld
 [error]
 
 === TEST 11: Compress whitespace
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -229,6 +328,15 @@ how are you doing
 [error]
 
 === TEST 12: Lowercase
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -249,6 +357,15 @@ hello world
 [error]
 
 === TEST 13: Everything
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

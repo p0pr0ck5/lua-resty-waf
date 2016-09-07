@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: No override, default DENY behavior
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -40,6 +49,15 @@ Rule action was DENY, so telling nginx to quit
 [error]
 
 === TEST 2: Override DENY action
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -78,6 +96,15 @@ Override DENY action
 Rule action was DENY, so telling nginx to quit
 
 === TEST 3: Override DENY action for valid request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -115,6 +142,15 @@ Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 4: Override invalid action
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -153,6 +189,15 @@ Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 5: No override, default ACCEPT behavior
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -184,6 +229,15 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 [error]
 
 === TEST 6: Override ACCEPT and DENY action for valid request
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -228,6 +282,15 @@ Rule action was DENY, so telling nginx to quit
 Override DENY action
 
 === TEST 7: Check waf object in hook
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -268,6 +331,15 @@ Override DENY action
 Rule action was DENY, so telling nginx to quit
 
 === TEST 8: Action hooks run in SIMULATE mode
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -308,6 +380,15 @@ Override DENY action
 Rule action was DENY, so telling nginx to quit
 
 === TEST 9: Non-function passed as hook
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Local set_option overrides implicit default
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
@@ -38,6 +45,13 @@ GET /t
 === TEST 2: Local set_option overrides explicit default_option
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
@@ -65,6 +79,13 @@ GET /t
 === TEST 3: Override of implicit default only affects defined scope
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
@@ -103,6 +124,13 @@ GET /t
 === TEST 4: Override of implicit default only affects defined scope (part 2)
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
@@ -140,6 +168,13 @@ GET /s
 === TEST 5: Override of explicit default only affects defined scope
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
@@ -178,6 +213,13 @@ GET /t
 === TEST 6: Override of explicit default only affects defined scope (part 2)
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
@@ -217,6 +259,13 @@ GET /s
 === TEST 7: Append to a table value option
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)

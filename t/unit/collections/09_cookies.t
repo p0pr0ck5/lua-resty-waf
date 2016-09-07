@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: COOKIES collections variable (single element)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -36,6 +45,15 @@ bar
 
 === TEST 2: COOKIES collections variable (multiple elements)
 # n.b. resty.cookie will only override a cookie sent multiple times
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -62,6 +80,15 @@ baz
 [error]
 
 === TEST 3: COOKIES collections variable (non-existent element)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -86,6 +113,15 @@ nil
 [error]
 
 === TEST 4: COOKIES collections variable (type verification)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

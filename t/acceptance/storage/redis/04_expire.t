@@ -12,6 +12,13 @@ __DATA__
 === TEST 1: Initialize empty, persist and re-initialize a collection
 --- http_config
     init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
         local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "redis")
         lua_resty_waf.default_option("debug", true)
@@ -91,6 +98,13 @@ Not persisting a collection that wasn't altered
 === TEST 2: Initialize empty, set with future expiry, persist, delay, and re-initialize a collection
 --- http_config
     init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
         local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "redis")
         lua_resty_waf.default_option("debug", true)
@@ -175,6 +189,13 @@ Not persisting a collection that wasn't altered
 === TEST 3: Initialize empty, set with expiry, persist, delay, re-initialize, and re-persist
 --- http_config
     init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
         local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "redis")
         lua_resty_waf.default_option("debug", true)
@@ -258,6 +279,13 @@ Not persisting a collection that wasn't altered
 === TEST 4: Initialize empty, set some with expiry, persist, delay, re-initialize, and re-persist
 --- http_config
     init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
         local lua_resty_waf = require "resty.waf"
         lua_resty_waf.default_option("storage_backend", "redis")
         lua_resty_waf.default_option("debug", true)

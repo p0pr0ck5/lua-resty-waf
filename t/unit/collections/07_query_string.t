@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: QUERY_STRING collections variable (empty)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -33,6 +42,15 @@ nil
 [error]
 
 === TEST 2: QUERY_STRING collections variable (single pair)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -57,6 +75,15 @@ foo=bar
 [error]
 
 === TEST 3: QUERY_STRING collections variable (complex)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -81,6 +108,15 @@ foo=bar&foo=bat&frob&qux=
 [error]
 
 === TEST 4: QUERY_STRING collections variable (type verification, empty)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -105,6 +141,15 @@ nil
 [error]
 
 === TEST 5: QUERY_STRING collections variable (type verification)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

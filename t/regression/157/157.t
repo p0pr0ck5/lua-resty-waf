@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Bail of out request due to if
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		if ($uri ~ t) {
@@ -42,6 +51,15 @@ Not attempting to write log as lua-resty-waf was never exec'd
 nil was given to table_keys
 
 === TEST 2: Do not bail of out request due to if
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		if ($uri ~ s) {

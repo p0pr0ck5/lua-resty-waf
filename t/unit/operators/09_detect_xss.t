@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Match (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -26,6 +35,15 @@ true
 [error]
 
 === TEST 2: Match (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -43,6 +61,15 @@ true
 [error]
 
 === TEST 3: No match (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -60,6 +87,15 @@ false
 [error]
 
 === TEST 4: No match (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -77,6 +113,15 @@ false
 [error]
 
 === TEST 5: Return types
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '

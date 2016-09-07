@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: No parse, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -31,6 +40,15 @@ FOO|nil|nil
 [error]
 
 === TEST 2: Truthy key, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -53,6 +71,15 @@ FOO|keys|1|nil|nil
 [error]
 
 === TEST 3: String key, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -75,6 +102,15 @@ FOO|specific|bar|nil|nil
 [error]
 
 === TEST 4: No parse, single transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -97,6 +133,15 @@ FOO|bar|nil
 [error]
 
 === TEST 5: No parse, multiple transforms, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -119,6 +164,15 @@ FOO|bar,bat|nil
 [error]
 
 === TEST 6: No parse, no transform, length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

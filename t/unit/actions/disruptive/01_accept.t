@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: ACCEPT exits the phase with ngx.OK
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -31,6 +40,15 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 We should not see this
 
 === TEST 2: ACCEPT does not exit the phase when mode is not ACTIVE
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

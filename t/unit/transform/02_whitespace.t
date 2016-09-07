@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: compress_whitespace
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -27,6 +36,15 @@ how are you doing?
 [error]
 
 === TEST 2: remove_whitespace
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

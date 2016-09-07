@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: expirevar calls storage.expire_var
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

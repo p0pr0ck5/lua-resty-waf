@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: DENY exits the phase with ngx.HTTP_FORBIDDEN
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -35,6 +44,15 @@ Rule action was DENY, so telling nginx to quit
 We should not see this
 
 === TEST 2: DENY does not exit the phase when mode is not ACTIVE
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

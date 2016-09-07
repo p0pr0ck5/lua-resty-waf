@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: PROTOCOL collections variable
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -33,6 +42,15 @@ HTTP/1.1
 [error]
 
 === TEST 2: PROTOCOL collections variable (HTTP/1.0)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -57,6 +75,15 @@ HTTP/1.0
 [error]
 
 === TEST 3: PROTOCOL collections variable (type verification)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

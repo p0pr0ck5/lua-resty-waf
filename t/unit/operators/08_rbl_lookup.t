@@ -12,6 +12,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Match (dummy record)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -46,6 +55,15 @@ true
 [warn]
 
 === TEST 2: No match (dummy record)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -79,6 +97,15 @@ nil
 [warn]
 
 === TEST 3: No match (bail on no nameservers)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -105,6 +132,15 @@ nil
 [warn]
 
 === TEST 4: No match (invalid IP)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '

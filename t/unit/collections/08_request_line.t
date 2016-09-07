@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: REQUEST_LINE collections variable (simple)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -33,6 +42,15 @@ GET /t HTTP/1.1
 [error]
 
 === TEST 2: REQUEST_LINE collections variable (single pair)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -57,6 +75,15 @@ GET /t?foo=bar HTTP/1.1
 [error]
 
 === TEST 3: REQUEST_LINE collections variable (complex)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -81,6 +108,15 @@ GET /t?foo=bar&foo=bat&frob&qux= HTTP/1.1
 [error]
 
 === TEST 4: REQUEST_LINE collections variable (type verification)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

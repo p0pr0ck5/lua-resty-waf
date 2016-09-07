@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: No User-Agent sent
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -41,6 +50,15 @@ Accept: */*
 "id":35003
 
 === TEST 2: Valid User-Agent sent
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -74,6 +92,15 @@ Accept: */*
 "id":35003
 
 === TEST 3: Known automated scanner
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -108,6 +135,15 @@ Accept: */*
 "id":35003
 
 === TEST 4: Known malicious User-Agent
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '

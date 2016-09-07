@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Handle a fatal failure
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 1})
+			jit.off()
+		end
+
 		logger = require "resty.waf.log"
 	';
 --- config
@@ -28,6 +35,13 @@ GET /t
 === TEST 2: Handle a fatal failure with warn error log level
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 1})
+			jit.off()
+		end
+
 		logger = require "resty.waf.log"
 	';
 --- config

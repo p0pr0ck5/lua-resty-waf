@@ -8,6 +8,14 @@ my $pwd = cwd();
 
 our $HttpConfig = qq{
 	lua_package_path "$pwd/t/?.lua;;";
+	init_by_lua_block {
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+	}
 };
 
 no_shuffle();

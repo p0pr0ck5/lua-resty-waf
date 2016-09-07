@@ -12,6 +12,13 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
@@ -49,6 +56,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
@@ -82,6 +96,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
@@ -120,6 +141,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
@@ -161,6 +189,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)

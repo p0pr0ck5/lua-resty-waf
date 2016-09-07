@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: base64_decode
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -27,6 +36,15 @@ hello world
 [error]
 
 === TEST 2: base64_encode
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

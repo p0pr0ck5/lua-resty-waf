@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Ruleset starter offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -37,6 +46,15 @@ GET /t
 [error]
 
 === TEST 2: Skip 1 offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -65,6 +83,15 @@ GET /t
 [error]
 
 === TEST 3: Skip 2 offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -93,6 +120,15 @@ GET /t
 [error]
 
 === TEST 3: Skip offsets to end of ruleset
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -121,6 +157,15 @@ nil
 [error]
 
 === TEST 4: Skipping chain starter
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -151,6 +196,15 @@ GET /t
 [error]
 
 === TEST 5: Skipping chain middle
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -181,6 +235,15 @@ GET /t
 [error]
 
 === TEST 6: Skipping chain end
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

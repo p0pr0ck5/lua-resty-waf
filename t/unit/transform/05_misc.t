@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: html_decode
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -27,6 +36,15 @@ GET /t
 [error]
 
 === TEST 2: uri_decode
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -45,6 +63,15 @@ GET /t
 [error]
 
 === TEST 3: normalise_path (duplicate slashes)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -63,6 +90,15 @@ GET /t
 [error]
 
 === TEST 4: normalise_path (self reference)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -81,6 +117,15 @@ GET /t
 [error]
 
 === TEST 5: normalise_path (back reference)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -99,6 +144,15 @@ GET /t
 [error]
 
 === TEST 6: normalise_path (mulitple normalizations)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

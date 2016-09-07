@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: lowercase
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -27,6 +36,15 @@ hello world
 [error]
 
 === TEST 2: string length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -45,6 +63,15 @@ GET /t
 [error]
 
 === TEST 3: string length (number)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -63,6 +90,15 @@ GET /t
 [error]
 
 === TEST 4: string length (boolean)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 1})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

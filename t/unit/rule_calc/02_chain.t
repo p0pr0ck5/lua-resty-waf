@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Ruleset starter offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -37,6 +46,15 @@ GET /t
 [error]
 
 === TEST 2: Chain starter offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -65,6 +83,15 @@ GET /t
 [error]
 
 === TEST 3: Chain middle offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -93,6 +120,15 @@ GET /t
 [error]
 
 === TEST 4: Chain end offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -121,6 +157,15 @@ GET /t
 [error]
 
 === TEST 5: Chain starter offsets with chain as ruleset end
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -148,6 +193,15 @@ nil
 [error]
 
 === TEST 6: Chain middle offsets with chain as ruleset end
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
@@ -175,6 +229,15 @@ nil
 [error]
 
 === TEST 7: Chain end offsets with chain as ruleset end
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '

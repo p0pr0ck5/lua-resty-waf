@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Merge done in init
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
@@ -36,6 +43,13 @@ false
 === TEST 2: One-time global merge
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.default_option("ignore_ruleset", "42000_xss")
@@ -82,6 +96,13 @@ true
 === TEST 4: Individual merge needed (scope-local ruleset change)
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
@@ -110,6 +131,13 @@ true
 === TEST 5: Ignoring ruleset triggers merge
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
@@ -138,6 +166,13 @@ true
 === TEST 6: Adding ruleset triggers merge
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
@@ -166,6 +201,13 @@ true
 === TEST 7: Adding ruleset string triggers merge
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
@@ -194,6 +236,13 @@ true
 === TEST 8: Ignoring single rule does not trigger merge
 --- http_config
 init_by_lua '
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
