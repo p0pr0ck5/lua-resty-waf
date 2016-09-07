@@ -21,9 +21,6 @@ _M.disruptive_lookup = {
 	CHAIN = function(waf, ctx)
 		logger.log(waf, "Chaining (pre-processed)")
 	end,
-	SCORE = function(waf, ctx)
-		logger.log(waf, "Score isn't a thing anymore, see TX.anomaly_score")
-	end,
 	DENY = function(waf, ctx)
 		logger.log(waf, "Rule action was DENY, so telling nginx to quit")
 		if (waf._mode == "ACTIVE") then
@@ -32,6 +29,9 @@ _M.disruptive_lookup = {
 	end,
 	IGNORE = function(waf)
 		logger.log(waf, "Ignoring rule for now")
+	end,
+	SCORE = function(waf, ctx)
+		logger.log(waf, "Score isn't a thing anymore, see TX.anomaly_score")
 	end,
 }
 
