@@ -9,6 +9,7 @@ _M.version = "0.8.1"
 _M.alter_actions = {
 	ACCEPT = true,
 	DENY   = true,
+	DROP   = true,
 }
 
 _M.disruptive_lookup = {

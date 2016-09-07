@@ -73,3 +73,12 @@ GET /t
 SCORE
 --- no_error_log
 [error]
+
+=== TEST 5: DROP is an alter action
+--- request
+GET /t
+--- error_code: 200
+--- response_body_like
+DROP
+--- no_error_log
+[error]
