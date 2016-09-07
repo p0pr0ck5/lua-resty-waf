@@ -6,7 +6,7 @@ use Cwd qw(cwd);
 my $pwd = cwd();
 
 use lib 'tools';
-use Modsec2LRW qw(translate_operator);
+use Modsec2LRW qw(translate_operator @auto_expand_operators);
 
 my $Mock = Test::MockModule->new('Modsec2LRW');
 
@@ -70,6 +70,9 @@ is_deeply(
 	{
 		operator => 'REGEX',
 		pattern  => '\bfoo\b',
+		opts     => {
+			parsepattern => 1,
+		}
 	},
 	'translate an operator that modifies the pattern'
 );
@@ -112,6 +115,9 @@ is_deeply(
 	{
 		operator => 'GREATER',
 		pattern  => 5,
+		opts     => {
+			parsepattern => 1,
+		}
 	},
 	'caste a pattern that looks like an integer to a number'
 );
@@ -132,6 +138,9 @@ is_deeply(
 	{
 		operator => 'GREATER',
 		pattern  => 0.2,
+		opts     => {
+			parsepattern => 1,
+		}
 	},
 	'caste a pattern that looks like a decimal to a number'
 );
@@ -176,90 +185,24 @@ is_deeply(
 	'split the ipMatch operator'
 );
 
-$translation = {};
-translate_operator(
-	{
-		operator => {
-			operator => 'beginsWith',
-			pattern  => 'foo',
+for my $op (@auto_expand_operators) {
+	$translation = {};
+	translate_operator(
+		{
+			operator => {
+				operator => $op,
+				pattern  => 'foo',
+			},
 		},
-	},
-	$translation,
-	undef
-);
-is(
-	$translation->{actions}->{parsepattern},
-	1,
-	'auto expand the beginsWith operator'
-);
-
-$translation = {};
-translate_operator(
-	{
-		operator => {
-			operator => 'contains',
-			pattern  => 'foo',
-		},
-	},
-	$translation,
-	undef
-);
-is(
-	$translation->{actions}->{parsepattern},
-	1,
-	'auto expand the contains operator'
-);
-
-$translation = {};
-translate_operator(
-	{
-		operator => {
-			operator => 'endsWith',
-			pattern  => 'foo',
-		},
-	},
-	$translation,
-	undef
-);
-is(
-	$translation->{actions}->{parsepattern},
-	1,
-	'auto expand the endsWith operator'
-);
-
-$translation = {};
-translate_operator(
-	{
-		operator => {
-			operator => 'streq',
-			pattern  => 'foo',
-		},
-	},
-	$translation,
-	undef
-);
-is(
-	$translation->{actions}->{parsepattern},
-	1,
-	'auto expand the streq operator'
-);
-
-$translation = {};
-translate_operator(
-	{
-		operator => {
-			operator => 'within',
-			pattern  => 'foo',
-		},
-	},
-	$translation,
-	undef
-);
-is(
-	$translation->{actions}->{parsepattern},
-	1,
-	'auto expand the within operator'
-);
+		$translation,
+		undef
+	);
+	is(
+		$translation->{opts}->{parsepattern},
+		1,
+		"auto expand the $op operator"
+	);
+}
 
 $translation = {};
 translate_operator(

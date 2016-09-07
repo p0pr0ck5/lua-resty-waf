@@ -25,6 +25,7 @@ exports qw(
 	translate_actions
 	figure_phase
 	translate_macro
+	@auto_expand_operators
 );
 
 export_tag translate => qw(
@@ -158,7 +159,19 @@ my $defaults = {
 	phase  => 'access',
 };
 
-my @auto_expand_operators = qw(beginsWith contains endsWith streq within);
+our @auto_expand_operators = qw(
+	beginsWith
+	contains
+	containsWord
+	endsWith
+	eq
+	ge
+	gt
+	le
+	lt
+	streq
+	within
+);
 
 my @alters_pattern_operators = qw(beginsWith containsWord endsWith);
 
@@ -699,7 +712,7 @@ sub translate_operator {
 
 	# automatically expand the rule pattern for certain operators
 	if (any { $_ eq $original_operator } @auto_expand_operators) {
-		$translation->{actions}->{parsepattern} = 1;
+		$translation->{opts}->{parsepattern} = 1;
 		$translation->{pattern} = translate_macro($translation->{pattern});
 	}
 
