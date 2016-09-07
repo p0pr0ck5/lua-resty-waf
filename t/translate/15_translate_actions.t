@@ -873,6 +873,58 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'pause',
+				value  => 5000,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'sleep',
+				data   => 5,
+			} ]
+		}
+	},
+	'translate pause'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'pause',
+				value  => 125,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'sleep',
+				data   => 0.125,
+			} ]
+		}
+	},
+	'translate pause with decimal value'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 't',
 				value  => 'none',
 			}

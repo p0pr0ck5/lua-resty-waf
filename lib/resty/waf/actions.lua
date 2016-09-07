@@ -66,6 +66,11 @@ _M.nondisruptive_lookup = {
 
 		storage.set_var(waf, ctx, data, value)
 	end,
+	sleep = function(waf, time)
+		logger.log(waf, "Sleeping for " .. time)
+
+		ngx.sleep(time)
+	end,
 }
 
 return _M
