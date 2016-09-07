@@ -27,6 +27,12 @@ _M.disruptive_lookup = {
 			ngx.exit(waf._deny_status)
 		end
 	end,
+	DROP = function(waf, ctx)
+		logger.log(waf, "Rule action was DROP, ending eith ngx.HTTP_CLOSE")
+		if (waf._mode == "ACTIVE") then
+			ngx.exit(ngx.HTTP_CLOSE)
+		end
+	end,
 	IGNORE = function(waf)
 		logger.log(waf, "Ignoring rule for now")
 	end,

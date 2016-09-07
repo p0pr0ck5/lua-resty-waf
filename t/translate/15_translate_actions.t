@@ -83,6 +83,26 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'drop'
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		action => 'DROP'
+	},
+	'translate drop'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'pass'
 			}
 		]

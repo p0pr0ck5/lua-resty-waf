@@ -136,6 +136,7 @@ my $action_lookup = {
 	allow => 'ACCEPT',
 	block => 'DENY',
 	deny  => 'DENY',
+	drop  => 'DROP',
 	pass  => 'IGNORE'
 };
 
@@ -717,6 +718,7 @@ sub translate_actions {
 		allow
 		block
 		deny
+		drop
 		pass
 	);
 
