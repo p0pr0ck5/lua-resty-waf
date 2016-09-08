@@ -198,6 +198,8 @@ local function _process_rule(self, rule, collections, ctx)
 
 	ctx.id = id
 
+	ctx.rule_status = nil
+
 	for k, v in ipairs(vars) do
 		local collection, var
 		var = vars[k]

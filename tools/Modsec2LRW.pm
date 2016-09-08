@@ -834,6 +834,12 @@ sub translate_actions {
 					action => 'setvar',
 					data   => $setvar
 				};
+		} elsif ($key eq 'status') {
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => $key,
+					data   => $value += 0,
+				};
 		} elsif ($key eq 'pause') {
 			my $time = $value / 1000; # pause:n is given in ms, ngx.sleep takes its arg as seconds
 

@@ -873,6 +873,32 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'status',
+				value  => '500',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'status',
+				data   => 500,
+			} ]
+		}
+	},
+	'translate status'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'pause',
 				value  => 5000,
 			}

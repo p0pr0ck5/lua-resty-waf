@@ -25,7 +25,7 @@ _M.disruptive_lookup = {
 	DENY = function(waf, ctx)
 		logger.log(waf, "Rule action was DENY, so telling nginx to quit")
 		if (waf._mode == "ACTIVE") then
-			ngx.exit(waf._deny_status)
+			ngx.exit(ctx.rule_status or waf._deny_status)
 		end
 	end,
 	DROP = function(waf, ctx)
@@ -72,6 +72,11 @@ _M.nondisruptive_lookup = {
 
 		ngx.sleep(time)
 	end,
+	status = function(waf, status, ctx)
+		logger.log(waf, "Overriding status from " .. waf._deny_status .. " to " .. status)
+
+		ctx.rule_status = status
+	end
 }
 
 return _M
