@@ -625,10 +625,14 @@ sub translate_vars {
 		if (defined $modifier && $modifier eq '!') {
 			my $key = $specific_regex ? 'ignore_regex' : 'ignore';
 
+			$specific = uc $specific if $lookup_var->{storage};
+
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
 		} elsif (length $specific) {
 			my $key = $specific_regex ? 'regex' : 'specific';
+
+			$specific = uc $specific if $lookup_var->{storage};
 
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
