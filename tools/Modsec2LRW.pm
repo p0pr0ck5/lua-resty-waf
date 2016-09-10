@@ -771,8 +771,8 @@ sub translate_actions {
 				{
 					action => 'expirevar',
 					data   => {
-						col  => $collection,
-						key  => $element,
+						col  => uc $collection,
+						key  => translate_macro($element),
 						time => $time,
 					}
 				};
@@ -784,7 +784,7 @@ sub translate_actions {
 					action => 'initcol',
 					data   => {
 						col   => uc $col,
-						value => $val,
+						value => translate_macro($val),
 					}
 				};
 		} elsif ($key eq 'logdata') {
@@ -809,8 +809,8 @@ sub translate_actions {
 					push @{$translation->{actions}->{nondisrupt}}, {
 						action => 'deletevar',
 						data   => {
-							col => $collection,
-							key => $element,
+							col => uc $collection,
+							key => uc $element,
 						}
 					};
 				} else {
@@ -819,15 +819,20 @@ sub translate_actions {
 				next;
 			}
 
-			my $setvar = { col => $collection, key => $element };
+			my $setvar = { col => uc $collection, key => uc $element };
 
 			if ($val =~ m/^\+/) {
 				substr $val, 0, 1, '';
 				$setvar->{inc} = 1;
-				$val += 0 if $val =~ m/^\d*(?:\.\d+)?$/;
 			}
 
-			$setvar->{value}  = $val;
+			if ($val =~ m/^\d*(?:\.\d+)?$/) {
+				$val += 0;
+			} else {
+				$val = translate_macro($val);
+			}
+
+			$setvar->{value} = $val;
 
 			push @{$translation->{actions}->{nondisrupt}},
 				{
@@ -890,12 +895,17 @@ sub translate_macro {
 		my ($key, $specific) = split /\./, $macro;
 		my $replacement;
 
-		if (my $lookup = clone($valid_vars->{$key})) {
+		if (my $lookup = clone($valid_vars->{uc $key})) {
 			$replacement = $lookup->{type};
 
-			$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
+			if ($lookup->{storage}) {
+				# this is a pretty ugly hack...
+				$replacement .= '.' . uc $specific;
+			} else {
+				$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
 
-			$replacement .= ".$specific" if $specific;
+				$replacement .= ".$specific" if $specific;
+			}
 		} else {
 			$replacement = $macro;
 		}

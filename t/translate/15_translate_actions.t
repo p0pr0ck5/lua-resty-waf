@@ -280,8 +280,8 @@ is_deeply(
 				action => 'expirevar',
 				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'bar-mocked',
 					time => 60,
 				}
 			} ]
@@ -311,8 +311,8 @@ is_deeply(
 				action => 'expirevar',
 				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'bar-mocked',
 					time => .2,
 				}
 			} ]
@@ -342,8 +342,8 @@ is_deeply(
 				action => 'expirevar',
 				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'bar-mocked',
 					time => 'baz-mocked',
 				}
 			} ]
@@ -379,7 +379,7 @@ translate_actions(
 		actions => [
 			{
 				action => 'initcol',
-				value  => 'IP=%{REMOTE_ADDR}',
+				value  => 'IP=foo',
 			}
 		]
 	},
@@ -396,13 +396,45 @@ is_deeply(
 					data   =>
 					{
 						col   => 'IP',
-						value => '%{REMOTE_ADDR}'
+						value => 'foo-mocked'
 					}
 				}
 			]
 		}
 	},
 	'translate initcol'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'initcol',
+				value  => 'ip=foo',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'initcol',
+					data   =>
+					{
+						col   => 'IP',
+						value => 'foo-mocked'
+					}
+				}
+			]
+		}
+	},
+	'translate initcol (col is uppercased)'
 );
 
 $translation = {};
@@ -652,8 +684,8 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
-					value => 'bar',
+					key   => 'FOO',
+					value => 'bar-mocked',
 				}
 			} ]
 		}
@@ -683,7 +715,7 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 					value => 60,
 				}
 			} ]
@@ -714,7 +746,7 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 					value => 60,
 					inc   => 1,
 				}
@@ -722,6 +754,38 @@ is_deeply(
 		}
 	},
 	'increment setvar with integer value'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'setvar',
+				value  => 'IP.foo=+bar',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
+				{
+					col   => 'IP',
+					key   => 'FOO',
+					value => 'bar-mocked',
+					inc   => 1,
+				}
+			} ]
+		}
+	},
+	'increment setvar with string value'
 );
 
 $translation = {};
@@ -746,8 +810,8 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
-					value => '.2',
+					key   => 'FOO',
+					value => '0.2',
 				}
 			} ]
 		}
@@ -777,7 +841,7 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 					value => '0.2',
 					inc   => 1,
 				}
@@ -809,7 +873,7 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo.bar',
+					key   => 'FOO.BAR',
 					value => 60,
 				}
 			} ]
@@ -840,7 +904,7 @@ is_deeply(
 				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 				}
 			} ]
 		}
