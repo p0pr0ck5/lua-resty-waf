@@ -474,7 +474,7 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		msg => 'data',
+		msg => 'data-mocked',
 	},
 	'translate msg'
 );

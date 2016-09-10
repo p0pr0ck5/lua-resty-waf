@@ -70,7 +70,7 @@ local function _log_event(self, rule, value, ctx)
 	}
 
 	if (self._event_log_verbosity > 1) then
-		t.msg = rule.msg
+		t.msg = util.parse_dynamic_value(self, rule.msg, ctx.collections)
 	end
 
 	if (self._event_log_verbosity > 2) then
