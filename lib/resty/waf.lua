@@ -296,10 +296,8 @@ local function _process_rule(self, rule, collections, ctx)
 				end
 
 				-- log the event
-				if (not opts.nolog) then
+				if (rule.actions.disrupt ~= "CHAIN" and not opts.nolog) then
 					_log_event(self, rule, value, ctx)
-				else
-					logger.log(self, "We had a match, but not logging because opts.nolog is set")
 				end
 
 				-- wrapper for the rules action
