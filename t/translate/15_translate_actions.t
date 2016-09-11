@@ -281,7 +281,7 @@ is_deeply(
 				data   =>
 				{
 					col  => 'FOO',
-					key  => 'bar-mocked',
+					key  => 'BAR',
 					time => 60,
 				}
 			} ]
@@ -312,7 +312,7 @@ is_deeply(
 				data   =>
 				{
 					col  => 'FOO',
-					key  => 'bar-mocked',
+					key  => 'BAR',
 					time => .2,
 				}
 			} ]
@@ -343,7 +343,7 @@ is_deeply(
 				data   =>
 				{
 					col  => 'FOO',
-					key  => 'bar-mocked',
+					key  => 'BAR',
 					time => 'baz-mocked',
 				}
 			} ]

@@ -775,7 +775,7 @@ sub translate_actions {
 					action => 'expirevar',
 					data   => {
 						col  => uc $collection,
-						key  => translate_macro($element),
+						key  => uc $element,
 						time => $time,
 					}
 				};
