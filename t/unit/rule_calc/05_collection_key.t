@@ -34,7 +34,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|nil|nil
+FOO|nil
 --- error_code: 200
 --- no_error_log
 [error]
@@ -65,7 +65,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|keys|1|nil|nil
+FOO|keys|1|nil
 --- error_code: 200
 --- no_error_log
 [error]
@@ -96,7 +96,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|specific|bar|nil|nil
+FOO|specific|bar|nil
 --- error_code: 200
 --- no_error_log
 [error]
@@ -127,7 +127,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|bar|nil
+FOO|bar
 --- error_code: 200
 --- no_error_log
 [error]
@@ -158,7 +158,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|bar,bat|nil
+FOO|bar,bat
 --- error_code: 200
 --- no_error_log
 [error]
@@ -189,7 +189,7 @@ init_by_lua_block{
 --- request
 GET /t
 --- response_body
-FOO|nil|1
+FOO|nil
 --- error_code: 200
 --- no_error_log
 [error]

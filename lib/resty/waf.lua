@@ -219,11 +219,6 @@ local function _process_rule(self, rule, collections, ctx)
 					collection = _do_transform(self, collection, opts.transform)
 				end
 
-				if (collection and var.length) then
-					logger.log(self, "col length is " .. #collection)
-					collection = #collection
-				end
-
 				ctx.transform[collection_key]     = collection
 				ctx.transform_key[collection_key] = true
 			elseif (var.storage) then
@@ -232,6 +227,16 @@ local function _process_rule(self, rule, collections, ctx)
 			else
 				logger.log(self, "Collection cache hit!")
 				collection = ctx.transform[collection_key]
+			end
+
+			if (var.length) then
+				if (type(collection) == 'table') then
+					collection = #collection
+				elseif(collection) then
+					collection = 1
+				else
+					collection = 0
+				end
 			end
 		end
 

@@ -26,10 +26,8 @@ local function _build_collection_key(var, transform)
 		key[2] = tostring(k)
 		key[3] = tostring(v)
 		key[4] = tostring(_transform_collection_key(transform))
-		key[5] = tostring(var.length)
 	else
 		key[2] = tostring(_transform_collection_key(transform))
-		key[3] = tostring(var.length)
 	end
 
 	return table_concat(key, "|")
