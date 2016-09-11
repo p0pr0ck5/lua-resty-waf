@@ -537,7 +537,7 @@ sub translate_chain {
 
 	my (@lua_resty_waf_chain, $chain_id, $chain_action, $ctr);
 
-	my @end_actions = qw(action skip skip_after);
+	my @end_actions = qw(action msg skip skip_after);
 
 	for my $rule (@chain) {
 		my $translation = {};
