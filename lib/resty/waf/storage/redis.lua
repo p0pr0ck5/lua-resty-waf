@@ -14,14 +14,14 @@ function _M.initialize(waf, storage, col)
 
 	local ok, err = redis:connect(host, port)
 	if (not ok) then
-		logger.log(waf, "Error in connecting to redis: " .. err)
+		logger.warn(waf, "Error in connecting to redis: " .. err)
 		storage[col] = {}
 		return
 	end
 
 	local array, err = redis:hgetall(col)
 	if (err) then
-		logger.log(waf, "Error retrieving " .. col .. ": " .. err)
+		logger.warn(waf, "Error retrieving " .. col .. ": " .. err)
 		storage[col] = {}
 		return
 	end
@@ -93,7 +93,7 @@ function _M.persist(waf, col, data)
 
 	local ok, err = redis:connect(host, port)
 	if (not ok) then
-		logger.log(waf, "Error in connecting to redis: " .. err)
+		logger.warn(waf, "Error in connecting to redis: " .. err)
 		return
 	end
 
@@ -118,7 +118,7 @@ function _M.persist(waf, col, data)
 	-- do it
 	local ok, err = redis:commit_pipeline()
 	if (not ok) then
-		logger.log(waf, "Error in redis pipelining: " .. err)
+		logger.warn(waf, "Error in redis pipelining: " .. err)
 	end
 
 	if (waf._storage_keepalive) then
