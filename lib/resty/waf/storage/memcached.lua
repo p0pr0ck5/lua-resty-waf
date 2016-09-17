@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 local cjson       = require "cjson"
 local logger      = require "resty.waf.log"
@@ -13,14 +13,14 @@ function _M.initialize(waf, storage, col)
 
 	local ok, err = memcached:connect(host, port)
 	if (not ok) then
-		logger.log(waf, "Error in connecting to memcached: " .. err)
+		logger.warn(waf, "Error in connecting to memcached: " .. err)
 		storage[col] = {}
 		return
 	end
 
 	local serialized, flags, err = memcached:get(col)
 	if (err) then
-		logger.log(waf, "Error retrieving " .. col .. ": " .. err)
+		logger.warn(waf, "Error retrieving " .. col .. ": " .. err)
 		storage[col] = {}
 		return
 	end
@@ -43,7 +43,7 @@ function _M.initialize(waf, storage, col)
 	local altered = false
 
 	if (not serialized) then
-		logger.log(waf, "Initializing an empty collection for " .. col)
+		logger.warn(waf, "Initializing an empty collection for " .. col)
 		storage[col] = {}
 	else
 		local data = cjson.decode(serialized)
@@ -78,13 +78,13 @@ function _M.persist(waf, col, data)
 
 	local ok, err = memcached:connect(host, port)
 	if (not ok) then
-		logger.log(waf, "Error in connecting to memcached: " .. err)
+		logger.warn(waf, "Error in connecting to memcached: " .. err)
 		return
 	end
 
 	local ok, err = memcached:set(col, serialized)
 	if (not ok) then
-		logger.log(waf, "Error persisting storage data: " .. err)
+		logger.warn(waf, "Error persisting storage data: " .. err)
 	end
 
 	if (waf._storage_keepalive) then

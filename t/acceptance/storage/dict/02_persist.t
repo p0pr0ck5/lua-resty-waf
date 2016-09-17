@@ -1,7 +1,7 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 6 * blocks();
+plan tests => repeat_each() * 6 * blocks() - 6;
 
 no_shuffle();
 run_tests();
@@ -12,6 +12,13 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -54,6 +61,13 @@ Not persisting a collection that wasn't altered
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -92,6 +106,13 @@ Persisting value: {"
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -130,6 +151,13 @@ Not persisting a collection that wasn't altered
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
@@ -166,6 +194,13 @@ Persisting value: {"
 --- http_config
 	lua_shared_dict store 16k;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -209,3 +244,41 @@ re-read: null
 [error]
 Not persisting a collection that wasn't altered
 re-read: "{\"COUNT\":\"aaaaa
+
+=== TEST 6: Fail to persist a collection when storage_zone is undefined
+--- http_config
+	lua_shared_dict store 10m;
+	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 15})
+			jit.off()
+		end
+
+		local lua_resty_waf = require "resty.waf"
+		lua_resty_waf.default_option("storage_backend", "dict")
+		lua_resty_waf.default_option("debug", true)
+	';
+--- config
+    location = /t {
+        access_by_lua '
+			local lua_resty_waf = require "resty.waf"
+			local waf           = lua_resty_waf:new()
+
+			local storage = require "resty.waf.storage"
+
+			local ctx = { storage = { FOO = { __altered = true, a = "b" } }, col_lookup = { FOO = "FOO" } }
+			storage.persist(waf, ctx.storage)
+		';
+
+		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+	}
+--- request
+GET /t
+--- error_code: 500
+--- error_log
+[error]
+No storage_zone configured for memory-based persistent storage
+--- no_error_log
+Persisting value: a

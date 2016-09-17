@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: lua_resty_waf runs with resty.core included
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		require "resty.core"
 	';
 --- config

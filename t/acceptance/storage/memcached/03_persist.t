@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Persist a collection
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
@@ -54,6 +61,13 @@ Not persisting a collection that wasn't altered
 === TEST 2: Don't persist an unaltered collection
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
@@ -93,6 +107,13 @@ Persisting value: {"
 === TEST 3: Persist an unaltered collection with expired keys
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_backend", "memcached")
 		lua_resty_waf.default_option("debug", true)
@@ -132,6 +153,13 @@ Not persisting a collection that wasn't altered
 === TEST 4: Don't persist the TX collection
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("debug", true)
 	';

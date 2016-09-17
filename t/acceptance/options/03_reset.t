@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Reset a simple value
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
@@ -38,6 +45,13 @@ GET /t
 === TEST 2: Reset a simple value and set it again
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
@@ -67,6 +81,13 @@ GET /t
 === TEST 3: Reset a table value
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)
@@ -96,6 +117,13 @@ Beginning ruleset 11000_whitelist,
 === TEST 4: Reset a table value and set it again
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", "11000_whitelist")

@@ -9,12 +9,21 @@ run_tests();
 __DATA__
 
 === TEST 1: No parse, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -25,18 +34,27 @@ __DATA__
 --- request
 GET /t
 --- response_body
-FOO|nil|nil
+FOO|nil
 --- error_code: 200
 --- no_error_log
 [error]
 
 === TEST 2: Truthy key, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -47,18 +65,27 @@ FOO|nil|nil
 --- request
 GET /t
 --- response_body
-FOO|keys|1|nil|nil
+FOO|keys|1|nil
 --- error_code: 200
 --- no_error_log
 [error]
 
 === TEST 3: String key, no transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -69,18 +96,27 @@ FOO|keys|1|nil|nil
 --- request
 GET /t
 --- response_body
-FOO|specific|bar|nil|nil
+FOO|specific|bar|nil
 --- error_code: 200
 --- no_error_log
 [error]
 
 === TEST 4: No parse, single transform, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = "bar" }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = "bar" }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -91,18 +127,27 @@ FOO|specific|bar|nil|nil
 --- request
 GET /t
 --- response_body
-FOO|bar|nil
+FOO|bar
 --- error_code: 200
 --- no_error_log
 [error]
 
 === TEST 5: No parse, multiple transforms, no length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = { "bar", "bat" } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO" } }, opts = { transform = { "bar", "bat" } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -113,18 +158,27 @@ FOO|bar|nil
 --- request
 GET /t
 --- response_body
-FOO|bar,bat|nil
+FOO|bar,bat
 --- error_code: 200
 --- no_error_log
 [error]
 
 === TEST 6: No parse, no transform, length
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", length = 1 } }, action = "DENY" },
+				{ id = 1, vars = { { type = "FOO", length = 1 } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -135,7 +189,7 @@ FOO|bar,bat|nil
 --- request
 GET /t
 --- response_body
-FOO|nil|1
+FOO|nil
 --- error_code: 200
 --- no_error_log
 [error]

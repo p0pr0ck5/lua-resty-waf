@@ -4,7 +4,7 @@ local actions = require "resty.waf.actions"
 local logger  = require "resty.waf.log"
 local util    = require "resty.waf.util"
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 _M.lookup = {
 	ignore_ruleset = function(waf, value)
@@ -46,7 +46,7 @@ _M.lookup = {
 		waf._nameservers[#waf._nameservers + 1] = value
 	end,
 	hook_action = function(waf, value, hook)
-		if (not util.table_has_key(value, actions.lookup)) then
+		if (not util.table_has_key(value, actions.disruptive_lookup)) then
 			logger.fatal_fail(value .. " is not a valid action to override")
 		end
 

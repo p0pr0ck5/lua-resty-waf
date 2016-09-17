@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Match (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -26,6 +35,15 @@ hello
 [error]
 
 === TEST 2: Match (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -43,6 +61,15 @@ hello
 [error]
 
 === TEST 3: No match (individual)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -60,6 +87,15 @@ nil
 [error]
 
 === TEST 4: No match (table)
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -77,6 +113,15 @@ nil
 [error]
 
 === TEST 5: Invalid pattern
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -94,6 +139,15 @@ error in ngx.re.match:
 [error]
 
 === TEST 6: Return values
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -118,6 +172,15 @@ ello
 [error]
 
 === TEST 7: Return value types
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '

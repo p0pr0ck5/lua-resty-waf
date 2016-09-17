@@ -9,14 +9,23 @@ run_tests();
 __DATA__
 
 === TEST 1: Ruleset starter offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -35,14 +44,23 @@ GET /t
 [error]
 
 === TEST 2: Ruleset middle element offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -61,14 +79,23 @@ GET /t
 [error]
 
 === TEST 3: Ruleset end offsets
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = {}, action = "DENY" },
-				{ id = 2, vars = {}, action = "DENY" },
-				{ id = 3, vars = {}, action = "DENY" },
+				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 2, vars = {}, actions = { disrupt = "DENY" }  },
+				{ id = 3, vars = {}, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)

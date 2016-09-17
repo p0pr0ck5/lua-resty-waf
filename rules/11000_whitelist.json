@@ -1,7 +1,9 @@
 {
    "access" : [
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 11001,
          "msg" : "Ignore passive requests with no arguments",
          "operator" : "REGEX",
@@ -16,7 +18,9 @@
          ]
       },
       {
-         "action" : "ACCEPT",
+         "actions" : {
+            "disrupt" : "ACCEPT"
+         },
          "id" : 11002,
          "msg" : "Ignore passive requests with no arguments",
          "op_negated" : 1,
@@ -35,6 +39,7 @@
          ]
       },
       {
+         "actions" : {},
          "id" : 11003,
          "msg" : "Skip whitelisting of some extensions for non-passive requests",
          "op_negated" : 1,
@@ -51,7 +56,9 @@
          ]
       },
       {
-         "action" : "ACCEPT",
+         "actions" : {
+            "disrupt" : "ACCEPT"
+         },
          "id" : 11004,
          "msg" : "Whitelisting extensions - images",
          "operator" : "REGEX",
@@ -66,7 +73,9 @@
          ]
       },
       {
-         "action" : "ACCEPT",
+         "actions" : {
+            "disrupt" : "ACCEPT"
+         },
          "id" : 11005,
          "msg" : "Whitelisting extensions - documents",
          "operator" : "REGEX",
@@ -81,7 +90,9 @@
          ]
       },
       {
-         "action" : "ACCEPT",
+         "actions" : {
+            "disrupt" : "ACCEPT"
+         },
          "id" : 11006,
          "msg" : "Whitelisting extensions - HTML",
          "operator" : "REGEX",
@@ -96,7 +107,9 @@
          ]
       },
       {
-         "action" : "ACCEPT",
+         "actions" : {
+            "disrupt" : "ACCEPT"
+         },
          "id" : 11007,
          "msg" : "Whitelisting extensions - media",
          "operator" : "REGEX",

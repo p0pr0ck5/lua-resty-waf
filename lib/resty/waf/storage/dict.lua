@@ -1,13 +1,13 @@
 local _M = {}
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 
 function _M.initialize(waf, storage, col)
 	if (not waf._storage_zone) then
-		return
+		logger.fatal_fail("No storage_zone configured for memory-based persistent storage")
 	end
 
 	local altered, serialized, shm
@@ -44,7 +44,7 @@ end
 
 function _M.persist(waf, col, data)
 	if (not waf._storage_zone) then
-		return
+		logger.fatal_fail("No storage_zone configured for memory-based persistent storage")
 	end
 
 	local shm        = ngx.shared[waf._storage_zone]

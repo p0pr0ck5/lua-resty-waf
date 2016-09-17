@@ -9,12 +9,21 @@ run_tests();
 __DATA__
 
 === TEST 1: DENY exits the phase with waf._deny_status
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE", _deny_status = 403 }, {})
+			actions.disruptive_lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE", _deny_status = 403 }, {})
 
 			ngx.log(ngx.INFO, "We should not see this")
 		';
@@ -31,12 +40,21 @@ Rule action was DENY, so telling nginx to quit
 We should not see this
 
 === TEST 2: DENY does not exit the phase when mode is not ACTIVE
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE", _deny_status = 403 }, {})
+			actions.disruptive_lookup["DENY"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE", _deny_status = 403 }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';

@@ -1,21 +1,24 @@
 {
    "access" : [
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 21001,
          "msg" : "No valid Host header",
          "op_negated" : 1,
          "operator" : "CONTAINS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "host",
          "vars" : [
             {
@@ -27,7 +30,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 21002,
          "op_negated" : 1,
          "operator" : "EQUALS",
@@ -42,21 +47,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 21003,
          "msg" : "No valid Accept header",
          "op_negated" : 1,
          "operator" : "CONTAINS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "accept",
          "vars" : [
             {
@@ -68,7 +76,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 21004,
          "op_negated" : 1,
          "operator" : "EQUALS",
@@ -83,20 +93,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 21005,
-         "msg" : "Accept header has no value",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 21005,
+         "msg" : "Accept header has no value",
+         "operator" : "REGEX",
          "pattern" : "^$",
          "vars" : [
             {
@@ -108,21 +121,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 21006,
          "msg" : "No valid User-Agent header",
          "op_negated" : 1,
          "operator" : "CONTAINS",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "user-agent",
          "vars" : [
             {
@@ -134,20 +150,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 21007,
-         "msg" : "User-Agent header has no value",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 21007,
+         "msg" : "User-Agent header has no value",
+         "operator" : "REGEX",
          "pattern" : "^$",
          "vars" : [
             {
@@ -159,7 +178,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 21008,
          "op_negated" : 1,
          "operator" : "CONTAINS",
@@ -177,21 +198,24 @@
          ]
       },
       {
-         "action" : "SCORE",
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
+               {
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
+               }
+            ]
+         },
          "id" : 21009,
          "msg" : "Request contains content, but missing Content-Type header",
          "op_negated" : 1,
          "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
-               {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
-               }
-            ]
-         },
          "pattern" : "^0$",
          "vars" : [
             {
@@ -203,20 +227,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 21010,
-         "msg" : "Host header contains an IP address",
-         "operator" : "REGEX",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 2
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 2
+                  }
                }
             ]
          },
+         "id" : 21010,
+         "msg" : "Host header contains an IP address",
+         "operator" : "REGEX",
          "pattern" : "^[\\d.:]+$",
          "vars" : [
             {

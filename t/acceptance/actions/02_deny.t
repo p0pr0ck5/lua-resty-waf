@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: DENY exits the phase with ngx.HTTP_FORBIDDEN
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -17,7 +26,7 @@ __DATA__
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"action":"DENY","id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should not see this")
@@ -35,6 +44,15 @@ Rule action was DENY, so telling nginx to quit
 We should not see this
 
 === TEST 2: DENY does not exit the phase when mode is not ACTIVE
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -42,7 +60,7 @@ We should not see this
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"action":"DENY","id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should see this")

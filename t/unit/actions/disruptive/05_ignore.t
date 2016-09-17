@@ -8,13 +8,22 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: CHAIN logs and does not exit
+=== TEST 1: IGNORE logs and does not exit
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["CHAIN"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
+			actions.disruptive_lookup["IGNORE"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';
@@ -25,7 +34,7 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log
-Chaining (pre-processed)
+Ignoring rule for now
 We should see this
 --- no_error_log
 [error]

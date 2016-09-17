@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 local random = require "resty.random"
 local string = require "resty.string"

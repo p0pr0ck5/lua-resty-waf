@@ -27,9 +27,8 @@ SecRule                 \
 /;
 
 {
-	open my $stdin, '<', \ $basic;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($basic);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345,pass"/ ],
@@ -38,9 +37,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $trim_left;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($trim_left);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345,pass"/ ],
@@ -49,9 +47,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $trim_right;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($trim_right);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345,pass"/ ],
@@ -60,9 +57,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $trim_both;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($trim_both);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345,pass"/ ],
@@ -71,9 +67,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $ignore_comment;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($ignore_comment);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[],
@@ -82,9 +77,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $invalid_directive;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($invalid_directive);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[],
@@ -93,9 +87,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $multi_line;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = (split /\n/, $multi_line);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345,pass"/ ],
@@ -104,10 +97,8 @@ SecRule                 \
 }
 
 {
-	my $data = "$basic\n$multi_line\n";
-	open my $stdin, '<', \ $data;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($basic, split /\n/, $multi_line);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[
@@ -119,10 +110,8 @@ SecRule                 \
 }
 
 {
-	my $data = "$basic\n$comment\n$multi_line";
-	open my $stdin, '<', \ $data;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = ($basic, $comment, split /\n/, $multi_line);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[
@@ -134,9 +123,8 @@ SecRule                 \
 }
 
 {
-	open my $stdin, '<', \ $multi_line_action;
-	local *STDIN = $stdin;
-	my @out = clean_input(*STDIN);
+	my @in  = (split /\n/, $multi_line_action);
+	my @out = clean_input(@in);
 	is_deeply(
 		\@out,
 		[ q/SecRule ARGS "foo" "id:12345, phase:1, block, setvar:tx.foo=bar, expirevar:tx.foo=60"/ ],

@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Parse a JSON string successfully
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -35,6 +44,15 @@ nil
 [error]
 
 === TEST 2: Parse a bad JSON string
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '

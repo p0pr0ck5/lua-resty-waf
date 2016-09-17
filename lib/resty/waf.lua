@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 local actions       = require "resty.waf.actions"
 local calc          = require "resty.waf.rule_calc"
@@ -70,12 +70,12 @@ local function _log_event(self, rule, value, ctx)
 	}
 
 	if (self._event_log_verbosity > 1) then
-		t.msg = rule.msg
+		t.msg = util.parse_dynamic_value(self, rule.msg, ctx.collections)
 	end
 
 	if (self._event_log_verbosity > 2) then
 		t.opts   = rule.opts
-		t.action = rule.action
+		t.action = rule.actions.disrupt
 	end
 
 	if (self._event_log_verbosity > 3) then
@@ -139,47 +139,6 @@ local function _finalize(self, ctx)
 	ngx.ctx = ctx
 end
 
--- non-disruptive actions for persistent storage handling
-local function _handle_storage(self, opts, ctx, collections)
-	if (opts.initcol) then
-		for col, value in pairs(opts.initcol) do
-			local parsed = util.parse_dynamic_value(self, value, collections)
-
-			logger.log(self, "Initializing " .. col .. " as " .. parsed)
-
-			storage.initialize(self, ctx.storage, parsed)
-			ctx.col_lookup[col] = parsed
-			collections[col]    = ctx.storage[parsed]
-		end
-	end
-
-	if (opts.setvar) then
-		for k in ipairs(opts.setvar) do
-			local element = opts.setvar[k]
-			local value   = util.parse_dynamic_value(self, element.value, collections)
-
-			storage.set_var(self, ctx, element, value)
-		end
-	end
-
-	if (opts.expirevar) then
-		for k in ipairs(opts.expirevar) do
-			local element = opts.expirevar[k]
-			local time    = util.parse_dynamic_value(self, element.time, collections)
-
-			storage.expire_var(self, ctx, element, time)
-		end
-	end
-
-	if (opts.deletevar) then
-		for k in ipairs(opts.deletevar) do
-			local element = opts.deletevar[k]
-
-			storage.delete_var(self, ctx, element)
-		end
-	end
-end
-
 -- use the lookup table to figure out what to do
 local function _rule_action(self, action, ctx, collections)
 	if (not action) then
@@ -194,7 +153,7 @@ local function _rule_action(self, action, ctx, collections)
 	if (self._hook_actions[action]) then
 		self._hook_actions[action](self, ctx)
 	else
-		actions.lookup[action](self, ctx)
+		actions.disruptive_lookup[action](self, ctx)
 	end
 end
 
@@ -233,12 +192,13 @@ local function _process_rule(self, rule, collections, ctx)
 	local id       = rule.id
 	local vars     = rule.vars
 	local opts     = rule.opts or {}
-	local action   = rule.action
 	local pattern  = rule.pattern
 	local operator = rule.operator
 	local offset
 
 	ctx.id = id
+
+	ctx.rule_status = nil
 
 	for k, v in ipairs(vars) do
 		local collection, var
@@ -259,11 +219,6 @@ local function _process_rule(self, rule, collections, ctx)
 					collection = _do_transform(self, collection, opts.transform)
 				end
 
-				if (collection and var.length) then
-					logger.log(self, "col length is " .. #collection)
-					collection = #collection
-				end
-
 				ctx.transform[collection_key]     = collection
 				ctx.transform_key[collection_key] = true
 			elseif (var.storage) then
@@ -272,6 +227,16 @@ local function _process_rule(self, rule, collections, ctx)
 			else
 				logger.log(self, "Collection cache hit!")
 				collection = ctx.transform[collection_key]
+			end
+
+			if (var.length) then
+				if (type(collection) == 'table') then
+					collection = #collection
+				elseif(collection) then
+					collection = 1
+				else
+					collection = 0
+				end
 			end
 		end
 
@@ -325,18 +290,18 @@ local function _process_rule(self, rule, collections, ctx)
 				end
 				collections.RULE = rule
 
-				-- wrapper for initcol, setvar, and expirevar actions
-				_handle_storage(self, opts, ctx, collections)
+				local nondisrupt = rule.actions.nondisrupt or {}
+				for _, action in ipairs(nondisrupt) do
+					actions.nondisruptive_lookup[action.action](self, action.data, ctx, collections)
+				end
 
 				-- log the event
-				if (not opts.nolog) then
+				if (rule.actions.disrupt ~= "CHAIN" and not opts.nolog) then
 					_log_event(self, rule, value, ctx)
-				else
-					logger.log(self, "We had a match, but not logging because opts.nolog is set")
 				end
 
 				-- wrapper for the rules action
-				_rule_action(self, action, ctx, collections)
+				_rule_action(self, rule.actions.disrupt, ctx, collections)
 
 				offset = rule.offset_match
 

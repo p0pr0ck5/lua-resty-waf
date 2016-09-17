@@ -11,6 +11,13 @@ __DATA__
 === TEST 1: Log a string
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
@@ -35,6 +42,13 @@ We have logged a string!
 === TEST 2: Log a string at ngx.INFO log level
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
@@ -62,6 +76,13 @@ We have logged a string!
 === TEST 3: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
@@ -87,6 +108,13 @@ qr/\[warn\].*We have logged a string!/
 === TEST 4: Log a string at ngx.WARN log level
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
@@ -112,6 +140,13 @@ qr/\[debug\].*We have logged a string!/
 === TEST 5: Do not log a string if debug disabled
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
@@ -135,6 +170,13 @@ We have logged a string!
 === TEST 6: Do not log a string if insufficient log level
 --- http_config
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 50})
+			jit.off()
+		end
+
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';

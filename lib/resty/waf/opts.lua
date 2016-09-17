@@ -3,7 +3,7 @@ local _M = {}
 local ngx_INFO = ngx.INFO
 local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 _M.defaults = {
 	_add_ruleset                 = {},

@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: sanity
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -23,6 +32,15 @@ __DATA__
 [error]
 
 === TEST 2: integer equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -40,6 +58,15 @@ true
 [error]
 
 === TEST 3: integer not equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -57,6 +84,15 @@ false
 [error]
 
 === TEST 4: string equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -74,6 +110,15 @@ true
 [error]
 
 === TEST 5: string not equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -91,6 +136,15 @@ false
 [error]
 
 === TEST 6: integer table equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -108,6 +162,15 @@ true
 [error]
 
 === TEST 7: integer table not equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -125,6 +188,15 @@ false
 [error]
 
 === TEST 8: string table equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -142,6 +214,15 @@ true
 [error]
 
 === TEST 9: string table not equals
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -159,6 +240,15 @@ false
 [error]
 
 === TEST 10: string "nil" not equals nil
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -176,6 +266,15 @@ false
 [error]
 
 === TEST 11: string not equals integer
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -193,6 +292,15 @@ false
 [error]
 
 === TEST 12: return values
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '
@@ -212,6 +320,15 @@ foo
 [error]
 
 === TEST 13: return value types
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         content_by_lua '

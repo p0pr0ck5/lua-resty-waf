@@ -81,5 +81,22 @@ is(
 	'translate a string with a malformed marker (3/3)'
 );
 
+is(
+	translate_macro('%{args.foo}'),
+	'%{REQUEST_ARGS.foo}',
+	"collection names are uc'd as part of the lookup"
+);
+
+is(
+	translate_macro('%{foo.bar}'),
+	'%{foo.bar}',
+	"collection lookup miss does not result in name being uc'd"
+);
+
+is(
+	translate_macro('%{ip.foo_bar}'),
+	'%{IP.FOO_BAR}',
+	"specific elements in storage collections are also uc'd"
+);
 
 done_testing;

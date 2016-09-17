@@ -1,20 +1,23 @@
 {
    "access" : [
       {
-         "action" : "SCORE",
-         "id" : 90001,
-         "msg" : "Dummy lua-resty-waf signature",
-         "operator" : "EQUALS",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 3
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 3
+                  }
                }
             ]
          },
+         "id" : 90001,
+         "msg" : "Dummy lua-resty-waf signature",
+         "operator" : "EQUALS",
          "pattern" : "lua-resty-waf Dummy",
          "vars" : [
             {
@@ -26,7 +29,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90002,
          "msg" : "SSH key scan (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)",
          "operator" : "REGEX",
@@ -38,7 +43,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90003,
          "operator" : "EQUALS",
          "opts" : {
@@ -52,7 +59,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90004,
          "msg" : "SSH key scan signature (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)",
          "operator" : "EQUALS",
@@ -64,7 +73,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90005,
          "operator" : "REGEX",
          "opts" : {
@@ -78,7 +89,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90006,
          "operator" : "CONTAINS",
          "opts" : {
@@ -95,7 +108,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90007,
          "msg" : "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)",
          "operator" : "REGEX",
@@ -110,7 +125,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90008,
          "operator" : "EQUALS",
          "opts" : {
@@ -124,7 +141,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90009,
          "msg" : "Brute force botnet affecting Wordpress domains",
          "operator" : "REGEX",
@@ -139,7 +158,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90010,
          "msg" : "Known *Coin miner worm (https://isc.sans.edu/forums/diary/Multi+Platform+Coin+Miner+Attacking+Routers+on+Port+32764/18353)",
          "operator" : "REGEX",
@@ -154,7 +175,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90011,
          "operator" : "EQUALS",
          "opts" : {
@@ -168,20 +191,23 @@
          ]
       },
       {
-         "action" : "SCORE",
-         "id" : 90012,
-         "msg" : "Client attempted to register a Wordpress user, but user registration is disabled.",
-         "operator" : "EQUALS",
-         "opts" : {
-            "setvar" : [
+         "actions" : {
+            "disrupt" : "SCORE",
+            "nondisrupt" : [
                {
-                  "col" : "TX",
-                  "inc" : 1,
-                  "key" : "anomaly_score",
-                  "value" : 5
+                  "action" : "setvar",
+                  "data" : {
+                     "col" : "TX",
+                     "inc" : 1,
+                     "key" : "anomaly_score",
+                     "value" : 5
+                  }
                }
             ]
          },
+         "id" : 90012,
+         "msg" : "Client attempted to register a Wordpress user, but user registration is disabled.",
+         "operator" : "EQUALS",
          "pattern" : "disabled",
          "vars" : [
             {
@@ -193,7 +219,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90013,
          "operator" : "EQUALS",
          "opts" : {
@@ -207,7 +235,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90014,
          "operator" : "EQUALS",
          "opts" : {
@@ -221,7 +251,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90015,
          "msg" : "Wordpress login attempted with no Referer",
          "op_negated" : 1,
@@ -237,7 +269,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90016,
          "operator" : "EQUALS",
          "opts" : {
@@ -251,7 +285,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90017,
          "operator" : "EQUALS",
          "opts" : {
@@ -268,7 +304,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90018,
          "msg" : "Slider Revolution WordPress Plugin LFI Vulnerability",
          "operator" : "REGEX",
@@ -283,7 +321,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90019,
          "msg" : "Bash environmental variable injection (CVE-2014-6271)",
          "operator" : "REGEX",
@@ -298,7 +338,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90020,
          "msg" : "Bash environmental variable injection (CVE-2014-6271)",
          "operator" : "REGEX",
@@ -313,7 +355,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90021,
          "operator" : "EQUALS",
          "opts" : {
@@ -327,7 +371,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90022,
          "operator" : "EQUALS",
          "opts" : {
@@ -341,7 +387,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90023,
          "msg" : "Emerging fake Googlebot wp-login bruteforce",
          "operator" : "EQUALS",
@@ -353,7 +401,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90024,
          "operator" : "CONTAINS",
          "opts" : {
@@ -371,7 +421,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90025,
          "operator" : "EQUALS",
          "opts" : {
@@ -389,7 +441,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90026,
          "operator" : "EQUALS",
          "opts" : {
@@ -407,7 +461,9 @@
          ]
       },
       {
-         "action" : "CHAIN",
+         "actions" : {
+            "disrupt" : "CHAIN"
+         },
          "id" : 90027,
          "operator" : "EQUALS",
          "opts" : {
@@ -422,7 +478,9 @@
          ]
       },
       {
-         "action" : "DENY",
+         "actions" : {
+            "disrupt" : "DENY"
+         },
          "id" : 90028,
          "msg" : "FancyBox for Wordpress access control vulnerability (https://www.cryptobells.com/fancybox-for-wordpress-zero-day-and-broken-patch/)",
          "operator" : "EQUALS",

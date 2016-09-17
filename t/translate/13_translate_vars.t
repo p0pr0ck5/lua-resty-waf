@@ -82,6 +82,31 @@ translate_vars(
 	{
 		vars => [
 			{
+				variable => 'IP',
+				specific => 'foo',
+			},
+		],
+	},
+	$translation,
+	undef,
+);
+is_deeply(
+	$translation->{vars},
+	[
+		{
+			type    => 'IP',
+			parse   => { specific => 'FOO' },
+			storage => 1
+		}
+	],
+	'translate a storage var in the lookup table (specific element is uppercased)'
+);
+
+$translation = {};
+translate_vars(
+	{
+		vars => [
+			{
 				variable => 'ARGS',
 				specific => '',
 				modifier => '&'

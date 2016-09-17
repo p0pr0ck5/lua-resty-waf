@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: ACCEPT is an alter action
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
@@ -62,5 +71,14 @@ GET /t
 --- error_code: 200
 --- response_body_unlike
 SCORE
+--- no_error_log
+[error]
+
+=== TEST 5: DROP is an alter action
+--- request
+GET /t
+--- error_code: 200
+--- response_body_like
+DROP
 --- no_error_log
 [error]

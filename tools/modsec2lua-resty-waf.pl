@@ -27,7 +27,7 @@ _EOF
 
 
 sub main {
-	my ($path, $quiet, $silent, $pretty, $force);
+	my ($path, $quiet, $silent, $pretty, $force, @input);
 
 	GetOptions(
 		'q|quiet'  => \$quiet,
@@ -41,9 +41,14 @@ sub main {
 	# silent implies quiet
 	$quiet = 1 if $silent;
 
+	while (<>) {
+		chomp;
+		push @input, $_;
+	}
+
 	# ModSecurity ruleset parsing
 	# clean the input and build an array of tokens
-	my @parsed_lines = map { parse_tokens(tokenize($_)) } clean_input(*STDIN);
+	my @parsed_lines = map { parse_tokens(tokenize($_)) } clean_input(@input);
 
 	# ModSecurity knows where it lives in a chain
 	# via pointer arithmetic and internal state handling

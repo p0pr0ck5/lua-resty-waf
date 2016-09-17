@@ -83,6 +83,26 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'drop'
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		action => 'DROP'
+	},
+	'translate drop'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'pass'
 			}
 		]
@@ -103,6 +123,147 @@ translate_actions(
 	{
 		actions => [
 			{
+				action => 'accuracy',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		accuracy => 7
+	},
+	'translate accuracy'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'maturity',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		maturity => 7
+	},
+	'translate maturity'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'rev',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		rev => 7
+	},
+	'translate rev'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'severity',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		severity => 7
+	},
+	'translate severity'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ver',
+				value  => 7,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		ver => 7
+	},
+	'translate ver'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'capture',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{},
+	'translate capture (no warning)'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'chain',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{},
+	'translate chain (no warning)'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
 				action => 'expirevar',
 				value  => 'foo.bar=60',
 			}
@@ -114,14 +275,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'BAR',
 					time => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with integer expire time'
@@ -143,14 +306,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'BAR',
 					time => .2,
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with decimal expire time'
@@ -172,14 +337,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			expirevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'expirevar',
+				data   =>
 				{
-					col  => 'foo',
-					key  => 'bar',
+					col  => 'FOO',
+					key  => 'BAR',
 					time => 'baz-mocked',
 				}
-			]
+			} ]
 		}
 	},
 	'translate expirevar with non-numeric expire time'
@@ -212,7 +379,7 @@ translate_actions(
 		actions => [
 			{
 				action => 'initcol',
-				value  => 'IP=%{REMOTE_ADDR}',
+				value  => 'IP=foo',
 			}
 		]
 	},
@@ -222,11 +389,52 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			initcol => { IP => '%{REMOTE_ADDR}' }
+		actions => {
+			nondisrupt => [
+				{
+					action => 'initcol',
+					data   =>
+					{
+						col   => 'IP',
+						value => 'foo-mocked'
+					}
+				}
+			]
 		}
 	},
 	'translate initcol'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'initcol',
+				value  => 'ip=foo',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'initcol',
+					data   =>
+					{
+						col   => 'IP',
+						value => 'foo-mocked'
+					}
+				}
+			]
+		}
+	},
+	'translate initcol (col is uppercased)'
 );
 
 $translation = {};
@@ -266,7 +474,7 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		msg => 'data',
+		msg => 'data-mocked',
 	},
 	'translate msg'
 );
@@ -470,14 +678,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
-					value => 'bar',
+					key   => 'FOO',
+					value => 'bar-mocked',
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with string value'
@@ -499,14 +709,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 					value => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with integer value'
@@ -528,18 +740,52 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 					value => 60,
 					inc   => 1,
 				}
-			]
+			} ]
 		}
 	},
 	'increment setvar with integer value'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'setvar',
+				value  => 'IP.foo=+bar',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
+				{
+					col   => 'IP',
+					key   => 'FOO',
+					value => 'bar-mocked',
+					inc   => 1,
+				}
+			} ]
+		}
+	},
+	'increment setvar with string value'
 );
 
 $translation = {};
@@ -558,14 +804,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
-					value => '.2',
+					key   => 'FOO',
+					value => '0.2',
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with decimal (string) value'
@@ -587,15 +835,17 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
-					value => 0.2,
+					key   => 'FOO',
+					value => '0.2',
 					inc   => 1,
 				}
-			]
+			} ]
 		}
 	},
 	'increment setvar with decimal value'
@@ -617,14 +867,16 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			setvar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'setvar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo.bar',
+					key   => 'FOO.BAR',
 					value => 60,
 				}
-			]
+			} ]
 		}
 	},
 	'translate setvar with key having a dot'
@@ -646,16 +898,18 @@ translate_actions(
 is_deeply(
 	$translation,
 	{
-		opts => {
-			deletevar => [
+		actions => {
+			nondisrupt => [ {
+				action => 'deletevar',
+				data   =>
 				{
 					col   => 'IP',
-					key   => 'foo',
+					key   => 'FOO',
 				}
-			]
+			} ]
 		}
 	},
-	'translate setvar with integer value'
+	'translate setvar into deletevar'
 );
 
 $translation = {};
@@ -677,6 +931,84 @@ warning_like
 	qr/No assignment in setvar, but not a delete\?/,
 	'warn when setvar sets not value, but does not prepend !'
 ;
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'status',
+				value  => '500',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'status',
+				data   => 500,
+			} ]
+		}
+	},
+	'translate status'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'pause',
+				value  => 5000,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'sleep',
+				data   => 5,
+			} ]
+		}
+	},
+	'translate pause'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'pause',
+				value  => 125,
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [ {
+				action => 'sleep',
+				data   => 0.125,
+			} ]
+		}
+	},
+	'translate pause with decimal value'
+);
 
 $translation = {};
 translate_actions(
@@ -757,6 +1089,57 @@ is_deeply(
 	$translation,
 	{},
 	'do not warn on translation fail when silent is set'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'tag',
+				value  => 'foo',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		tag => [
+			'foo-mocked'
+		]
+	},
+	'translate one tag'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'tag',
+				value  => 'foo',
+			},
+			{
+				action => 'tag',
+				value  => 'bar',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		tag => [
+			'foo-mocked',
+			'bar-mocked',
+		]
+	},
+	'translate two tags'
 );
 
 $translation = {};

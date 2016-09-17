@@ -1,7 +1,7 @@
 use Test::Nginx::Socket::Lua;
 
 repeat_each(3);
-plan tests => repeat_each() * 5 * blocks() - 3;
+plan tests => repeat_each() * 5 * blocks() - 6;
 
 no_shuffle();
 run_tests();
@@ -12,6 +12,13 @@ __DATA__
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -44,6 +51,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -92,6 +106,13 @@ Removing expired key:
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -141,6 +162,13 @@ Initializing an empty collection for FOO
 --- http_config
 	lua_shared_dict store 10m;
 	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 110})
+			jit.off()
+		end
+
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("storage_backend", "dict")
@@ -185,4 +213,41 @@ Removing expired key: c
 --- no_error_log
 [error]
 Initializing an empty collection for FOO
+
+=== TEST 5: Fail when attempting to initialize storage when storage_zone is undefined
+--- http_config
+	lua_shared_dict store 10m;
+	init_by_lua '
+		if (os.getenv("LRW_COVERAGE")) then
+			runner = require "luacov.runner"
+			runner.tick = true
+			runner.init({savestepsize = 25})
+			jit.off()
+		end
+
+		local lua_resty_waf = require "resty.waf"
+		lua_resty_waf.default_option("storage_backend", "dict")
+		lua_resty_waf.default_option("debug", true)
+	';
+--- config
+    location = /t {
+        access_by_lua '
+			local lua_resty_waf = require "resty.waf"
+			local waf           = lua_resty_waf:new()
+
+			local data = {}
+
+			local storage = require "resty.waf.storage"
+			storage.initialize(waf, data, "FOO")
+		';
+
+		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+	}
+--- request
+GET /t
+--- error_code: 500
+--- error_log
+[error]
+Initializing storage type dict
+No storage_zone configured for memory-based persistent storage
 

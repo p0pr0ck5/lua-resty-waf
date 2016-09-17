@@ -25,6 +25,7 @@ exports qw(
 	translate_actions
 	figure_phase
 	translate_macro
+	@auto_expand_operators
 );
 
 export_tag translate => qw(
@@ -136,6 +137,7 @@ my $action_lookup = {
 	allow => 'ACCEPT',
 	block => 'DENY',
 	deny  => 'DENY',
+	drop  => 'DROP',
 	pass  => 'IGNORE'
 };
 
@@ -157,7 +159,19 @@ my $defaults = {
 	phase  => 'access',
 };
 
-my @auto_expand_operators = qw(beginsWith contains endsWith streq within);
+our @auto_expand_operators = qw(
+	beginsWith
+	contains
+	containsWord
+	endsWith
+	eq
+	ge
+	gt
+	le
+	lt
+	streq
+	within
+);
 
 my @alters_pattern_operators = qw(beginsWith containsWord endsWith);
 
@@ -170,14 +184,13 @@ sub valid_line {
 }
 
 sub clean_input {
-	my ($fh) = @_;
+	my (@input) = @_;
 
 	my (@lines, @line_buf);
 
-	while (my $line = <$fh>) {
-		chomp $line;
-
+	for my $line (@input) {
 		# ignore comments and blank lines
+		next if ! $line;
 		next if $line =~ m/^\s*$/;
 		next if $line =~ m/^\s*#/;
 
@@ -524,7 +537,7 @@ sub translate_chain {
 
 	my (@lua_resty_waf_chain, $chain_id, $chain_action, $ctr);
 
-	my @end_actions = qw(action skip skip_after);
+	my @end_actions = qw(action msg logdata skip skip_after);
 
 	for my $rule (@chain) {
 		my $translation = {};
@@ -576,6 +589,8 @@ sub translate_chain {
 			$translation->{action} = 'CHAIN';
 		}
 
+		$translation->{actions}->{disrupt} = delete $translation->{action};
+
 		push @lua_resty_waf_chain, $translation;
 	}
 
@@ -610,10 +625,14 @@ sub translate_vars {
 		if (defined $modifier && $modifier eq '!') {
 			my $key = $specific_regex ? 'ignore_regex' : 'ignore';
 
+			$specific = uc $specific if $lookup_var->{storage};
+
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
 		} elsif (length $specific) {
 			my $key = $specific_regex ? 'regex' : 'specific';
+
+			$specific = uc $specific if $lookup_var->{storage};
 
 			$translated_var->{parse}->{$key} = $specific;
 			delete $translated_var->{parse}->{values};
@@ -697,7 +716,7 @@ sub translate_operator {
 
 	# automatically expand the rule pattern for certain operators
 	if (any { $_ eq $original_operator } @auto_expand_operators) {
-		$translation->{actions}->{parsepattern} = 1;
+		$translation->{opts}->{parsepattern} = 1;
 		$translation->{pattern} = translate_macro($translation->{pattern});
 	}
 
@@ -707,13 +726,43 @@ sub translate_operator {
 sub translate_actions {
 	my ($rule, $translation, $silent) = @_;
 
+	my @silent_actions = qw(
+		capture
+		chain
+	);
+
+	my @disruptive_actions = qw(
+		allow
+		block
+		deny
+		drop
+		pass
+	);
+
+	my @direct_translation_actions = qw(
+		accuracy
+		id
+		maturity
+		phase
+		rev
+		severity
+		skip
+		ver
+	);
+
 	for my $action (@{$rule->{actions}}) {
 		my $key   = $action->{action};
 		my $value = $action->{value};
 
+		# these values have no direct translation,
+		# but we don't need to warn about them
+		next if grep { $_ eq $key } @silent_actions;
+
 		# easier to do this than a lookup table
-		if (grep { $_ eq $key } qw(allow block deny pass)) {
+		if (grep { $_ eq $key } @disruptive_actions) {
 			$translation->{action} = uc $action_lookup->{$key};
+		} elsif (grep { $_ eq $key } @direct_translation_actions) {
+			$translation->{$key} = $value;
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
@@ -721,26 +770,34 @@ sub translate_actions {
 			# dont cast as an int if this is a macro
 			$time = $time =~ m/^\d*(?:\.\d+)?$/ ? $time + 0 : translate_macro($time);
 
-			push @{$translation->{opts}->{expirevar}},
-				{ col => $collection, key => $element, time => $time };
-		} elsif ($key eq 'id') {
-			$translation->{id} = $value;
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'expirevar',
+					data   => {
+						col  => uc $collection,
+						key  => uc $element,
+						time => $time,
+					}
+				};
 		} elsif ($key eq 'initcol') {
 			my ($col, $val) = split /=/, $value;
 
-			$translation->{opts}->{initcol}->{uc $col} = $val;
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'initcol',
+					data   => {
+						col   => uc $col,
+						value => translate_macro($val),
+					}
+				};
 		} elsif ($key eq 'logdata') {
 			$translation->{logdata} = translate_macro($value);
 		} elsif ($key eq 'msg') {
-			$translation->{msg} = $value;
+			$translation->{msg} = translate_macro($value);
 		} elsif ($key =~ m/^no(?:audit)?log$/) {
 			$translation->{opts}->{nolog} = 1;
 		} elsif ($key =~ m/^(?:audit)?log$/) {
 			delete $translation->{opts}->{nolog} if defined $translation->{opts};
-		} elsif ($key eq 'phase') {
-			$translation->{phase} = $value; # this will be deleted after we figure where the chain will live
-		} elsif ($key eq 'skip') {
-			$translation->{skip} = $value;
 		} elsif ($key eq 'skipAfter') {
 			$translation->{skip_after} = $value;
 		} elsif ($key eq 'setvar') {
@@ -754,25 +811,53 @@ sub translate_actions {
 				if ($var =~ m/^\!/) {
 					substr $collection, 0, 1, '';
 
-					my $deletevar = { col => $collection, key => $element };
-					push @{$translation->{opts}->{deletevar}}, $deletevar;
+					push @{$translation->{actions}->{nondisrupt}}, {
+						action => 'deletevar',
+						data   => {
+							col => uc $collection,
+							key => uc $element,
+						}
+					};
 				} else {
 					warn "No assignment in setvar, but not a delete?\n";
 				}
 				next;
 			}
 
-			my $setvar = { col => $collection, key => $element };
+			my $setvar = { col => uc $collection, key => uc $element };
 
 			if ($val =~ m/^\+/) {
 				substr $val, 0, 1, '';
 				$setvar->{inc} = 1;
-				$val += 0 if $val =~ m/^\d*(?:\.\d+)?$/;
 			}
 
-			$setvar->{value}  = $val;
+			if ($val =~ m/^\d*(?:\.\d+)?$/) {
+				$val += 0;
+			} else {
+				$val = translate_macro($val);
+			}
 
-			push @{$translation->{opts}->{setvar}}, $setvar;
+			$setvar->{value} = $val;
+
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'setvar',
+					data   => $setvar
+				};
+		} elsif ($key eq 'status') {
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => $key,
+					data   => $value += 0,
+				};
+		} elsif ($key eq 'pause') {
+			my $time = $value / 1000; # pause:n is given in ms, ngx.sleep takes its arg as seconds
+
+			push @{$translation->{actions}->{nondisrupt}},
+				{
+					action => 'sleep',
+					data   => $time,
+				};
 		} elsif ($key eq 't') {
 			next if $value eq 'none';
 
@@ -784,6 +869,8 @@ sub translate_actions {
 			}
 
 			push @{$translation->{opts}->{transform}}, $transform;
+		} elsif ($key eq 'tag') {
+			push @{$translation->{tag}}, translate_macro($value);
 		} else {
 			warn "Cannot translate action $key\n" if !$silent;
 		}
@@ -813,12 +900,17 @@ sub translate_macro {
 		my ($key, $specific) = split /\./, $macro;
 		my $replacement;
 
-		if (my $lookup = clone($valid_vars->{$key})) {
+		if (my $lookup = clone($valid_vars->{uc $key})) {
 			$replacement = $lookup->{type};
 
-			$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
+			if ($lookup->{storage}) {
+				# this is a pretty ugly hack...
+				$replacement .= '.' . uc $specific;
+			} else {
+				$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
 
-			$replacement .= ".$specific" if $specific;
+				$replacement .= ".$specific" if $specific;
+			}
 		} else {
 			$replacement = $macro;
 		}

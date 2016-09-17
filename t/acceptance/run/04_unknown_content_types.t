@@ -9,6 +9,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Do not allow unknown content types
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         access_by_lua '
@@ -32,6 +41,15 @@ application/foobar not a valid content type
 [error]
 
 === TEST 2: Explicitly allow unknown content types
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 110})
+		jit.off()
+	end
+}
 --- config
     location = /t {
         access_by_lua '

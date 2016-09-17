@@ -9,12 +9,21 @@ run_tests();
 __DATA__
 
 === TEST 1: ACCEPT exits the phase with ngx.OK
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
+			actions.disruptive_lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should not see this")
 		';
@@ -31,12 +40,21 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 We should not see this
 
 === TEST 2: ACCEPT does not exit the phase when mode is not ACTIVE
+--- http_config
+init_by_lua_block{
+	if (os.getenv("LRW_COVERAGE")) then
+		runner = require "luacov.runner"
+		runner.tick = true
+		runner.init({savestepsize = 50})
+		jit.off()
+	end
+}
 --- config
 	location /t {
 		access_by_lua '
 			local actions = require "resty.waf.actions"
 
-			actions.lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE" }, {})
+			actions.disruptive_lookup["ACCEPT"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "SIMULATE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
 		';

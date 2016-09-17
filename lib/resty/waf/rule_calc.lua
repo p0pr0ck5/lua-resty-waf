@@ -2,7 +2,7 @@ local _M = {}
 
 local table_concat = table.concat
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 local function _transform_collection_key(transform)
 	if (not transform) then
@@ -26,10 +26,8 @@ local function _build_collection_key(var, transform)
 		key[2] = tostring(k)
 		key[3] = tostring(v)
 		key[4] = tostring(_transform_collection_key(transform))
-		key[5] = tostring(var.length)
 	else
 		key[2] = tostring(_transform_collection_key(transform))
-		key[3] = tostring(var.length)
 	end
 
 	return table_concat(key, "|")
@@ -44,7 +42,7 @@ local function _write_chain_offsets(chain, max, cur_offset)
 
 		if (offset + cur_offset >= max) then
 			rule.offset_nomatch = nil
-			if (rule.action == "CHAIN") then
+			if (rule.actions.disrupt == "CHAIN") then
 				rule.offset_match = 1
 			else
 				rule.offset_match = nil
@@ -87,7 +85,7 @@ function _M.calculate(ruleset)
 			var.collection_key = _build_collection_key(var, rule.opts.transform)
 		end
 
-		if (rule.action ~= "CHAIN") then
+		if (rule.actions.disrupt ~= "CHAIN") then
 			_write_chain_offsets(chain, max, i - #chain)
 
 			if (rule.skip) then
