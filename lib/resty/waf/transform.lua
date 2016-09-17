@@ -9,7 +9,7 @@ local string_len   = string.len
 local string_lower = string.lower
 local string_sub   = string.sub
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 _M.lookup = {
 	base64_decode = function(waf, value)

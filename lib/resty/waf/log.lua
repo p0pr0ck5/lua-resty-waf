@@ -4,7 +4,7 @@ local cjson         = require "cjson"
 local file_logger   = require "resty.logger.file"
 local socket_logger = require "resty.logger.socket"
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 -- debug logger
 function _M.log(waf, msg)

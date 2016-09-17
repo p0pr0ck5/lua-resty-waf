@@ -4,7 +4,7 @@ local logger  = require "resty.waf.log"
 local storage = require "resty.waf.storage"
 local util    = require "resty.waf.util"
 
-_M.version = "0.8.1"
+_M.version = "0.8.2"
 
 _M.alter_actions = {
 	ACCEPT = true,
