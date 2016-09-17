@@ -112,10 +112,10 @@ lua-resty-waf workload is almost exclusively CPU bound. Memory footprint in the 
 
 ##Installation
 
-A simple Makefile is provided. Simply run `make install`:
+A simple Makefile is provided:
 
 ```
-	# make install
+	# make && sudo make install
 ```
 
 Alternatively, install via Luarocks:

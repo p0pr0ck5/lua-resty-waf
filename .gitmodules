@@ -1,0 +1,6 @@
+[submodule "libinjection"]
+	path = libinjection
+	url = https://github.com/p0pr0ck5/libinjection
+[submodule "lua-aho-corasick"]
+	path = lua-aho-corasick
+	url = https://github.com/p0pr0ck5/lua-aho-corasick
