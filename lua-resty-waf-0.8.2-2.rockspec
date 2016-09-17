@@ -1,7 +1,7 @@
 package = "lua-resty-waf"
-version = "0.8.2-1"
+version = "0.8.2-2"
 source = {
-   url = "git://github.com/p0pr0ck5/lua-resty-waf",
+   url = "gitrec+https://github.com/p0pr0ck5/lua-resty-waf",
 }
 description = {
    summary = "High-performance WAF built on the OpenResty stack",
@@ -10,7 +10,8 @@ description = {
    maintainer = "Robert Paprocki <robert@cryptobells.com>"
 }
 dependencies = {
-   "lua >= 5.1"
+   "lua >= 5.1",
+   "luarocks-fetch-gitrec",
 }
 build = {
    type = "make",
