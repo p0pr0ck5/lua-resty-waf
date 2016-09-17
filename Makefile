@@ -47,12 +47,12 @@ test-translate:
 
 test: test-unit test-acceptance test-regression test-translate
 
-install: all
+install:
 	$(INSTALL) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
 	$(INSTALL) $(PWD)/lib/*.so $(LUA_LIB_DIR)
 	$(INSTALL) $(PWD)/rules/ $(LUA_LIB_DIR)
 
-install-hard: all
+install-hard:
 	$(INSTALL_HARD) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
 	$(INSTALL_HARD) $(PWD)/lib/*.so $(LUA_LIB_DIR)
 	$(INSTALL_HARD) $(PWD)/rules/ $(LUA_LIB_DIR)
