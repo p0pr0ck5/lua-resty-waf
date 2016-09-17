@@ -5,6 +5,9 @@ cache:
 notifications:
   irc: "chat.freenode.net#lua-resty-waf"
   webhooks: https://www.cryptobells.com/endpoint
+branches:
+  except:
+    - submodules
 env:
   global:
     - V_OPENRESTY=1.11.2.1
