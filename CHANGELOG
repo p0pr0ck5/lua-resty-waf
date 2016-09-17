@@ -1,3 +1,22 @@
+v0.8.2                                                              Sep 17, 2016
+
+    * Distribution: libinjection and lua-aho-corasick are now provided as git
+      submodules and built as part of the make process
+
+    * Translation: Force upper case for storage variables
+
+    * Translation: Various bugfixes and cleanup improvements
+
+    * Bugfix: Properly determine collection when length modifier is present
+
+    * Improvement: Proper handling of non-disruptive actions
+
+    * Feature: Add DROP disruptive action
+
+    * Feature: Add sleep non-disruptive action
+
+    * Improvement: Fatally fail when a storage_zone hasn't been defined
+
 v0.8.1                                                              Aug 21, 2016
 
     * Feature: Configurable cosocket keepalive pools for remote persistent
