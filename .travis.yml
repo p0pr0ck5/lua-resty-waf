@@ -5,9 +5,6 @@ cache:
 notifications:
   irc: "chat.freenode.net#lua-resty-waf"
   webhooks: https://www.cryptobells.com/endpoint
-branches:
-  except:
-    - submodules
 env:
   global:
     - V_OPENRESTY=1.11.2.1
@@ -24,12 +21,11 @@ install:
     - cpanm -v --notest Test::Nginx Test::More Exporter::Declare Test::Exception Test::MockModule;
 before_script:
     - sudo apt-get update -q
-    - sudo apt-get install libssl-dev lua5.1 -y
+    - sudo apt-get install lua5.1 liblua5.1-0-dev -y
     - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
     - sudo tar -jxvf openresty-$V_OPENRESTY-$DATE.tar.bz2 -C /usr/local/
-    - sudo ln -s $(pwd)/lib/resty/* /usr/local/openresty/lualib/resty/
-    - sudo ln -s $(pwd)/lib/*.so /usr/local/openresty/lualib/
-    - sudo ln -s $(pwd)/rules /usr/local/openresty/lualib/
+    - make
+    - sudo make install
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
   - ./tools/lua-releng -L

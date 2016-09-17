@@ -5,15 +5,33 @@ INSTALL_HARD      = cp -r
 PWD               = `pwd`
 
 LIBS    = cookie.lua iputils.lua logger libinjection.lua waf waf.lua
+C_LIBS  = lua-aho-corasick libinjection
 SO_LIBS = libac.so libinjection.so
 RULES   = rules
 
-.PHONY: all test install clean test-unit test-acceptance test-regression test-translate
+.PHONY: all test install clean test-unit test-acceptance test-regression test-translate lua-aho-corasick libinjection clean-libinjection clean-lua-aho-corasick
 
-all: ;
+all: $(C_LIBS)
 
 clean:
 	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm $(SO_LIBS) && cd resty/ && rm -rf $(LIBS)
+
+clean-build: clean-libinjection clean-lua-aho-corasick clean-libs
+
+clean-lua-aho-corasick:
+	cd lua-aho-corasick && make clean
+
+clean-libinjection:
+	cd libinjection && make clean && git checkout -- .
+
+clean-libs:
+	cd lib && rm $(SO_LIBS)
+
+lua-aho-corasick:
+	cd lua-aho-corasick && make && cp libac.so ../lib/
+
+libinjection:
+	cd libinjection && make && cp src/libinjection.so ../lib/
 
 test-unit:
 	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/unit
