@@ -339,8 +339,8 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 ```lua
 	http {
-		-- the lua module 50000.lua must live at
-		-- /path/to/extra/rulesets/rules/50000.lua
+		-- the rule file 50000.json must live at
+		-- /path/to/extra/rulesets/rules/50000.json
 		lua_package_path '/path/to/extra/rulesets/?.lua;;';
 	}
 
