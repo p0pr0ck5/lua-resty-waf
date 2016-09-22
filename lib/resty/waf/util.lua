@@ -147,7 +147,7 @@ function _M.parse_ruleset(data)
 	end
 end
 
--- find a rule file with a .json prefix, read it, and return a JSON string
+-- find a rule file with a .json suffix, read it, and return a JSON string
 function _M.load_ruleset_file(name)
 	for k, v in string_gmatch(package.path, "[^;]+") do
 		local path = string_match(k, "(.*/)")
