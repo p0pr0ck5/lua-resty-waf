@@ -9,7 +9,7 @@ our $HttpConfig = qq{
 };
 
 repeat_each(3);
-plan tests => repeat_each() * 4 * blocks() + 3;
+plan tests => repeat_each() * 4 * blocks();
 
 no_shuffle();
 run_tests();
@@ -35,7 +35,6 @@ GET /t
 --- error_code:
 --- error_log
 Rule action was DROP, ending eith ngx.HTTP_CLOSE
-lua exit with code 444
 --- no_error_log
 [error]
 We should not see this
