@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks();
@@ -9,20 +17,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Default storage backend
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -53,20 +56,15 @@ Initializing an empty collection for FOO
 [error]
 
 === TEST 2: Define dict storage backend
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -93,20 +91,15 @@ Initializing an empty collection for FOO
 [error]
 
 === TEST 3: Define memcached storage backend
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -138,20 +131,15 @@ Initializing an empty collection for FOO
 [error]
 
 === TEST 4: Define redis storage backend
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -186,20 +174,15 @@ Initializing an empty collection for FOO
 [error]
 
 === TEST 5: Default invalid storage backend
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '

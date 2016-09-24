@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
@@ -9,18 +17,13 @@ run_tests();
 __DATA__
 
 === TEST 1: Log a string
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -40,18 +43,13 @@ We have logged a string!
 [error]
 
 === TEST 2: Log a string at ngx.INFO log level
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -74,18 +72,13 @@ We have logged a string!
 [error]
 
 === TEST 3: Log a string at ngx.WARN log level
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -106,18 +99,13 @@ qr/\[warn\].*We have logged a string!/
 [error]
 
 === TEST 4: Log a string at ngx.WARN log level
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -138,18 +126,13 @@ qr/\[debug\].*We have logged a string!/
 [error]
 
 === TEST 5: Do not log a string if debug disabled
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -168,18 +151,13 @@ We have logged a string!
 [error]
 
 === TEST 6: Do not log a string if insufficient log level
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 50})
-			jit.off()
-		end
-
 		lua_resty_waf = require "resty.waf"
 		logger  = require "resty.waf.log"
 	';
+#
 --- config
 	location /t {
 		access_by_lua '

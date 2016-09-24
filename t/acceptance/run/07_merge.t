@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
@@ -9,19 +17,14 @@ run_tests();
 __DATA__
 
 === TEST 1: Merge done in init
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -41,21 +44,16 @@ false
 [error]
 
 === TEST 2: One-time global merge
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.default_option("ignore_ruleset", "42000_xss")
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -75,6 +73,7 @@ false
 [error]
 
 === TEST 3: No global merge done (init never called)
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -94,19 +93,14 @@ true
 [error]
 
 === TEST 4: Individual merge needed (scope-local ruleset change)
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -129,19 +123,14 @@ true
 [error]
 
 === TEST 5: Ignoring ruleset triggers merge
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -164,19 +153,14 @@ true
 [error]
 
 === TEST 6: Adding ruleset triggers merge
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -199,19 +183,14 @@ true
 [error]
 
 === TEST 7: Adding ruleset string triggers merge
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -234,19 +213,14 @@ true
 [error]
 
 === TEST 8: Ignoring single rule does not trigger merge
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 init_by_lua '
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
 ';
+#
 --- config
 	location /t {
 		access_by_lua '

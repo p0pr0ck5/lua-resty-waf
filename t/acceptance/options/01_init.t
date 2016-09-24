@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
@@ -9,19 +17,14 @@ run_tests();
 __DATA__
 
 === TEST 1: Call init with no options
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -41,21 +44,16 @@ GET /t
 [lua] log.lua:12: log()
 
 === TEST 2: Inherit init options
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.default_option("debug_log_level", ngx.DEBUG)
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '

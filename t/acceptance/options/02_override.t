@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks() + 3;
@@ -9,19 +17,14 @@ run_tests();
 __DATA__
 
 === TEST 1: Local set_option overrides implicit default
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -43,20 +46,15 @@ GET /t
 [error]
 
 === TEST 2: Local set_option overrides explicit default_option
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -77,19 +75,14 @@ GET /t
 [lua] log.lua:12: log()
 
 === TEST 3: Override of implicit default only affects defined scope
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -122,19 +115,14 @@ GET /t
 [error]
 
 === TEST 4: Override of implicit default only affects defined scope (part 2)
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -166,20 +154,15 @@ GET /s
 [lua] log.lua:12: log()
 
 === TEST 5: Override of explicit default only affects defined scope
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -211,20 +194,15 @@ GET /t
 [lua] log.lua:12: log()
 
 === TEST 6: Override of explicit default only affects defined scope (part 2)
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("debug", true)
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '
@@ -257,20 +235,15 @@ GET /s
 [error]
 
 === TEST 7: Append to a table value option
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 
 		lua_resty_waf.default_option("ignore_ruleset", 11000)
 		lua_resty_waf.init()
 	';
+#
 --- config
 	location /t {
 		access_by_lua '

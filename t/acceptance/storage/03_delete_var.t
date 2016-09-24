@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks();
@@ -9,20 +17,15 @@ run_tests();
 __DATA__
 
 === TEST 1: Delete a var - confirm the value is gone
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -58,20 +61,15 @@ Deleting FOO:COUNT
 [error]
 
 === TEST 2: Delete a var - confirm the __altered flag is set
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -107,20 +105,15 @@ Deleting FOO:COUNT
 [error]
 
 === TEST 3: Delete a non-existing var
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
@@ -156,20 +149,15 @@ BAR was not found in FOO
 [error]
 
 === TEST 4: Delete a non-existing var - confirm the altered flag is unset
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
 		lua_resty_waf.default_option("storage_zone", "store")
 		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '

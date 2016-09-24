@@ -7,15 +7,8 @@ plan tests => repeat_each() * 14 * blocks() - 3;
 my $pwd = cwd();
 
 our $HttpConfig = qq{
-	lua_package_path "$pwd/t/?.lua;;";
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+	lua_package_path "$pwd/lib/?.lua;$pwd/t/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
 };
 
 no_shuffle();
@@ -24,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Runs the default rulesets
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -65,15 +50,7 @@ Adding ruleset
 Ignoring ruleset
 
 === TEST 2: Ignore a ruleset
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '

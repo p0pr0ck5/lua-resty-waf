@@ -1,4 +1,13 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+	lua_shared_dict shm 10m;
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 6 * blocks() - 6;
@@ -10,16 +19,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Show the design of the resource
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		content_by_lua '
@@ -47,16 +47,7 @@ __DATA__
 ["Set key 'foo'!\n", "shm:foo is set as: 'bar'\n"]
 
 === TEST 2: Benign request is not caught in SIMULATE mode
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -116,16 +107,7 @@ __DATA__
 "id":99001
 
 === TEST 3: Benign request is not caught in ACTIVE mode
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -187,16 +169,7 @@ __DATA__
 "id":99001
 
 === TEST 4: Malicious request exploits stored XSS vulnerability
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		content_by_lua '
@@ -226,16 +199,7 @@ __DATA__
 "id":99001
 
 === TEST 5: Malicious request is logged in SIMULATE mode
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -295,16 +259,7 @@ __DATA__
 "id":99001
 
 === TEST 6: Malicious request is blocked in ACTIVE mode
---- http_config
-	lua_shared_dict shm 10m;
-	init_by_lua_block{
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-	}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
