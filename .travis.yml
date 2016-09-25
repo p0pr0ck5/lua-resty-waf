@@ -25,7 +25,6 @@ before_script:
     - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
     - sudo tar -jxvf openresty-$V_OPENRESTY-$DATE.tar.bz2 -C /usr/local/
     - make
-    - sudo make install
 script:
   - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
   - ./tools/lua-releng -L
