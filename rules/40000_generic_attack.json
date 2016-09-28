@@ -44,7 +44,7 @@
             ]
          },
          "id" : 40002,
-         "msg" : "Repetative non-word characters anomaly detected",
+         "msg" : "Repetitive non-word characters anomaly detected",
          "operator" : "REGEX",
          "opts" : {
             "transform" : "uri_decode"
