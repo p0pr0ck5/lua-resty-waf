@@ -349,7 +349,7 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 	location / {
 		access_by_lua '
-			waf:set_option("add_ruleset", 50000)
+			waf:set_option("add_ruleset", "50000_extra_rules")
 		';
 	}
 ```
@@ -367,7 +367,7 @@ Adds an additional ruleset to be used during processing. This allows users to im
 ```lua
 	location / {
 		access_by_lua '
-			waf:set_option("add_ruleset_string", "70000", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "70000_extra_rules", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 		';
 	}
 ```
@@ -852,7 +852,7 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 ```lua
 	location / {
 		access_by_lua '
-			waf:set_option("ignore_ruleset", 40000)
+			waf:set_option("ignore_ruleset", "41000_sqli")
 		';
 	}
 ```
@@ -1163,15 +1163,15 @@ Additionally, it is required to call `write_log_events` in a `log_by_lua` handle
 
 lua-resty-waf is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
 
-* **11000**: Local policy whitelisting
-* **20000**: HTTP protocol violation
-* **21000**: HTTP protocol anomalies
-* **35000**: Malicious/suspect user agents
-* **40000**: Generic attacks
-* **41000**: SQLi
-* **42000**: XSS
-* **90000**: Custom rules/virtual patching
-* **99000**: Anomaly score handling
+* **11000_whitelist**: Local policy whitelisting
+* **20000_http_violation**: HTTP protocol violation
+* **21000_http_anomaly**: HTTP protocol anomalies
+* **35000_user_agent**: Malicious/suspect user agents
+* **40000_generic_attack**: Generic attacks
+* **41000_sqli**: SQLi
+* **42000_xss**: XSS
+* **90000_custom**: Custom rules/virtual patching
+* **99000_scoring**: Anomaly score handling
 
 ##Rule Definitions
 
