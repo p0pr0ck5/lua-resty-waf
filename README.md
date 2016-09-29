@@ -597,7 +597,7 @@ When set to true, the log entries contain the request body under the `request_bo
 ```lua
 	location / {
 		access_by_lua '
-			waf:set_option("event_log_request_arguments", true)
+			waf:set_option("event_log_request_body", true)
 		';
 	}
 ```
@@ -831,6 +831,7 @@ Instructs the module to ignore a specified rule ID. Note that ignoring a rule in
 	location / {
 		access_by_lua '
 			waf:set_option("ignore_rule", 40294)
+			waf:set_option("ignore_rule", {40002, 41036})
 		';
 	}
 ```
@@ -1065,7 +1066,7 @@ Define a host to use when using memcached as a persistent variable storage engin
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_host", "10.10.10.10")
+			waf:set_option("storage_memcached_host", "10.10.10.10")
 		';
 	}
 ```
@@ -1081,7 +1082,7 @@ Define a port to use when using memcached as a persistent variable storage engin
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_port", 11221)
+			waf:set_option("storage_memcached_port", 11221)
 		';
 	}
 ```
@@ -1097,7 +1098,7 @@ Define a host to use when using redis as a persistent variable storage engine.
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_host", "10.10.10.10")
+			waf:set_option("storage_redis_host", "10.10.10.10")
 		';
 	}
 ```
@@ -1113,7 +1114,7 @@ Define a port to use when using redis as a persistent variable storage engine.
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_port", 6397)
+			waf:set_option("storage_redis_port", 6397)
 		';
 	}
 ```
