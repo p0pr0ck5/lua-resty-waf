@@ -148,6 +148,9 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			-- this may be desirable for low-traffic or testing sites
 			-- by default, event logs are not written until the buffer is full
 			-- for testing, flush the log buffer every 5 seconds
+			--
+			-- this is only necessary when configuring a remote TCP/UDP
+			-- socket server for event logs. otherwise, this is ignored
 			lua_resty_waf.default_option("event_log_periodic_flush", 5)
 
 			-- perform some preloading and optimization
@@ -717,7 +720,7 @@ Defines the destination for event logs. lua-resty-waf currently supports logging
 	}
 ```
 
-Note that, due to a limition in the logging library used, only a single target socket (and separate file target) can be defined. This is to say, you may elect to use both socket and file logging in different locations, but you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged. Similarly, you may only define one file path if using a `file` logging target; writes to a second path location will be lost.
+Note that, due to a limition in the logging library used, only a single target socket can be defined. This is to say, you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged.
 
 ###event_log_target_host
 
