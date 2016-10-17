@@ -4,12 +4,3 @@
 [submodule "lua-aho-corasick"]
 	path = lua-aho-corasick
 	url = https://github.com/p0pr0ck5/lua-aho-corasick
-[submodule "lua-ffi-libinjection"]
-	path = lua-ffi-libinjection
-	url = https://github.com/p0pr0ck5/lua-ffi-libinjection
-[submodule "lua-resty-cookie"]
-	path = lua-resty-cookie
-	url = https://github.com/cloudflare/lua-resty-cookie
-[submodule "lua-resty-iputils"]
-	path = lua-resty-iputils
-	url = https://github.com/hamishforbes/lua-resty-iputils
