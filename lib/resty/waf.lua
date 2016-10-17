@@ -339,8 +339,6 @@ local function _merge_rulesets(self)
 		t[v] = true
 	end
 
-	ngx.log(ngx.ERR, "merge")
-
 	if (self) then
 		local added   = self._add_ruleset
 		local added_s = self._add_ruleset_string
@@ -442,7 +440,6 @@ function _M.exec(self)
 
 	-- build rulesets
 	if (self.need_merge == true) then
-		ngx.log(ngx.ERR, "found need_merge true")
 		_merge_rulesets(self)
 	else
 		self._active_rulesets = _global_rulesets
@@ -569,7 +566,6 @@ function _M.new(self)
 	}
 
 	if (_ruleset_def_cnt == 0) then
-		ngx.log(ngx.ERR, "need_merge true")
 		t.need_merge = true
 	end
 
@@ -614,8 +610,6 @@ function _M.init()
 			_ruleset_def_cnt = _ruleset_def_cnt + 1
 		end
 	end
-
-	ngx.log(ngx.ERR, _ruleset_def_cnt)
 end
 
 -- push log data regarding matching rule(s) to the configured target
