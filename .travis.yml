@@ -8,7 +8,7 @@ notifications:
 env:
   global:
     - V_OPENRESTY=1.11.2.1
-    - DATE=20160902
+    - DATE=20161017
   matrix:
     - TEST=unit
     - TEST=acceptance
@@ -20,6 +20,7 @@ services:
 install:
     - cpanm -v --notest Test::Nginx Test::More Exporter::Declare Test::Exception Test::MockModule;
 before_script:
+    - export PATH=/usr/local/openresty/bin/:$PATH
     - sudo apt-get update -q
     - sudo apt-get install lua5.1 liblua5.1-0-dev -y
     - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
