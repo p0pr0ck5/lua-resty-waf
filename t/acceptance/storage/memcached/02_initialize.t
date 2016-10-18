@@ -21,8 +21,6 @@ __DATA__
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -30,6 +28,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
@@ -59,8 +60,6 @@ Initializing an empty collection for FOO
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -69,6 +68,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b" })
 
@@ -110,8 +112,6 @@ Removing expired key:
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -120,6 +120,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
 
@@ -162,8 +165,6 @@ Initializing an empty collection for FOO
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -172,6 +173,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
 

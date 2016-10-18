@@ -21,8 +21,6 @@ __DATA__
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -30,6 +28,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
@@ -54,13 +55,11 @@ Initializing an empty collection
 [error]
 Error in connecting to memcached
 
-=== TEST 2: Connect with invalid host
+=== TEST 2: Connect with invalid port
 --- http_config eval
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 	lua_socket_log_errors off;
 #
@@ -69,6 +68,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()

@@ -22,8 +22,6 @@ __DATA__
 $::HttpConfig . q#
     init_by_lua '
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_backend", "redis")
-        lua_resty_waf.default_option("debug", true)
     ';
 #
 --- config
@@ -31,6 +29,9 @@ $::HttpConfig . q#
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local redis_m = require "resty.redis"
 			local redis   = redis_m:new()
@@ -60,6 +61,9 @@ $::HttpConfig . q#
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
@@ -103,8 +107,6 @@ Not persisting a collection that wasn't altered
 $::HttpConfig . q#
     init_by_lua '
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_backend", "redis")
-        lua_resty_waf.default_option("debug", true)
     ';
 #
 --- config
@@ -112,6 +114,9 @@ $::HttpConfig . q#
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local redis_m = require "resty.redis"
 			local redis   = redis_m:new()
@@ -144,6 +149,9 @@ $::HttpConfig . q#
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
@@ -189,8 +197,6 @@ Not persisting a collection that wasn't altered
 $::HttpConfig . q#
     init_by_lua '
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_backend", "redis")
-        lua_resty_waf.default_option("debug", true)
     ';
 #
 --- config
@@ -198,6 +204,9 @@ $::HttpConfig . q#
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local redis_m = require "resty.redis"
 			local redis   = redis_m:new()
@@ -230,6 +239,9 @@ $::HttpConfig . q#
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
@@ -274,8 +286,6 @@ Not persisting a collection that wasn't altered
 $::HttpConfig . q#
     init_by_lua '
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_backend", "redis")
-        lua_resty_waf.default_option("debug", true)
     ';
 #
 --- config
@@ -283,6 +293,9 @@ $::HttpConfig . q#
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local redis_m = require "resty.redis"
 			local redis   = redis_m:new()
@@ -318,6 +331,9 @@ $::HttpConfig . q#
 			ngx.sleep(.5)
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}

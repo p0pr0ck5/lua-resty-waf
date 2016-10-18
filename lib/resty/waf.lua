@@ -8,7 +8,6 @@ local collections_t = require "resty.waf.collections"
 local logger        = require "resty.waf.log"
 local operators     = require "resty.waf.operators"
 local options       = require "resty.waf.options"
-local opts          = require "resty.waf.opts"
 local phase_t       = require "resty.waf.phase"
 local random        = require "resty.waf.random"
 local storage       = require "resty.waf.storage"
@@ -563,6 +562,7 @@ function _M.new(self)
 	_storage_zone                = nil,
 
 	transaction_id = random.random_bytes(10),
+	need_merge = false,
 	}
 
 	if (_ruleset_def_cnt == 0) then
@@ -594,8 +594,6 @@ function _M.init()
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
 	for _, ruleset in ipairs(_global_rulesets) do
-		ngx.log(ngx.ERR, ruleset)
-
 		local rs, err, calc
 
 		rs, err = util.load_ruleset_file(ruleset)

@@ -22,8 +22,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -31,6 +29,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 

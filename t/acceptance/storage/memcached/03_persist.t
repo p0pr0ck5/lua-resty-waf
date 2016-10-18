@@ -21,8 +21,6 @@ __DATA__
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -31,6 +29,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -66,8 +67,6 @@ Not persisting a collection that wasn't altered
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -76,6 +75,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -107,8 +109,6 @@ Persisting value: {"
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "memcached")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -117,6 +117,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10, BAR = 1 })
@@ -148,7 +151,6 @@ Not persisting a collection that wasn't altered
 $::HttpConfig . q#
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -157,6 +159,9 @@ $::HttpConfig . q#
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "memcached")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = { TX = {} }, col_lookup = { TX = "TX" } }
 			local var = require("cjson").encode({ COUNT = 5 })
