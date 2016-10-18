@@ -12,12 +12,10 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Installation](#installation)
 * [Synopsis](#synopsis)
 * [Public Functions](#public-functions)
-	* [lua-resty-waf.default_option()](#lua-resty-wafdefault_option)
 	* [lua-resty-waf.init()](#lua-resty-wafinit)
 * [Public Methods](#public-methods)
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
 	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
-	* [lua-resty-waf:reset_option()](#lua-resty-wafreset_option)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [add_ruleset](#add_ruleset)
@@ -141,18 +139,6 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			-- require the base module
 			local lua_resty_waf = require "waf"
 
-			-- define options that will be inherited across all scopes
-			lua_resty_waf.default_option("debug", true)
-			lua_resty_waf.default_option("mode", "ACTIVE")
-
-			-- this may be desirable for low-traffic or testing sites
-			-- by default, event logs are not written until the buffer is full
-			-- for testing, flush the log buffer every 5 seconds
-			--
-			-- this is only necessary when configuring a remote TCP/UDP
-			-- socket server for event logs. otherwise, this is ignored
-			lua_resty_waf.default_option("event_log_periodic_flush", 5)
-
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
 		';
@@ -165,8 +151,17 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 				local waf = lua_resty_waf:new()
 
-				-- default options can be overridden
-				waf:set_option("debug", false)
+				-- define options that will be inherited across all scopes
+				waf:set_option("debug", true)
+				waf:set_option("mode", "ACTIVE")
+
+				-- this may be desirable for low-traffic or testing sites
+				-- by default, event logs are not written until the buffer is full
+				-- for testing, flush the log buffer every 5 seconds
+				--
+				-- this is only necessary when configuring a remote TCP/UDP
+				-- socket server for event logs. otherwise, this is ignored
+				waf:set_option("event_log_periodic_flush", 5)
 
 				-- run the firewall
 				waf:exec()
@@ -205,26 +200,9 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 ##Public Functions
 
-###lua_resty_waf.default_option()
-
-Define default values for configuration options that will be inherited across all scopes. This is useful when you are using lua-resty-waf in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
-
-```lua
-	http {
-		init_by_lua '
-			local lua_resty_waf = require "waf"
-
-			lua_resty_waf.default_option("debug", true)
-
-			-- this would be a useless operation since it does not change the default
-			lua_resty_waf.default_option("debug_log_level", ngx.INFO)
-		';
-	}
-```
-
 ###lua-resty-waf.init()
 
-Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any lua-resty-waf function call in `init_by_lua`, and should never be called outside this scope.
+Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should never be called outside this scope.
 
 *Example*:
 
@@ -260,7 +238,7 @@ Instantiate a new instance of lua-resty-waf. You must call this in every request
 
 ###lua-resty-waf:set_option()
 
-Configure an option on a per-scope basis. You should only do this if you are overriding a default value in this scope (e.g. it would be useless to use this to define the same configurable everywhere).
+Configure an option on a per-scope basis.
 
 *Example*:
 
@@ -273,35 +251,6 @@ Configure an option on a per-scope basis. You should only do this if you are ove
 
 			-- enable debug logging only for this scope
 			waf:set_option("debug", true)
-		';
-	}
-```
-
-###lua-resty-waf:reset_option()
-
-Set the given option to its documented default, regardless of whatever value was assigned via `default_option`. This is most useful for options that are more complex than boolean or integer values.
-
-*Example*:
-
-```lua
-	http {
-		init_by_lua '
-			local lua_resty_waf = require "waf"
-
-			lua_resty_waf.default_option("allowed_content_types", "text/json")
-		';
-	}
-
-	[...snip...]
-
-	location / {
-		access_by_lua '
-			local lua_resty_waf = require "waf"
-
-			local waf = lua_resty_waf:new()
-
-			-- reset the value to its documented default
-			waf:reset_option("allowed_content_types")
 		';
 	}
 ```
@@ -327,10 +276,6 @@ Write any audit log entries that were generated from the transaction. This shoul
 ```
 
 ##Options
-
-Module options can be configured using the `default_option` and `set_option` functions. Use `default_option` when in the `init_by_lua` handler, and without calling `lua-resty-waf:new()`, to set default values that will be inherited across all scopes. These values (or options that were not modified by `default_option` can be further adjusted on a per-scope basis via `set_option`. Additionally, scope-level options can be re-adjusted back to the documented defaults via the `reset_option` method. This will set the given option to its documented default, overriding the default set by the `default_option` function.
-
-Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
 
 ###add_ruleset
 
