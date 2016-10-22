@@ -33,7 +33,7 @@ table
 --- no_error_log
 [error]
 
-=== TEST 2: Three phases are currently defined
+=== TEST 2: Four phases are currently defined
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
@@ -47,7 +47,7 @@ table
 GET /t
 --- error_code: 200
 --- response_body
-3
+4
 --- no_error_log
 [error]
 
@@ -200,7 +200,7 @@ true
 GET /t
 --- error_code: 200
 --- response_body
-false
+true
 --- no_error_log
 [error]
 
