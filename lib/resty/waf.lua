@@ -137,6 +137,10 @@ local function _finalize(self, ctx)
 
 	-- store the local copy of the ctx table
 	ngx.ctx = ctx
+
+	if (ctx.phase == 'log') then
+		self:write_log_events(true)
+	end
 end
 
 -- use the lookup table to figure out what to do
@@ -598,12 +602,15 @@ end
 
 -- push log data regarding matching rule(s) to the configured target
 -- in the case of socket or file logging, this data will be buffered
-function _M.write_log_events(self)
+function _M.write_log_events(self, has_ctx)
 	-- there is a small bit of code duplication here to get our context
 	-- because this lives outside exec()
 	local ctx = ngx.ctx
-	if (ctx.opts) then
-		_load(self, ctx.opts)
+
+	if (not has_ctx) then
+		if (ctx.opts) then
+			_load(self, ctx.opts)
+		end
 	end
 
 	if (not ctx.lrw_initted) then

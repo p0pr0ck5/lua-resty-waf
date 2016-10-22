@@ -146,7 +146,7 @@ my $phase_lookup = {
 	2 => 'access',
 	3 => 'header_filter',
 	4 => 'body_filter',
-	5 => 'body_filter', # lua-resty-waf doesnt have a proper logging phase
+	5 => 'log',
 };
 
 my $op_sep_lookup = {

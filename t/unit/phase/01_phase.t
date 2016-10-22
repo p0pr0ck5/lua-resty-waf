@@ -187,7 +187,7 @@ true
 --- no_error_log
 [error]
 
-=== TEST 11: Log is not a valid phase
+=== TEST 11: Log is a valid phase
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {

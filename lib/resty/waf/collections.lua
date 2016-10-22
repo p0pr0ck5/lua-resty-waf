@@ -97,7 +97,8 @@ _M.lookup = {
 			collections.RESPONSE_BODY = table_concat(ctx.buffers, '')
 			ngx.arg[1] = collections.RESPONSE_BODY
 		end
-	end
+	end,
+	log = function() end
 }
 
 return _M
