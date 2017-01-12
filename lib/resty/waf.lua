@@ -8,7 +8,6 @@ local collections_t = require "resty.waf.collections"
 local logger        = require "resty.waf.log"
 local operators     = require "resty.waf.operators"
 local options       = require "resty.waf.options"
-local opts          = require "resty.waf.opts"
 local phase_t       = require "resty.waf.phase"
 local random        = require "resty.waf.random"
 local storage       = require "resty.waf.storage"
@@ -17,6 +16,9 @@ local util          = require "resty.waf.util"
 
 local table_sort   = table.sort
 local string_lower = string.lower
+
+local ngx_INFO = ngx.INFO
+local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
 local mt = { __index = _M }
 
@@ -35,9 +37,7 @@ local _global_rulesets = {
 
 -- ruleset table cache
 local _ruleset_defs = {}
-
--- default options
-local default_opts = util.table_copy(opts.defaults)
+local _ruleset_def_cnt = 0
 
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, parse)
@@ -336,43 +336,45 @@ end
 -- merge the default and any custom rules
 local function _merge_rulesets(self)
 	local default = _global_rulesets
-	local added   = self._add_ruleset
-	local added_s = self._add_ruleset_string
-	local ignored = self._ignore_ruleset
-
 	local t = {}
 
 	for k, v in ipairs(default) do
 		t[v] = true
 	end
 
-	for k, v in ipairs(added) do
-		logger.log(self, "Adding ruleset " .. v)
-		t[v] = true
-	end
+	if (self) then
+		local added   = self._add_ruleset
+		local added_s = self._add_ruleset_string
+		local ignored = self._ignore_ruleset
 
-	for k, v in pairs(added_s) do
-		logger.log(self, "Adding ruleset string " .. k)
-
-		if (not _ruleset_defs[k]) then
-			local rs, err = util.parse_ruleset(v)
-
-			if (err) then
-				logger.fatal_fail("Could not load " .. k)
-			else
-				logger.log(self, "Doing offset calculation of " .. k)
-				_calculate_offset(rs)
-
-				_ruleset_defs[k] = rs
-			end
+		for k, v in ipairs(added) do
+			logger.log(self, "Adding ruleset " .. v)
+			t[v] = true
 		end
 
-		t[k] = true
-	end
+		for k, v in pairs(added_s) do
+			logger.log(self, "Adding ruleset string " .. k)
 
-	for k, v in ipairs(ignored) do
-		logger.log(self, "Ignoring ruleset " .. v)
-		t[v] = nil
+			if (not _ruleset_defs[k]) then
+				local rs, err = util.parse_ruleset(v)
+
+				if (err) then
+					logger.fatal_fail("Could not load " .. k)
+				else
+					logger.log(self, "Doing offset calculation of " .. k)
+					_calculate_offset(rs)
+
+					_ruleset_defs[k] = rs
+				end
+			end
+
+			t[k] = true
+		end
+
+		for k, v in ipairs(ignored) do
+			logger.log(self, "Ignoring ruleset " .. v)
+			t[v] = nil
+		end
 	end
 
 	t = util.table_keys(t)
@@ -440,8 +442,10 @@ function _M.exec(self)
 	ctx.collections = collections
 
 	-- build rulesets
-	if (self.need_merge) then
+	if (self.need_merge == true) then
 		_merge_rulesets(self)
+	else
+		self._active_rulesets = _global_rulesets
 	end
 
 	-- set up tracking tables and flags if we're using redis for persistent storage
@@ -513,14 +517,63 @@ end
 function _M.new(self)
 	-- we need a separate copy of this table since we will
 	-- potentially override values with set_option
-	local t = util.table_copy(default_opts)
 
-	t.transaction_id = random.random_bytes(10)
+	local t = {
+		_add_ruleset                 = {},
+		_add_ruleset_string          = {},
+		_allow_unknown_content_types = false,
+		_allowed_content_types       = {},
+		_debug                       = false,
+		_debug_log_level             = ngx_INFO,
+		_deny_status                 = ngx_HTTP_FORBIDDEN,
+		_event_log_altered_only      = true,
+		_event_log_buffer_size       = 4096,
+		_event_log_level             = ngx_INFO,
+		_event_log_ngx_vars          = {},
+		_event_log_periodic_flush    = nil,
+		_event_log_request_arguments = false,
+		_event_log_request_body      = false,
+		_event_log_request_headers   = false,
+		_event_log_ssl               = false,
+		_event_log_ssl_sni_host      = nil,
+		_event_log_ssl_verify        = false,
+		_event_log_socket_proto      = 'udp',
+		_event_log_target            = 'error',
+		_event_log_target_host       = nil,
+		_event_log_target_path       = nil,
+		_event_log_target_port       = nil,
+		_event_log_verbosity         = 1,
+		_hook_actions                = {},
+		_ignore_rule                 = {},
+		_ignore_ruleset              = {},
+		_mode                        = 'SIMULATE',
+		_nameservers                 = {},
+		_pcre_flags                  = 'oij',
+		_process_multipart_body      = true,
+		_req_tid_header              = false,
+		_res_body_max_size           = (1024 * 1024),
+		_res_body_mime_types         = { ["text/plain"] = true, ["text/html"] = true },
+		_res_tid_header              = false,
+		_score_threshold             = 5,
+		_storage_backend             = 'dict',
+		_storage_keepalive           = true,
+		_storage_keepalive_pool_size = 100,
+		_storage_keepalive_timeout   = 10000,
+		_storage_memcached_host      = '127.0.0.1',
+		_storage_memcached_port      = 11211,
+		_storage_redis_host          = '127.0.0.1',
+		_storage_redis_port          = 6379,
+		_storage_zone                = nil,
+	}
 
-	-- handle conditions where init() wasnt called
-	-- and the default rulesets weren't merged
-	if (not t._active_rulesets) then
+	if (not t.transaction_id) then
+		t.transaction_id = random.random_bytes(10)
+	end
+
+	if (_ruleset_def_cnt == 0) then
 		t.need_merge = true
+	else
+		t.need_merge = false
 	end
 
 	return setmetatable(t, mt)
@@ -542,62 +595,26 @@ function _M.set_option(self, option, value, data)
 	end
 end
 
--- configuraton wrapper for default options
-function _M.default_option(option, value, data)
-	if (type(value) == "table") then
-		for _, v in ipairs(value) do
-			_M.default_option(option, v, data)
-		end
-	else
-		if (options.lookup[option]) then
-			options.lookup[option](default_opts, value, data)
-		else
-			local _option = "_" .. option
-			default_opts[_option] = value
-		end
-	end
-end
-
--- reset the given option to its static default
-function _M.reset_option(self, option)
-	local _option = "_" .. option
-	self[_option] = opts.defaults[_option]
-
-	if (option == "add_ruleset" or option == "ignore_ruleset") then
-		self.need_merge = true
-	end
-end
-
 -- init_by_lua handler precomputations
 function _M.init()
-	-- do an initial rule merge based on default_option calls
-	-- this prevents have to merge every request in scopes
-	-- which do not further alter elected rulesets
-	_merge_rulesets(default_opts)
-
 	-- do offset jump calculations for default rulesets
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
-	for _, ruleset in ipairs(default_opts._active_rulesets) do
+	for _, ruleset in ipairs(_global_rulesets) do
 		local rs, err, calc
 
-		if (not _ruleset_defs[ruleset]) then
-			rs, err = util.load_ruleset_file(ruleset)
-			calc = true
-		end
+		rs, err = util.load_ruleset_file(ruleset)
 
 		if (err) then
 			ngx.log(ngx.ERR, err)
-		elseif (calc) then
+		else
 			_calculate_offset(rs)
 
 			_ruleset_defs[ruleset] = rs
+
+			_ruleset_def_cnt = _ruleset_def_cnt + 1
 		end
 	end
-
-	-- clear this flag if we handled additional rulesets
-	-- so its not passed to new objects
-	default_opts.need_merge = false
 end
 
 -- push log data regarding matching rule(s) to the configured target
