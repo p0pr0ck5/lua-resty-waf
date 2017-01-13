@@ -29,7 +29,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -57,7 +57,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -85,7 +85,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -114,7 +114,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -143,7 +143,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections  = ngx.ctx.collections
+			local collections  = ngx.ctx.lua_resty_waf.collections
 			local request_body = collections.REQUEST_BODY
 
 			for k, v in pairs(request_body) do
@@ -176,7 +176,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -208,7 +208,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -241,7 +241,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -273,7 +273,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_BODY)
 		';
@@ -304,7 +304,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -337,7 +337,7 @@ Request has no content type, ignoring the body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -371,7 +371,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';

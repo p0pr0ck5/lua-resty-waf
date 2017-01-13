@@ -37,7 +37,7 @@ __DATA__
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.STATUS .. [["]])
 		';
@@ -71,7 +71,7 @@ GET /t
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.STATUS .. [["]])
 		';
@@ -105,7 +105,7 @@ GET /t
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. type(collections.STATUS) .. [["]])
 		';

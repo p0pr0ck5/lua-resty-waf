@@ -136,7 +136,7 @@ local function _finalize(self, ctx)
 	storage.persist(self, ctx.storage)
 
 	-- store the local copy of the ctx table
-	ngx.ctx = ctx
+	ngx.ctx.lua_resty_waf = ctx
 end
 
 -- use the lookup table to figure out what to do
@@ -396,7 +396,7 @@ function _M.exec(self)
 		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
 	end
 
-	local ctx         = ngx.ctx
+	local ctx         = ngx.ctx.lua_resty_waf or {}
 	local collections = ctx.collections or {}
 
 	-- restore options from a previous phase
@@ -618,7 +618,7 @@ end
 function _M.write_log_events(self)
 	-- there is a small bit of code duplication here to get our context
 	-- because this lives outside exec()
-	local ctx = ngx.ctx
+	local ctx = ngx.ctx.lua_resty_waf or {}
 	if (ctx.opts) then
 		_load(self, ctx.opts)
 	end
