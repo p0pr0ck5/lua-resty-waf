@@ -18,7 +18,7 @@ function _M.parse_request_body(waf, request_headers)
 	-- or result from misconfigured proxies. may consider relaxing
 	-- this or adding an option to disable this checking in the future
 	if (type(content_type_header) == "table") then
-		logger.log(waf, "Request contained multiple content-type headers, bailing!")
+		--_LOG_"Request contained multiple content-type headers, bailing!"
 		ngx.exit(400)
 	end
 
@@ -27,7 +27,7 @@ function _M.parse_request_body(waf, request_headers)
 	-- but its necessary for us to properly handle the request
 	-- and its likely a sign of nogoodnickery anyway
 	if (not content_type_header) then
-		logger.log(waf, "Request has no content type, ignoring the body")
+		--_LOG_"Request has no content type, ignoring the body"
 		return nil
 	end
 
@@ -94,7 +94,7 @@ function _M.parse_request_body(waf, request_headers)
 		if (ngx.req.get_body_file() == nil) then
 			return ngx.req.get_post_args()
 		else
-			logger.log(waf, "Request body size larger than client_body_buffer_size, ignoring request body")
+			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil
 		end
 	elseif (util.table_has_key(content_type_header, waf._allowed_content_types)) then
@@ -104,15 +104,15 @@ function _M.parse_request_body(waf, request_headers)
 		if (ngx.req.get_body_file() == nil) then
 			return ngx.req.get_body_data()
 		else
-			logger.log(waf, "Request body size larger than client_body_buffer_size, ignoring request body")
+			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil
 		end
 	else
 		if (waf._allow_unknown_content_types) then
-			logger.log(waf, "Allowing request with content type " .. tostring(content_type_header))
+			--_LOG_"Allowing request with content type " .. tostring(content_type_header)
 			return nil
 		else
-			logger.log(waf, tostring(content_type_header) .. " not a valid content type!")
+			--_LOG_tostring(content_type_header) .. " not a valid content type!"
 			ngx.exit(ngx.HTTP_FORBIDDEN)
 		end
 	end

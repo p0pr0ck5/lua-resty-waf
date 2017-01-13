@@ -127,7 +127,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 	-- and find it in the lookup table
 	local str = ngx.re.gsub(key, [[%{([A-Za-z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
 
-	logger.log(waf, "Parsed dynamic value is " .. str)
+	--_LOG_"Parsed dynamic value is " .. str
 
 	if (ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags)) then
 		return tonumber(str)
@@ -209,7 +209,7 @@ end
 -- parse collection elements based on a given directive
 _M.parse_collection = {
 	specific = function(waf, collection, value)
-		logger.log(waf, "Parse collection is getting a specific value: " .. value)
+		--_LOG_"Parse collection is getting a specific value: " .. value
 		return collection[value]
 	end,
 	regex = function(waf, collection, value)
@@ -253,18 +253,18 @@ _M.parse_collection = {
 		return _collection
 	end,
 	ignore = function(waf, collection, value)
-		logger.log(waf, "Parse collection is ignoring a value: " .. value)
+		--_LOG_"Parse collection is ignoring a value: " .. value
 		local _collection = {}
 		_collection = _M.table_copy(collection)
 		_collection[value] = nil
 		return _collection
 	end,
 	keys = function(waf, collection)
-		logger.log(waf, "Parse collection is getting the keys")
+		--_LOG_"Parse collection is getting the keys"
 		return _M.table_keys(collection)
 	end,
 	values = function(waf, collection)
-		logger.log(waf, "Parse collection is getting the values")
+		--_LOG_"Parse collection is getting the values"
 		return _M.table_values(collection)
 	end,
 	all = function(waf, collection)

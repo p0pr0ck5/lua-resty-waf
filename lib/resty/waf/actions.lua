@@ -14,31 +14,31 @@ _M.alter_actions = {
 
 _M.disruptive_lookup = {
 	ACCEPT = function(waf, ctx)
-		logger.log(waf, "Rule action was ACCEPT, so ending this phase with ngx.OK")
+		--_LOG_"Rule action was ACCEPT, so ending this phase with ngx.OK"
 		if (waf._mode == "ACTIVE") then
 			ngx.exit(ngx.OK)
 		end
 	end,
 	CHAIN = function(waf, ctx)
-		logger.log(waf, "Chaining (pre-processed)")
+		--_LOG_"Chaining (pre-processed)"
 	end,
 	DENY = function(waf, ctx)
-		logger.log(waf, "Rule action was DENY, so telling nginx to quit")
+		--_LOG_"Rule action was DENY, so telling nginx to quit"
 		if (waf._mode == "ACTIVE") then
 			ngx.exit(ctx.rule_status or waf._deny_status)
 		end
 	end,
 	DROP = function(waf, ctx)
-		logger.log(waf, "Rule action was DROP, ending eith ngx.HTTP_CLOSE")
+		--_LOG_"Rule action was DROP, ending eith ngx.HTTP_CLOSE"
 		if (waf._mode == "ACTIVE") then
 			ngx.exit(ngx.HTTP_CLOSE)
 		end
 	end,
 	IGNORE = function(waf)
-		logger.log(waf, "Ignoring rule for now")
+		--_LOG_"Ignoring rule for now"
 	end,
 	SCORE = function(waf, ctx)
-		logger.log(waf, "Score isn't a thing anymore, see TX.anomaly_score")
+		--_LOG_"Score isn't a thing anymore, see TX.anomaly_score"
 	end,
 }
 
@@ -56,7 +56,7 @@ _M.nondisruptive_lookup = {
 		local value  = data.value
 		local parsed = util.parse_dynamic_value(waf, value, collections)
 
-		logger.log(waf, "Initializing " .. col .. " as " .. parsed)
+		--_LOG_"Initializing " .. col .. " as " .. parsed
 
 		storage.initialize(waf, ctx.storage, parsed)
 		ctx.col_lookup[col] = parsed
@@ -68,12 +68,12 @@ _M.nondisruptive_lookup = {
 		storage.set_var(waf, ctx, data, value)
 	end,
 	sleep = function(waf, time)
-		logger.log(waf, "Sleeping for " .. time)
+		--_LOG_"Sleeping for " .. time
 
 		ngx.sleep(time)
 	end,
 	status = function(waf, status, ctx)
-		logger.log(waf, "Overriding status from " .. waf._deny_status .. " to " .. status)
+		--_LOG_"Overriding status from " .. waf._deny_status .. " to " .. status
 
 		ctx.rule_status = status
 	end

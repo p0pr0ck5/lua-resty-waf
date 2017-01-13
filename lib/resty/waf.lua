@@ -165,7 +165,7 @@ local function _do_transform(self, collection, transform)
 				return collection -- dont transform if the collection was nil, i.e. a specific arg key dne
 			end
 
-			logger.log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
+			--_LOG_"doing transform of type " .. transform .. " on collection value " .. tostring(collection)
 			return transform_t.lookup[transform](self, collection)
 		end
 	end
@@ -195,10 +195,10 @@ local function _process_rule(self, rule, collections, ctx)
 		else
 			local collection_key = var.collection_key
 
-			logger.log(self, "Checking for collection_key " .. collection_key)
+			--_LOG_"Checking for collection_key " .. collection_key
 
 			if (not var.storage and not ctx.transform_key[collection_key]) then
-				logger.log(self, "Collection cache miss")
+				--_LOG_"Collection cache miss"
 				collection = _parse_collection(self, collections[var.type], var.parse)
 
 				if (opts.transform) then
@@ -208,10 +208,10 @@ local function _process_rule(self, rule, collections, ctx)
 				ctx.transform[collection_key]     = collection
 				ctx.transform_key[collection_key] = true
 			elseif (var.storage) then
-				logger.log(self, "Forcing cache miss")
+				--_LOG_"Forcing cache miss"
 				collection = _parse_collection(self, collections[var.type], var.parse)
 			else
-				logger.log(self, "Collection cache hit!")
+				--_LOG_"Collection cache hit!"
 				collection = ctx.transform[collection_key]
 			end
 
@@ -227,11 +227,11 @@ local function _process_rule(self, rule, collections, ctx)
 		end
 
 		if (not collection) then
-			logger.log(self, "No values for this collection")
+			--_LOG_"No values for this collection"
 			offset = rule.offset_nomatch
 		else
 			if (opts.parsepattern) then
-				logger.log(self, "Parsing dynamic pattern: " .. pattern)
+				--_LOG_"Parsing dynamic pattern: " .. pattern
 				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
@@ -249,7 +249,7 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			if (match) then
-				logger.log(self, "Match of rule " .. id)
+				--_LOG_"Match of rule " .. id
 
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value
@@ -298,7 +298,7 @@ local function _process_rule(self, rule, collections, ctx)
 		end
 	end
 
-	logger.log(self, "Returning offset " .. tostring(offset))
+	--_LOG_"Returning offset " .. tostring(offset)
 	return offset
 end
 
@@ -330,12 +330,12 @@ local function _merge_rulesets(self)
 		local ignored = self._ignore_ruleset
 
 		for k, v in ipairs(added) do
-			logger.log(self, "Adding ruleset " .. v)
+			--_LOG_"Adding ruleset " .. v
 			t[v] = true
 		end
 
 		for k, v in pairs(added_s) do
-			logger.log(self, "Adding ruleset string " .. k)
+			--_LOG_"Adding ruleset string " .. k
 
 			if (not _ruleset_defs[k]) then
 				local rs, err = util.parse_ruleset(v)
@@ -343,7 +343,7 @@ local function _merge_rulesets(self)
 				if (err) then
 					logger.fatal_fail("Could not load " .. k)
 				else
-					logger.log(self, "Doing offset calculation of " .. k)
+					--_LOG_"Doing offset calculation of " .. k
 					_calculate_offset(rs)
 
 					_ruleset_defs[k] = rs
@@ -354,7 +354,7 @@ local function _merge_rulesets(self)
 		end
 
 		for k, v in ipairs(ignored) do
-			logger.log(self, "Ignoring ruleset " .. v)
+			--_LOG_"Ignoring ruleset " .. v
 			t[v] = nil
 		end
 	end
@@ -372,7 +372,7 @@ end
 -- main entry point
 function _M.exec(self)
 	if (self._mode == "INACTIVE") then
-		logger.log(self, "Operational mode is INACTIVE, not running")
+		--_LOG_"Operational mode is INACTIVE, not running"
 		return
 	end
 
@@ -404,7 +404,7 @@ function _M.exec(self)
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	if (ctx.altered[phase]) then
-		logger.log(self, "Transaction was already altered, not running!")
+		--_LOG_"Transaction was already altered, not running!"
 		return
 	end
 
@@ -433,10 +433,10 @@ function _M.exec(self)
 		self._storage_redis_setkey   = {}
 	end
 
-	logger.log(self, "Beginning run of phase " .. phase)
+	--_LOG_"Beginning run of phase " .. phase
 
 	for _, ruleset in ipairs(self._active_rulesets) do
-		logger.log(self, "Beginning ruleset " .. ruleset)
+		--_LOG_"Beginning ruleset " .. ruleset
 
 		local rs = _ruleset_defs[ruleset]
 
@@ -447,7 +447,7 @@ function _M.exec(self)
 			if (err) then
 				logger.fatal_fail(err)
 			else
-				logger.log(self, "Doing offset calculation of " .. ruleset)
+				--_LOG_"Doing offset calculation of " .. ruleset
 				_calculate_offset(rs)
 
 				_ruleset_defs[ruleset] = rs
@@ -461,7 +461,7 @@ function _M.exec(self)
 			local id = rule.id
 
 			if (not util.table_has_key(id, self._ignore_rule)) then
-				logger.log(self, "Processing rule " .. id)
+				--_LOG_"Processing rule " .. id
 
 				local returned_offset = _process_rule(self, rule, collections, ctx)
 				if (returned_offset) then
@@ -470,7 +470,7 @@ function _M.exec(self)
 					offset = nil
 				end
 			else
-				logger.log(self, "Ignoring rule " .. id)
+				--_LOG_"Ignoring rule " .. id
 
 				local rule_nomatch = rule.offset_nomatch
 
@@ -615,12 +615,12 @@ function _M.write_log_events(self, has_ctx, ctx)
 	end
 
 	if (table.getn(util.table_keys(ctx.altered)) == 0 and self._event_log_altered_only) then
-		logger.log(self, "Not logging a request that wasn't altered")
+		--_LOG_"Not logging a request that wasn't altered"
 		return
 	end
 
 	if (ctx.log_entries_n == 0) then
-		logger.log(self, "Not logging a request that had no rule alerts")
+		--_LOG_"Not logging a request that had no rule alerts"
 		return
 	end
 

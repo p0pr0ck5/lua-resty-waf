@@ -44,7 +44,7 @@ function _M.initialize(waf, storage, col)
 	local altered = false
 
 	if (#array == 0) then
-		logger.log(waf, "Initializing an empty collection for " .. col)
+		--_LOG_"Initializing an empty collection for " .. col
 		storage[col] = {}
 	else
 		local data = redis:array_to_hash(array)
@@ -54,10 +54,10 @@ function _M.initialize(waf, storage, col)
 		-- the key for deletion via hdel when we persist
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
-				logger.log(waf, "checking " .. key)
+				--_LOG_"checking " .. key
 				if (tonumber(data["__expire_" .. key]) < ngx.now()) then
 					-- do the actual removal
-					logger.log(waf, "Removing expired key: " .. key)
+					--_LOG_"Removing expired key: " .. key
 					data["__expire_" .. key] = nil
 					data[key] = nil
 
@@ -85,7 +85,7 @@ end
 
 function _M.persist(waf, col, data)
 	local serialized = cjson.encode(data)
-	logger.log(waf, 'Persisting value: ' .. tostring(serialized))
+	--_LOG_'Persisting value: ' .. tostring(serialized)
 
 	local redis = redis_m:new()
 	local host  = waf._storage_redis_host
@@ -98,11 +98,11 @@ function _M.persist(waf, col, data)
 	end
 
 	redis:init_pipeline()
-	logger.log(waf, "Redis start pipeline")
+	--_LOG_"Redis start pipeline"
 
 	-- build the hdel command to drop expired/deleted keys
 	if (waf._storage_redis_delkey_n > 0) then
-		logger.log(waf, "Redis hdel")
+		--_LOG_"Redis hdel"
 		for i=1, waf._storage_redis_delkey_n do
 			local k = waf._storage_redis_delkey[i]
 			redis:hdel(col, k)
@@ -111,7 +111,7 @@ function _M.persist(waf, col, data)
 
 	-- build the hmset command to save affected keys
 	if (waf._storage_redis_setkey_t) then
-		logger.log(waf, "Redis hmset")
+		--_LOG_"Redis hmset"
 		redis:hmset(col, waf._storage_redis_setkey)
 	end
 

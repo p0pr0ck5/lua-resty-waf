@@ -52,9 +52,9 @@ function _M.initialize(waf, storage, col)
 		-- we need to roll our own expire handling
 		for key in pairs(data) do
 			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
-				logger.log(waf, "checking " .. key)
+				--_LOG_"checking " .. key
 				if (data["__expire_" .. key] < ngx.now()) then
-					logger.log(waf, "Removing expired key: " .. key)
+					--_LOG_"Removing expired key: " .. key
 					data["__expire_" .. key] = nil
 					data[key] = nil
 					altered = true
@@ -70,7 +70,7 @@ end
 
 function _M.persist(waf, col, data)
 	local serialized = cjson.encode(data)
-	logger.log(waf, 'Persisting value: ' .. tostring(serialized))
+	--_LOG_'Persisting value: ' .. tostring(serialized)
 
 	local memcached = memcached_m:new()
 	local host      = waf._storage_memcached_host
