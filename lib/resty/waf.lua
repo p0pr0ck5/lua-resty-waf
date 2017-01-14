@@ -90,24 +90,6 @@ local function _log_event(self, rule, value, ctx)
 	ctx.log_entries[ctx.log_entries_n] = t
 end
 
--- restore options from a previous phase
-local function _load(self, opts)
-	for k, v in pairs(opts) do
-		self[k] = v
-	end
-end
-
--- save options to the ctx table to be used in another phase
-local function _save(self, ctx)
-	local opts = {}
-
-	for k, v in pairs(self) do
-		opts[k] = v
-	end
-
-	ctx.opts = opts
-end
-
 local function _transaction_id_header(self, ctx)
 	-- upstream request header
 	if (self._req_tid_header) then
@@ -130,7 +112,7 @@ local function _finalize(self, ctx)
 	end
 
 	-- save our options for the next phase
-	_save(self, ctx)
+	ctx.opts = self
 
 	-- persistent variable storage
 	storage.persist(self, ctx.storage)
@@ -399,11 +381,6 @@ function _M.exec(self)
 	local ctx         = ngx.ctx.lua_resty_waf or {}
 	local collections = ctx.collections or {}
 
-	-- restore options from a previous phase
-	if (ctx.opts) then
-		_load(self, ctx.opts)
-	end
-
 	ctx.lrw_initted   = true
 	ctx.altered       = ctx.altered or {}
 	ctx.col_lookup    = ctx.col_lookup or {}
@@ -510,10 +487,15 @@ function _M.exec(self)
 end
 
 -- instantiate a new instance of the module
-function _M.new(self)
-	-- we need a separate copy of this table since we will
-	-- potentially override values with set_option
+function _M.new()
+	local ctx = ngx.ctx.lua_resty_waf or {}
 
+	-- restore options and self from a previous phase
+	if (ctx.opts) then
+		return setmetatable(ctx.opts, mt)
+	end
+
+	-- we're new to this transaction get us some opts and get movin!
 	local t = {
 		_add_ruleset                 = {},
 		_add_ruleset_string          = {},
@@ -560,11 +542,8 @@ function _M.new(self)
 		_storage_redis_host          = '127.0.0.1',
 		_storage_redis_port          = 6379,
 		_storage_zone                = nil,
+		transaction_id               = random.random_bytes(10),
 	}
-
-	if (not t.transaction_id) then
-		t.transaction_id = random.random_bytes(10)
-	end
 
 	if (_ruleset_def_cnt == 0) then
 		t.need_merge = true
@@ -620,7 +599,7 @@ function _M.write_log_events(self)
 	-- because this lives outside exec()
 	local ctx = ngx.ctx.lua_resty_waf or {}
 	if (ctx.opts) then
-		_load(self, ctx.opts)
+		self = ctx.opts
 	end
 
 	if (not ctx.lrw_initted) then
