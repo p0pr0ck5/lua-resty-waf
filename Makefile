@@ -19,9 +19,12 @@ LOCAL_LIB_DIR = lib/resty
 test-translate lua-aho-corasick libinjection clean-libinjection \
 clean-lua-aho-corasick install-opm-libs clean-opm-libs
 
-all: $(MAKE_LIBS)
+all: $(MAKE_LIBS) debug-macro
 
-clean: clean-libinjection clean-lua-aho-corasick clean-libs clean-test
+clean: clean-libinjection clean-lua-aho-corasick clean-libs clean-test clean-debug-macro
+
+clean-debug-macro:
+	./tools/debug-macro.sh clean
 
 clean-install: clean-opm-libs
 	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm -f $(SO_LIBS) && cd resty/ && rm -rf $(LIBS)
@@ -40,6 +43,9 @@ clean-opm-libs:
 
 clean-test:
 	rm -rf t/servroot
+
+debug-macro:
+	./tools/debug-macro.sh
 
 lua-aho-corasick:
 	cd lua-aho-corasick && make && cp libac.so ../lib/

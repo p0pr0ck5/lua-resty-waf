@@ -34,7 +34,7 @@ __DATA__
 GET /t
 --- error_code: 200
 --- error_log eval
-qr/log[(][)]: \[[a-f0-9]{20}\]/
+qr/\[lua\] \w+\.lua:\d+: \w+[(][)]: \[[a-f0-9]{20}\]/
 --- no_error_log
 [error]
 

@@ -6,13 +6,6 @@ local socket_logger = require "resty.logger.socket"
 
 _M.version = "0.8.2"
 
--- debug logger
-function _M.log(waf, msg)
-	if (waf._debug == true) then
-		ngx.log(waf._debug_log_level, '[', waf.transaction_id, '] ', msg)
-	end
-end
-
 -- warn logger
 function _M.warn(waf, msg)
 	ngx.log(ngx.WARN, '[', waf.transaction_id, '] ', msg)
