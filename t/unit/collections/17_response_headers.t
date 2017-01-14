@@ -40,7 +40,7 @@ __DATA__
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.RESPONSE_HEADERS["X-Foo"] .. [["]])
 		';
@@ -77,7 +77,7 @@ GET /t
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			for k, v in ipairs(collections.RESPONSE_HEADERS["X-Foo"]) do
 				ngx.log(ngx.INFO, [["]] .. v .. [["]])
@@ -116,7 +116,7 @@ GET /t
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_HEADERS["X-Foo"]) .. [["]])
 		';
@@ -152,7 +152,7 @@ GET /t
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. type(collections.RESPONSE_HEADERS) .. [["]])
 		';

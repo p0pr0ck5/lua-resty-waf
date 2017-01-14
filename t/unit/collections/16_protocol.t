@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.PROTOCOL)
 		';
@@ -53,7 +53,7 @@ HTTP/1.1
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.PROTOCOL)
 		';
@@ -78,7 +78,7 @@ HTTP/1.0
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.PROTOCOL))
 		';

@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.QUERY_STRING)
 		';
@@ -53,7 +53,7 @@ nil
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.QUERY_STRING)
 		';
@@ -78,7 +78,7 @@ foo=bar
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.QUERY_STRING)
 		';
@@ -103,7 +103,7 @@ foo=bar&foo=bat&frob&qux=
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.QUERY_STRING))
 		';
@@ -128,7 +128,7 @@ nil
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.QUERY_STRING))
 		';

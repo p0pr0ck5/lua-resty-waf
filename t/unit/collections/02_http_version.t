@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.HTTP_VERSION)
 		';
@@ -53,7 +53,7 @@ GET /t
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.HTTP_VERSION)
 		';
@@ -78,7 +78,7 @@ GET /t HTTP/1.0
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.HTTP_VERSION))
 		';

@@ -43,7 +43,7 @@ __DATA__
 			waf:set_option("debug", true)
 			waf:exec()
 
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
 		';
 
@@ -96,7 +96,7 @@ Hello, world!
 			waf:set_option("debug", true)
 			waf:exec()
 
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, tostring(collections.RESPONSE_BODY))
 		';
 
@@ -144,7 +144,7 @@ world!
 			waf:set_option("debug", true)
 			waf:exec()
 
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
 		';
 
@@ -190,7 +190,7 @@ Hello, world!
 			waf:set_option("debug", true)
 			waf:exec()
 
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. type(collections.RESPONSE_BODY) .. [["]])
 		';
 

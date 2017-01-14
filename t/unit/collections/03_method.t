@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.METHOD)
 		';
@@ -53,7 +53,7 @@ GET
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.METHOD)
 		';
@@ -76,7 +76,7 @@ POST
 
 			waf:exec()
 
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.header["X-Method"] = collections.METHOD
 		';
 
@@ -102,7 +102,7 @@ X-Method: HEAD
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.METHOD))
 		';

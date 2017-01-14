@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 
@@ -55,7 +55,7 @@ GET /t
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.SCORE_THRESHOLD))
 		';
@@ -80,7 +80,7 @@ number
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 			local lua_resty_waf     = require "resty.waf"
 			local waf               = lua_resty_waf:new()
 

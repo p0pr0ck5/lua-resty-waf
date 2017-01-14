@@ -28,7 +28,7 @@ __DATA__
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_BASENAME)
 		';
@@ -53,7 +53,7 @@ GET /t
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say("Hello world!")
 		';
@@ -68,7 +68,7 @@ GET /t
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_BASENAME)
 		';
@@ -93,7 +93,7 @@ GET /foo/bar/index.php
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BASENAME))
 		';

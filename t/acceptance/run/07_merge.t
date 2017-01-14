@@ -49,8 +49,6 @@ $::HttpConfig . q#
 init_by_lua '
 	local lua_resty_waf = require "resty.waf"
 
-	lua_resty_waf.default_option("ignore_ruleset", "42000_xss")
-
 	lua_resty_waf.init()
 ';
 #

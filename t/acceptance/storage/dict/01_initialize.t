@@ -22,9 +22,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -32,6 +29,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local data = {}
 
@@ -56,9 +56,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -66,6 +63,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b" })
 			local shm = ngx.shared[waf._storage_zone]
@@ -106,9 +106,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -116,6 +113,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
 			local shm = ngx.shared[waf._storage_zone]
@@ -157,9 +157,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -167,6 +164,9 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
 			local shm = ngx.shared[waf._storage_zone]
@@ -208,8 +208,6 @@ $::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
 #
 --- config
@@ -217,6 +215,8 @@ $::HttpConfig . q#
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("debug", true)
 
 			local data = {}
 
