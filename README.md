@@ -42,7 +42,6 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_target_host](#event_log_target_host)
 	* [event_log_target_path](#event_log_target_path)
 	* [event_log_target_port](#event_log_target_port)
-	* [event_log_verbosity](#event_log_verbosity)
 	* [hook_action](#hook_action)
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
@@ -713,33 +712,6 @@ Defines the target port for event logs that target a remote server.
 	location / {
 		access_by_lua '
 			waf:set_option("event_log_target_port", 9001)
-		';
-	}
-```
-
-###event_log_verbosity
-
-*Default*: 1
-
-Sets the verbosity used in writing event log notification. The higher the verbosity, the more information will be included in the JSON blob generated for each notification.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			-- default verbosity. the client IP, request URI, rule match data, and rule ID will be logged
-			waf:set_option("event_log_verbosity", 1)
-
-			-- the rule description will be written in addition to existing data
-			waf:set_option("event_log_verbosity", 2)
-
-			-- the rule description, options and action will be written in addition to existing data
-			waf:set_option("event_log_verbosity", 3)
-
-			-- the entire rule definition, including the match pattern, will be written in addition to existing data
-			-- note that for some rule definitions, such as the XSS and SQLi rulesets, this pattern can be large
-			waf:set_option("event_log_verbosity", 4)
 		';
 	}
 ```

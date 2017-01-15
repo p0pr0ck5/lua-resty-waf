@@ -69,17 +69,8 @@ local function _log_event(self, rule, value, ctx)
 		match = value
 	}
 
-	if (self._event_log_verbosity > 1) then
+	if (rule.msg) then
 		t.msg = util.parse_dynamic_value(self, rule.msg, ctx.collections)
-	end
-
-	if (self._event_log_verbosity > 2) then
-		t.opts   = rule.opts
-		t.action = rule.actions.disrupt
-	end
-
-	if (self._event_log_verbosity > 3) then
-		t.var = rule.var
 	end
 
 	if (rule.logdata) then
