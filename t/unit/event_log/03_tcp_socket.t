@@ -61,11 +61,11 @@ A response is sent
 			waf:set_option("event_log_target_port", 9001)
 			waf:set_option("event_log_socket_proto", "tcp")
 			waf:set_option("event_log_buffer_size", 64)
-			waf:set_option("event_log_periodic_flush", 1)
+			waf:set_option("event_log_periodic_flush", .1)
 
 			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
-			ngx.sleep(2)
+			ngx.sleep(.2)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
@@ -98,7 +98,7 @@ A response is sent
 
 			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
-			ngx.sleep(2)
+			ngx.sleep(.2)
 		';
 
 		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
