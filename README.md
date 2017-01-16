@@ -16,6 +16,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Public Methods](#public-methods)
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
 	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
+	* [lua-resty-waf:exec()](#lua-resty-wafexec)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [add_ruleset](#add_ruleset)
@@ -189,9 +190,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 				local waf = lua_resty_waf:new()
 
-				-- write out any event log entries to the
-				-- configured target, if applicable
-				waf:write_log_events()
+				waf:exec()
 			';
 		}
 	}
@@ -254,9 +253,28 @@ Configure an option on a per-scope basis.
 	}
 ```
 
+###lua-resty-waf:exec()
+
+Run the rule engine.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			local lua_resty_waf = require "waf"
+
+			local waf = lua_resty_waf:new()
+
+			-- fire!
+			waf:exec()
+		';
+	}
+```
+
 ###lua-resty-waf:write_log_events()
 
-Write any audit log entries that were generated from the transaction. This should be called in the `log_by_lua` handler.
+Write any audit log entries that were generated from the transaction. This is only optional when `exec` is called in a `log_by_lua` handler.
 
 *Example*:
 
@@ -1071,10 +1089,9 @@ lua-resty-waf is designed to run in multiple phases of the request lifecycle. Ru
 * **access**: Request information, such as URI, request headers, URI args, and request body are available in this phase.
 * **header_filter**: Response headers and HTTP status are available in this phase.
 * **body_filter**: Response body is available in this phase.
+* **log**: Event logs are automatically written at the completion of this phase.
 
-These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
-
-Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. lua-resty-waf is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
+These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, `body_filter_by_lua`, and `log_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
 
 ##Included Rulesets
 
