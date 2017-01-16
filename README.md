@@ -12,12 +12,11 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Installation](#installation)
 * [Synopsis](#synopsis)
 * [Public Functions](#public-functions)
-	* [lua-resty-waf.default_option()](#lua-resty-wafdefault_option)
 	* [lua-resty-waf.init()](#lua-resty-wafinit)
 * [Public Methods](#public-methods)
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
 	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
-	* [lua-resty-waf:reset_option()](#lua-resty-wafreset_option)
+	* [lua-resty-waf:exec()](#lua-resty-wafexec)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
 	* [add_ruleset](#add_ruleset)
@@ -44,7 +43,6 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [event_log_target_host](#event_log_target_host)
 	* [event_log_target_path](#event_log_target_path)
 	* [event_log_target_port](#event_log_target_port)
-	* [event_log_verbosity](#event_log_verbosity)
 	* [hook_action](#hook_action)
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
@@ -141,15 +139,6 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			-- require the base module
 			local lua_resty_waf = require "waf"
 
-			-- define options that will be inherited across all scopes
-			lua_resty_waf.default_option("debug", true)
-			lua_resty_waf.default_option("mode", "ACTIVE")
-
-			-- this may be desirable for low-traffic or testing sites
-			-- by default, event logs are not written until the buffer is full
-			-- for testing, flush the log buffer every 5 seconds
-			lua_resty_waf.default_option("event_log_periodic_flush", 5)
-
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
 		';
@@ -162,8 +151,17 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 				local waf = lua_resty_waf:new()
 
-				-- default options can be overridden
-				waf:set_option("debug", false)
+				-- define options that will be inherited across all scopes
+				waf:set_option("debug", true)
+				waf:set_option("mode", "ACTIVE")
+
+				-- this may be desirable for low-traffic or testing sites
+				-- by default, event logs are not written until the buffer is full
+				-- for testing, flush the log buffer every 5 seconds
+				--
+				-- this is only necessary when configuring a remote TCP/UDP
+				-- socket server for event logs. otherwise, this is ignored
+				waf:set_option("event_log_periodic_flush", 5)
 
 				-- run the firewall
 				waf:exec()
@@ -192,9 +190,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 				local waf = lua_resty_waf:new()
 
-				-- write out any event log entries to the
-				-- configured target, if applicable
-				waf:write_log_events()
+				waf:exec()
 			';
 		}
 	}
@@ -202,26 +198,9 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 ##Public Functions
 
-###lua_resty_waf.default_option()
-
-Define default values for configuration options that will be inherited across all scopes. This is useful when you are using lua-resty-waf in many different scopes (i.e. many server blocks, locations, etc.), and don't want to have to make the same call to `set_option` many times. You do not have to call this function if you are not changing the value of the option from what is defined as the default.
-
-```lua
-	http {
-		init_by_lua '
-			local lua_resty_waf = require "waf"
-
-			lua_resty_waf.default_option("debug", true)
-
-			-- this would be a useless operation since it does not change the default
-			lua_resty_waf.default_option("debug_log_level", ngx.INFO)
-		';
-	}
-```
-
 ###lua-resty-waf.init()
 
-Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets and those added or ignored via `default_option`. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should be called after any lua-resty-waf function call in `init_by_lua`, and should never be called outside this scope.
+Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should never be called outside this scope.
 
 *Example*:
 
@@ -257,7 +236,7 @@ Instantiate a new instance of lua-resty-waf. You must call this in every request
 
 ###lua-resty-waf:set_option()
 
-Configure an option on a per-scope basis. You should only do this if you are overriding a default value in this scope (e.g. it would be useless to use this to define the same configurable everywhere).
+Configure an option on a per-scope basis.
 
 *Example*:
 
@@ -274,38 +253,28 @@ Configure an option on a per-scope basis. You should only do this if you are ove
 	}
 ```
 
-###lua-resty-waf:reset_option()
+###lua-resty-waf:exec()
 
-Set the given option to its documented default, regardless of whatever value was assigned via `default_option`. This is most useful for options that are more complex than boolean or integer values.
+Run the rule engine.
 
 *Example*:
 
 ```lua
-	http {
-		init_by_lua '
-			local lua_resty_waf = require "waf"
-
-			lua_resty_waf.default_option("allowed_content_types", "text/json")
-		';
-	}
-
-	[...snip...]
-
 	location / {
 		access_by_lua '
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
 
-			-- reset the value to its documented default
-			waf:reset_option("allowed_content_types")
+			-- fire!
+			waf:exec()
 		';
 	}
 ```
 
 ###lua-resty-waf:write_log_events()
 
-Write any audit log entries that were generated from the transaction. This should be called in the `log_by_lua` handler.
+Write any audit log entries that were generated from the transaction. This is only optional when `exec` is called in a `log_by_lua` handler.
 
 *Example*:
 
@@ -325,10 +294,6 @@ Write any audit log entries that were generated from the transaction. This shoul
 
 ##Options
 
-Module options can be configured using the `default_option` and `set_option` functions. Use `default_option` when in the `init_by_lua` handler, and without calling `lua-resty-waf:new()`, to set default values that will be inherited across all scopes. These values (or options that were not modified by `default_option` can be further adjusted on a per-scope basis via `set_option`. Additionally, scope-level options can be re-adjusted back to the documented defaults via the `reset_option` method. This will set the given option to its documented default, overriding the default set by the `default_option` function.
-
-Note that options set in an earlier phase handler do not need to be re-set in a later phase, though they can be overwritten (i.e., you can set `debug` in the `access` phase, but disable it in `header_filter`. Details for available options are provided below.
-
 ###add_ruleset
 
 *Default*: none
@@ -339,8 +304,8 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 ```lua
 	http {
-		-- the lua module 50000.lua must live at
-		-- /path/to/extra/rulesets/rules/50000.lua
+		-- the rule file 50000.json must live at
+		-- /path/to/extra/rulesets/rules/50000.json
 		lua_package_path '/path/to/extra/rulesets/?.lua;;';
 	}
 
@@ -597,7 +562,7 @@ When set to true, the log entries contain the request body under the `request_bo
 ```lua
 	location / {
 		access_by_lua '
-			waf:set_option("event_log_request_arguments", true)
+			waf:set_option("event_log_request_body", true)
 		';
 	}
 ```
@@ -717,7 +682,7 @@ Defines the destination for event logs. lua-resty-waf currently supports logging
 	}
 ```
 
-Note that, due to a limition in the logging library used, only a single target socket (and separate file target) can be defined. This is to say, you may elect to use both socket and file logging in different locations, but you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged. Similarly, you may only define one file path if using a `file` logging target; writes to a second path location will be lost.
+Note that, due to a limition in the logging library used, only a single target socket can be defined. This is to say, you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged.
 
 ###event_log_target_host
 
@@ -769,33 +734,6 @@ Defines the target port for event logs that target a remote server.
 	}
 ```
 
-###event_log_verbosity
-
-*Default*: 1
-
-Sets the verbosity used in writing event log notification. The higher the verbosity, the more information will be included in the JSON blob generated for each notification.
-
-*Example*:
-
-```lua
-	location / {
-		access_by_lua '
-			-- default verbosity. the client IP, request URI, rule match data, and rule ID will be logged
-			waf:set_option("event_log_verbosity", 1)
-
-			-- the rule description will be written in addition to existing data
-			waf:set_option("event_log_verbosity", 2)
-
-			-- the rule description, options and action will be written in addition to existing data
-			waf:set_option("event_log_verbosity", 3)
-
-			-- the entire rule definition, including the match pattern, will be written in addition to existing data
-			-- note that for some rule definitions, such as the XSS and SQLi rulesets, this pattern can be large
-			waf:set_option("event_log_verbosity", 4)
-		';
-	}
-```
-
 ###hook_action
 
 *Default*: none
@@ -831,6 +769,7 @@ Instructs the module to ignore a specified rule ID. Note that ignoring a rule in
 	location / {
 		access_by_lua '
 			waf:set_option("ignore_rule", 40294)
+			waf:set_option("ignore_rule", {40002, 41036})
 		';
 	}
 ```
@@ -1065,7 +1004,7 @@ Define a host to use when using memcached as a persistent variable storage engin
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_host", "10.10.10.10")
+			waf:set_option("storage_memcached_host", "10.10.10.10")
 		';
 	}
 ```
@@ -1081,7 +1020,7 @@ Define a port to use when using memcached as a persistent variable storage engin
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_port", 11221)
+			waf:set_option("storage_memcached_port", 11221)
 		';
 	}
 ```
@@ -1097,7 +1036,7 @@ Define a host to use when using redis as a persistent variable storage engine.
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_host", "10.10.10.10")
+			waf:set_option("storage_redis_host", "10.10.10.10")
 		';
 	}
 ```
@@ -1113,7 +1052,7 @@ Define a port to use when using redis as a persistent variable storage engine.
 ```lua
 	location / {
 		acccess_by_lua '
-			waf:set_option("storage_port", 6397)
+			waf:set_option("storage_redis_port", 6397)
 		';
 	}
 ```
@@ -1150,10 +1089,9 @@ lua-resty-waf is designed to run in multiple phases of the request lifecycle. Ru
 * **access**: Request information, such as URI, request headers, URI args, and request body are available in this phase.
 * **header_filter**: Response headers and HTTP status are available in this phase.
 * **body_filter**: Response body is available in this phase.
+* **log**: Event logs are automatically written at the completion of this phase.
 
-These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, and `body_filter_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
-
-Additionally, it is required to call `write_log_events` in a `log_by_lua` handler. lua-resty-waf is not designed to process rules in this phase; logging rules late in the request allows all rules to be coalesced into a single entry per request. See the synopsis above for example syntax.
+These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, `body_filter_by_lua`, and `log_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
 
 ##Included Rulesets
 

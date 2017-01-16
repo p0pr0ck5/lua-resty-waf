@@ -14,9 +14,10 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "anomaly_score"
-               },
+               "parse" : [
+                  "specific",
+                  "anomaly_score"
+               ],
                "storage" : 1,
                "type" : "TX"
             }
@@ -36,9 +37,10 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "anomaly_score"
-               },
+               "parse" : [
+                  "specific",
+                  "anomaly_score"
+               ],
                "storage" : 1,
                "type" : "TX"
             }
@@ -60,9 +62,10 @@
          "pattern" : "%{SCORE_THRESHOLD}",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "anomaly_score"
-               },
+               "parse" : [
+                  "specific",
+                  "anomaly_score"
+               ],
                "storage" : 1,
                "type" : "TX"
             }

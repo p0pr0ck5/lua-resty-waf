@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 local logger    = require "resty.waf.log"
 local request   = require "resty.waf.request"
@@ -97,7 +97,8 @@ _M.lookup = {
 			collections.RESPONSE_BODY = table_concat(ctx.buffers, '')
 			ngx.arg[1] = collections.RESPONSE_BODY
 		end
-	end
+	end,
+	log = function() end
 }
 
 return _M

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 local actions       = require "resty.waf.actions"
 local calc          = require "resty.waf.rule_calc"
@@ -8,7 +8,6 @@ local collections_t = require "resty.waf.collections"
 local logger        = require "resty.waf.log"
 local operators     = require "resty.waf.operators"
 local options       = require "resty.waf.options"
-local opts          = require "resty.waf.opts"
 local phase_t       = require "resty.waf.phase"
 local random        = require "resty.waf.random"
 local storage       = require "resty.waf.storage"
@@ -17,6 +16,9 @@ local util          = require "resty.waf.util"
 
 local table_sort   = table.sort
 local string_lower = string.lower
+
+local ngx_INFO = ngx.INFO
+local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
 local mt = { __index = _M }
 
@@ -35,9 +37,7 @@ local _global_rulesets = {
 
 -- ruleset table cache
 local _ruleset_defs = {}
-
--- default options
-local default_opts = util.table_copy(opts.defaults)
+local _ruleset_def_cnt = 0
 
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, parse)
@@ -54,7 +54,8 @@ local function _parse_collection(self, collection, parse)
 	end
 
 	-- get the next (first)(only) k/v pair in the parse table
-	local key, value = next(parse)
+	local key   = parse[1]
+	local value = parse[2]
 
 	return util.parse_collection[key](self, collection, value)
 end
@@ -69,17 +70,8 @@ local function _log_event(self, rule, value, ctx)
 		match = value
 	}
 
-	if (self._event_log_verbosity > 1) then
+	if (rule.msg) then
 		t.msg = util.parse_dynamic_value(self, rule.msg, ctx.collections)
-	end
-
-	if (self._event_log_verbosity > 2) then
-		t.opts   = rule.opts
-		t.action = rule.actions.disrupt
-	end
-
-	if (self._event_log_verbosity > 3) then
-		t.var = rule.var
 	end
 
 	if (rule.logdata) then
@@ -88,24 +80,6 @@ local function _log_event(self, rule, value, ctx)
 
 	ctx.log_entries_n = ctx.log_entries_n + 1
 	ctx.log_entries[ctx.log_entries_n] = t
-end
-
--- restore options from a previous phase
-local function _load(self, opts)
-	for k, v in pairs(opts) do
-		self[k] = v
-	end
-end
-
--- save options to the ctx table to be used in another phase
-local function _save(self, ctx)
-	local opts = {}
-
-	for k, v in pairs(self) do
-		opts[k] = v
-	end
-
-	ctx.opts = opts
 end
 
 local function _transaction_id_header(self, ctx)
@@ -130,13 +104,17 @@ local function _finalize(self, ctx)
 	end
 
 	-- save our options for the next phase
-	_save(self, ctx)
+	ctx.opts = self
 
 	-- persistent variable storage
 	storage.persist(self, ctx.storage)
 
 	-- store the local copy of the ctx table
-	ngx.ctx = ctx
+	ngx.ctx.lua_resty_waf = ctx
+
+	if (ctx.phase == 'log') then
+		self:write_log_events(true, ctx)
+	end
 end
 
 -- use the lookup table to figure out what to do
@@ -179,7 +157,7 @@ local function _do_transform(self, collection, transform)
 				return collection -- dont transform if the collection was nil, i.e. a specific arg key dne
 			end
 
-			logger.log(self, "doing transform of type " .. transform .. " on collection value " .. tostring(collection))
+			--_LOG_"doing transform of type " .. transform .. " on collection value " .. tostring(collection)
 			return transform_t.lookup[transform](self, collection)
 		end
 	end
@@ -209,10 +187,10 @@ local function _process_rule(self, rule, collections, ctx)
 		else
 			local collection_key = var.collection_key
 
-			logger.log(self, "Checking for collection_key " .. collection_key)
+			--_LOG_"Checking for collection_key " .. collection_key
 
 			if (not var.storage and not ctx.transform_key[collection_key]) then
-				logger.log(self, "Collection cache miss")
+				--_LOG_"Collection cache miss"
 				collection = _parse_collection(self, collections[var.type], var.parse)
 
 				if (opts.transform) then
@@ -222,10 +200,10 @@ local function _process_rule(self, rule, collections, ctx)
 				ctx.transform[collection_key]     = collection
 				ctx.transform_key[collection_key] = true
 			elseif (var.storage) then
-				logger.log(self, "Forcing cache miss")
+				--_LOG_"Forcing cache miss"
 				collection = _parse_collection(self, collections[var.type], var.parse)
 			else
-				logger.log(self, "Collection cache hit!")
+				--_LOG_"Collection cache hit!"
 				collection = ctx.transform[collection_key]
 			end
 
@@ -241,11 +219,11 @@ local function _process_rule(self, rule, collections, ctx)
 		end
 
 		if (not collection) then
-			logger.log(self, "No values for this collection")
+			--_LOG_"No values for this collection"
 			offset = rule.offset_nomatch
 		else
 			if (opts.parsepattern) then
-				logger.log(self, "Parsing dynamic pattern: " .. pattern)
+				--_LOG_"Parsing dynamic pattern: " .. pattern
 				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
@@ -263,7 +241,7 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			if (match) then
-				logger.log(self, "Match of rule " .. id)
+				--_LOG_"Match of rule " .. id
 
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value
@@ -312,7 +290,7 @@ local function _process_rule(self, rule, collections, ctx)
 		end
 	end
 
-	logger.log(self, "Returning offset " .. tostring(offset))
+	--_LOG_"Returning offset " .. tostring(offset)
 	return offset
 end
 
@@ -332,43 +310,45 @@ end
 -- merge the default and any custom rules
 local function _merge_rulesets(self)
 	local default = _global_rulesets
-	local added   = self._add_ruleset
-	local added_s = self._add_ruleset_string
-	local ignored = self._ignore_ruleset
-
 	local t = {}
 
 	for k, v in ipairs(default) do
 		t[v] = true
 	end
 
-	for k, v in ipairs(added) do
-		logger.log(self, "Adding ruleset " .. v)
-		t[v] = true
-	end
+	if (self) then
+		local added   = self._add_ruleset
+		local added_s = self._add_ruleset_string
+		local ignored = self._ignore_ruleset
 
-	for k, v in pairs(added_s) do
-		logger.log(self, "Adding ruleset string " .. k)
-
-		if (not _ruleset_defs[k]) then
-			local rs, err = util.parse_ruleset(v)
-
-			if (err) then
-				logger.fatal_fail("Could not load " .. k)
-			else
-				logger.log(self, "Doing offset calculation of " .. k)
-				_calculate_offset(rs)
-
-				_ruleset_defs[k] = rs
-			end
+		for k, v in ipairs(added) do
+			--_LOG_"Adding ruleset " .. v
+			t[v] = true
 		end
 
-		t[k] = true
-	end
+		for k, v in pairs(added_s) do
+			--_LOG_"Adding ruleset string " .. k
 
-	for k, v in ipairs(ignored) do
-		logger.log(self, "Ignoring ruleset " .. v)
-		t[v] = nil
+			if (not _ruleset_defs[k]) then
+				local rs, err = util.parse_ruleset(v)
+
+				if (err) then
+					logger.fatal_fail("Could not load " .. k)
+				else
+					--_LOG_"Doing offset calculation of " .. k
+					_calculate_offset(rs)
+
+					_ruleset_defs[k] = rs
+				end
+			end
+
+			t[k] = true
+		end
+
+		for k, v in ipairs(ignored) do
+			--_LOG_"Ignoring ruleset " .. v
+			t[v] = nil
+		end
 	end
 
 	t = util.table_keys(t)
@@ -384,7 +364,7 @@ end
 -- main entry point
 function _M.exec(self)
 	if (self._mode == "INACTIVE") then
-		logger.log(self, "Operational mode is INACTIVE, not running")
+		--_LOG_"Operational mode is INACTIVE, not running"
 		return
 	end
 
@@ -394,13 +374,8 @@ function _M.exec(self)
 		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
 	end
 
-	local ctx         = ngx.ctx
+	local ctx         = ngx.ctx.lua_resty_waf or {}
 	local collections = ctx.collections or {}
-
-	-- restore options from a previous phase
-	if (ctx.opts) then
-		_load(self, ctx.opts)
-	end
 
 	ctx.lrw_initted   = true
 	ctx.altered       = ctx.altered or {}
@@ -421,7 +396,7 @@ function _M.exec(self)
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	if (ctx.altered[phase]) then
-		logger.log(self, "Transaction was already altered, not running!")
+		--_LOG_"Transaction was already altered, not running!"
 		return
 	end
 
@@ -436,8 +411,10 @@ function _M.exec(self)
 	ctx.collections = collections
 
 	-- build rulesets
-	if (self.need_merge) then
+	if (self.need_merge == true) then
 		_merge_rulesets(self)
+	else
+		self._active_rulesets = _global_rulesets
 	end
 
 	-- set up tracking tables and flags if we're using redis for persistent storage
@@ -448,10 +425,10 @@ function _M.exec(self)
 		self._storage_redis_setkey   = {}
 	end
 
-	logger.log(self, "Beginning run of phase " .. phase)
+	--_LOG_"Beginning run of phase " .. phase
 
 	for _, ruleset in ipairs(self._active_rulesets) do
-		logger.log(self, "Beginning ruleset " .. ruleset)
+		--_LOG_"Beginning ruleset " .. ruleset
 
 		local rs = _ruleset_defs[ruleset]
 
@@ -462,7 +439,7 @@ function _M.exec(self)
 			if (err) then
 				logger.fatal_fail(err)
 			else
-				logger.log(self, "Doing offset calculation of " .. ruleset)
+				--_LOG_"Doing offset calculation of " .. ruleset
 				_calculate_offset(rs)
 
 				_ruleset_defs[ruleset] = rs
@@ -476,7 +453,7 @@ function _M.exec(self)
 			local id = rule.id
 
 			if (not util.table_has_key(id, self._ignore_rule)) then
-				logger.log(self, "Processing rule " .. id)
+				--_LOG_"Processing rule " .. id
 
 				local returned_offset = _process_rule(self, rule, collections, ctx)
 				if (returned_offset) then
@@ -485,7 +462,7 @@ function _M.exec(self)
 					offset = nil
 				end
 			else
-				logger.log(self, "Ignoring rule " .. id)
+				--_LOG_"Ignoring rule " .. id
 
 				local rule_nomatch = rule.offset_nomatch
 
@@ -506,17 +483,68 @@ function _M.exec(self)
 end
 
 -- instantiate a new instance of the module
-function _M.new(self)
-	-- we need a separate copy of this table since we will
-	-- potentially override values with set_option
-	local t = util.table_copy(default_opts)
+function _M.new()
+	local ctx = ngx.ctx.lua_resty_waf or {}
 
-	t.transaction_id = random.random_bytes(10)
+	-- restore options and self from a previous phase
+	if (ctx.opts) then
+		return setmetatable(ctx.opts, mt)
+	end
 
-	-- handle conditions where init() wasnt called
-	-- and the default rulesets weren't merged
-	if (not t._active_rulesets) then
+	-- we're new to this transaction get us some opts and get movin!
+	local t = {
+		_add_ruleset                 = {},
+		_add_ruleset_string          = {},
+		_allow_unknown_content_types = false,
+		_allowed_content_types       = {},
+		_debug                       = false,
+		_debug_log_level             = ngx_INFO,
+		_deny_status                 = ngx_HTTP_FORBIDDEN,
+		_event_log_altered_only      = true,
+		_event_log_buffer_size       = 4096,
+		_event_log_level             = ngx_INFO,
+		_event_log_ngx_vars          = {},
+		_event_log_periodic_flush    = nil,
+		_event_log_request_arguments = false,
+		_event_log_request_body      = false,
+		_event_log_request_headers   = false,
+		_event_log_ssl               = false,
+		_event_log_ssl_sni_host      = nil,
+		_event_log_ssl_verify        = false,
+		_event_log_socket_proto      = 'udp',
+		_event_log_target            = 'error',
+		_event_log_target_host       = nil,
+		_event_log_target_path       = nil,
+		_event_log_target_port       = nil,
+		_event_log_verbosity         = 1,
+		_hook_actions                = {},
+		_ignore_rule                 = {},
+		_ignore_ruleset              = {},
+		_mode                        = 'SIMULATE',
+		_nameservers                 = {},
+		_pcre_flags                  = 'oij',
+		_process_multipart_body      = true,
+		_req_tid_header              = false,
+		_res_body_max_size           = (1024 * 1024),
+		_res_body_mime_types         = { ["text/plain"] = true, ["text/html"] = true },
+		_res_tid_header              = false,
+		_score_threshold             = 5,
+		_storage_backend             = 'dict',
+		_storage_keepalive           = true,
+		_storage_keepalive_pool_size = 100,
+		_storage_keepalive_timeout   = 10000,
+		_storage_memcached_host      = '127.0.0.1',
+		_storage_memcached_port      = 11211,
+		_storage_redis_host          = '127.0.0.1',
+		_storage_redis_port          = 6379,
+		_storage_zone                = nil,
+		transaction_id               = random.random_bytes(10),
+	}
+
+	if (_ruleset_def_cnt == 0) then
 		t.need_merge = true
+	else
+		t.need_merge = false
 	end
 
 	return setmetatable(t, mt)
@@ -538,72 +566,38 @@ function _M.set_option(self, option, value, data)
 	end
 end
 
--- configuraton wrapper for default options
-function _M.default_option(option, value, data)
-	if (type(value) == "table") then
-		for _, v in ipairs(value) do
-			_M.default_option(option, v, data)
-		end
-	else
-		if (options.lookup[option]) then
-			options.lookup[option](default_opts, value, data)
-		else
-			local _option = "_" .. option
-			default_opts[_option] = value
-		end
-	end
-end
-
--- reset the given option to its static default
-function _M.reset_option(self, option)
-	local _option = "_" .. option
-	self[_option] = opts.defaults[_option]
-
-	if (option == "add_ruleset" or option == "ignore_ruleset") then
-		self.need_merge = true
-	end
-end
-
 -- init_by_lua handler precomputations
 function _M.init()
-	-- do an initial rule merge based on default_option calls
-	-- this prevents have to merge every request in scopes
-	-- which do not further alter elected rulesets
-	_merge_rulesets(default_opts)
-
 	-- do offset jump calculations for default rulesets
 	-- this is also lazily handled in exec() for rulesets
 	-- that dont appear here
-	for _, ruleset in ipairs(default_opts._active_rulesets) do
+	for _, ruleset in ipairs(_global_rulesets) do
 		local rs, err, calc
 
-		if (not _ruleset_defs[ruleset]) then
-			rs, err = util.load_ruleset_file(ruleset)
-			calc = true
-		end
+		rs, err = util.load_ruleset_file(ruleset)
 
 		if (err) then
 			ngx.log(ngx.ERR, err)
-		elseif (calc) then
+		else
 			_calculate_offset(rs)
 
 			_ruleset_defs[ruleset] = rs
+
+			_ruleset_def_cnt = _ruleset_def_cnt + 1
 		end
 	end
-
-	-- clear this flag if we handled additional rulesets
-	-- so its not passed to new objects
-	default_opts.need_merge = false
 end
 
 -- push log data regarding matching rule(s) to the configured target
 -- in the case of socket or file logging, this data will be buffered
-function _M.write_log_events(self)
+function _M.write_log_events(self, has_ctx, ctx)
 	-- there is a small bit of code duplication here to get our context
 	-- because this lives outside exec()
-	local ctx = ngx.ctx
-	if (ctx.opts) then
-		_load(self, ctx.opts)
+	if (not has_ctx) then
+		ctx = ngx.ctx.lua_resty_waf or {}
+		if (ctx.opts) then
+			self = ctx.opts
+		end
 	end
 
 	if (not ctx.lrw_initted) then
@@ -613,12 +607,12 @@ function _M.write_log_events(self)
 	end
 
 	if (table.getn(util.table_keys(ctx.altered)) == 0 and self._event_log_altered_only) then
-		logger.log(self, "Not logging a request that wasn't altered")
+		--_LOG_"Not logging a request that wasn't altered"
 		return
 	end
 
 	if (ctx.log_entries_n == 0) then
-		logger.log(self, "Not logging a request that had no rule alerts")
+		--_LOG_"Not logging a request that had no rule alerts"
 		return
 	end
 

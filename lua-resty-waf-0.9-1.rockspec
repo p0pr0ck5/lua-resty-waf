@@ -1,5 +1,5 @@
 package = "lua-resty-waf"
-version = "0.8.2-2"
+version = "0.9-1"
 source = {
    url = "gitrec+https://github.com/p0pr0ck5/lua-resty-waf",
 }

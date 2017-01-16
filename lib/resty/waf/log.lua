@@ -1,17 +1,10 @@
 local _M = {}
 
+
 local cjson         = require "cjson"
-local file_logger   = require "resty.logger.file"
 local socket_logger = require "resty.logger.socket"
 
-_M.version = "0.8.2"
-
--- debug logger
-function _M.log(waf, msg)
-	if (waf._debug == true) then
-		ngx.log(waf._debug_log_level, '[', waf.transaction_id, '] ', msg)
-	end
-end
+_M.version = "0.9"
 
 -- warn logger
 function _M.warn(waf, msg)
@@ -30,15 +23,19 @@ _M.write_log_events = {
 		ngx.log(waf._event_log_level, cjson.encode(t))
 	end,
 	file = function(waf, t)
-		if (not file_logger.initted()) then
-			file_logger.init({
-				path           = waf._event_log_target_path,
-				flush_limit    = waf._event_log_buffer_size,
-				periodic_flush = waf._event_log_periodic_flush
-			})
+		if (not waf._event_log_target_path) then
+			_M.fatal_fail("Event log target path is undefined in file logger")
 		end
 
-		file_logger.log(cjson.encode(t) .. "\n")
+		local f = io.open(waf._event_log_target_path, 'a')
+
+		if (not f) then
+			_M.warn(waf, "Could not open " .. waf._event_log_target_path)
+			return
+		end
+
+		f:write(cjson.encode(t), "\n")
+		f:close()
 	end,
 	socket = function(waf, t)
 		if (not socket_logger.initted()) then

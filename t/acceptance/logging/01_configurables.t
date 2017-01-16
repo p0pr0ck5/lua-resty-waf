@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks() + 12;
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Log ngx.var to event log
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -47,15 +47,7 @@ GET /t?foo=alert(1)
 "args":"foo=alert(1)"
 
 === TEST 2: Do not log ngx.var if option is unset
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -84,15 +76,7 @@ GET /t?foo=alert(1)
 "args":"foo=alert(1)"
 
 === TEST 3: Log request arguments
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -123,15 +107,7 @@ GET /t?foo=alert(1)
 [error]
 
 === TEST 4: Do not log request arguments if option is unset
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -160,15 +136,7 @@ GET /t?foo=alert(1)
 [error]
 
 === TEST 5: Log request headers
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -203,15 +171,7 @@ X-Foo: Bar
 [error]
 
 === TEST 6: Do not log request headers if option is unset
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -245,15 +205,7 @@ X-Foo: Bar
 "x-foo":"Bar",
 
 === TEST 7: Log request body
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -287,15 +239,7 @@ Content-Type: application/x-www-form-urlencoded
 [error]
 
 === TEST 8: Do not log request body if option is unset
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '

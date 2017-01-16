@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 17 * blocks();
@@ -10,26 +18,21 @@ run_tests();
 __DATA__
 
 === TEST 1: Initialize empty, persist and re-initialize a collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
     lua_shared_dict store 10m;
     init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_zone", "store")
-        lua_resty_waf.default_option("storage_backend", "dict")
-        lua_resty_waf.default_option("debug", true)
     ';
+#
 --- config
     location = /t {
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -49,6 +52,9 @@ __DATA__
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local data = {}
 
@@ -83,26 +89,21 @@ Persisting value: {"COUNT":1}
 Not persisting a collection that wasn't altered
 
 === TEST 2: Initialize empty, set with future expiry, persist, delay, and re-initialize a collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
     lua_shared_dict store 10m;
     init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_zone", "store")
-        lua_resty_waf.default_option("storage_backend", "dict")
-        lua_resty_waf.default_option("debug", true)
     ';
+#
 --- config
     location = /t {
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -127,6 +128,9 @@ Not persisting a collection that wasn't altered
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local data = {}
 
@@ -163,26 +167,21 @@ Persisting value: {"
 Not persisting a collection that wasn't altered
 
 === TEST 3: Initialize empty, set with expiry, persist, delay, re-initialize, and re-persist
---- http_config
+--- http_config eval
+$::HttpConfig . q#
     lua_shared_dict store 10m;
     init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_zone", "store")
-        lua_resty_waf.default_option("storage_backend", "dict")
-        lua_resty_waf.default_option("debug", true)
     ';
+#
 --- config
     location = /t {
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -207,6 +206,9 @@ Not persisting a collection that wasn't altered
 		access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local data = {}
 
@@ -242,26 +244,21 @@ Examining FOO
 Not persisting a collection that wasn't altered
 
 === TEST 4: Initialize empty, set some with expiry, persist, delay, re-initialize, and re-persist
---- http_config
+--- http_config eval
+$::HttpConfig . q#
     lua_shared_dict store 10m;
     init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
         local lua_resty_waf = require "resty.waf"
-        lua_resty_waf.default_option("storage_zone", "store")
-        lua_resty_waf.default_option("storage_backend", "dict")
-        lua_resty_waf.default_option("debug", true)
     ';
+#
 --- config
     location = /t {
         access_by_lua '
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -291,6 +288,9 @@ Not persisting a collection that wasn't altered
 			ngx.sleep(.5)
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local data = {}
 

@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
@@ -18,7 +18,7 @@ function _M.initialize(waf, storage, col)
 
 	local backend_m = require("resty.waf.storage." .. backend)
 
-	logger.log(waf, "Initializing storage type " .. backend)
+	--_LOG_"Initializing storage type " .. backend
 
 	backend_m.initialize(waf, storage, col)
 end
@@ -35,19 +35,19 @@ function _M.set_var(waf, ctx, element, value)
 		if (existing and type(existing) ~= "number") then
 			logger.fatal_fail("Cannot increment a value that was not previously a number")
 		elseif (not existing) then
-			logger.log(waf, "Incrementing a non-existing value")
+			--_LOG_"Incrementing a non-existing value"
 			existing = 0
 		end
 
 		if (type(value) == "number") then
 			value = value + existing
 		else
-			logger.log(waf, "Failed to increment a non-number, falling back to existing value")
+			--_LOG_"Failed to increment a non-number, falling back to existing value"
 			value = existing
 		end
 	end
 
-	logger.log(waf, "Setting " .. col .. ":" .. key .. " to " .. value)
+	--_LOG_"Setting " .. col .. ":" .. key .. " to " .. value
 
 	-- save data to in-memory table
 	-- data not in the TX col will be persisted at the end of the phase
@@ -67,7 +67,7 @@ function _M.expire_var(waf, ctx, element, value)
 	local storage = ctx.storage
 	local expire  = ngx.now() + value
 
-	logger.log(waf, "Expiring " .. element.col .. ":" .. element.key .. " in " .. value)
+	--_LOG_"Expiring " .. element.col .. ":" .. element.key .. " in " .. value
 
 
 	storage[col]["__expire_" .. key] = expire
@@ -76,7 +76,7 @@ function _M.expire_var(waf, ctx, element, value)
 	-- track which keys to write to redis
 	if (waf._storage_backend == 'redis') then
 		waf._storage_redis_setkey['__expire_' .. key] = expire
-		logger.log(waf, cjson.encode(waf._storage_redis_setkey))
+		--_LOG_cjson.encode(waf._storage_redis_setkey)
 	end
 end
 
@@ -85,7 +85,7 @@ function _M.delete_var(waf, ctx, element)
 	local key     = element.key
 	local storage = ctx.storage
 
-	logger.log(waf, "Deleting " .. col .. ":" .. key)
+	--_LOG_"Deleting " .. col .. ":" .. key
 
 	if (storage[col][key]) then
 		storage[col][key]         = nil
@@ -97,7 +97,7 @@ function _M.delete_var(waf, ctx, element)
 			waf._storage_redis_delkey[waf._storage_redis_delkey_n] = key
 		end
 	else
-		logger.log(waf, key .. " was not found in " .. col)
+		--_LOG_key .. " was not found in " .. col
 	end
 end
 
@@ -113,17 +113,17 @@ function _M.persist(waf, storage)
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
-	logger.log(waf, 'Persisting storage type ' .. backend)
+	--_LOG_'Persisting storage type ' .. backend
 
 	for col in pairs(storage) do
 		if (col ~= 'TX') then
-			logger.log(waf, 'Examining ' .. col)
+			--_LOG_'Examining ' .. col
 
 			if (storage[col]["__altered"]) then
 				storage[col]["__altered"] = nil -- dont need to persist this flag
 				backend_m.persist(waf, col, storage[col])
 			else
-				logger.log(waf, "Not persisting a collection that wasn't altered")
+				--_LOG_"Not persisting a collection that wasn't altered"
 			end
 		end
 	end

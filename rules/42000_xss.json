@@ -70,9 +70,10 @@
          "skip" : 67,
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -104,9 +105,10 @@
          "pattern" : "\\bgetparentfolder\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -138,9 +140,10 @@
          "pattern" : "\\bonmousedown\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -172,9 +175,10 @@
          "pattern" : "\\bsrc\\b\\W*?\\bshell:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -206,9 +210,10 @@
          "pattern" : "\\bmocha:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -240,9 +245,10 @@
          "pattern" : "\\bonabort\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -274,9 +280,10 @@
          "pattern" : "\\blowsrc\\b\\W*?\\bhttp:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -308,9 +315,10 @@
          "pattern" : "\\bonmouseup\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -342,9 +350,10 @@
          "pattern" : "\\bstyle\\b\\W*\\=.*\\bexpression\\b\\W*\\(",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -376,9 +385,10 @@
          "pattern" : "\\bhref\\b\\W*?\\bshell:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -410,9 +420,10 @@
          "pattern" : "\\bcreatetextrange\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -444,9 +455,10 @@
          "pattern" : "\\bondragdrop\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -478,9 +490,10 @@
          "pattern" : "\\bcopyparentfolder\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -512,9 +525,10 @@
          "pattern" : "\\bonunload\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -546,9 +560,10 @@
          "pattern" : "\\.execscript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -580,9 +595,10 @@
          "pattern" : "\\bgetspecialfolder\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -614,9 +630,10 @@
          "pattern" : "<body\\b.*?\\bonload\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -648,9 +665,10 @@
          "pattern" : "\\burl\\b\\W*?\\bvbscript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -682,9 +700,10 @@
          "pattern" : "\\bonkeydown\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -716,9 +735,10 @@
          "pattern" : "\\bonmousemove\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -750,9 +770,10 @@
          "pattern" : "\\blivescript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -784,9 +805,10 @@
          "pattern" : "\\bonblur\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -818,9 +840,10 @@
          "pattern" : "\\bonmove\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -852,9 +875,10 @@
          "pattern" : "\\bsettimeout\\b\\W*?\\(",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -886,9 +910,10 @@
          "pattern" : "< ?iframe",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -920,9 +945,10 @@
          "pattern" : "\\bsrc\\b\\W*?\\bjavascript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -954,9 +980,10 @@
          "pattern" : "<body\\b.*?\\bbackground\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -988,9 +1015,10 @@
          "pattern" : "\\bsrc\\b\\W*?\\bvbscript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1022,9 +1050,10 @@
          "pattern" : "\\btype\\b\\W*?\\btext\\b\\W*?\\becmascript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1056,9 +1085,10 @@
          "pattern" : "\\bonfocus\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1090,9 +1120,10 @@
          "pattern" : "\\bdocument\\b\\s*\\.\\s*\\bcookie\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1124,9 +1155,10 @@
          "pattern" : "\\<\\!\\[cdata\\[",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1158,9 +1190,10 @@
          "pattern" : "\\bonerror\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1192,9 +1225,10 @@
          "pattern" : "\\blowsrc\\b\\W*?\\bjavascript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1226,9 +1260,10 @@
          "pattern" : "\\bactivexobject\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1260,9 +1295,10 @@
          "pattern" : "\\bonkeypress\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1294,9 +1330,10 @@
          "pattern" : "\\bonsubmit\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1328,9 +1365,10 @@
          "pattern" : "\\btype\\b\\W*?\\bapplication\\b\\W*?\\bx-javascript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1362,9 +1400,10 @@
          "pattern" : "\\.addimport\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1396,9 +1435,10 @@
          "pattern" : "\\bhref\\b\\W*?\\bjavascript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1430,9 +1470,10 @@
          "pattern" : "\\bonchange\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1464,9 +1505,10 @@
          "pattern" : "\\btype\\b\\W*?\\btext\\b\\W*?\\bjscript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1498,9 +1540,10 @@
          "pattern" : "\\balert\\b\\W*?\\(",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1532,9 +1575,10 @@
          "pattern" : "\\btype\\b\\W*?\\bapplication\\b\\W*?\\bx-vbscript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1566,9 +1610,10 @@
          "pattern" : "< ?meta",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1600,9 +1645,10 @@
          "pattern" : "\\bsrc\\b\\W*?\\bhttp:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1634,9 +1680,10 @@
          "pattern" : "\\btype\\b\\W*?\\btext\\b\\W*?\\bvbscript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1668,9 +1715,10 @@
          "pattern" : "\\bonmouseout\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1702,9 +1750,10 @@
          "pattern" : "\\blowsrc\\b\\W*?\\bshell:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1736,9 +1785,10 @@
          "pattern" : "\\basfunction:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1770,9 +1820,10 @@
          "pattern" : "\\bonmouseover\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1804,9 +1855,10 @@
          "pattern" : "\\bhref\\b\\W*?\\bvbscript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1838,9 +1890,10 @@
          "pattern" : "\\burl\\b\\W*?\\bjavascript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1872,9 +1925,10 @@
          "pattern" : "\\.innerhtml\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1906,9 +1960,10 @@
          "pattern" : "\\bonselect\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1940,9 +1995,10 @@
          "pattern" : "\\import\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -1974,9 +2030,10 @@
          "pattern" : "\\blowsrc\\b\\W*?\\bvbscript:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2008,9 +2065,10 @@
          "pattern" : "\\bonload\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2042,9 +2100,10 @@
          "pattern" : "< ?script\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2076,9 +2135,10 @@
          "pattern" : "\\bonresize\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2110,9 +2170,10 @@
          "pattern" : "\\bonclick\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2144,9 +2205,10 @@
          "pattern" : "\\biframe\\b.{0,100}?\\bsrc\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2178,9 +2240,10 @@
          "pattern" : "\\bbackground-image:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2212,9 +2275,10 @@
          "pattern" : "\\bonkeyup\\b\\W*?\\=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2246,9 +2310,10 @@
          "pattern" : "<input\\b.*?\\btype\\b\\W*?\\bimage\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2280,9 +2345,10 @@
          "pattern" : "\\burl\\b\\W*?\\bshell:",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2314,9 +2380,10 @@
          "pattern" : "\\btype\\b\\W*?\\btext\\b\\W*?\\bjavascript\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2342,9 +2409,10 @@
          "pattern" : "\\.fromcharcode\\b",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2376,9 +2444,10 @@
          "pattern" : "<(a|abbr|acronym|address|applet|area|audioscope|b|base|basefront|bdo|bgsound|big|blackface|blink|blockquote|body|bq|br|button|caption|center|cite|code|col|colgroup|comment|dd|del|dfn|dir|div|dl|dt|em|embed|fieldset|fn|font|form|frame|frameset|h1|head|hr|html|i|iframe|ilayer|img|input|ins|isindex|kdb|keygen|label|layer|legend|li|limittext|link|listing|map|marquee|menu|meta|multicol|nobr|noembed|noframes|noscript|nosmartquotes|object|ol|optgroup|option|p|param|plaintext|pre|q|rt|ruby|s|samp|script|select|server|shadow|sidebar|small|spacer|span|strike|strong|style|sub|sup|table|tbody|td|textarea|tfoot|th|thead|title|tr|tt|u|ul|var|wbr|xml|xmp)\\W",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2410,9 +2479,10 @@
          "pattern" : "\\ballowscriptaccess\\b|\\brel\\b\\W*?=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2444,9 +2514,10 @@
          "pattern" : ".+application/x-shockwave-flash|image/svg\\+xml|text/(css|html|ecmascript|javascript|vbscript|x-(javascript|scriptlet|vbscript)).+",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2478,9 +2549,10 @@
          "pattern" : "\\bon(abort|blur|change|click|dblclick|dragdrop|error|focus|keydown|keypress|keyup|load|mousedown|mousemove|mouseout|mouseover|mouseup|move|readystatechange|reset|resize|select|submit|unload)\\b\\W*?=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2512,9 +2584,10 @@
          "pattern" : "\\b(background|dynsrc|href|lowsrc|src)\\b\\W*?=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2546,9 +2619,10 @@
          "pattern" : "(asfunction|javascript|vbscript|data|mocha|livescript):",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2580,9 +2654,10 @@
          "pattern" : "\\bstyle\\b\\W*?=",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2614,9 +2689,10 @@
          "pattern" : "(fromcharcode|alert|eval)\\s*\\(",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2648,9 +2724,10 @@
          "pattern" : "background\\b\\W*?:\\W*?url|background-image\\b\\W*?:|behavior\\b\\W*?:\\W*?url|-moz-binding\\b|@import\\b|expression\\b\\W*?\\(",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2682,9 +2759,10 @@
          "pattern" : "<!\\[cdata\\[|\\]\\]>",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2716,9 +2794,10 @@
          "pattern" : "[/'\\\"<]xss[/'\\\">]",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2750,9 +2829,10 @@
          "pattern" : "(88,83,83)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2784,9 +2864,10 @@
          "pattern" : "'';!--\\\"<xss>=&{()}",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2818,9 +2899,10 @@
          "pattern" : "\"<!(doctype|entity)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2852,9 +2934,10 @@
          "pattern" : "(?:<script.*?>)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2886,9 +2969,10 @@
          "pattern" : "(?:<style.*?>.*?((@[i\\\\\\\\])|(([:=]|(&#x?0*((58)|(3A)|(61)|(3D));?)).*?([(\\\\\\\\]|(&#x?0*((40)|(28)|(92)|(5C));?)))))",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2920,9 +3004,10 @@
          "pattern" : "(?:<script.*?[ /+\\t]*?((src)|(xlink:href)|(href))[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2954,9 +3039,10 @@
          "pattern" : "(?:<[i]?frame.*?[ /+\\t]*?src[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -2988,9 +3074,10 @@
          "pattern" : "(?i:<.*[:]vmlframe.*?[ /+\\t]*?src[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3022,9 +3109,10 @@
          "pattern" : "(?:(j|(&#x?0*((74)|(4A)|(106)|(6A));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(a|(&#x?0*((65)|(42)|(97)|(61));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(v|(&#x?0*((86)|(56)|(118)|(76));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(a|(&#x?0*((65)|(42)|(97)|(61));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(s|(&#x?0*((83)|(53)|(115)|(73));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(c|(&#x?0*((67)|(43)|(99)|(63));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(r|(&#x?0*((82)|(52)|(114)|(72));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(i|(&#x?0*((73)|(49)|(105)|(69));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(p|(&#x?0*((80)|(50)|(112)|(70));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(t|(&#x?0*((84)|(54)|(116)|(74));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(:|(&((#x?0*((58)|(3A));?)|(colon;)))).)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3056,9 +3144,10 @@
          "pattern" : "(?:(v|(&#x?0*((86)|(56)|(118)|(76));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(b|(&#x?0*((66)|(42)|(98)|(62));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(s|(&#x?0*((83)|(53)|(115)|(73));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(c|(&#x?0*((67)|(43)|(99)|(63));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(r|(&#x?0*((82)|(52)|(114)|(72));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(i|(&#x?0*((73)|(49)|(105)|(69));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(p|(&#x?0*((80)|(50)|(112)|(70));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(t|(&#x?0*((84)|(54)|(116)|(74));?))([\\t]|(&((#x?0*(9|(13)|(10)|A|D);?)|(tab;)|(newline;))))*(:|(&((#x?0*((58)|(3A));?)|(colon;)))).)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3090,9 +3179,10 @@
          "pattern" : "(?:<EMBED /+\\t].*?((src)|(type)).*?=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3124,9 +3214,10 @@
          "pattern" : "(?:<[?]?import /+\\t].*?implementation[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3158,9 +3249,10 @@
          "pattern" : "(?:<META /+\\t].*?http-equiv[ /+\\t]*=[ /+\\t]*[\\\"\\'`]?(((c|(&#x?0*((67)|(43)|(99)|(63));?)))|((r|(&#x?0*((82)|(52)|(114)|(72));?)))|((s|(&#x?0*((83)|(53)|(115)|(73));?)))))",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3192,9 +3284,10 @@
          "pattern" : "(?:<META /+\\t].*?charset[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3226,9 +3319,10 @@
          "pattern" : "(?:<LINK /+\\t].*?href[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3260,9 +3354,10 @@
          "pattern" : "(?:<BASE /+\\t].*?href[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3294,9 +3389,10 @@
          "pattern" : "(?:<APPLET /+\\t>])",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -3328,9 +3424,10 @@
          "pattern" : "(?:<OBJECT /+\\t].*?((type)|(codetype)|(classid)|(code)|(data))[ /+\\t]*=)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]

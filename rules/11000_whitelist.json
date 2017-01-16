@@ -31,9 +31,10 @@
          "pattern" : ".*",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]

@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Log a warning
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -39,15 +39,7 @@ qr/\[warn\].*We have logged a warning!/
 [error]
 
 === TEST 2: Log a warning at INFO level
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -71,15 +63,7 @@ qr/\[warn\].*We have logged a warning!/
 [error]
 
 === TEST 3: Log a warning at ERROR level
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '

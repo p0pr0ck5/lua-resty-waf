@@ -39,7 +39,7 @@ is(
 	figure_phase({
 		phase => 5,
 	}),
-	'body_filter',
+	'log',
 	'phase determined from phase key (phase 5)'
 );
 

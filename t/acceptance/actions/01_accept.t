@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks();
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: ACCEPT exits the phase with ngx.OK
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -26,7 +26,7 @@ init_by_lua_block{
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"ACCEPT"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"ACCEPT"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should not see this")
@@ -44,15 +44,7 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 We should not see this
 
 === TEST 2: ACCEPT does not exit the phase when mode is not ACTIVE
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 110})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -60,7 +52,7 @@ init_by_lua_block{
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"ACCEPT"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"ACCEPT"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should see this")

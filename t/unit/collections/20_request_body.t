@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks();
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: REQUEST_BODY collections variable (GET request, no body)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -29,7 +29,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -45,15 +45,7 @@ Request has no content type, ignoring the body
 [error]
 
 === TEST 2: REQUEST_BODY collections variable type (GET request, no body)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -65,7 +57,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -81,15 +73,7 @@ Request has no content type, ignoring the body
 [error]
 
 === TEST 3: REQUEST_BODY collections variable (POST request, no content type)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -101,7 +85,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -118,15 +102,7 @@ Request has no content type, ignoring the body
 [error]
 
 === TEST 4: REQUEST_BODY collections variable type (POST request, no content type)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -138,7 +114,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -155,15 +131,7 @@ Request has no content type, ignoring the body
 [error]
 
 === TEST 5: REQUEST_BODY collections variable (POST request, application/x-www-form-urlencoded)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -175,7 +143,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections  = ngx.ctx.collections
+			local collections  = ngx.ctx.lua_resty_waf.collections
 			local request_body = collections.REQUEST_BODY
 
 			for k, v in pairs(request_body) do
@@ -196,15 +164,7 @@ foo: bar
 Request has no content type, ignoring the body
 
 === TEST 6: REQUEST_BODY collections variable type (POST request, application/x-www-form-urlencoded)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -216,7 +176,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -234,15 +194,7 @@ table
 Request has no content type, ignoring the body
 
 === TEST 7: REQUEST_BODY collections variable (POST request, application/x-www-form-urlencoded, too large)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		client_body_buffer_size 1k;
@@ -256,7 +208,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -275,15 +227,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 [error]
 
 === TEST 8: REQUEST_BODY collections variable type (POST request, application/x-www-form-urlencoded, too large)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		client_body_buffer_size 1k;
@@ -297,7 +241,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -316,15 +260,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 [error]
 
 === TEST 9: REQUEST_BODY collections variable (POST request, text/json)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -337,7 +273,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_BODY)
 		';
@@ -355,15 +291,7 @@ Content-Type: text/json
 Request has no content type, ignoring the body
 
 === TEST 10: REQUEST_BODY collections variable type (POST request, text/json)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -376,7 +304,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';
@@ -394,15 +322,7 @@ string
 Request has no content type, ignoring the body
 
 === TEST 11: REQUEST_BODY collections variable (POST request, text/json, too large)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		client_body_buffer_size 1k;
@@ -417,7 +337,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
 		';
@@ -436,15 +356,7 @@ Request body size larger than client_body_buffer_size, ignoring request body
 [error]
 
 === TEST 12: REQUEST_BODY collections variable type (POST request, text/json, too large)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		client_body_buffer_size 1k;
@@ -459,7 +371,7 @@ init_by_lua_block{
 		';
 
 		content_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
 		';

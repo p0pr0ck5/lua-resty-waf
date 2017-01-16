@@ -9,24 +9,24 @@ local string_len   = string.len
 local string_lower = string.lower
 local string_sub   = string.sub
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 _M.lookup = {
 	base64_decode = function(waf, value)
-		logger.log(waf, "Decoding from base64: " .. tostring(value))
+		--_LOG_"Decoding from base64: " .. tostring(value)
 		local t_val = ngx.decode_base64(tostring(value))
 		if (t_val) then
-			logger.log(waf, "Decode successful, decoded value is " .. t_val)
+			--_LOG_"Decode successful, decoded value is " .. t_val
 			return t_val
 		else
-			logger.log(waf, "Decode unsuccessful, returning original value " .. value)
+			--_LOG_"Decode unsuccessful, returning original value " .. value
 			return value
 		end
 	end,
 	base64_encode = function(waf, value)
-		logger.log(waf, "Encoding to base64: " .. tostring(value))
+		--_LOG_"Encoding to base64: " .. tostring(value)
 		local t_val = ngx.encode_base64(value)
-		logger.log(waf, "Encoded value is " .. t_val)
+		--_LOG_"Encoded value is " .. t_val
 		return t_val
 	end,
 	cmd_line = function(waf, value)
@@ -55,7 +55,7 @@ _M.lookup = {
 		str = ngx.re.gsub(str, [=[&#(\d+);]=], function(n) return string_char(n[1]) end, waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[&#x(\d+);]=], function(n) return string_char(tonumber(n[1],16)) end, waf._pcre_flags)
 		str = ngx.re.gsub(str, [=[&amp;]=], '&', waf._pcre_flags)
-		logger.log(waf, "html decoded value is " .. str)
+		--_LOG_"html decoded value is " .. str
 		return str
 	end,
 	length = function(waf, value)

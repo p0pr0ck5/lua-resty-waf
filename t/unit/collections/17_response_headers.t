@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks() + 3;
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: RESPONSE_HEADERS collections variable (single element)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -40,7 +40,7 @@ init_by_lua_block{
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.RESPONSE_HEADERS["X-Foo"] .. [["]])
 		';
@@ -54,15 +54,7 @@ GET /t
 [error]
 
 === TEST 2: RESPONSE_HEADERS collections variable (multiple elements)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -85,7 +77,7 @@ init_by_lua_block{
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			for k, v in ipairs(collections.RESPONSE_HEADERS["X-Foo"]) do
 				ngx.log(ngx.INFO, [["]] .. v .. [["]])
@@ -102,15 +94,7 @@ GET /t
 [error]
 
 === TEST 3: RESPONSE_HEADERS collections variable (non-existent element)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -132,7 +116,7 @@ init_by_lua_block{
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_HEADERS["X-Foo"]) .. [["]])
 		';
@@ -146,15 +130,7 @@ GET /t
 [error]
 
 === TEST 4: RESPONSE_HEADERS collections variable (type verification)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
 	location /t {
 		access_by_lua '
@@ -176,7 +152,7 @@ init_by_lua_block{
 		';
 
 		log_by_lua '
-			local collections = ngx.ctx.collections
+			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. type(collections.RESPONSE_HEADERS) .. [["]])
 		';

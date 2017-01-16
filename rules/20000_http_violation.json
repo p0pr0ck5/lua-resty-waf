@@ -39,9 +39,10 @@
          "pattern" : "0",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "content-length"
-               },
+               "parse" : [
+                  "specific",
+                  "content-length"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -85,9 +86,10 @@
          "pattern" : "content-length",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -116,9 +118,10 @@
          "pattern" : "identity",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "content-encoding"
-               },
+               "parse" : [
+                  "specific",
+                  "content-encoding"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -136,9 +139,10 @@
          "pattern" : "100-continue",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "expect"
-               },
+               "parse" : [
+                  "specific",
+                  "expect"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -181,9 +185,10 @@
          "pattern" : "pragma",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -201,9 +206,10 @@
          "pattern" : "no-cache",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "pragma"
-               },
+               "parse" : [
+                  "specific",
+                  "pragma"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -221,9 +227,10 @@
          "pattern" : "cache-control",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -275,9 +282,10 @@
          "pattern" : "^bytes=0-",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "range"
-               },
+               "parse" : [
+                  "specific",
+                  "range"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -303,9 +311,10 @@
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "range"
-               },
+               "parse" : [
+                  "specific",
+                  "range"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -331,9 +340,10 @@
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "request-range"
-               },
+               "parse" : [
+                  "specific",
+                  "request-range"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -359,9 +369,10 @@
          "pattern" : "\\b(keep-alive|close),\\s?(keep-alive|close)\\b",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "connection"
-               },
+               "parse" : [
+                  "specific",
+                  "connection"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]

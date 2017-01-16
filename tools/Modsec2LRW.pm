@@ -39,12 +39,12 @@ export_tag translate => qw(
 my @valid_directives = qw(SecRule SecAction SecDefaultAction SecMarker);
 
 my $valid_vars = {
-	ARGS                    => { type => 'REQUEST_ARGS', parse => { values => 1 } },
-	ARGS_GET                => { type => 'URI_ARGS', parse => { values => 1 } },
-	ARGS_GET_NAMES          => { type => 'URI_ARGS', parse => { keys => 1 } },
-	ARGS_NAMES              => { type => 'REQUEST_ARGS', parse => { keys => 1 } },
-	ARGS_POST               => { type => 'REQUEST_BODY', parse => { values => 1 } },
-	ARGS_POST_NAMES         => { type => 'REQUEST_BODY', parse => { keys => 1 } },
+	ARGS                    => { type => 'REQUEST_ARGS', parse => [ qw(values 1) ] },
+	ARGS_GET                => { type => 'URI_ARGS', parse => [ qw(values 1) ] },
+	ARGS_GET_NAMES          => { type => 'URI_ARGS', parse => [ qw(keys 1) ] },
+	ARGS_NAMES              => { type => 'REQUEST_ARGS', parse => [ qw(keys 1) ] },
+	ARGS_POST               => { type => 'REQUEST_BODY', parse => [ qw(values 1) ] },
+	ARGS_POST_NAMES         => { type => 'REQUEST_BODY', parse => [ qw(keys 1) ] },
 	MATCHED_VAR             => { type => 'MATCHED_VAR' },
 	MATCHED_VARS            => { type => 'MATCHED_VARS' },
 	MATCHED_VAR_NAME        => { type => 'MATCHED_VAR_NAME' },
@@ -53,23 +53,23 @@ my $valid_vars = {
 	REMOTE_ADDR             => { type => 'REMOTE_ADDR' },
 	REQUEST_BASENAME        => { type => 'REQUEST_BASENAME' },
 	REQUEST_BODY            => { type => 'REQUEST_BODY' },
-	REQUEST_COOKIES         => { type => 'COOKIES', parse => { values => 1 } },
-	REQUEST_COOKIES_NAMES   => { type => 'COOKIES', parse => { keys => 1 } },
+	REQUEST_COOKIES         => { type => 'COOKIES', parse => [ qw(values 1) ] },
+	REQUEST_COOKIES_NAMES   => { type => 'COOKIES', parse => [ qw(keys 1) ] },
 	REQUEST_FILENAME        => { type => 'URI' },
-	REQUEST_HEADERS         => { type => 'REQUEST_HEADERS', parse => { values => 1 } },
-	REQUEST_HEADERS_NAMES   => { type => 'REQUEST_HEADERS', parse => { keys => 1 } },
+	REQUEST_HEADERS         => { type => 'REQUEST_HEADERS', parse => [ qw(values 1) ] },
+	REQUEST_HEADERS_NAMES   => { type => 'REQUEST_HEADERS', parse => [ qw(keys 1) ] },
 	REQUEST_LINE            => { type => 'REQUEST_LINE' },
 	REQUEST_METHOD          => { type => 'METHOD' },
 	REQUEST_PROTOCOL        => { type => 'PROTOCOL' },
 	REQUEST_URI             => { type => 'REQUEST_URI' },
 	RESPONSE_BODY           => { type => 'RESPONSE_BODY' },
-	RESPONSE_CONTENT_LENGTH => { type => 'RESPONSE_HEADERS', parse => { specific => 'Content-Length' } },
-	RESPONSE_CONTENT_TYPE   => { type => 'RESPONSE_HEADERS', parse => { specific => 'Content-Type' } },
-	RESPONSE_HEADERS        => { type => 'RESPONSE_HEADERS', parse => { values => 1 } },
-	RESPONSE_HEADERS_NAMES  => { type => 'RESPONSE_HEADERS', parse => { keys => 1 } },
+	RESPONSE_CONTENT_LENGTH => { type => 'RESPONSE_HEADERS', parse => [ qw(specific Content-Length) ] },
+	RESPONSE_CONTENT_TYPE   => { type => 'RESPONSE_HEADERS', parse => [ qw(specific Content-Type) ] },
+	RESPONSE_HEADERS        => { type => 'RESPONSE_HEADERS', parse => [ qw(values 1) ] },
+	RESPONSE_HEADERS_NAMES  => { type => 'RESPONSE_HEADERS', parse => [ qw(keys 1) ] },
 	RESPONSE_PROTOCOL       => { type => 'PROTOCOL' },
 	RESPONSE_STATUS         => { type => 'STATUS' },
-	SERVER_NAME             => { type => 'REQUEST_HEADERS', parse => { specific => 'Host' } },
+	SERVER_NAME             => { type => 'REQUEST_HEADERS', parse => [ qw(specific Host) ] },
 	TIME                    => { type => 'TIME' },
 	TIME_DAY                => { type => 'TIME_DAY' },
 	TIME_EPOCH              => { type => 'TIME_EPOCH' },
@@ -146,7 +146,7 @@ my $phase_lookup = {
 	2 => 'access',
 	3 => 'header_filter',
 	4 => 'body_filter',
-	5 => 'body_filter', # lua-resty-waf doesnt have a proper logging phase
+	5 => 'log',
 };
 
 my $op_sep_lookup = {
@@ -610,7 +610,7 @@ sub translate_vars {
 		next if !$lookup_var;
 
 		die "Cannot have a specific attribute when the lookup table already provided one"
-			if ($var->{specific} && $lookup_var->{parse}->{specific});
+			if ($var->{specific} && grep { $_ eq 'specific' } @{$lookup_var->{parse}});
 
 		my $translated_var = $lookup_var;
 		my $modifier       = $var->{modifier};
@@ -627,15 +627,15 @@ sub translate_vars {
 
 			$specific = uc $specific if $lookup_var->{storage};
 
-			$translated_var->{parse}->{$key} = $specific;
-			delete $translated_var->{parse}->{values};
+			delete $translated_var->{parse};
+			push @{$translated_var->{parse}}, $key, $specific;
 		} elsif (length $specific) {
 			my $key = $specific_regex ? 'regex' : 'specific';
 
 			$specific = uc $specific if $lookup_var->{storage};
 
-			$translated_var->{parse}->{$key} = $specific;
-			delete $translated_var->{parse}->{values};
+			delete $translated_var->{parse};
+			push @{$translated_var->{parse}}, $key, $specific;
 		}
 
 		if (defined $modifier && $modifier eq '&') {
@@ -907,7 +907,8 @@ sub translate_macro {
 				# this is a pretty ugly hack...
 				$replacement .= '.' . uc $specific;
 			} else {
-				$replacement .= ".$lookup->{parse}->{specific}" if $lookup->{parse}->{specific};
+				$replacement .= ".$lookup->{parse}->[1]"
+					if $lookup->{parse}->[0] && $lookup->{parse}->[0] eq 'specific';
 
 				$replacement .= ".$specific" if $specific;
 			}

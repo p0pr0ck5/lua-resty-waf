@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks() + 3;
@@ -9,25 +17,21 @@ run_tests();
 __DATA__
 
 === TEST 1: Set a var - confirm the set value
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -55,25 +59,21 @@ Setting FOO:COUNT to 1
 [error]
 
 === TEST 2: Set a var - confirm the __altered flag is set
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
@@ -101,25 +101,21 @@ Setting FOO:COUNT to 1
 [error]
 
 === TEST 3: Override an existing value
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -150,25 +146,21 @@ Setting FOO:COUNT to 1
 [error]
 
 === TEST 4: Increment an existing value
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -199,25 +191,21 @@ Setting FOO:COUNT to 6
 [error]
 
 === TEST 5: Increment an non-existing value
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ blah = 5 })
@@ -249,25 +237,21 @@ Setting FOO:COUNT to 1
 [error]
 
 === TEST 6: Fail to increment a non-numeric value 1/2
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = "blah" })
@@ -296,25 +280,21 @@ Cannot increment a value that was not previously a number
 Setting FOO:COUNT to 6
 
 === TEST 7: Fail to increment a non-numeric value 2/2
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 3 })

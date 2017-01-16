@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 4 * blocks() + 6;
@@ -9,24 +17,20 @@ run_tests();
 __DATA__
 
 === TEST 1: Initialize empty collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "redis")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local redis_m = require "resty.redis"
 			local redis   = redis_m:new()
@@ -52,25 +56,21 @@ Initializing an empty collection for FOO
 [error]
 
 === TEST 2: Initialize pre-populated collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "redis")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local var = { a = "b" }
 
@@ -109,25 +109,21 @@ Initializing an empty collection for FOO
 Removing expired key:
 
 === TEST 3: Initialize pre-populated collection with expired keys
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "redis")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local var = { a = "b", c = "d", __expire_c = ngx.time() - 10 }
 			waf._storage_redis_delkey_n = 0
@@ -169,25 +165,21 @@ Removing expired key: c
 Initializing an empty collection for FOO
 
 === TEST 4: Initialize pre-populated collection with only some expired keys
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "redis")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local var = { a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 }
 			waf._storage_redis_delkey_n = 0
@@ -229,25 +221,21 @@ Removing expired key: c
 Initializing an empty collection for FOO
 
 === TEST 5: Test types of initialized values
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "redis")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_backend", "redis")
+			waf:set_option("debug", true)
 
 			local var = { a = "b", c = 5 }
 

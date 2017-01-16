@@ -1,3 +1,19 @@
+0.9                                                                 Jan 16, 2016
+
+    * Distribution: Improve Makefile flexibility and feature sets
+
+    * Maintenance: Refactor on-disk event logging to use native io library
+
+    * Improvement: Remove default_option API for performance
+
+    * Improvement: Use a unique namespace in the global ngx.ctx
+
+    * Improvement: Refactor var parse structure to obviate a next() call
+
+    * Feature: Allow execution in log phase
+
+    * Maintenance: Improve runtimes in socket logging unit tests
+
 v0.8.2                                                              Sep 17, 2016
 
     * Distribution: libinjection and lua-aho-corasick are now provided as git

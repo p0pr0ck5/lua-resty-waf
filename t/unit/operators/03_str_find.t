@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 3 * blocks();
@@ -9,15 +17,7 @@ run_tests();
 __DATA__
 
 === TEST 1: Match (individual)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '
@@ -35,15 +35,7 @@ hello
 [error]
 
 === TEST 2: Match (table)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '
@@ -61,15 +53,7 @@ hello
 [error]
 
 === TEST 3: No match (individual)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '
@@ -87,15 +71,7 @@ nil
 [error]
 
 === TEST 4: No match (table)
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '
@@ -113,15 +89,7 @@ nil
 [error]
 
 === TEST 5: Return values
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '
@@ -141,15 +109,7 @@ hello
 [error]
 
 === TEST 7: Return value types
---- http_config
-init_by_lua_block{
-	if (os.getenv("LRW_COVERAGE")) then
-		runner = require "luacov.runner"
-		runner.tick = true
-		runner.init({savestepsize = 50})
-		jit.off()
-	end
-}
+--- http_config eval: $::HttpConfig
 --- config
     location = /t {
         content_by_lua '

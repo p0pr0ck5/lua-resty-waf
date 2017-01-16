@@ -1,4 +1,12 @@
 use Test::Nginx::Socket::Lua;
+use Cwd qw(cwd);
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+	lua_package_path "$pwd/lib/?.lua;;";
+	lua_package_cpath "$pwd/lib/?.lua;;";
+};
 
 repeat_each(3);
 plan tests => repeat_each() * 6 * blocks() - 6;
@@ -9,26 +17,21 @@ run_tests();
 __DATA__
 
 === TEST 1: Persist a collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -58,26 +61,21 @@ Persisting value: {"COUNT":1}
 Not persisting a collection that wasn't altered
 
 === TEST 2: Don't persist an unaltered collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -103,26 +101,21 @@ Not persisting a collection that wasn't altered
 Persisting value: {"
 
 === TEST 3: Persist an unaltered collection with expired keys
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10, BAR = 1 })
@@ -148,25 +141,21 @@ Persisting value: {"BAR":1}
 Not persisting a collection that wasn't altered
 
 === TEST 4: Don't persist the TX collection
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = { TX = {} }, col_lookup = { TX = "TX" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -191,26 +180,21 @@ Not persisting a collection that wasn't altered
 Persisting value: {"
 
 === TEST 5: Warn on failure
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 16k;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 110})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_zone", "store")
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
 
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
@@ -246,25 +230,20 @@ Not persisting a collection that wasn't altered
 re-read: "{\"COUNT\":\"aaaaa
 
 === TEST 6: Fail to persist a collection when storage_zone is undefined
---- http_config
+--- http_config eval
+$::HttpConfig . q#
 	lua_shared_dict store 10m;
 	init_by_lua '
-		if (os.getenv("LRW_COVERAGE")) then
-			runner = require "luacov.runner"
-			runner.tick = true
-			runner.init({savestepsize = 15})
-			jit.off()
-		end
-
 		local lua_resty_waf = require "resty.waf"
-		lua_resty_waf.default_option("storage_backend", "dict")
-		lua_resty_waf.default_option("debug", true)
 	';
+#
 --- config
     location = /t {
         access_by_lua '
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
+
+			waf:set_option("debug", true)
 
 			local storage = require "resty.waf.storage"
 
