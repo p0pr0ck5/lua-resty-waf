@@ -27,7 +27,7 @@ __DATA__
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 
 			waf:exec()
 		';
@@ -53,7 +53,7 @@ Processing rule 73
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:set_option("ignore_rule", 73)
 
 			waf:exec()

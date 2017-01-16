@@ -54,7 +54,8 @@ local function _parse_collection(self, collection, parse)
 	end
 
 	-- get the next (first)(only) k/v pair in the parse table
-	local key, value = next(parse)
+	local key   = parse[1]
+	local value = parse[2]
 
 	return util.parse_collection[key](self, collection, value)
 end

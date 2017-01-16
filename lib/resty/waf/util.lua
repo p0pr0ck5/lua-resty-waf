@@ -213,10 +213,12 @@ _M.parse_collection = {
 		return collection[value]
 	end,
 	regex = function(waf, collection, value)
+		--_LOG_"Parse collection is geting for the regex: " .. value
 		local v
 		local n = 0
 		local _collection = {}
 		for k, _ in pairs(collection) do
+			--_LOG_"checking " .. k
 			if (ngx.re.find(k, value, waf._pcre_flags)) then
 				v = collection[k]
 				if (type(v) == "table") then

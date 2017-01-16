@@ -26,7 +26,7 @@ __DATA__
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should not see this")
@@ -53,7 +53,7 @@ We should not see this
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 		';
 
@@ -78,7 +78,7 @@ Overriding status from 403 to 404
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10200", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10200", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 		';
 
@@ -92,7 +92,7 @@ Overriding status from 403 to 404
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
-			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
+			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
 		';
 

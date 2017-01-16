@@ -46,7 +46,7 @@ FOO|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { keys = 1 } } }, actions = { disrupt = "DENY" }  },
+				{ id = 1, vars = { { type = "FOO", parse = { "keys", 1 } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)
@@ -69,7 +69,7 @@ FOO|keys|1|nil
 		content_by_lua '
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
-				{ id = 1, vars = { { type = "FOO", parse = { specific = "bar" } } }, actions = { disrupt = "DENY" }  },
+				{ id = 1, vars = { { type = "FOO", parse = { "specific", "bar" } } }, actions = { disrupt = "DENY" }  },
 			}
 
 			rule_calc.calculate(mock_rules)

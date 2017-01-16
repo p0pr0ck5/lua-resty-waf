@@ -21,9 +21,10 @@
          "pattern" : "lua-resty-waf Dummy",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "user-agent"
-               },
+               "parse" : [
+                  "specific",
+                  "user-agent"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -100,9 +101,10 @@
          "pattern" : "webshot",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "URI_ARGS"
             }
          ]
@@ -117,9 +119,10 @@
          "pattern" : "\\$\\(.*\\)",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "src"
-               },
+               "parse" : [
+                  "specific",
+                  "src"
+               ],
                "type" : "URI_ARGS"
             }
          ]
@@ -150,9 +153,10 @@
          "pattern" : "WinHttp\\.WinHttpRequest\\.5",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "user-agent"
-               },
+               "parse" : [
+                  "specific",
+                  "user-agent"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -167,9 +171,10 @@
          "pattern" : "Mozilla/5\\.0 \\(compatible; Zollard; Linux\\)",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "user-agent"
-               },
+               "parse" : [
+                  "specific",
+                  "user-agent"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -211,9 +216,10 @@
          "pattern" : "disabled",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "registration"
-               },
+               "parse" : [
+                  "specific",
+                  "registration"
+               ],
                "type" : "URI_ARGS"
             }
          ]
@@ -261,9 +267,10 @@
          "pattern" : "referer",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -296,9 +303,10 @@
          "pattern" : "revslider_show_image",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "action"
-               },
+               "parse" : [
+                  "specific",
+                  "action"
+               ],
                "type" : "URI_ARGS"
             }
          ]
@@ -313,9 +321,10 @@
          "pattern" : "^\\.\\./wp-*|\\.php$",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "img"
-               },
+               "parse" : [
+                  "specific",
+                  "img"
+               ],
                "type" : "URI_ARGS"
             }
          ]
@@ -330,9 +339,10 @@
          "pattern" : "^\\(\\)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_ARGS"
             }
          ]
@@ -347,9 +357,10 @@
          "pattern" : "^\\(\\)",
          "vars" : [
             {
-               "parse" : {
-                  "all" : 1
-               },
+               "parse" : [
+                  "all",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -413,9 +424,10 @@
          "pattern" : "mfbfw",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_BODY"
             }
          ]
@@ -433,9 +445,10 @@
          "pattern" : "update",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "action"
-               },
+               "parse" : [
+                  "specific",
+                  "action"
+               ],
                "type" : "REQUEST_BODY"
             }
          ]
@@ -453,9 +466,10 @@
          "pattern" : "fancybox-for-wordpress",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "page"
-               },
+               "parse" : [
+                  "specific",
+                  "page"
+               ],
                "type" : "URI_ARGS"
             }
          ]

@@ -47,7 +47,7 @@ is_deeply(
 	[
 		{
 			type  => 'REQUEST_ARGS',
-			parse => { values => 1 },
+			parse => [ qw(values 1) ],
 		}
 	],
 	'translate a var in the lookup table with a parse helper'
@@ -71,7 +71,7 @@ is_deeply(
 	[
 		{
 			type  => 'REQUEST_ARGS',
-			parse => { specific => 'foo' },
+			parse => [ qw(specific foo) ],
 		}
 	],
 	'translate a var in the lookup table with a specific value'
@@ -95,7 +95,7 @@ is_deeply(
 	[
 		{
 			type    => 'IP',
-			parse   => { specific => 'FOO' },
+			parse   => [ qw(specific FOO) ],
 			storage => 1
 		}
 	],
@@ -121,7 +121,7 @@ is_deeply(
 	[
 		{
 			type   => 'REQUEST_ARGS',
-			parse  => { values => 1 },
+			parse  => [ qw(values 1) ],
 			length => 1,
 		}
 	],
@@ -147,7 +147,7 @@ is_deeply(
 	[
 		{
 			type   => 'REQUEST_ARGS',
-			parse  => { specific => 'foo' },
+			parse  => [ qw(specific foo) ],
 			length => 1,
 		}
 	],
@@ -172,7 +172,7 @@ is_deeply(
 	[
 		{
 			type  => 'REQUEST_ARGS',
-			parse => { regex => 'foo' },
+			parse => [ qw(regex foo) ],
 		}
 	],
 	'translate a var in the lookup table with a specific regex value'
@@ -197,7 +197,7 @@ is_deeply(
 	[
 		{
 			type  => 'REQUEST_ARGS',
-			parse => { ignore_regex => 'foo' },
+			parse => [ qw(ignore_regex foo) ],
 		}
 	],
 	'translate a var in the lookup table ignoring a specific regex value'
@@ -217,7 +217,7 @@ translate_vars(
 	undef,
 );
 is(
-	$translation->{vars}->[0]->{parse}->{regex},
+	$translation->{vars}->[0]->{parse}->[1],
 	'foo',
 	'slash-only regex specific wrapper is removed'
 );
@@ -236,7 +236,7 @@ translate_vars(
 	undef,
 );
 is(
-	$translation->{vars}->[0]->{parse}->{regex},
+	$translation->{vars}->[0]->{parse}->[1],
 	'foo',
 	'quote and slash regex specific wrapper is removed'
 );
@@ -255,7 +255,7 @@ translate_vars(
 	undef,
 );
 is(
-	$translation->{vars}->[0]->{parse}->{specific},
+	$translation->{vars}->[0]->{parse}->[1],
 	'fo/o',
 	'specific element does not have slash removed when its not a wrapper'
 );

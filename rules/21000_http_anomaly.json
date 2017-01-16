@@ -22,9 +22,10 @@
          "pattern" : "host",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -68,9 +69,10 @@
          "pattern" : "accept",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -113,9 +115,10 @@
          "pattern" : "^$",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "accept"
-               },
+               "parse" : [
+                  "specific",
+                  "accept"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -142,9 +145,10 @@
          "pattern" : "user-agent",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -170,9 +174,10 @@
          "pattern" : "^$",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "user-agent"
-               },
+               "parse" : [
+                  "specific",
+                  "user-agent"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -190,9 +195,10 @@
          "pattern" : "content-type",
          "vars" : [
             {
-               "parse" : {
-                  "keys" : 1
-               },
+               "parse" : [
+                  "keys",
+                  1
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -219,9 +225,10 @@
          "pattern" : "^0$",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "content-length"
-               },
+               "parse" : [
+                  "specific",
+                  "content-length"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
@@ -247,9 +254,10 @@
          "pattern" : "^[\\d.:]+$",
          "vars" : [
             {
-               "parse" : {
-                  "specific" : "host"
-               },
+               "parse" : [
+                  "specific",
+                  "host"
+               ],
                "type" : "REQUEST_HEADERS"
             }
          ]
