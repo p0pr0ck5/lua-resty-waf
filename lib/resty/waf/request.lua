@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 local cookiejar = require "resty.cookie"
 local upload	= require "resty.upload"

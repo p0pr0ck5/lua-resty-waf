@@ -4,7 +4,7 @@ local _M = {}
 local cjson         = require "cjson"
 local socket_logger = require "resty.logger.socket"
 
-_M.version = "0.8.2"
+_M.version = "0.9"
 
 -- warn logger
 function _M.warn(waf, msg)
