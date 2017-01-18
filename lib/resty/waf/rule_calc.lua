@@ -1,6 +1,7 @@
 local _M = {}
 
 local table_concat = table.concat
+local table_insert = table.insert
 
 _M.version = "0.9"
 
@@ -16,17 +17,30 @@ local function _transform_collection_key(transform)
 	end
 end
 
+local function _ignore_collection_key(ignore)
+	local t = {}
+
+	for i, j in ipairs(ignore) do
+		table_insert(t, table_concat(j, ','))
+	end
+
+	return table_concat(t, ',')
+end
+
 local function _build_collection_key(var, transform)
 	local key = {}
 	key[1] = tostring(var.type)
 
 	if (var.parse ~= nil) then
-		key[2] = var.parse[1]
-		key[3] = var.parse[2]
-		key[4] = tostring(_transform_collection_key(transform))
-	else
-		key[2] = tostring(_transform_collection_key(transform))
+		table_insert(key, var.parse[1])
+		table_insert(key, var.parse[2])
 	end
+
+	if (var.ignore ~= nil) then
+		table_insert(key, tostring(_ignore_collection_key(var.ignore)))
+	end
+
+	table_insert(key, tostring(_transform_collection_key(transform)))
 
 	return table_concat(key, "|")
 end

@@ -1,0 +1,34 @@
+{
+   "access" : [
+      {
+         "actions" : {
+            "disrupt" : "DENY"
+         },
+         "id" : "12345",
+         "operator" : "REGEX",
+         "pattern" : "bar",
+         "vars" : [
+            {
+               "ignore" : [
+                  [
+                     "ignore",
+                     "foo"
+                  ],
+                  [
+                     "regex",
+                     "^b"
+                  ]
+               ],
+               "parse" : [
+                  "values",
+                  "1"
+               ],
+               "type" : "URI_ARGS"
+            }
+         ]
+      }
+   ],
+   "body_filter" : [],
+   "header_filter" : []
+}
+

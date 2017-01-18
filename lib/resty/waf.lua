@@ -40,7 +40,9 @@ local _ruleset_defs = {}
 local _ruleset_def_cnt = 0
 
 -- get a subset or superset of request data collection
-local function _parse_collection(self, collection, parse)
+local function _parse_collection(self, collection, var)
+	local parse = var.parse
+
 	if (type(collection) ~= "table" and parse) then
 		-- if a collection isn't a table it can't be parsed,
 		-- so we shouldn't return the original collection as
@@ -56,6 +58,24 @@ local function _parse_collection(self, collection, parse)
 	local key   = parse[1]
 	local value = parse[2]
 
+	-- if this var has an ignore, we need to copy this collection table
+	-- as we're going to be removing some of its elements, so we can no
+	-- longer use it simply as a reference
+	if (var.ignore) then
+		local collection_copy = util.table_copy(collection)
+
+		for _, ignore in ipairs(var.ignore) do
+			local ikey   = ignore[1]
+			local ivalue = ignore[2]
+
+			util.sieve_collection[ikey](self, collection_copy, ivalue)
+		end
+
+		return util.parse_collection[key](self, collection_copy, value)
+	end
+
+	-- since we didn't have to ignore, we can just parse the collection
+	-- based on the parse key (specific, keys, values, etc)
 	return util.parse_collection[key](self, collection, value)
 end
 
@@ -190,7 +210,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 			if (not var.storage and not ctx.transform_key[collection_key]) then
 				--_LOG_"Collection cache miss"
-				collection = _parse_collection(self, collections[var.type], var.parse)
+				collection = _parse_collection(self, collections[var.type], var)
 
 				if (opts.transform) then
 					collection = _do_transform(self, collection, opts.transform)
@@ -200,7 +220,7 @@ local function _process_rule(self, rule, collections, ctx)
 				ctx.transform_key[collection_key] = true
 			elseif (var.storage) then
 				--_LOG_"Forcing cache miss"
-				collection = _parse_collection(self, collections[var.type], var.parse)
+				collection = _parse_collection(self, collections[var.type], var)
 			else
 				--_LOG_"Collection cache hit!"
 				collection = ctx.transform[collection_key]

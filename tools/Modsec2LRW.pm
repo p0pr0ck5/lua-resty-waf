@@ -354,6 +354,28 @@ sub parse_vars {
 			$parsed->{modifier} = $modifier;
 		}
 
+		# pop the last var off the stack to add our ignore
+		if (defined $modifier && $modifier eq '!') {
+			my $prev_parsed_var = pop @parsed_vars;
+
+			if (!$prev_parsed_var) {
+				warn "No previous var\n";
+				next;
+			}
+
+			if ($prev_parsed_var->{variable} ne $var) {
+				warn "Seen var $var doesn't match previous var $prev_parsed_var->{variable}\n";
+				push @parsed_vars, $prev_parsed_var;
+				next;
+			}
+
+			push @{$prev_parsed_var->{ignore}}, $specific;
+			$parsed = $prev_parsed_var;
+			$parsed->{modifier} = '!';
+			push @parsed_vars, $parsed;
+			next;
+		}
+
 		$parsed->{variable} = $var;
 		$parsed->{specific} = $specific;
 
@@ -623,12 +645,19 @@ sub translate_vars {
 		}
 
 		if (defined $modifier && $modifier eq '!') {
-			my $key = $specific_regex ? 'ignore_regex' : 'ignore';
+			for my $elt (@{$var->{ignore}}) {
+				my $elt_regex;
+				if ($elt =~ m/^'?\//) {
+					$elt =~ s/^'?\/(.*)\/'?/$1/;
+					$elt_regex = 1;
+				}
 
-			$specific = uc $specific if $lookup_var->{storage};
+				my $key = $elt_regex ? 'regex' : 'ignore';
 
-			delete $translated_var->{parse};
-			push @{$translated_var->{parse}}, $key, $specific;
+				$elt = uc $elt if $lookup_var->{storage};
+
+				push @{$translated_var->{ignore}}, [ ($key, $elt) ];
+			}
 		} elsif (length $specific) {
 			my $key = $specific_regex ? 'regex' : 'specific';
 

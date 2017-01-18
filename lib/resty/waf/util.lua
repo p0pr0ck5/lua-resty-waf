@@ -213,7 +213,7 @@ _M.parse_collection = {
 		return collection[value]
 	end,
 	regex = function(waf, collection, value)
-		--_LOG_"Parse collection is geting for the regex: " .. value
+		--_LOG_"Parse collection is geting the regex: " .. value
 		local v
 		local n = 0
 		local _collection = {}
@@ -232,33 +232,6 @@ _M.parse_collection = {
 				end
 			end
 		end
-		return _collection
-	end,
-	ignore_regex = function(waf, collection, value)
-		local v
-		local n = 0
-		local _collection = {}
-		for k, _ in pairs(collection) do
-			if (not ngx.re.find(k, value, waf._pcre_flags)) then
-				v = collection[k]
-				if (type(v) == "table") then
-					for __, _v in pairs(v) do
-						n = n + 1
-						_collection[n] = _v
-					end
-				else
-					n = n + 1
-					_collection[n] = v
-				end
-			end
-		end
-		return _collection
-	end,
-	ignore = function(waf, collection, value)
-		--_LOG_"Parse collection is ignoring a value: " .. value
-		local _collection = {}
-		_collection = _M.table_copy(collection)
-		_collection[value] = nil
 		return _collection
 	end,
 	keys = function(waf, collection)
@@ -282,6 +255,23 @@ _M.parse_collection = {
 		end
 		return _collection
 	end
+}
+
+_M.sieve_collection = {
+	ignore = function(waf, collection, value)
+		--_LOG_"Sieveing specific value " .. value
+		collection[value] = nil
+	end,
+	regex = function(waf, collection, value)
+		--_LOG_"Sieveing regex value " .. value
+		for k, _ in pairs(collection) do
+			--_LOG_"Checking " .. k
+			if (ngx.re.find(k, value, waf._pcre_flags)) then
+				--_LOG_"Removing " .. k
+				collection[k] = nil
+			end
+		end
+	end,
 }
 
 return _M

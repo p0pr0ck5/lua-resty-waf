@@ -1,4 +1,5 @@
 use Test::More;
+use Test::Warn;
 
 use lib 'tools';
 use Modsec2LRW qw(parse_vars);
@@ -28,15 +29,29 @@ is_deeply(
 );
 
 is_deeply(
-	parse_vars('!ARGS:foo'),
+	parse_vars('ARGS|!ARGS:foo'),
 	[
 		{
 			variable => 'ARGS',
-			specific => 'foo',
-			modifier => '!'
+			modifier => '!',
+			ignore   => [ 'foo' ],
+			specific => '',
 		}
 	],
 	'single var with specific element and negative modifier'
+);
+
+is_deeply(
+	parse_vars('ARGS|!ARGS:/__foo/'),
+	[
+		{
+			variable => 'ARGS',
+			modifier => '!',
+			ignore   => [ '/__foo/' ],
+			specific => '',
+		}
+	],
+	'single var with specific element and negative regex modifier'
 );
 
 is_deeply(
@@ -369,4 +384,21 @@ is_deeply(
 	],
 	'real-life example from CRSv2 (#185)'
 );
+
+warning_like
+	{
+		parse_vars('!ARGS:foo');
+	}
+	qr/No previous var/,
+	'Warn when trying to ignore an element from a previously unseen collection'
+;
+
+warning_like
+	{
+		parse_vars('ARGS_GET|!ARGS:foo');
+	}
+	qr/Seen var ARGS doesn't match previous var ARGS_GET/,
+	'Warn when trying to ignore an element from a mismatched previous collection'
+;
+
 done_testing;

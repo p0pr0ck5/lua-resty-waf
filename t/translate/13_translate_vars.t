@@ -184,8 +184,9 @@ translate_vars(
 		vars => [
 			{
 				variable => 'ARGS',
-				specific => '/foo/',
+				specific => '',
 				modifier => '!',
+				ignore   => [ qw(foo) ],
 			},
 		],
 	},
@@ -196,11 +197,103 @@ is_deeply(
 	$translation->{vars},
 	[
 		{
-			type  => 'REQUEST_ARGS',
-			parse => [ qw(ignore_regex foo) ],
+			type   => 'REQUEST_ARGS',
+			parse  => [ qw(values 1) ],
+			ignore => [
+				[ qw(ignore foo) ]
+			],
+		}
+	],
+	'translate a var in the lookup table ignoring a specific value'
+);
+
+$translation = {};
+translate_vars(
+	{
+		vars => [
+			{
+				variable => 'ARGS',
+				specific => '',
+				modifier => '!',
+				ignore   => [ qw(foo bar) ],
+			},
+		],
+	},
+	$translation,
+	undef,
+);
+is_deeply(
+	$translation->{vars},
+	[
+		{
+			type   => 'REQUEST_ARGS',
+			parse  => [ qw(values 1) ],
+			ignore => [
+				[ qw(ignore foo) ],
+				[ qw(ignore bar) ]
+			],
+		}
+	],
+	'translate a var in the lookup table ignoring multiple specific values'
+);
+
+$translation = {};
+translate_vars(
+	{
+		vars => [
+			{
+				variable => 'ARGS',
+				specific => '',
+				modifier => '!',
+				ignore   => [ qw(/foo/) ],
+			},
+		],
+	},
+	$translation,
+	undef,
+);
+is_deeply(
+	$translation->{vars},
+	[
+		{
+			type   => 'REQUEST_ARGS',
+			parse  => [ qw(values 1) ],
+			ignore => [
+				[ qw(regex foo) ]
+			],
 		}
 	],
 	'translate a var in the lookup table ignoring a specific regex value'
+);
+
+$translation = {};
+translate_vars(
+	{
+		vars => [
+			{
+				variable => 'ARGS',
+				specific => '',
+				modifier => '!',
+				ignore   => [ qw(/foo/ bar) ],
+			},
+		],
+	},
+	$translation,
+	undef,
+);
+is_deeply(
+	$translation->{vars},
+	[
+		{
+			type   => 'REQUEST_ARGS',
+			parse  => [ qw(values 1) ],
+			ignore => [
+				[ qw(regex foo) ],
+				[ qw(ignore bar) ]
+			],
+		}
+	],
+	'translate a var in the lookup table ignoring a regex value and a specific value'
 );
 
 $translation = {};
