@@ -32,7 +32,7 @@ translate_operator(
 is_deeply(
 	$translation,
 	{
-		operator => 'REGEX',
+		operator => 'REFIND',
 		pattern  => 'foo',
 	},
 	'translate an operator'
@@ -68,7 +68,7 @@ translate_operator(
 is_deeply(
 	$translation,
 	{
-		operator => 'REGEX',
+		operator => 'REFIND',
 		pattern  => '\bfoo\b',
 		opts     => {
 			parsepattern => 1,
@@ -92,7 +92,7 @@ translate_operator(
 is_deeply(
 	$translation,
 	{
-		operator   => 'REGEX',
+		operator   => 'REFIND',
 		pattern    => 'foo',
 		op_negated => 1,
 	},

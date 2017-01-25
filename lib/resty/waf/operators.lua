@@ -217,6 +217,33 @@ function _M.regex(waf, subject, pattern)
 	return match, captures
 end
 
+function _M.refind(waf, subject, pattern)
+	local opts = waf._pcre_flags
+	local from, to, err, match
+
+	if (type(subject) == "table") then
+		for _, v in ipairs(subject) do
+			match, from = _M.refind(waf, v, pattern)
+
+			if (match) then
+				break
+			end
+		end
+	else
+		from, to, err = ngx.re.find(subject, pattern, opts)
+
+		if err then
+			logger.warn(waf, "error in ngx.re.find: " .. err)
+		end
+
+		if from then
+			match = true
+		end
+	end
+
+	return match, from
+end
+
 function _M.ac_lookup(needle, haystack, ctx)
 	local id = ctx.id
 	local match, _ac, value
@@ -414,6 +441,7 @@ end
 
 _M.lookup = {
 	REGEX        = function(waf, collection, pattern) return _M.regex(waf, collection, pattern) end,
+	REFIND       = function(waf, collection, pattern) return _M.refind(waf, collection, pattern) end,
 	EQUALS       = function(waf, collection, pattern) return _M.equals(collection, pattern) end,
 	GREATER      = function(waf, collection, pattern) return _M.greater(collection, pattern) end,
 	LESS         = function(waf, collection, pattern) return _M.less(collection, pattern) end,

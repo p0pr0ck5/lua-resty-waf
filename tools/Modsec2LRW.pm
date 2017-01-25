@@ -83,12 +83,12 @@ my $valid_vars = {
 };
 
 my $valid_operators = {
-	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
+	beginsWith       => sub { my $pattern = shift; return('REFIND', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
-	containsWord     => sub { my $pattern = shift; return('REGEX', "\\b$pattern\\b"); },
+	containsWord     => sub { my $pattern = shift; return('REFIND', "\\b$pattern\\b"); },
 	detectSQLi       => 'DETECT_SQLI',
 	detectXSS        => 'DETECT_XSS',
-	endsWith         => sub { my $pattern = shift; return('REGEX', "$pattern\$"); },
+	endsWith         => sub { my $pattern = shift; return('REFIND', "$pattern\$"); },
 	eq               => 'EQUALS',
 	ge               => 'GREATER_EQ',
 	gt               => 'GREATER',
@@ -101,7 +101,7 @@ my $valid_operators = {
 	pmf              => 'PM',
 	pmFromFile       => 'PM',
 	rbl              => 'RBL_LOOKUP',
-	rx               => 'REGEX',
+	rx               => 'REFIND',
 	streq            => 'EQUALS',
 	strmatch         => 'STR_MATCH',
 	within           => 'STR_EXISTS',
@@ -756,7 +756,6 @@ sub translate_actions {
 	my ($rule, $translation, $silent) = @_;
 
 	my @silent_actions = qw(
-		capture
 		chain
 	);
 
@@ -792,6 +791,10 @@ sub translate_actions {
 			$translation->{action} = uc $action_lookup->{$key};
 		} elsif (grep { $_ eq $key } @direct_translation_actions) {
 			$translation->{$key} = $value;
+		} elsif ($key eq 'capture') {
+			$translation->{operator} eq 'REFIND' ?
+				$translation->{operator} = 'REGEX' :
+				warn 'capture set when translated operator was not REFIND';
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
