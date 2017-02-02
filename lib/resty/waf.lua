@@ -434,6 +434,13 @@ function _M.exec(self, opts)
 	-- (e.g. multiple chunks are going through body_filter)
 	if ctx.short_circuit then return end
 
+	for i = 1, self.var_count do
+		local data  = self.var[i]
+		local value = util.parse_dynamic_value(self, data.value, collections)
+
+		storage.set_var(self, ctx, data, value)
+	end
+
 	-- store the collections table in ctx, which will get saved to ngx.ctx
 	ctx.collections = collections
 
@@ -566,6 +573,8 @@ function _M.new()
 		_storage_redis_port          = 6379,
 		_storage_zone                = nil,
 		transaction_id               = random.random_bytes(10),
+		var_count                    = 0,
+		var                          = {},
 	}
 
 	if (_ruleset_def_cnt == 0) then
@@ -575,6 +584,17 @@ function _M.new()
 	end
 
 	return setmetatable(t, mt)
+end
+
+function _M.set_var(self, key, value)
+	local data = {
+		col   = "TX",
+		key   = key,
+		value = value,
+	}
+
+	self.var_count = self.var_count + 1
+	self.var[self.var_count] = data
 end
 
 -- configuraton wrapper for per-instance options
