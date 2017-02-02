@@ -381,13 +381,15 @@ local function _merge_rulesets(self)
 end
 
 -- main entry point
-function _M.exec(self)
+function _M.exec(self, opts)
 	if (self._mode == "INACTIVE") then
 		--_LOG_"Operational mode is INACTIVE, not running"
 		return
 	end
 
-	local phase = ngx.get_phase()
+	opts = opts or {}
+
+	local phase = opts.phase or ngx.get_phase()
 
 	if (not phase_t.is_valid_phase(phase)) then
 		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
@@ -420,7 +422,13 @@ function _M.exec(self)
 	end
 
 	-- populate the collections table
-	collections_t.lookup[phase](self, collections, ctx)
+	if (opts.collections) then
+		for k, v in pairs(opts.collections) do
+			collections[k] = v
+		end
+	else
+		collections_t.lookup[phase](self, collections, ctx)
+	end
 
 	-- don't run through the rulesets if we're going to be here again
 	-- (e.g. multiple chunks are going through body_filter)
