@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local str  = [=[{"foo":"bar","baz":["bat","qux"]}]=]
 
@@ -30,7 +30,7 @@ __DATA__
 			ngx.say(parse.baz[1])
 			ngx.say(type(parse))
 			ngx.say(err)
-		';
+		}
 	}
 --- request
 GET /t
@@ -47,7 +47,7 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local str  = [=[{"foo":"bar","baz":["bat","qux]}]=]
 
@@ -55,7 +55,7 @@ nil
 
 			ngx.say(type(parse))
 			ngx.say(err)
-		';
+		}
 	}
 --- request
 GET /t

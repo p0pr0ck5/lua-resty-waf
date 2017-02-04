@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -29,16 +29,16 @@ __DATA__
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- raw_request eval
 "GET /t HTTP/1.0\r
@@ -55,7 +55,7 @@ User-Agent: Hostless
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -64,16 +64,16 @@ User-Agent: Hostless
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -89,7 +89,7 @@ User-Agent: Acceptless
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -98,16 +98,16 @@ User-Agent: Acceptless
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -123,7 +123,7 @@ Accept:
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -132,16 +132,16 @@ Accept:
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -155,7 +155,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -164,16 +164,16 @@ GET /t
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -189,7 +189,7 @@ User-Agent:
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -198,16 +198,16 @@ User-Agent:
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 POST /t
@@ -225,7 +225,7 @@ User-Agent: Typeless
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -234,16 +234,16 @@ User-Agent: Typeless
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- raw_request eval
 "GET /t HTTP/1.0\r

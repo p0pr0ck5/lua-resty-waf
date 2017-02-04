@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local collection = {
@@ -33,7 +33,7 @@ __DATA__
 			ngx.say(tostring(collection.foo))
 			ngx.say(tostring(collection.bar))
 			ngx.say(tostring(collection.baz))
-		';
+		}
 	}
 --- request
 GET /t
@@ -51,7 +51,7 @@ Sieveing specific value bar
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local collection = {
@@ -65,7 +65,7 @@ Sieveing specific value bar
 			ngx.say(tostring(collection.foo))
 			ngx.say(tostring(collection.bar))
 			ngx.say(tostring(collection.baz))
-		';
+		}
 	}
 --- request
 GET /t
@@ -84,7 +84,7 @@ Sieveing specific value baz
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local collection = {
@@ -97,7 +97,7 @@ Sieveing specific value baz
 			ngx.say(tostring(collection.foo))
 			ngx.say(tostring(collection.bar))
 			ngx.say(tostring(collection.baz))
-		';
+		}
 	}
 --- request
 GET /t
@@ -115,7 +115,7 @@ Sieveing specific value qux
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local collection = {
@@ -128,7 +128,7 @@ Sieveing specific value qux
 			ngx.say(tostring(collection.foo))
 			ngx.say(tostring(collection.bar))
 			ngx.say(tostring(collection.baz))
-		';
+		}
 	}
 --- request
 GET /t
@@ -152,7 +152,7 @@ Removing baz
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local collection = {
@@ -166,7 +166,7 @@ Removing baz
 			ngx.say(tostring(collection.foo))
 			ngx.say(tostring(collection.bar))
 			ngx.say(tostring(collection.baz))
-		';
+		}
 	}
 --- request
 GET /t

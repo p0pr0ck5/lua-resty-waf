@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 	}
 --- request
 GET /t?foo=bar
@@ -38,26 +38,26 @@ You've entered the following: 'bar'
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?foo=bar
@@ -76,27 +76,27 @@ You've entered the following: 'bar'
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?foo=bar
@@ -115,11 +115,11 @@ You've entered the following: 'bar'
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 	}
 --- request
 GET /t?foo=<script>alert(1)</script>
@@ -133,26 +133,26 @@ You've entered the following: '<script>alert(1)</script>'
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?foo=<script>alert(1)</script>
@@ -173,27 +173,27 @@ You've entered the following: '<script>alert(1)</script>'
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 
 			ngx.say("You\'ve entered the following: \'" .. args.foo .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?foo=<script>alert(1)</script>

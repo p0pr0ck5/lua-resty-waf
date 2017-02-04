@@ -20,27 +20,27 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.STATUS .. [["]])
-		';
+		}
 	}
 --- request
 GET /t
@@ -54,27 +54,27 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_FORBIDDEN)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_FORBIDDEN)}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. collections.STATUS .. [["]])
-		';
+		}
 	}
 --- request
 GET /t
@@ -88,27 +88,27 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.log(ngx.INFO, [["]] .. type(collections.STATUS) .. [["]])
-		';
+		}
 	}
 --- request
 GET /t

@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("\'><script><alert(1)</script>")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,11 +38,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss({"this string has the word select and alert", "\'><script><alert(1)</script>"})
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t?f
@@ -56,11 +56,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("this string has the word select and alert")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -74,11 +74,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss({"this string has the word select and alert", "so does select this alert one"})
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,12 +92,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.detect_xss("\'><script><alert(1)</script>")
 			ngx.say(type(match))
 			ngx.say(type(value))
-		';
+		}
 	}
 --- request
 GET /t

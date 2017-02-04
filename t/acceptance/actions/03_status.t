@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -30,9 +30,9 @@ __DATA__
 			waf:exec()
 
 			ngx.log(ngx.INFO, "We should not see this")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?a=foo
@@ -47,7 +47,7 @@ We should not see this
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -55,9 +55,9 @@ We should not see this
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?a=foo
@@ -72,7 +72,7 @@ Overriding status from 403 to 404
 --- http_config eval: $::HttpConfig
 --- config
 	location /s {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -80,13 +80,13 @@ Overriding status from 403 to 404
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "10200", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -94,9 +94,9 @@ Overriding status from 403 to 404
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "10100", [=[{"access":[{"actions":{"disrupt":"DENY","nondisrupt":[{"action":"status","data":404}]},"id":"12345","operator":"REGEX","pattern":"foo","vars":[{"parse":["values",1],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request eval
 ["GET /t?a=foo", "GET /s?a=foo"]

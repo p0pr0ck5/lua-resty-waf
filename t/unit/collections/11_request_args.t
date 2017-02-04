@@ -20,18 +20,18 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_ARGS["foo"])
-		';
+		}
 	}
 --- request
 POST /t?foo=bar
@@ -48,18 +48,18 @@ bar
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_ARGS["foo"])
-		';
+		}
 	}
 --- request
 POST /t?foo=bar
@@ -76,18 +76,18 @@ barbaz
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_ARGS["foo"])
-		';
+		}
 	}
 --- request
 POST /t?frob=qux
@@ -104,18 +104,18 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_ARGS))
-		';
+		}
 	}
 --- request
 GET /t

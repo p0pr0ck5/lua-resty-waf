@@ -20,23 +20,23 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)
@@ -52,7 +52,7 @@ Rule action was DENY, so telling nginx to quit
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "Override DENY action")
 				ngx.status = ngx.HTTP_NOT_FOUND
@@ -65,16 +65,16 @@ Rule action was DENY, so telling nginx to quit
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)
@@ -91,7 +91,7 @@ Rule action was DENY, so telling nginx to quit
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "Override DENY action")
 				ngx.status = ngx.HTTP_NOT_FOUND
@@ -104,16 +104,16 @@ Rule action was DENY, so telling nginx to quit
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=notathreat
@@ -129,7 +129,7 @@ Override DENY action
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "Override DENY action")
 				ngx.status = ngx.HTTP_NOT_FOUND
@@ -142,16 +142,16 @@ Override DENY action
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "FOO", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)
@@ -168,23 +168,23 @@ Override DENY action
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -200,7 +200,7 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local accept_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "Override ACCEPT action")
 			end
@@ -218,16 +218,16 @@ Rule action was ACCEPT, so ending this phase with ngx.OK
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:set_option("hook_action", "ACCEPT", accept_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t
@@ -245,7 +245,7 @@ Override DENY action
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "waf mode is " .. waf._mode)
 				ngx.log(ngx.DEBUG, "Override DENY action")
@@ -259,16 +259,16 @@ Override DENY action
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)
@@ -286,7 +286,7 @@ Rule action was DENY, so telling nginx to quit
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = function(waf, ctx)
 				ngx.log(ngx.DEBUG, "waf mode is " .. waf._mode)
 				ngx.log(ngx.DEBUG, "Override DENY action")
@@ -300,16 +300,16 @@ Rule action was DENY, so telling nginx to quit
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)
@@ -327,7 +327,7 @@ Rule action was DENY, so telling nginx to quit
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local deny_override = 42
 
 			local lua_resty_waf = require "resty.waf"
@@ -337,16 +337,16 @@ Rule action was DENY, so telling nginx to quit
 			waf:set_option("debug", true)
 			waf:set_option("hook_action", "DENY", deny_override)
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request
 GET /t?a=alert(1)

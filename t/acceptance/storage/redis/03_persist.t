@@ -19,13 +19,13 @@ __DATA__
 === TEST 1: Persist a collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -53,9 +53,9 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -71,13 +71,13 @@ Not persisting a collection that wasn't altered
 === TEST 2: Don't persist an unaltered collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -102,9 +102,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -119,13 +119,13 @@ Persisting value: {"
 === TEST 3: Persist an unaltered collection with expired keys
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -150,9 +150,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -167,13 +167,13 @@ Not persisting a collection that wasn't altered
 === TEST 4: Don't persist the TX collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local redis_m   = require "resty.redis"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -195,9 +195,9 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

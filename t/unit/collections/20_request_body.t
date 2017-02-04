@@ -20,19 +20,19 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 GET /t
@@ -48,19 +48,19 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 GET /t
@@ -76,19 +76,19 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -105,19 +105,19 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -134,22 +134,22 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections  = ngx.ctx.lua_resty_waf.collections
 			local request_body = collections.REQUEST_BODY
 
 			for k, v in pairs(request_body) do
 				ngx.say(k .. ": " .. v)
 			end
-		';
+		}
 	}
 --- request
 POST /t
@@ -167,19 +167,19 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -199,19 +199,19 @@ Request has no content type, ignoring the body
 	location /t {
 		client_body_buffer_size 1k;
 
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -232,19 +232,19 @@ Request body size larger than client_body_buffer_size, ignoring request body
 	location /t {
 		client_body_buffer_size 1k;
 
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -263,20 +263,20 @@ Request body size larger than client_body_buffer_size, ignoring request body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("allowed_content_types", "text/json")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.REQUEST_BODY)
-		';
+		}
 	}
 --- request
 POST /t
@@ -294,20 +294,20 @@ Request has no content type, ignoring the body
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("allowed_content_types", "text/json")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -327,20 +327,20 @@ Request has no content type, ignoring the body
 	location /t {
 		client_body_buffer_size 1k;
 
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("allowed_content_types", "text/json")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(tostring(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t
@@ -361,20 +361,20 @@ Request body size larger than client_body_buffer_size, ignoring request body
 	location /t {
 		client_body_buffer_size 1k;
 
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("allowed_content_types", "text/json")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.REQUEST_BODY))
-		';
+		}
 	}
 --- request
 POST /t

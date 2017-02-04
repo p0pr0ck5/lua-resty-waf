@@ -20,18 +20,18 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.PROTOCOL)
-		';
+		}
 	}
 --- request
 GET /t
@@ -45,18 +45,18 @@ HTTP/1.1
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.PROTOCOL)
-		';
+		}
 	}
 --- request
 GET /t HTTP/1.0
@@ -70,18 +70,18 @@ HTTP/1.0
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.PROTOCOL))
-		';
+		}
 	}
 --- request
 GET /t

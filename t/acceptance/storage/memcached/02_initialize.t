@@ -19,13 +19,13 @@ __DATA__
 === TEST 1: Initialize empty collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -42,9 +42,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -58,13 +58,13 @@ Initializing an empty collection for FOO
 === TEST 2: Initialize pre-populated collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -84,9 +84,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered") then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
@@ -94,7 +94,7 @@ $::HttpConfig . q#
 			end
 
 			ngx.say(ngx.ctx["__altered"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -110,13 +110,13 @@ Removing expired key:
 === TEST 3: Initialize pre-populated collection with expired keys
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -136,9 +136,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered") then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
@@ -146,7 +146,7 @@ $::HttpConfig . q#
 			end
 
 			ngx.say(ngx.ctx["__altered"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -163,13 +163,13 @@ Initializing an empty collection for FOO
 === TEST 4: Initialize pre-populated collection with only some expired keys
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -189,9 +189,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
@@ -199,7 +199,7 @@ $::HttpConfig . q#
 			end
 
 			ngx.say(ngx.ctx["__altered"])
-		';
+		}
 	}
 --- request
 GET /t

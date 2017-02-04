@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -42,11 +42,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -62,13 +62,13 @@ Setting FOO:COUNT to 1
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -84,11 +84,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["__altered"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -104,13 +104,13 @@ Setting FOO:COUNT to 1
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -129,11 +129,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -149,13 +149,13 @@ Setting FOO:COUNT to 1
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -174,11 +174,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -194,13 +194,13 @@ Setting FOO:COUNT to 6
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -219,11 +219,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -240,13 +240,13 @@ Setting FOO:COUNT to 1
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -265,11 +265,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t
@@ -283,13 +283,13 @@ Setting FOO:COUNT to 6
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -308,11 +308,11 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			ngx.ctx = ctx.storage["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.say(ngx.ctx["COUNT"])
-		';
+		}
 	}
 --- request
 GET /t

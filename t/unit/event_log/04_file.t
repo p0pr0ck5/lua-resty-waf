@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local log           = require "resty.waf.log"
 			local waf           = lua_resty_waf:new()
@@ -29,9 +29,9 @@ __DATA__
 			waf:set_option("event_log_target_path", "/tmp/waf.log")
 
 			log.write_log_events[waf._event_log_target](waf, {foo = "bar"})
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -44,7 +44,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local log           = require "resty.waf.log"
 			local waf           = lua_resty_waf:new()
@@ -52,9 +52,9 @@ GET /t
 			waf:set_option("event_log_target", "file")
 
 			log.write_log_events[waf._event_log_target](waf, {foo = "bar"})
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -66,7 +66,7 @@ Event log target path is undefined in file logger
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local log           = require "resty.waf.log"
 			local waf           = lua_resty_waf:new()
@@ -77,9 +77,9 @@ Event log target path is undefined in file logger
 			io.open = function() return false end
 
 			log.write_log_events[waf._event_log_target](waf, {foo = "bar"})
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

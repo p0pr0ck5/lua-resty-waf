@@ -135,7 +135,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 		lua_package_path '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
 		lua_package_cpath '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
 
-		init_by_lua '
+		init_by_lua_block {
 			-- use resty.core for performance improvement, see the status note above
 			require "resty.core"
 
@@ -144,12 +144,12 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
-		';
+		}
 	}
 
 	server {
 		location / {
-			access_by_lua '
+			access_by_lua_block {
 				local lua_resty_waf = require "waf"
 
 				local waf = lua_resty_waf:new()
@@ -168,9 +168,9 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 				-- run the firewall
 				waf:exec()
-			';
+			}
 
-			header_filter_by_lua '
+			header_filter_by_lua_block {
 				local lua_resty_waf = require "waf"
 
 				-- note that options set in previous handlers (in the same scope)
@@ -178,23 +178,23 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 				local waf = lua_resty_waf:new()
 
 				waf:exec()
-			';
+			}
 
-			body_filter_by_lua '
+			body_filter_by_lua_block {
 				local lua_resty_waf = require "waf"
 
 				local waf = lua_resty_waf:new()
 
 				waf:exec()
-			';
+			}
 
-			log_by_lua '
+			log_by_lua_block {
 				local lua_resty_waf = require "waf"
 
 				local waf = lua_resty_waf:new()
 
 				waf:exec()
-			';
+			}
 		}
 	}
 ```
@@ -209,13 +209,13 @@ Perform some pre-computation of rules and rulesets, based on what's been made av
 
 ```lua
 	http {
-		init_by_lua '
+		init_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			-- set default options...
 
 			lua_resty_waf.init()
-		';
+		}
 	}
 ```
 
@@ -229,11 +229,11 @@ Instantiate a new instance of lua-resty-waf. You must call this in every request
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
-		';
+		}
 	}
 ```
 
@@ -245,14 +245,14 @@ Configure an option on a per-scope basis.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
 
 			-- enable debug logging only for this scope
 			waf:set_option("debug", true)
-		';
+		}
 	}
 ```
 
@@ -264,13 +264,13 @@ Define a transaction variable (stored in the `TX` variable collection) before ex
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
 
 			waf:set_var("FOO", "bar")
-		';
+		}
 	}
 ```
 
@@ -284,16 +284,16 @@ Run the rule engine. By default, the engine is executed according to the current
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
 
 			-- execute according to access phase collections and rules
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
@@ -310,7 +310,7 @@ Run the rule engine. By default, the engine is executed according to the current
 			}
 
 			waf:exec(opts)
-		';
+		}
 	}
 ```
 
@@ -322,7 +322,7 @@ Write any audit log entries that were generated from the transaction. This is on
 
 ```lua
 	location / {
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "waf"
 
 			local waf = lua_resty_waf:new()
@@ -330,7 +330,7 @@ Write any audit log entries that were generated from the transaction. This is on
 			-- write out any event log entries to the
 			-- configured target, if applicable
 			waf:write_log_events()
-		';
+		}
 	}
 ```
 
@@ -352,9 +352,9 @@ Adds an additional ruleset to be used during processing. This allows users to im
 	}
 
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("add_ruleset", "50000_extra_rules")
-		';
+		}
 	}
 ```
 
@@ -370,9 +370,9 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("add_ruleset_string", "70000_extra_rules", [=[{"access":[{"action":"DENY","id":73,"operator":"REGEX","opts":{},"pattern":"foo","vars":[{"parse":{"values":1},"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
-		';
+		}
 	}
 ```
 
@@ -388,9 +388,9 @@ Instructs lua-resty-waf to continue processing the request when a Content-Type h
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("allow_unknown_content_types", true)
-		';
+		}
 	}
 ```
 
@@ -405,13 +405,13 @@ Defines one or more Content-Type headers that will be allowed, in addition to th
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- define a single allowed Content-Type value
 			waf:set_option("allowed_content_types", "text/xml")
 
 			-- defines multiple allowed Content-Type values
 			waf:set_option("allowed_content_types", { "text/html", "text/json", "application/json" })
-		';
+		}
 	}
 ```
 
@@ -427,9 +427,9 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("debug", true)
-		';
+		}
 	}
 ```
 
@@ -443,9 +443,9 @@ Sets the nginx log level constant used for debug logging.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("debug_log_level", ngx.DEBUG)
-		';
+		}
 	}
 ```
 
@@ -459,9 +459,9 @@ Sets the status to use when denying requests.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("deny_status", ngx.HTTP_NOT_FOUND)
-		';
+		}
 	}
 ```
 
@@ -475,9 +475,9 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("disable_pcre_optimization", true)
-		';
+		}
 	}
 ```
 
@@ -491,9 +491,9 @@ Determines whether to write log entries for rule matches in a transaction that w
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_altered_only", false)
-		';
+		}
 	}
 ```
 
@@ -509,10 +509,10 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- 8 KB event log message buffer
 			waf:set_option("event_log_buffer_size", 8192)
-		';
+		}
 	}
 ```
 
@@ -526,9 +526,9 @@ Sets the nginx log level constant used for event logging.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_level", ngx.WARN)
-		';
+		}
 	}
 ```
 
@@ -542,10 +542,10 @@ Defines what extra variables from `ngx.var` are put to the log event. This is a 
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_ngx_vars", "host")
 			waf:set_option("event_log_ngx_vars", "request_id")
-		';
+		}
 	}
 ```
 
@@ -570,10 +570,10 @@ Defines an interval, in seconds, at which the event log buffer will periodically
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- flush the event log buffer every 30 seconds
 			waf:set_option("event_log_periodic_flush", 30)
-		';
+		}
 	}
 ```
 
@@ -587,9 +587,9 @@ When set to true, the log entries contain the request arguments under the `uri_a
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_request_arguments", true)
-		';
+		}
 	}
 ```
 
@@ -603,9 +603,9 @@ When set to true, the log entries contain the request body under the `request_bo
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_request_body", true)
-		';
+		}
 	}
 ```
 
@@ -619,9 +619,9 @@ The headers of the HTTP request is copied to the log event, under the `request_h
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_request_headers", true)
-		';
+		}
 	}
 ```
 
@@ -646,9 +646,9 @@ Enable SSL connections when logging via TCP/UDP.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_ssl", true)
-		';
+		}
 	}
 ```
 
@@ -662,9 +662,9 @@ Set the SNI host for `lua-resty-logger-socket` connections.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_ssl_sni_host", "loghost.example.com")
-		';
+		}
 	}
 ```
 
@@ -678,9 +678,9 @@ Enable certification verification for SSL connections when logging via TCP/UDP.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_ssl_verify", true)
-		';
+		}
 	}
 ```
 
@@ -694,10 +694,10 @@ Defines which IP protocol to use (TCP or UDP) when shipping event logs via a rem
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- send logs via TCP
 			waf:set_option("event_log_socket_proto", "tcp")
-		';
+		}
 	}
 ```
 
@@ -711,7 +711,7 @@ Defines the destination for event logs. lua-resty-waf currently supports logging
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- send event logs to the server's error_log location (default)
 			waf:set_option("event_log_target", "error")
 
@@ -720,7 +720,7 @@ Defines the destination for event logs. lua-resty-waf currently supports logging
 
 			-- send event logs to a remote server
 			waf:set_option("event_log_target", "socket")
-		';
+		}
 	}
 ```
 
@@ -736,9 +736,9 @@ Defines the target server for event logs that target a remote server.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_target_host", "10.10.10.10")
-		';
+		}
 	}
 ```
 
@@ -752,9 +752,9 @@ Defines the target path for event logs that target a local file system location.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_target_path", "/var/log/lua-resty-waf/event.log")
-		';
+		}
 	}
 ```
 
@@ -770,9 +770,9 @@ Defines the target port for event logs that target a remote server.
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("event_log_target_port", 9001)
-		';
+		}
 	}
 ```
 
@@ -787,7 +787,7 @@ Override the functionality of actions taken when a rule is matched. See the exam
 ```lua
 
 		location / {
-			access_by_lua '
+			access_by_lua_block {
 				local deny_override = function(waf, ctx)
 					ngx.log(ngx.INFO, "Overriding DENY action")
 					ngx.status = 404
@@ -795,7 +795,7 @@ Override the functionality of actions taken when a rule is matched. See the exam
 
 				-- override the DENY action with the function defined above
 				waf:set_option("hook_action", "DENY", deny_override)
-			';
+			}
 		}
 ```
 
@@ -809,10 +809,10 @@ Instructs the module to ignore a specified rule ID. Note that ignoring a rule in
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("ignore_rule", 40294)
 			waf:set_option("ignore_rule", {40002, 41036})
-		';
+		}
 	}
 ```
 
@@ -828,9 +828,9 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("ignore_ruleset", "41000_sqli")
-		';
+		}
 	}
 ```
 
@@ -846,9 +846,9 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("mode", "ACTIVE")
-		';
+		}
 	}
 ```
 
@@ -862,9 +862,9 @@ Sets the DNS resolver(s) to be used for RBL lookups. Currently only UDP/53 traff
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("nameservers", "10.10.10.10")
-		';
+		}
 	}
 ```
 
@@ -878,11 +878,11 @@ Enable processing of multipart/form-data request bodies (when present), using th
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- disable processing of multipart/form-data requests
 			-- note that the request body will still be sent to the upstream
 			waf:set_option("process_multipart_body", false)
-		';
+		}
 	}
 ```
 
@@ -896,9 +896,9 @@ Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value 
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("req_tid_header", true)
-		';
+		}
 	}
 ```
 
@@ -912,10 +912,10 @@ Defines the content length threshold beyond which response bodies will not be pr
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- increase the max response size to 2 MB
 			waf:set_option("res_body_max_size", 1024 * 1024 * 2)
-		';
+		}
 	}
 ```
 Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
@@ -930,10 +930,10 @@ Defines the MIME types with which lua-resty-waf will process the response body. 
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			-- mime types that will be processed are now text/plain, text/html, and text/json
 			waf:set_option("res_body_mime_types", "text/json")
-		';
+		}
 	}
 ```
 
@@ -949,9 +949,9 @@ Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the val
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("res_tid_header", true)
-		';
+		}
 	}
 ```
 
@@ -965,9 +965,9 @@ Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty
 
 ```lua
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("score_threshold", 10)
-		';
+		}
 	}
 ```
 
@@ -981,9 +981,9 @@ Define an engine to use for persistent variable storage. Current available optio
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_backend", "memcached")
-		';
+		}
 	}
 ```
 
@@ -997,9 +997,9 @@ Enable or disable TCP keepalive for connections to remote persistent storage hos
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_keepalive", false)
-		';
+		}
 	}
 ```
 
@@ -1013,9 +1013,9 @@ Configure (in milliseconds) the timeout for the cosocket keepalive pool for remo
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_keepalive_timeout", 30000)
-		';
+		}
 	}
 ```
 
@@ -1029,9 +1029,9 @@ Configure the pool size for the cosocket keepalive pool for remote persistent st
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_keepalive_pool_size", 50)
-		';
+		}
 	}
 ```
 
@@ -1045,9 +1045,9 @@ Define a host to use when using memcached as a persistent variable storage engin
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_memcached_host", "10.10.10.10")
-		';
+		}
 	}
 ```
 
@@ -1061,9 +1061,9 @@ Define a port to use when using memcached as a persistent variable storage engin
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_memcached_port", 11221)
-		';
+		}
 	}
 ```
 
@@ -1077,9 +1077,9 @@ Define a host to use when using redis as a persistent variable storage engine.
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_redis_host", "10.10.10.10")
-		';
+		}
 	}
 ```
 
@@ -1093,9 +1093,9 @@ Define a port to use when using redis as a persistent variable storage engine.
 
 ```lua
 	location / {
-		acccess_by_lua '
+		acccess_by_lua_block {
 			waf:set_option("storage_redis_port", 6397)
-		';
+		}
 	}
 ```
 
@@ -1114,9 +1114,9 @@ Defines the `lua_shared_dict` that will be used to hold persistent storage data.
 	}
 
 	location / {
-		access_by_lua '
+		access_by_lua_block {
 			waf:set_option("storage_zone", "persistent_storage")
-		';
+		}
 	}
 ```
 

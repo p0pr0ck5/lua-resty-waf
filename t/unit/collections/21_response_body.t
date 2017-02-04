@@ -20,23 +20,23 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		body_filter_by_lua '
+		body_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -45,7 +45,7 @@ __DATA__
 
 			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
-		';
+		}
 
 	}
 --- request
@@ -66,30 +66,30 @@ Hello, world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			ngx.header["Content-Type"] = "text/plain"
 			ngx.header["Content-Length"] = 14
 			ngx.say("Hello,")
 			ngx.say("world!")
-		';
+		}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		body_filter_by_lua '
+		body_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -98,7 +98,7 @@ Hello, world!
 
 			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, tostring(collections.RESPONSE_BODY))
-		';
+		}
 
 	}
 --- request
@@ -119,15 +119,15 @@ world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			ngx.header["Content-Type"] = "text/foo"
 
 			local lua_resty_waf = require "resty.waf"
@@ -135,9 +135,9 @@ world!
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		body_filter_by_lua '
+		body_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -146,7 +146,7 @@ world!
 
 			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. tostring(collections.RESPONSE_BODY) .. [["]])
-		';
+		}
 
 	}
 --- request
@@ -167,23 +167,23 @@ Hello, world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		body_filter_by_lua '
+		body_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -192,7 +192,7 @@ Hello, world!
 
 			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.log(ngx.INFO, [["]] .. type(collections.RESPONSE_BODY) .. [["]])
-		';
+		}
 
 	}
 --- request

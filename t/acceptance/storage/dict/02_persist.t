@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -45,9 +45,9 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -64,13 +64,13 @@ Not persisting a collection that wasn't altered
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -86,9 +86,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -104,13 +104,13 @@ Persisting value: {"
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -126,9 +126,9 @@ $::HttpConfig . q#
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -144,13 +144,13 @@ Not persisting a collection that wasn't altered
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -166,9 +166,9 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -183,13 +183,13 @@ Persisting value: {"
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 16k;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -211,9 +211,9 @@ $::HttpConfig . q#
 
 			local d = shm:get("FOO")
 			ngx.log(ngx.DEBUG, "re-read: " .. require("cjson").encode(d))
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -233,13 +233,13 @@ re-read: "{\"COUNT\":\"aaaaa
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -249,9 +249,9 @@ $::HttpConfig . q#
 
 			local ctx = { storage = { FOO = { __altered = true, a = "b" } }, col_lookup = { FOO = "FOO" } }
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

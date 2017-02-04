@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -34,7 +34,7 @@ __DATA__
 
 			ngx.say(mock_rules[1].offset_match)
 			ngx.say(mock_rules[1].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -49,7 +49,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -63,7 +63,7 @@ GET /t
 
 			ngx.say(mock_rules[2].offset_match)
 			ngx.say(mock_rules[2].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -78,7 +78,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -92,7 +92,7 @@ GET /t
 
 			ngx.say(mock_rules[3].offset_match)
 			ngx.say(mock_rules[3].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -107,7 +107,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -121,7 +121,7 @@ GET /t
 
 			ngx.say(mock_rules[4].offset_match)
 			ngx.say(mock_rules[4].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -136,7 +136,7 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -149,7 +149,7 @@ GET /t
 
 			ngx.say(mock_rules[2].offset_match)
 			ngx.say(mock_rules[2].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -164,7 +164,7 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -177,7 +177,7 @@ nil
 
 			ngx.say(mock_rules[3].offset_match)
 			ngx.say(mock_rules[3].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t
@@ -192,7 +192,7 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local rule_calc  = require "resty.waf.rule_calc"
 			local mock_rules = {
 				{ id = 1, vars = {}, actions = { disrupt = "DENY" }  },
@@ -205,7 +205,7 @@ nil
 
 			ngx.say(mock_rules[4].offset_match)
 			ngx.say(mock_rules[4].offset_nomatch)
-		';
+		}
 	}
 --- request
 GET /t

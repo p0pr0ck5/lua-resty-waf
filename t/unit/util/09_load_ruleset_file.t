@@ -20,14 +20,14 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local ruleset, err = util.load_ruleset_file("extra")
 
 			ngx.say(type(ruleset))
 			ngx.say(err)
-		';
+		}
 	}
 --- request
 GET /t
@@ -42,14 +42,14 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local parse, err = util.load_ruleset_file("dne")
 
 			ngx.say(type(parse))
 			ngx.say(err)
-		';
+		}
 	}
 --- request
 GET /t
@@ -64,14 +64,14 @@ could not find dne
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 
 			local parse, err = util.load_ruleset_file("extra_broken")
 
 			ngx.say(type(parse))
 			ngx.print(err)
-		';
+		}
 	}
 --- request
 GET /t

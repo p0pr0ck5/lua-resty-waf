@@ -19,15 +19,15 @@ __DATA__
 === TEST 1: Handle a fatal failure
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		logger = require "resty.waf.log"
-	';
+	}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			logger.fatal_fail("We have encountered a fatal failure!")
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,15 +38,15 @@ GET /t
 === TEST 2: Handle a fatal failure with warn error log level
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		logger = require "resty.waf.log"
-	';
+	}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			logger.fatal_fail("We have encountered a fatal failure!")
-		';
+		}
 	}
 --- log_level
 warn

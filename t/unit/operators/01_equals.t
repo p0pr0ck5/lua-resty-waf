@@ -20,9 +20,9 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local equals = require "resty.waf.operators"
-        ';
+        }
     }
 --- request
     GET /t
@@ -35,11 +35,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals(1, 1)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -53,11 +53,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals(1, 2)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -71,11 +71,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -89,11 +89,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "bar")
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -107,11 +107,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals({3, 2, 1}, 1)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -125,11 +125,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals({3, 2, 0}, 1)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -143,11 +143,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals({"bar", "foo"}, "foo")
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -161,11 +161,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals({"bar", "baz"}, "foo")
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -179,11 +179,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("nil", nil)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -197,11 +197,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("7", 7)
 			ngx.say(equals)
-        ';
+        }
     }
 --- request
     GET /t
@@ -215,12 +215,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(equals)
 			ngx.say(value)
-        ';
+        }
     }
 --- request
     GET /t
@@ -235,12 +235,12 @@ foo
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local equals, value = op.equals("foo", "foo")
 			ngx.say(type(equals))
 			ngx.say(type(value))
-        ';
+        }
     }
 --- request
     GET /t

@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			ngx.say(specific)
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&baz=qux
@@ -39,14 +39,14 @@ bar
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["specific"]({}, collection, "foo")
 			for i in ipairs(specific) do
 				ngx.say(specific[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&foo=bat&baz=qux
@@ -61,14 +61,14 @@ bat
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
 				ngx.say(keys[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&baz=qux
@@ -83,14 +83,14 @@ baz
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local keys       = lookup.parse_collection["keys"]({}, collection, "foo")
 			for i in ipairs(keys) do
 				ngx.say(keys[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&foo=bat&baz=qux
@@ -105,14 +105,14 @@ baz
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
 				ngx.say(values[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&baz=qux
@@ -127,14 +127,14 @@ qux
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local values     = lookup.parse_collection["values"]({}, collection, "foo")
 			for i in ipairs(values) do
 				ngx.say(values[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&foo=bat&baz=qux
@@ -150,14 +150,14 @@ qux
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do
 				ngx.say(all[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&baz=qux
@@ -174,14 +174,14 @@ qux
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local all        = lookup.parse_collection["all"]({}, collection, "foo")
 			for i in ipairs(all) do
 				ngx.say(all[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&foo=bat&baz=qux
@@ -199,12 +199,12 @@ qux
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
 			ngx.say(specific)
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&baz=qux
@@ -218,14 +218,14 @@ bar
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup     = require "resty.waf.util"
 			local collection = ngx.req.get_uri_args()
 			local specific   = lookup.parse_collection["regex"]({ _pcre_flags = "joi" }, collection, [=[^f]=])
 			for i in ipairs(specific) do
 				ngx.say(specific[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t?foo=bar&foo=bat&baz=qux

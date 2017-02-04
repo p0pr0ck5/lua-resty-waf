@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_key("foo", t)
 			ngx.say(val)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ true
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 			local t    = { "foo", "bar", "qux", "frob" }
 			local val  = util.table_has_key(1, t)
 			ngx.say(val)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,12 +58,12 @@ true
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 			local t    = { foo = "bar", qux = "frob" }
 			local val  = util.table_has_key("baz", t)
 			ngx.say(val)
-		';
+		}
 	}
 --- request
 GET /t
@@ -77,12 +77,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 			local t    = { "foo", "bar", "qux", "frob" }
 			local val  = util.table_has_key(0, t)
 			ngx.say(val)
-		';
+		}
 	}
 --- request
 GET /t
@@ -96,12 +96,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util = require "resty.waf.util"
 			local t    = "foo, bar"
 			local val  = util.table_has_key("foo", t)
 			ngx.say(val)
-		';
+		}
 	}
 --- request
 GET /t

@@ -22,22 +22,22 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 	}
 
 	location /s {
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=bar", "GET /s"]
@@ -50,52 +50,52 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 
 	location /s {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=bar", "GET /s"]
@@ -110,54 +110,54 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 
 	location /s {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=bar", "GET /s"]
@@ -172,22 +172,22 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 	}
 
 	location /s {
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=<script>alert(1)</script>", "GET /s"]
@@ -202,52 +202,52 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 
 	location /s {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=<script>alert(1)</script>", "GET /s"]
@@ -262,54 +262,54 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local args = ngx.req.get_uri_args()
 			local shm  = ngx.shared.shm
 
 			shm:set("foo", args.foo)
 			ngx.say("Set key \'foo\'!")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 
 	location /s {
-		access_by_lua '
+		access_by_lua_block {
 			lua_resty_waf = require "resty.waf"
 			local waf      = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:set_option("mode", "ACTIVE")
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local shm = ngx.shared.shm
 			local foo = shm:get("foo")
 
 			ngx.say("shm:foo is set as: \'" .. tostring(foo) .. "\'")
-		';
+		}
 
-		log_by_lua '
+		log_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:write_log_events()
-		';
+		}
 	}
 --- request eval
 ["GET /t?foo=<script>alert(1)</script>", "GET /s"]

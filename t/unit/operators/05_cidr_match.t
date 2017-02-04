@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -40,13 +40,13 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
 			local match, value = op.cidr_match("192.168.0.1", cidrs)
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -60,13 +60,13 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("172.16.31.255", cidr)
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -80,13 +80,13 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local cidrs = { "192.168.0.0/16", "192.169.0.0/16" }
 
 			local match, value = op.cidr_match("172.16.31.255", cidrs)
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -100,13 +100,13 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("foobar", cidr)
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -120,14 +120,14 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -142,14 +142,14 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op   = require "resty.waf.operators"
 			local cidr = "192.168.0.0/16"
 
 			local match, value = op.cidr_match("192.168.0.1", cidr)
 			ngx.say(type(match))
 			ngx.say(type(value))
-		';
+		}
 	}
 --- request
 GET /t

@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "0x48656c6c6f2c20776f726c6421"
 			local transform = lookup.lookup["sql_hex_decode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ Hello, world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "48656c6c6f2c20776f726c6421"
 			local transform = lookup.lookup["sql_hex_decode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,12 +58,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "48656c6c6f2c20776f726c6421"
 			local transform = lookup.lookup["hex_decode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -77,11 +77,11 @@ Hello, world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util   = require "resty.waf.util"
 			local value  = "this is not hex"
 			ngx.say(util.hex_decode(value))
-		';
+		}
 	}
 --- request
 GET /t
@@ -95,12 +95,12 @@ this is not hex
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "Hello, world!"
 			local transform = lookup.lookup["hex_encode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

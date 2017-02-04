@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "how  	are	you    doing?"
 			local transform = lookup.lookup["compress_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ how are you doing?
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "how  	are	you    doing?"
 			local transform = lookup.lookup["remove_whitespace"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

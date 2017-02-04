@@ -19,35 +19,35 @@ __DATA__
 === TEST 1: lua_resty_waf runs with resty.core included
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		require "resty.core"
-	';
+	}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:set_option("debug", true)
 			waf:exec()
-		';
+		}
 
-		header_filter_by_lua '
+		header_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		body_filter_by_lua '
+		body_filter_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

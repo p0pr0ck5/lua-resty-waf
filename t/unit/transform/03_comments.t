@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "UNI/*1*/ON SELECT"
 			local transform = lookup.lookup["remove_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ UNION SELECT
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "UNION/* */SELECT"
 			local transform = lookup.lookup["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,12 +58,12 @@ UNION SELECT
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "; DROP TABLE bobby--"
 			local transform = lookup.lookup["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -77,12 +77,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "; DROP TABLE bobby#"
 			local transform = lookup.lookup["remove_comments_char"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -96,12 +96,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "UNION/***/SELECT"
 			local transform = lookup.lookup["replace_comments"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

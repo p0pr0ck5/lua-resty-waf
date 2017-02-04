@@ -22,7 +22,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -30,9 +30,9 @@ __DATA__
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "12345", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"bar","vars":[{"ignore":[["ignore","foo"],["regex","^b"]],"parse":["values","1"],"type":"URI_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?a=bar
@@ -47,7 +47,7 @@ Sieveing regex value ^b
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -55,9 +55,9 @@ Sieveing regex value ^b
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "12345", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"bar","vars":[{"ignore":[["ignore","foo"],["regex","^b"]],"parse":["values","1"],"type":"URI_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?foo=bar
@@ -72,7 +72,7 @@ Sieveing regex value ^b
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -80,9 +80,9 @@ Sieveing regex value ^b
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "12345", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"bar","vars":[{"ignore":[["ignore","foo"],["regex","^b"]],"parse":["values","1"],"type":"URI_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?bat=bar
@@ -98,7 +98,7 @@ Removing bat
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -106,9 +106,9 @@ Removing bat
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "12345", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"bar","vars":[{"ignore":[["ignore","foo"],["regex","^b"]],"parse":["values","1"],"type":"URI_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?a=bar&foo=bar
@@ -124,7 +124,7 @@ Sieveing regex value ^b
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -132,9 +132,9 @@ Sieveing regex value ^b
 			waf:set_option("mode", "ACTIVE")
 			waf:set_option("add_ruleset_string", "12345", [=[{"access":[{"actions":{"disrupt":"DENY"},"id":"12345","operator":"REGEX","pattern":"bar","vars":[{"ignore":[["ignore","foo"],["regex","^b"]],"parse":["values","1"],"type":"URI_ARGS"}]},{"actions":{"disrupt":"DENY"},"id":"12346","operator":"REGEX","pattern":"bar","vars":[{"parse":["values","1"],"type":"URI_ARGS"}]}],"body_filter":[],"header_filter":[]}]=])
 			waf:exec()
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t?foo=bar

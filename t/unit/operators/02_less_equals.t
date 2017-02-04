@@ -20,9 +20,9 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local less = require "resty.waf.operators"
-        ';
+        }
     }
 --- request
     GET /t
@@ -35,11 +35,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals(1, 2)
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -53,11 +53,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals(1, 1)
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -71,11 +71,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals(2, 1)
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -89,11 +89,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals({0, 1, 2}, 1)
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -107,11 +107,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = (op.less_equals({1, 2, 3}, 1))
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -125,11 +125,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals({1, 2, 3}, 0)
 			ngx.say(less)
-        ';
+        }
     }
 --- request
     GET /t
@@ -143,12 +143,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals(1, 2)
 			ngx.say(less)
 			ngx.say(value)
-        ';
+        }
     }
 --- request
     GET /t
@@ -163,12 +163,12 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local less, value = op.less_equals(1, 2)
 			ngx.say(type(less))
 			ngx.say(type(value))
-        ';
+        }
     }
 --- request
     GET /t
