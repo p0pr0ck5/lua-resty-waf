@@ -16,6 +16,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Public Methods](#public-methods)
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
 	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
+	* [lua-resty-waf:set_var()](#lua-resty-wafset_var)
 	* [lua-resty-waf:exec()](#lua-resty-wafexec)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
@@ -121,6 +122,8 @@ Alternatively, install via Luarocks:
 ```
 	# luarocks install lua-resty-waf
 ```
+
+lua-resty-waf makes use of the [OPM](https://github.com/openresty/opm) package manager, available in modern OpenResty distributions. The client OPM tools requires that the `resty` command line tool is available in your system's `PATH` environmental variable.
 
 Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
@@ -253,9 +256,9 @@ Configure an option on a per-scope basis.
 	}
 ```
 
-###lua-resty-waf:exec()
+###lua-resty-waf:set_var()
 
-Run the rule engine.
+Define a transaction variable (stored in the `TX` variable collection) before executing the WAF. This can be used to define variables used by complex rulesets such as the [OWASP CRS](https://github.com/SpiderLabs/owasp-modsecurity-crs).
 
 *Example*:
 
@@ -266,8 +269,47 @@ Run the rule engine.
 
 			local waf = lua_resty_waf:new()
 
-			-- fire!
+			waf:set_var("FOO", "bar")
+		';
+	}
+```
+
+Note that as with any other ModSecurity rule, the existence of a variable bears no functional change to WAF processing; it is the responsibility of the rule author to understand and use `TX` variables.
+
+###lua-resty-waf:exec()
+
+Run the rule engine. By default, the engine is executed according to the currently running phase. An optional table may be passed, allowing users to "mock" execution of a different phase.
+
+*Example*:
+
+```lua
+	location / {
+		access_by_lua '
+			local lua_resty_waf = require "waf"
+
+			local waf = lua_resty_waf:new()
+
+			-- execute according to access phase collections and rules
 			waf:exec()
+		';
+
+		content_by_lua '
+			local lua_resty_waf = require "waf"
+
+			local waf = lua_resty_waf:new()
+
+			-- execute header_filter rules, passing in a table of additional collections
+			-- this assumes the 'request_headers' and 'status' Lua variables were
+			-- declared and initialized elsewhere
+			local opts = {
+				phase = 'header_filter',
+				collections = {
+					REQUEST_HEADERS = request_headers,
+					STATUS = status,
+				}
+			}
+
+			waf:exec(opts)
 		';
 	}
 ```
