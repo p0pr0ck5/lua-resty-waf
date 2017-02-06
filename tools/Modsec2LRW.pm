@@ -810,7 +810,11 @@ sub translate_actions {
 		} elsif ($key eq 'ctl') {
 			my ($opt, $data) = split /=/, $value;
 
-			$ctl_lookup->{$opt}($data, $translation);
+			if (defined $ctl_lookup->{$opt}) {
+				$ctl_lookup->{$opt}($data, $translation);
+			} else {
+				warn "Cannot translate ctl option $opt";
+			}
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
