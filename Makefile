@@ -4,6 +4,7 @@ INSTALL_SOFT     ?= ln -s
 INSTALL          ?= install
 RESTY_BINDIR      = $(OPENRESTY_PREFIX)/bin
 OPM               = $(RESTY_BINDIR)/opm
+OPM_LIB_DIR      ?= $(OPENRESTY_PREFIX)/site
 PWD               = `pwd`
 
 LIBS       = waf waf.lua
@@ -39,7 +40,7 @@ clean-libs:
 	cd lib && rm -f $(SO_LIBS)
 
 clean-opm-libs:
-	$(OPM) --install-dir=$(LUA_LIB_DIR) remove $(OPM_LIBS)
+	$(OPM) --install-dir=$(OPM_LIB_DIR) remove $(OPM_LIBS)
 
 clean-test:
 	rm -rf t/servroot
@@ -75,7 +76,7 @@ test-libs: clean all test-lua-aho-corasick test-libinjection
 test-recursive: test test-libs
 
 install-opm-libs:
-	$(OPM) --install-dir=$(LUA_LIB_DIR) get $(OPM_LIBS)
+	$(OPM) --install-dir=$(OPM_LIB_DIR) get $(OPM_LIBS)
 
 install: install-opm-libs
 	$(INSTALL) -d $(LUA_LIB_DIR)/resty/waf/storage
