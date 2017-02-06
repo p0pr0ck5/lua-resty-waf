@@ -76,6 +76,11 @@ _M.nondisruptive_lookup = {
 		--_LOG_"Overriding status from " .. waf._deny_status .. " to " .. status
 
 		ctx.rule_status = status
+	end,
+	rule_remove_id = function(waf, rule)
+		--_LOG_"Runtime ignoring rule " .. rule
+
+		waf._ignore_rule[rule] = true
 	end
 }
 

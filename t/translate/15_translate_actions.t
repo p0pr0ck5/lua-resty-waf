@@ -1244,4 +1244,32 @@ warning_like
 	'warn when capture is used with non-rx operator'
 ;
 
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveById=12345',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_id',
+					data   => 12345
+				}
+			]
+		},
+	},
+	'translate ruleRemoveById'
+);
+
 done_testing;

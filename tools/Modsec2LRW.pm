@@ -149,6 +149,17 @@ my $phase_lookup = {
 	5 => 'log',
 };
 
+my $ctl_lookup = {
+	ruleRemoveById => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{actions}->{nondisrupt}}, {
+			action => 'rule_remove_id',
+			data   => $value,
+		};
+	},
+};
+
 my $op_sep_lookup = {
 	PM         => '\s+',
 	CIDR_MATCH => ',',
@@ -795,6 +806,11 @@ sub translate_actions {
 			$translation->{operator} eq 'REFIND' ?
 				$translation->{operator} = 'REGEX' :
 				warn 'capture set when translated operator was not REFIND';
+
+		} elsif ($key eq 'ctl') {
+			my ($opt, $data) = split /=/, $value;
+
+			$ctl_lookup->{$opt}($data, $translation);
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;
