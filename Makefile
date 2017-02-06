@@ -39,7 +39,7 @@ clean-libs:
 	cd lib && rm -f $(SO_LIBS)
 
 clean-opm-libs:
-	$(OPM) remove $(OPM_LIBS)
+	$(OPM) --install-dir=$(LUA_LIB_DIR) remove $(OPM_LIBS)
 
 clean-test:
 	rm -rf t/servroot
@@ -75,7 +75,7 @@ test-libs: clean all test-lua-aho-corasick test-libinjection
 test-recursive: test test-libs
 
 install-opm-libs:
-	$(OPM) install $(OPM_LIBS)
+	$(OPM) --install-dir=$(LUA_LIB_DIR) get $(OPM_LIBS)
 
 install: install-opm-libs
 	$(INSTALL) -d $(LUA_LIB_DIR)/resty/waf/storage
