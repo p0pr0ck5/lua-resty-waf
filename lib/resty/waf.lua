@@ -322,8 +322,6 @@ local function _calculate_offset(ruleset)
 			ruleset[phase] = {}
 		end
 	end
-
-	ruleset.initted = true
 end
 
 -- merge the default and any custom rules
