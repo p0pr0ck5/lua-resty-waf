@@ -81,7 +81,7 @@ local function _write_skip_offset(rule, max, cur_offset)
 	end
 end
 
-function _M.calculate(ruleset)
+function _M.calculate(ruleset, meta_lookup)
 	local max = #ruleset
 	local chain = {}
 
@@ -121,6 +121,29 @@ function _M.calculate(ruleset)
 			end
 
 			chain = {}
+		end
+
+		-- meta table lookups for exceptions
+		if (meta_lookup) then
+			if (rule.msg) then
+				local msg = rule.msg
+
+				if (not meta_lookup.msgs[msg]) then
+					meta_lookup.msgs[msg] = { rule.id }
+				else
+					table_insert(meta_lookup.msgs[msg], rule.id)
+				end
+			end
+
+			if (rule.tag) then
+				for _, tag in ipairs(rule.tag) do
+					if (not meta_lookup.tags[tag]) then
+						meta_lookup.tags[tag] = { rule.id }
+					else
+						table_insert(meta_lookup.tags[tag], rule.id)
+					end
+				end
+			end
 		end
 	end
 end

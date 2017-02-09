@@ -1272,4 +1272,102 @@ is_deeply(
 	'translate ruleRemoveById'
 );
 
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=XSS',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS'
+		]
+	},
+	'translate ruleRemoveByMsg'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByTag=XSS',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS'
+		]
+	},
+	'translate ruleRemoveByTag'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=XSS',
+			},
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=SQL',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS',
+			'SQL',
+		]
+	},
+	'translate multiple meta removal actions'
+);
+
 done_testing;

@@ -5,7 +5,7 @@ _M.version = "0.9"
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 
-
+local re_find       = ngx.re.find
 local string_byte   = string.byte
 local string_char   = string.char
 local string_format = string.format
@@ -99,6 +99,19 @@ function _M.table_has_value(needle, haystack)
 	end
 
 	return false
+end
+
+-- append the contents of (array-like) table b into table a
+function _M.table_append(a, b)
+	-- handle some ugliness
+	local c = type(b) == 'table' and b or { b }
+
+	local a_count = #a
+
+	for i = 1, #c do
+		a_count = a_count + 1
+		a[a_count] = c[i]
+	end
 end
 
 -- pick out dynamic data from storage key definitions
@@ -273,5 +286,39 @@ _M.sieve_collection = {
 		end
 	end,
 }
+
+-- build the msg/tag exception table for a given rule
+function _M.rule_exception(exception_table, rule)
+	if not rule.exceptions then
+		return
+	end
+
+	local ids   = {}
+	local count = 0
+
+	for i, exception in ipairs(rule.exceptions) do
+		for key, rules in pairs(exception_table.msgs) do
+			if (re_find(key, exception, 'jo')) then
+				for j, id in ipairs(rules) do
+					count = count + 1
+					ids[count] = id
+				end
+			end
+		end
+
+		for key, rules in pairs(exception_table.tags) do
+			if (re_find(key, exception, 'jo')) then
+				for j, id in ipairs(rules) do
+					count = count + 1
+					ids[count] = id
+				end
+			end
+		end
+	end
+
+	if count > 0 then
+		exception_table.meta_ids[rule.id] = ids
+	end
+end
 
 return _M

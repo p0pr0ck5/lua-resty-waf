@@ -81,7 +81,18 @@ _M.nondisruptive_lookup = {
 		--_LOG_"Runtime ignoring rule " .. rule
 
 		waf._ignore_rule[rule] = true
-	end
+	end,
+	rule_remove_by_meta = function(waf, data, ctx)
+		--_LOG_"Runtime ignoring rules by meta"
+
+		-- this lookup table holds
+		local meta_rules = waf._meta_exception.meta_ids[ctx.id] or {}
+
+		for i, id in ipairs(meta_rules) do
+			--_LOG_"Runtime ignoring rule " .. id
+			waf._ignore_rule[id] = true
+		end
+	end,
 }
 
 return _M

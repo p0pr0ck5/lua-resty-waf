@@ -149,6 +149,24 @@ my $phase_lookup = {
 	5 => 'log',
 };
 
+sub meta_exception {
+	my ($translation) = @_;
+
+	my $do_add = not defined $translation->{actions}->{nondisrupt};
+
+	$do_add ||= defined $translation->{actions}->{nondisrupt} &&
+		! grep { $_ eq 'rule_remove_by_meta' }
+		map { $_->{action} } @{$translation->{actions}->{nondisrupt}};
+
+	if ($do_add) {
+		push @{$translation->{actions}->{nondisrupt}},
+			{
+				action => 'rule_remove_by_meta',
+				data   => 1,
+			};
+	}
+}
+
 my $ctl_lookup = {
 	ruleRemoveById => sub {
 		my ($value, $translation) = @_;
@@ -157,6 +175,20 @@ my $ctl_lookup = {
 			action => 'rule_remove_id',
 			data   => $value,
 		};
+	},
+	ruleRemoveByMsg => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{exceptions}}, $value;
+
+		meta_exception($translation);
+	},
+	ruleRemoveByTag => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{exceptions}}, $value;
+
+		meta_exception($translation);
 	},
 };
 

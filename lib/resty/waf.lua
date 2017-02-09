@@ -39,6 +39,30 @@ local _global_rulesets = {
 local _ruleset_defs = {}
 local _ruleset_def_cnt = 0
 
+-- lookup tables for msg and tag exceptions
+-- public so it can be accessed via metatable
+_M._meta_exception = {
+	msgs = {},
+	tags = {},
+	meta_ids = {},
+}
+
+-- this function runs when a new ruleset has been introduced to
+-- _ruleset_defs. it reads over all the rules, looking for msg and tag
+-- elements, and building a lookup table for exceptions
+local function _build_exception_table()
+	-- build a rule.id -> { rule.id, ... } lookup table based on the exception
+	-- action for the rule
+
+	for r, ruleset in pairs(_ruleset_defs) do
+		for phase, rules in pairs(ruleset) do
+			for i, rule in ipairs(rules) do
+				util.rule_exception(_M._meta_exception, rule)
+			end
+		end
+	end
+end
+
 -- get a subset or superset of request data collection
 local function _parse_collection(self, collection, var)
 	local parse = var.parse
@@ -317,7 +341,7 @@ end
 local function _calculate_offset(ruleset)
 	for phase, i in pairs(phase_t.phases) do
 		if (ruleset[phase]) then
-			calc.calculate(ruleset[phase])
+			calc.calculate(ruleset[phase], _M._meta_exception)
 		else
 			ruleset[phase] = {}
 		end
@@ -332,6 +356,8 @@ local function _merge_rulesets(self)
 	for k, v in ipairs(default) do
 		t[v] = true
 	end
+
+	local rebuild_exception_table = false
 
 	if (self) then
 		local added   = self._add_ruleset
@@ -356,6 +382,9 @@ local function _merge_rulesets(self)
 					_calculate_offset(rs)
 
 					_ruleset_defs[k] = rs
+					_ruleset_def_cnt = _ruleset_def_cnt + 1
+
+					rebuild_exception_table = true
 				end
 			end
 
@@ -367,6 +396,8 @@ local function _merge_rulesets(self)
 			t[v] = nil
 		end
 	end
+
+	if rebuild_exception_table then _build_exception_table() end
 
 	t = util.table_keys(t)
 
@@ -475,6 +506,9 @@ function _M.exec(self, opts)
 				_calculate_offset(rs)
 
 				_ruleset_defs[ruleset] = rs
+				_ruleset_def_cnt = _ruleset_def_cnt + 1
+
+				_build_exception_table()
 			end
 		end
 
@@ -627,8 +661,9 @@ function _M.init()
 			_calculate_offset(rs)
 
 			_ruleset_defs[ruleset] = rs
-
 			_ruleset_def_cnt = _ruleset_def_cnt + 1
+
+			_build_exception_table()
 		end
 	end
 end
