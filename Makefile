@@ -43,7 +43,7 @@ clean-opm-libs:
 	$(OPM) --install-dir=$(OPM_LIB_DIR) remove $(OPM_LIBS)
 
 clean-test:
-	rm -rf t/servroot
+	rm -rf t/servroot*
 
 debug-macro:
 	./tools/debug-macro.sh
