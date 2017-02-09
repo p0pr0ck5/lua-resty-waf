@@ -33,6 +33,9 @@ $::HttpConfig . q#
 			waf:set_option("storage_backend", "memcached")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
@@ -40,7 +43,6 @@ $::HttpConfig . q#
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }

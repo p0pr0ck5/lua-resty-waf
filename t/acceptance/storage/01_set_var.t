@@ -162,12 +162,14 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
@@ -207,12 +209,14 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ blah = 5 })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
@@ -253,12 +257,14 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = "blah" })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1, inc = 1 }
@@ -296,12 +302,14 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 3 })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = nil, inc = 1 }

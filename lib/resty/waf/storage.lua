@@ -129,4 +129,6 @@ function _M.persist(waf, storage)
 	end
 end
 
+_M.col_prefix = 'lua_resty_waf_'
+
 return _M

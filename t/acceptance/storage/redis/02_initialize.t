@@ -74,14 +74,16 @@ $::HttpConfig . q#
 
 			local var = { a = "b" }
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
 			redis:flushall()
-			redis:hmset("FOO", var)
+			redis:hmset(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -129,14 +131,16 @@ $::HttpConfig . q#
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
 			redis:flushall()
-			redis:hmset("FOO", var)
+			redis:hmset(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -185,14 +189,16 @@ $::HttpConfig . q#
 			waf._storage_redis_delkey_n = 0
 			waf._storage_redis_delkey   = {}
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
 			redis:flushall()
-			redis:hmset("FOO", var)
+			redis:hmset(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -239,14 +245,16 @@ $::HttpConfig . q#
 
 			local var = { a = "b", c = 5 }
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local redis = redis_m:new()
 			redis:connect(waf._storage_redis_host, waf._storage_redis_port)
 			redis:flushall()
-			redis:hmset("FOO", var)
+			redis:hmset(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]

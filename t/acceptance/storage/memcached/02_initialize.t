@@ -74,13 +74,15 @@ $::HttpConfig . q#
 
 			local var = require("cjson").encode({ a = "b" })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -126,13 +128,15 @@ $::HttpConfig . q#
 
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -179,13 +183,15 @@ $::HttpConfig . q#
 
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]

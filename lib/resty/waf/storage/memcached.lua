@@ -5,6 +5,9 @@ _M.version = "0.9"
 local cjson       = require "cjson"
 local logger      = require "resty.waf.log"
 local memcached_m = require "resty.memcached"
+local storage = require "resty.waf.storage"
+
+_M.col_prefix = storage.col_prefix
 
 function _M.initialize(waf, storage, col)
 	local memcached = memcached_m:new()
@@ -18,7 +21,9 @@ function _M.initialize(waf, storage, col)
 		return
 	end
 
-	local serialized, flags, err = memcached:get(col)
+	local col_name = _M.col_prefix .. col
+
+	local serialized, flags, err = memcached:get(col_name)
 	if (err) then
 		logger.warn(waf, "Error retrieving " .. col .. ": " .. err)
 		storage[col] = {}
@@ -82,7 +87,9 @@ function _M.persist(waf, col, data)
 		return
 	end
 
-	local ok, err = memcached:set(col, serialized)
+	local col_name = _M.col_prefix .. col
+
+	local ok, err = memcached:set(col_name, serialized)
 	if (not ok) then
 		logger.warn(waf, "Error persisting storage data: " .. err)
 	end

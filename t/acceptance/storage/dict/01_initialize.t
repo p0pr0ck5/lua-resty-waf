@@ -67,13 +67,15 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local var = require("cjson").encode({ a = "b" })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -117,13 +119,15 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local var = require("cjson").encode({ a = "b", c = "d", __expire_c = ngx.time() - 10 })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
@@ -168,13 +172,15 @@ $::HttpConfig . q#
 			waf:set_option("storage_zone", "store")
 			waf:set_option("debug", true)
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local var = require("cjson").encode({ a = "b", __expire_a = ngx.time() + 10, c = "d", __expire_c = ngx.time() - 10 })
 			local shm = ngx.shared[waf._storage_zone]
-			shm:set("FOO", var)
+			shm:set(storage.col_prefix .. "FOO", var)
 
 			local data = {}
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
