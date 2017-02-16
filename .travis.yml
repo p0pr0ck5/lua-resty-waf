@@ -7,13 +7,14 @@ notifications:
   webhooks: https://www.cryptobells.com/endpoint
 env:
   global:
-    - V_OPENRESTY=1.11.2.1
-    - DATE=20161017
+    - V_OPENRESTY=1.11.2.2
+    - DATE=20170216
   matrix:
-    - TEST=unit
-    - TEST=acceptance
-    - TEST=regression
-    - TEST=translate
+    - TEST=unit RUNNER='perl'
+    - TEST=acceptance RUNNER='perl'
+    - TEST=regression RUNNER='perl'
+    - TEST=translate RUNNER='perl'
+    - TEST=translation RUNNER='rebusted -o=TAP'
 services:
     - memcached
     - redis
@@ -22,10 +23,15 @@ install:
 before_script:
     - export PATH=/usr/local/openresty/bin/:$PATH
     - sudo apt-get update -q
-    - sudo apt-get install lua5.1 liblua5.1-0-dev -y
-    - wget http://cdn.cryptobells.com/openresty-$V_OPENRESTY-$DATE.tar.bz2
+    - sudo apt-get install lua5.1 liblua5.1-0-dev luarocks -y
+    - sudo luarocks install busted
+    - sudo luarocks install luafilesystem
+    - sudo wget -O /usr/local/bin/rebusted https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/bin/busted
+    - sudo chmod +x /usr/local/bin/rebusted
+    - wget https://s3.amazonaws.com/p0pr0ck5-data/openresty-$V_OPENRESTY-$DATE.tar.bz2
     - sudo tar -jxvf openresty-$V_OPENRESTY-$DATE.tar.bz2 -C /usr/local/
     - make
+    - sudo make install-link
 script:
-  - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -r t/$TEST
-  - ./tools/lua-releng -L
+    - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -v --exec "$RUNNER" -r t/$TEST/*
+    - ./tools/lua-releng -L

@@ -75,10 +75,18 @@ test-libs: clean all test-lua-aho-corasick test-libinjection
 
 test-recursive: test test-libs
 
+install-check:
+	stat lib/*.so > /dev/null
+
 install-opm-libs:
 	$(OPM) --install-dir=$(OPM_LIB_DIR) get $(OPM_LIBS)
 
-install: install-opm-libs
+install-link: install-check
+	$(INSTALL_SOFT) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
+	$(INSTALL_SOFT) $(PWD)/lib/*.so $(LUA_LIB_DIR)
+	$(INSTALL_SOFT) $(PWD)/rules/ $(LUA_LIB_DIR)
+
+install: install-check install-opm-libs
 	$(INSTALL) -d $(LUA_LIB_DIR)/resty/waf/storage
 	$(INSTALL) -d $(LUA_LIB_DIR)/rules
 	$(INSTALL) lib/resty/*.lua $(LUA_LIB_DIR)/resty/
@@ -87,7 +95,4 @@ install: install-opm-libs
 	$(INSTALL) lib/*.so $(LUA_LIB_DIR)
 	$(INSTALL) rules/*.json $(LUA_LIB_DIR)/rules/
 
-install-soft: install-opm-libs
-	$(INSTALL_SOFT) $(PWD)/lib/resty/* $(LUA_LIB_DIR)/resty/
-	$(INSTALL_SOFT) $(PWD)/lib/*.so $(LUA_LIB_DIR)
-	$(INSTALL_SOFT) $(PWD)/rules/ $(LUA_LIB_DIR)
+install-soft: install-check install-opm-libs install-link

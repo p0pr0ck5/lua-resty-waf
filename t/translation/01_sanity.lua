@@ -1,0 +1,5 @@
+describe("module", function()
+	it("loads without errors", function()
+		assert.has_no.errors(function() require "resty.waf.translate" end)
+	end)
+end)
