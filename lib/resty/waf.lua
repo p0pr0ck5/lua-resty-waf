@@ -12,6 +12,7 @@ local phase_t       = require "resty.waf.phase"
 local random        = require "resty.waf.random"
 local storage       = require "resty.waf.storage"
 local transform_t   = require "resty.waf.transform"
+local translate     = require "resty.waf.translate"
 local util          = require "resty.waf.util"
 
 local table_sort   = table.sort
@@ -666,6 +667,37 @@ function _M.init()
 			_build_exception_table()
 		end
 	end
+end
+
+-- translate and add a SecRule files to ruleset defs
+function _M.load_secrules(ruleset, opts)
+	local rules_tab = {}
+	local rules_cnt = 0
+	local f = assert(io.open(ruleset, 'r'))
+
+	while true do
+		local line = f:read("*line")
+
+		if line == nil then break end
+
+		rules_cnt = rules_cnt + 1
+		rules_tab[rules_cnt] = line
+	end
+
+	f:close()
+
+	local chains, errs = translate.translate(rules_tab, opts)
+
+	if errs then
+		for i = 1, #errs do ngx.log(ngx.ERR, errs[i]) end
+	end
+
+	local name = string.gsub(ruleset, "(.*/)(.*)", "%2")
+
+	_calculate_offset(chains)
+
+	_ruleset_defs[name] = chains
+	_ruleset_def_cnt = _ruleset_def_cnt + 1
 end
 
 -- push log data regarding matching rule(s) to the configured target

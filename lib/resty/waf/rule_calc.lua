@@ -32,8 +32,8 @@ local function _build_collection_key(var, transform)
 	key[1] = tostring(var.type)
 
 	if (var.parse ~= nil) then
-		table_insert(key, var.parse[1])
-		table_insert(key, var.parse[2])
+		table_insert(key, tostring(var.parse[1]))
+		table_insert(key, tostring(var.parse[2]))
 	end
 
 	if (var.ignore ~= nil) then
