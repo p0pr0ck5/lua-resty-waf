@@ -12,6 +12,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Installation](#installation)
 * [Synopsis](#synopsis)
 * [Public Functions](#public-functions)
+	* [lua-resty-waf.load_secrules()](#lua-resty-wafload_secrules)
 	* [lua-resty-waf.init()](#lua-resty-wafinit)
 * [Public Methods](#public-methods)
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
@@ -201,6 +202,51 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 ##Public Functions
 
+###lua-resty-waf.load_secrules()
+
+Translate and initialize a ModSecurity SecRules file from disk. Note that this still requires the ruleset to be added via [add_ruleset](#add_ruleset) (the basename of the file must be given as the key).
+
+*Example*:
+
+```lua
+	http {
+		init_by_lua_block {
+			local lua_resty_waf = require "waf"
+
+			-- this translates and calculates a ruleset called 'ruleset_name'
+			local ok, errs = pcall(function()
+				lua_resty_waf.load_secrules("/path/to/secrules/ruleset_name")
+			end)
+
+			-- errs is an array-like table
+			if errs then
+				for i = 1, #errs do ngx.log(ngx.ERR, errs[i])
+			end
+		}
+	}
+
+	server {
+		location / {
+			access_by_lua_block {
+				local lua_resty_waf = require "waf"
+
+				local waf = lua_resty_waf:new()
+
+				-- in order to use the loaded ruleset, it must be added via
+				-- the 'add_ruleset' option
+				waf:set_option("add_ruleset", "ruleset_name")
+			}
+		}
+	}
+```
+
+Additionally, `load_secrules` can take an optional second argument as a table of options to pass to various translation functions. The following options are recognized:
+
+* *path*: Define a filesystem path to search for data files for operators such as @pmFromFile. If no such key is defined, the current working directory (`.`) is used
+* *force*: Do not error and abort when failing to translate a rule variable
+* *loose*: Do not error and abort when failing to translate a rule action
+* *quiet*: Do not error or warn when failing to translate a rule action
+
 ###lua-resty-waf.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should never be called outside this scope.
@@ -211,8 +257,6 @@ Perform some pre-computation of rules and rulesets, based on what's been made av
 	http {
 		init_by_lua_block {
 			local lua_resty_waf = require "waf"
-
-			-- set default options...
 
 			lua_resty_waf.init()
 		}
