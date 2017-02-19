@@ -1,3 +1,29 @@
+v0.10                                                               Feb 18, 2017
+
+    * Feature: Implement in-line SecRules translation
+
+    * Feature: Implement module interface to directly load SecRules translation
+
+    * Bugfix: Treat ignores like a seive, not a separate collection
+
+    * Improvement: Use ngx.re.find as the default regex operator handler
+
+    * Feature: Allow for execution in arbitrary phases
+
+    * Feature: Introduce setvar object interface
+
+    * Feature: Implement ruleRemoveBy* ctl actions
+
+    * Distrubution: Define configurable installation dir for OPM libs
+
+    * Improvement: Define prefix for persistent memory storage collections keys
+
+    * Maintenance: Standardize versions among library modules
+
+    * Maintenance: Implement deprecation function
+
+    * Maintenance: Expose the default global rulesets
+
 v0.9                                                                Jan 16, 2017
 
     * Distribution: Improve Makefile flexibility and feature sets
