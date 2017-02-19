@@ -405,9 +405,7 @@ local function _merge_rulesets(self)
 	t = util.table_keys(t)
 
 	-- rulesets will be processed in numeric order
-	table_sort(t, function(a, b)
-		return string_lower(a) < string_lower(b)
-	end)
+	table_sort(t)
 
 	self._active_rulesets = t
 end
