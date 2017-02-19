@@ -8,7 +8,6 @@ local util    = require "resty.waf.util"
 _M.version = base.version
 
 _M.alter_actions = {
-	ACCEPT = true,
 	DENY   = true,
 	DROP   = true,
 }

@@ -170,7 +170,7 @@ local function _rule_action(self, action, ctx, collections)
 	end
 
 	if util.table_has_key(action, actions.alter_actions) then
-		ctx.altered[ctx.phase] = true
+		ctx.altered = true
 		_finalize(self, ctx)
 	end
 
@@ -429,7 +429,6 @@ function _M.exec(self, opts)
 	local collections = ctx.collections or {}
 
 	ctx.lrw_initted   = true
-	ctx.altered       = ctx.altered or {}
 	ctx.col_lookup    = ctx.col_lookup or {}
 	ctx.log_entries   = ctx.log_entries or {}
 	ctx.log_entries_n = ctx.log_entries_n or 0
@@ -446,7 +445,8 @@ function _M.exec(self, opts)
 	ctx.col_lookup["TX"] = "TX"
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
-	if ctx.altered[phase] then
+	-- also https://github.com/p0pr0ck5/lua-resty-waf/issues/229
+	if ctx.altered == true then
 		--_LOG_"Transaction was already altered, not running!"
 		return
 	end
@@ -718,7 +718,7 @@ function _M.write_log_events(self, has_ctx, ctx)
 		return
 	end
 
-	if table.getn(util.table_keys(ctx.altered)) == 0 and self._event_log_altered_only then
+	if ctx.altered ~= true and self._event_log_altered_only then
 		--_LOG_"Not logging a request that wasn't altered"
 		return
 	end
