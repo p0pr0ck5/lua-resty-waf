@@ -1,15 +1,16 @@
 local _M = {}
 
-_M.version = "0.9"
-
 local cookiejar = require "resty.cookie"
 local upload	= require "resty.upload"
 
+local base   = require "resty.waf.base"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
 local table_concat = table.concat
 local table_insert = table.insert
+
+_M.version = base.version
 
 function _M.parse_request_body(waf, request_headers)
 	local content_type_header = request_headers["content-type"]
@@ -17,7 +18,7 @@ function _M.parse_request_body(waf, request_headers)
 	-- multiple content-type headers are likely an evasion tactic
 	-- or result from misconfigured proxies. may consider relaxing
 	-- this or adding an option to disable this checking in the future
-	if (type(content_type_header) == "table") then
+	if type(content_type_header) == "table" then
 		--_LOG_"Request contained multiple content-type headers, bailing!"
 		ngx.exit(400)
 	end
@@ -26,7 +27,7 @@ function _M.parse_request_body(waf, request_headers)
 	-- this does technically violate the RFC
 	-- but its necessary for us to properly handle the request
 	-- and its likely a sign of nogoodnickery anyway
-	if (not content_type_header) then
+	if not content_type_header then
 		--_LOG_"Request has no content type, ignoring the body"
 		return nil
 	end
@@ -35,8 +36,8 @@ function _M.parse_request_body(waf, request_headers)
 	-- multipart/form-data requests will be streamed in via lua-resty-upload,
 	-- which provides some basic sanity checking as far as form and protocol goes
 	-- (but its much less strict that ModSecurity's strict checking)
-	if (ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], waf._pcre_flags)) then
-		if (not waf._process_multipart_body) then
+	if ngx.re.find(content_type_header, [=[^multipart/form-data; boundary=]=], waf._pcre_flags) then
+		if not waf._process_multipart_body then
 			return
 		end
 
@@ -60,18 +61,18 @@ function _M.parse_request_body(waf, request_headers)
 				logger.fatal_fail("failed to stream request body: " .. err)
 			end
 
-			if (typ == "header") then
+			if typ == "header" then
 				chunk = res[3] -- form:read() returns { key, value, line } here
 				ngx.req.append_body("\r\n" .. chunk)
-			elseif (typ == "body") then
+			elseif typ == "body" then
 				chunk = res
-				if (lasttype == "header") then
+				if lasttype == "header" then
 					ngx.req.append_body("\r\n\r\n")
 				end
 				ngx.req.append_body(chunk)
-			elseif (typ == "part_end") then
+			elseif typ == "part_end" then
 				ngx.req.append_body("\r\n--" .. form.boundary)
-			elseif (typ == "eof") then
+			elseif typ == "eof" then
 				ngx.req.append_body("--\r\n")
 				break
 			end
@@ -85,30 +86,30 @@ function _M.parse_request_body(waf, request_headers)
 		ngx.req.finish_body()
 
 		return nil
-	elseif (ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags)) then
+	elseif ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags) then
 		-- use the underlying ngx API to read the request body
 		-- ignore processing the request body if the content length is larger than client_body_buffer_size
 		-- to avoid wasting resources on ruleset matching of very large data sets
 		ngx.req.read_body()
 
-		if (ngx.req.get_body_file() == nil) then
+		if ngx.req.get_body_file() == nil then
 			return ngx.req.get_post_args()
 		else
 			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil
 		end
-	elseif (util.table_has_key(content_type_header, waf._allowed_content_types)) then
+	elseif util.table_has_key(content_type_header, waf._allowed_content_types) then
 		-- if the content type has been whitelisted by the user, set REQUEST_BODY as a string
 		ngx.req.read_body()
 
-		if (ngx.req.get_body_file() == nil) then
+		if ngx.req.get_body_file() == nil then
 			return ngx.req.get_body_data()
 		else
 			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil
 		end
 	else
-		if (waf._allow_unknown_content_types) then
+		if waf._allow_unknown_content_types then
 			--_LOG_"Allowing request with content type " .. tostring(content_type_header)
 			return nil
 		else
@@ -124,7 +125,7 @@ function _M.request_uri()
 
 	request_line[1] = ngx.var.uri
 
-	if (is_args) then
+	if is_args then
 		request_line[2] = is_args
 		request_line[3] = ngx.var.query_string
 	end
@@ -151,12 +152,12 @@ function _M.common_args(collections)
 	local t = {}
 
 	for _, collection in pairs(collections) do
-		if (type(collection) == "table") then
+		if type(collection) == "table" then
 			for k, v in pairs(collection) do
-				if (t[k] == nil) then
+				if t[k] == nil then
 					t[k] = v
 				else
-					if (type(t[k]) == "table") then
+					if type(t[k]) == "table" then
 						table_insert(t[k], v)
 					else
 						local _v = t[k]

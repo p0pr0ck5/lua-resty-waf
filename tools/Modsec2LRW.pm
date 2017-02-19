@@ -83,12 +83,12 @@ my $valid_vars = {
 };
 
 my $valid_operators = {
-	beginsWith       => sub { my $pattern = shift; return('REGEX', "^$pattern"); },
+	beginsWith       => sub { my $pattern = shift; return('REFIND', "^$pattern"); },
 	contains         => 'STR_CONTAINS',
-	containsWord     => sub { my $pattern = shift; return('REGEX', "\\b$pattern\\b"); },
+	containsWord     => sub { my $pattern = shift; return('REFIND', "\\b$pattern\\b"); },
 	detectSQLi       => 'DETECT_SQLI',
 	detectXSS        => 'DETECT_XSS',
-	endsWith         => sub { my $pattern = shift; return('REGEX', "$pattern\$"); },
+	endsWith         => sub { my $pattern = shift; return('REFIND', "$pattern\$"); },
 	eq               => 'EQUALS',
 	ge               => 'GREATER_EQ',
 	gt               => 'GREATER',
@@ -101,7 +101,7 @@ my $valid_operators = {
 	pmf              => 'PM',
 	pmFromFile       => 'PM',
 	rbl              => 'RBL_LOOKUP',
-	rx               => 'REGEX',
+	rx               => 'REFIND',
 	streq            => 'EQUALS',
 	strmatch         => 'STR_MATCH',
 	within           => 'STR_EXISTS',
@@ -147,6 +147,49 @@ my $phase_lookup = {
 	3 => 'header_filter',
 	4 => 'body_filter',
 	5 => 'log',
+};
+
+sub meta_exception {
+	my ($translation) = @_;
+
+	my $do_add = not defined $translation->{actions}->{nondisrupt};
+
+	$do_add ||= defined $translation->{actions}->{nondisrupt} &&
+		! grep { $_ eq 'rule_remove_by_meta' }
+		map { $_->{action} } @{$translation->{actions}->{nondisrupt}};
+
+	if ($do_add) {
+		push @{$translation->{actions}->{nondisrupt}},
+			{
+				action => 'rule_remove_by_meta',
+				data   => 1,
+			};
+	}
+}
+
+my $ctl_lookup = {
+	ruleRemoveById => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{actions}->{nondisrupt}}, {
+			action => 'rule_remove_id',
+			data   => $value,
+		};
+	},
+	ruleRemoveByMsg => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{exceptions}}, $value;
+
+		meta_exception($translation);
+	},
+	ruleRemoveByTag => sub {
+		my ($value, $translation) = @_;
+
+		push @{$translation->{exceptions}}, $value;
+
+		meta_exception($translation);
+	},
 };
 
 my $op_sep_lookup = {
@@ -352,6 +395,28 @@ sub parse_vars {
 		if ($var =~ m/^[&!]/) {
 			$modifier = substr $var, 0, 1, '';
 			$parsed->{modifier} = $modifier;
+		}
+
+		# pop the last var off the stack to add our ignore
+		if (defined $modifier && $modifier eq '!') {
+			my $prev_parsed_var = pop @parsed_vars;
+
+			if (!$prev_parsed_var) {
+				warn "No previous var\n";
+				next;
+			}
+
+			if ($prev_parsed_var->{variable} ne $var) {
+				warn "Seen var $var doesn't match previous var $prev_parsed_var->{variable}\n";
+				push @parsed_vars, $prev_parsed_var;
+				next;
+			}
+
+			push @{$prev_parsed_var->{ignore}}, $specific;
+			$parsed = $prev_parsed_var;
+			$parsed->{modifier} = '!';
+			push @parsed_vars, $parsed;
+			next;
 		}
 
 		$parsed->{variable} = $var;
@@ -623,12 +688,19 @@ sub translate_vars {
 		}
 
 		if (defined $modifier && $modifier eq '!') {
-			my $key = $specific_regex ? 'ignore_regex' : 'ignore';
+			for my $elt (@{$var->{ignore}}) {
+				my $elt_regex;
+				if ($elt =~ m/^'?\//) {
+					$elt =~ s/^'?\/(.*)\/'?/$1/;
+					$elt_regex = 1;
+				}
 
-			$specific = uc $specific if $lookup_var->{storage};
+				my $key = $elt_regex ? 'regex' : 'ignore';
 
-			delete $translated_var->{parse};
-			push @{$translated_var->{parse}}, $key, $specific;
+				$elt = uc $elt if $lookup_var->{storage};
+
+				push @{$translated_var->{ignore}}, [ ($key, $elt) ];
+			}
 		} elsif (length $specific) {
 			my $key = $specific_regex ? 'regex' : 'specific';
 
@@ -727,7 +799,6 @@ sub translate_actions {
 	my ($rule, $translation, $silent) = @_;
 
 	my @silent_actions = qw(
-		capture
 		chain
 	);
 
@@ -763,6 +834,19 @@ sub translate_actions {
 			$translation->{action} = uc $action_lookup->{$key};
 		} elsif (grep { $_ eq $key } @direct_translation_actions) {
 			$translation->{$key} = $value;
+		} elsif ($key eq 'capture') {
+			$translation->{operator} eq 'REFIND' ?
+				$translation->{operator} = 'REGEX' :
+				warn 'capture set when translated operator was not REFIND';
+
+		} elsif ($key eq 'ctl') {
+			my ($opt, $data) = split /=/, $value;
+
+			if (defined $ctl_lookup->{$opt}) {
+				$ctl_lookup->{$opt}($data, $translation);
+			} else {
+				warn "Cannot translate ctl option $opt";
+			}
 		} elsif ($key eq 'expirevar') {
 			my ($var, $time)           = split /=/, $value;
 			my ($collection, $element) = split /\./, $var;

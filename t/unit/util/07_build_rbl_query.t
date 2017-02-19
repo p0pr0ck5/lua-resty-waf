@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util    = require "resty.waf.util"
 			local ip      = "127.0.0.1"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
 			ngx.say(util.build_rbl_query(ip, rbl_srv))
-		';
+		}
 	}
 --- request
 GET /t
@@ -40,13 +40,13 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util    = require "resty.waf.util"
 			local ip      = { "127.0.0.1" }
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
 			ngx.say(util.build_rbl_query(ip, rbl_srv))
-		';
+		}
 	}
 --- request
 GET /t
@@ -60,13 +60,13 @@ false
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util    = require "resty.waf.util"
 			local ip      = "im.not.an.ip"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
 			ngx.say(util.build_rbl_query(ip, rbl_srv))
-		';
+		}
 	}
 --- request
 GET /t
@@ -81,13 +81,13 @@ false
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util    = require "resty.waf.util"
 			local ip      = "999.999.999.999"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
 
 			ngx.say(util.build_rbl_query(ip, rbl_srv))
-		';
+		}
 	}
 --- request
 GET /t

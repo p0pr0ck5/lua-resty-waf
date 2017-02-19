@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "HELLO WORLD"
 			local transform = lookup.lookup["lowercase"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "hello world"
 			local transform = lookup.lookup["length"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,12 +58,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = 8001
 			local transform = lookup.lookup["length"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -77,12 +77,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = true
 			local transform = lookup.lookup["length"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

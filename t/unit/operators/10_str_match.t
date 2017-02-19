@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match("hello, 1234", "hello")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,11 +38,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match({ "99-99-99", "	_\\\\", "hello, 1234"}, "hello")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -56,11 +56,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match("HELLO, 1234", "hello")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -74,11 +74,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match({ "99-99-99", "	_\\\\", "HELLO, 1234"}, "hello")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,12 +92,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match("hello, 1234", "hello")
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -112,12 +112,12 @@ hello, 1234
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.str_match("hello, 1234", "hello")
 			ngx.say(type(match))
 			ngx.say(type(value))
-		';
+		}
 	}
 --- request
 GET /t

@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [=[hello \\ wor\\l\\\\d]=]
+			local value     = [=[hello \ wor\l\\d]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -41,13 +41,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello " wor"l""d]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -62,13 +62,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [=[hello \' wor\'l\'\'d]=]
+			local value     = [=[hello ' wor'l''d]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -83,13 +83,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello ^ wor^l^^d]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -104,13 +104,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [=[\'hello \\ wor"l^d\']=]
+			local value     = [=['hello \ wor"l^d']=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -125,13 +125,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello /wo   /rld]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -146,13 +146,13 @@ hello/wo/rld
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello (wo   (rld]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -167,13 +167,13 @@ hello(wo(rld
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello,world]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -188,13 +188,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello;world]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -209,13 +209,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[hello,wo;rld]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -230,13 +230,13 @@ hello wo rld
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[how      are you    doing]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -251,13 +251,13 @@ how are you doing
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [=[HeLLo wORlD]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -272,13 +272,13 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [=[ThIs    IS th\\e	s^\'on"g th,At  / never ( ends;]=]
+			local value     = [=[ThIs    IS th\e	s^'on"g th,At  / never ( ends;]=]
 			local transform = lookup.lookup["cmd_line"]({ _pcre_flags = "oij" }, value)
 			ngx.say(value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

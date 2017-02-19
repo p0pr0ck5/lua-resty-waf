@@ -6,7 +6,7 @@
          },
          "id" : 20001,
          "msg" : "GET/HEAD request with a body",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "nolog" : true
          },
@@ -132,7 +132,7 @@
          },
          "id" : 20006,
          "msg" : "Expect header sent in non-HTTP/1.1 request",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "nolog" : true
          },
@@ -278,7 +278,7 @@
          },
          "id" : 20012,
          "msg" : "Request sent with abnormal Range header",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^bytes=0-",
          "vars" : [
             {
@@ -307,7 +307,7 @@
          },
          "id" : 20013,
          "msg" : "Excessive number of byte range fields within one request",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
@@ -336,7 +336,7 @@
          },
          "id" : 20014,
          "msg" : "Excessive number of byte range fields within one request",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^bytes=(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,\\s?(\\d+)?\\-(\\d+)?\\,",
          "vars" : [
             {
@@ -365,7 +365,7 @@
          },
          "id" : 20015,
          "msg" : "Duplicate/broken connection header",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "\\b(keep-alive|close),\\s?(keep-alive|close)\\b",
          "vars" : [
             {

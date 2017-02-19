@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local actions = require "resty.waf.actions"
 
 			ngx.sleep = function(time)
@@ -28,7 +28,7 @@ __DATA__
 			end
 
 			actions.nondisruptive_lookup["sleep"]({ _debug = true, _debug_log_level = ngx.INFO }, 5)
-		';
+		}
 	}
 --- request
 GET /t

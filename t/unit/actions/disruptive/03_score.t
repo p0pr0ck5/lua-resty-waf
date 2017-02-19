@@ -20,15 +20,15 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local actions = require "resty.waf.actions"
 
 			actions.disruptive_lookup["SCORE"]({ _debug = true, _debug_log_level = ngx.INFO, _mode = "ACTIVE" }, {})
 
 			ngx.log(ngx.INFO, "We should see this")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

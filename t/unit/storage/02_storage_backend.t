@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
 
@@ -43,9 +43,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -60,13 +60,13 @@ Initializing an empty collection for FOO
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -79,9 +79,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -96,13 +96,13 @@ Initializing an empty collection for FOO
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -120,9 +120,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -137,13 +137,13 @@ Initializing an empty collection for FOO
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -164,9 +164,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -181,13 +181,13 @@ Initializing an empty collection for FOO
 --- http_config eval
 $::HttpConfig . q#
 	lua_shared_dict store 10m;
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -200,9 +200,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

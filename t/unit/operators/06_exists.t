@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists("foo", { "foo", "bar", "baz", "qux" })
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,11 +38,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists({ "bang", "bash", "qux" }, { "foo", "bar", "baz", "qux" })
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -56,11 +56,11 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists("far", { "foo", "bar", "baz", "qux" })
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -74,11 +74,11 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists({ "bang", "bash", "quz" }, { "foo", "bar", "baz", "qux" })
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,12 +92,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists("foo", { "foo", "bar", "baz", "qux" })
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -112,12 +112,12 @@ foo
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op = require "resty.waf.operators"
 			local match, value = op.exists("foo", { "foo", "bar", "baz", "qux" })
 			ngx.say(type(match))
 			ngx.say(type(value))
-		';
+		}
 	}
 --- request
 GET /t

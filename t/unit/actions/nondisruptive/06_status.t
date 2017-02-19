@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local actions = require "resty.waf.actions"
 
 			local ctx = {}
@@ -34,7 +34,7 @@ __DATA__
 			)
 
 			ngx.say(ctx.rule_status)
-		';
+		}
 	}
 --- request
 GET /t

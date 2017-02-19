@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local actions = require "resty.waf.actions"
 			local storage = require "resty.waf.storage"
 
@@ -29,9 +29,9 @@ __DATA__
 			end
 
 			actions.nondisruptive_lookup["deletevar"]({}, { value = "foo" }, {}, {})
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

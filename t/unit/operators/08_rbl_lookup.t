@@ -23,7 +23,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
@@ -34,7 +34,7 @@ __DATA__
 
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,7 +58,7 @@ true
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.1"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
@@ -69,7 +69,7 @@ true
 
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,7 +92,7 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op      = require "resty.waf.operators"
 			local ip      = "127.0.0.4"
 			local rbl_srv = "sbl-xbl.spamhaus.org"
@@ -103,7 +103,7 @@ nil
 
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t
@@ -119,7 +119,7 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op      = require "resty.waf.operators"
 			local ip      = nil
 			local rbl_srv = "sbl-xbl.spamhaus.org"
@@ -130,7 +130,7 @@ nil
 
 			ngx.say(match)
 			ngx.say(value)
-		';
+		}
 	}
 --- request
 GET /t

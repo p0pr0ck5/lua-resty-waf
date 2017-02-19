@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 			local logger  = require "resty.waf.log"
@@ -32,9 +32,9 @@ __DATA__
 			waf:set_option("event_log_buffer_size", 32)
 
 			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -51,7 +51,7 @@ A response is sent
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 			local logger  = require "resty.waf.log"
@@ -66,9 +66,9 @@ A response is sent
 			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(.2)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -85,7 +85,7 @@ A response is sent
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 			local logger  = require "resty.waf.log"
@@ -99,9 +99,9 @@ A response is sent
 			logger.write_log_events[waf._event_log_target](waf, "A message has been sent to a socket")
 
 			ngx.sleep(.2)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

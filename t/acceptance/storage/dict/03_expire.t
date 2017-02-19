@@ -21,13 +21,13 @@ __DATA__
 --- http_config eval
 $::HttpConfig . q#
     lua_shared_dict store 10m;
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -43,13 +43,13 @@ $::HttpConfig . q#
             storage.set_var(waf, ctx, element, element.value)
 
             storage.persist(waf, ctx.storage)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -62,15 +62,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered") then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -92,13 +92,13 @@ Not persisting a collection that wasn't altered
 --- http_config eval
 $::HttpConfig . q#
     lua_shared_dict store 10m;
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -119,13 +119,13 @@ $::HttpConfig . q#
             storage.persist(waf, ctx.storage)
 
 			ngx.sleep(.5)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -138,15 +138,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -170,13 +170,13 @@ Not persisting a collection that wasn't altered
 --- http_config eval
 $::HttpConfig . q#
     lua_shared_dict store 10m;
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -197,13 +197,13 @@ $::HttpConfig . q#
             storage.persist(waf, ctx.storage)
 
 			ngx.sleep(.5)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -216,15 +216,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -247,13 +247,13 @@ Not persisting a collection that wasn't altered
 --- http_config eval
 $::HttpConfig . q#
     lua_shared_dict store 10m;
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -278,13 +278,13 @@ $::HttpConfig . q#
             storage.set_var(waf, ctx, element, element.value)
 
             storage.persist(waf, ctx.storage)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
 			ngx.sleep(.5)
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
@@ -300,15 +300,15 @@ $::HttpConfig . q#
 			ngx.ctx = data["FOO"]
 
 			storage.persist(waf, data)
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]

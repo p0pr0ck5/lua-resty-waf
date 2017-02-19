@@ -20,13 +20,13 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.lookup["md5"]({}, value)
 			ngx.say(util.hex_encode(transform))
-		';
+		}
 	}
 --- request
 GET /t
@@ -40,13 +40,13 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.lookup["md5"]({}, value)
 			ngx.say(util.hex_encode(transform) == ngx.md5(value))
-		';
+		}
 	}
 --- request
 GET /t
@@ -60,13 +60,13 @@ true
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local util      = require "resty.waf.util"
 			local value     = "hello world"
 			local transform = lookup.lookup["sha1"]({}, value)
 			ngx.say(util.hex_encode(transform))
-		';
+		}
 	}
 --- request
 GET /t

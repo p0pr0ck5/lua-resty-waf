@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#41;&quot;]]
 			local transform = lookup.lookup["html_decode"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "%22%3E%3Cscript%3Ealert(1)%3C%2Fscript%3E"
 			local transform = lookup.lookup["uri_decode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,12 +58,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "/a//b///c"
 			local transform = lookup.lookup["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -77,12 +77,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "/a/b/./c"
 			local transform = lookup.lookup["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -96,12 +96,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "/a/d/../b/c"
 			local transform = lookup.lookup["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -115,12 +115,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "/a///b/d/../c/./e/../"
 			local transform = lookup.lookup["normalise_path"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

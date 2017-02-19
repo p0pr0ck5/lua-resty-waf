@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "aGVsbG8gd29ybGQ="
 			local transform = lookup.lookup["base64_decode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ hello world
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
 			local value     = "goodbye world"
 			local transform = lookup.lookup["base64_encode"]({}, value)
 			ngx.say(transform)
-		';
+		}
 	}
 --- request
 GET /t

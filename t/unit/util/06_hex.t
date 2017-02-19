@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util   = require "resty.waf.util"
 			local value  = "48656c6c6f2c20776f726c6421"
 			ngx.say(util.hex_decode(value))
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,11 +38,11 @@ Hello, world!
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util   = require "resty.waf.util"
 			local value  = "this is not hex"
 			ngx.say(util.hex_decode(value))
-		';
+		}
 	}
 --- request
 GET /t
@@ -56,11 +56,11 @@ this is not hex
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local util   = require "resty.waf.util"
 			local value  = "Hello, world!"
 			ngx.say(util.hex_encode(value))
-		';
+		}
 	}
 --- request
 GET /t

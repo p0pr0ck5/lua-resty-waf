@@ -228,24 +228,6 @@ translate_actions(
 	{
 		actions => [
 			{
-				action => 'capture',
-			}
-		]
-	},
-	$translation,
-	undef
-);
-is_deeply(
-	$translation,
-	{},
-	'translate capture (no warning)'
-);
-
-$translation = {};
-translate_actions(
-	{
-		actions => [
-			{
 				action => 'chain',
 			}
 		]
@@ -1204,6 +1186,188 @@ is_deeply(
 	$translation,
 	{},
 	'do not warn on translation fail when silent is set'
+);
+
+$translation = {
+	operator => 'REFIND'
+};
+translate_actions(
+	{
+		actions => [
+			{ action => 'capture' }
+		],
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		operator => 'REGEX',
+	},
+	'retranslate operator when capture is set'
+);
+
+$translation = {
+	operator => 'REFIND'
+};
+translate_actions(
+	{
+		actions => [],
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		operator => 'REFIND',
+	},
+	'do not retranslate operator when capture is not set'
+);
+$translation = {
+	operator => 'FOO'
+};
+warning_like
+	{
+		translate_actions(
+			{
+				actions => [
+					{ action => 'capture' }
+				],
+			},
+			$translation,
+			undef
+		);
+	}
+	qr/capture set when translated operator was not REFIND/,
+	'warn when capture is used with non-rx operator'
+;
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveById=12345',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_id',
+					data   => 12345
+				}
+			]
+		},
+	},
+	'translate ruleRemoveById'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=XSS',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS'
+		]
+	},
+	'translate ruleRemoveByMsg'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByTag=XSS',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS'
+		]
+	},
+	'translate ruleRemoveByTag'
+);
+
+$translation = {};
+translate_actions(
+	{
+		actions => [
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=XSS',
+			},
+			{
+				action => 'ctl',
+				value  => 'ruleRemoveByMsg=SQL',
+			}
+		]
+	},
+	$translation,
+	undef
+);
+is_deeply(
+	$translation,
+	{
+		actions => {
+			nondisrupt => [
+				{
+					action => 'rule_remove_by_meta',
+					data   => 1,
+				}
+			]
+		},
+		exceptions => [
+			'XSS',
+			'SQL',
+		]
+	},
+	'translate multiple meta removal actions'
 );
 
 done_testing;

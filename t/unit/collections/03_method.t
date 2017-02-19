@@ -20,18 +20,18 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.METHOD)
-		';
+		}
 	}
 --- request
 GET /t
@@ -45,18 +45,18 @@ GET
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(collections.METHOD)
-		';
+		}
 	}
 --- request
 POST /t
@@ -70,7 +70,7 @@ POST
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -78,9 +78,9 @@ POST
 
 			local collections = ngx.ctx.lua_resty_waf.collections
 			ngx.header["X-Method"] = collections.METHOD
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 HEAD /t
@@ -94,18 +94,18 @@ X-Method: HEAD
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			waf:exec()
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			local collections = ngx.ctx.lua_resty_waf.collections
 
 			ngx.say(type(collections.METHOD))
-		';
+		}
 	}
 --- request
 GET /t

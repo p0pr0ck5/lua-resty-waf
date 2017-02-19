@@ -1,10 +1,11 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base   = require "resty.waf.base"
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
+
+_M.version = base.version
 
 local string_upper = string.upper
 
@@ -12,7 +13,7 @@ local _valid_backends = { dict = true, memcached = true, redis = true }
 
 function _M.initialize(waf, storage, col)
 	local backend   = waf._storage_backend
-	if (not util.table_has_key(backend, _valid_backends)) then
+	if not util.table_has_key(backend, _valid_backends) then
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
@@ -29,17 +30,17 @@ function _M.set_var(waf, ctx, element, value)
 	local inc     = element.inc
 	local storage = ctx.storage
 
-	if (inc) then
+	if inc then
 		local existing = storage[col][key]
 
-		if (existing and type(existing) ~= "number") then
+		if existing and type(existing) ~= "number" then
 			logger.fatal_fail("Cannot increment a value that was not previously a number")
-		elseif (not existing) then
+		elseif not existing then
 			--_LOG_"Incrementing a non-existing value"
 			existing = 0
 		end
 
-		if (type(value) == "number") then
+		if type(value) == "number" then
 			value = value + existing
 		else
 			--_LOG_"Failed to increment a non-number, falling back to existing value"
@@ -55,7 +56,7 @@ function _M.set_var(waf, ctx, element, value)
 	storage[col]["__altered"] = true
 
 	-- track which keys to write to redis
-	if (waf._storage_backend == 'redis') then
+	if waf._storage_backend == 'redis' then
 		waf._storage_redis_setkey[key] = value
 		waf._storage_redis_setkey_t    = true
 	end
@@ -74,7 +75,7 @@ function _M.expire_var(waf, ctx, element, value)
 	storage[col]["__altered"]        = true
 
 	-- track which keys to write to redis
-	if (waf._storage_backend == 'redis') then
+	if waf._storage_backend == 'redis' then
 		waf._storage_redis_setkey['__expire_' .. key] = expire
 		--_LOG_cjson.encode(waf._storage_redis_setkey)
 	end
@@ -87,12 +88,12 @@ function _M.delete_var(waf, ctx, element)
 
 	--_LOG_"Deleting " .. col .. ":" .. key
 
-	if (storage[col][key]) then
+	if storage[col][key] then
 		storage[col][key]         = nil
 		storage[col]["__altered"] = true
 
 		-- redis cant expire specific keys in a hash so we track them for hdel when persisting
-		if (waf._storage_backend == 'redis') then
+		if waf._storage_backend == 'redis' then
 			waf._storage_redis_delkey_n = waf._storage_redis_delkey_n + 1
 			waf._storage_redis_delkey[waf._storage_redis_delkey_n] = key
 		end
@@ -103,23 +104,23 @@ end
 
 function _M.persist(waf, storage)
 	local backend   = waf._storage_backend
-	if (not util.table_has_key(backend, _valid_backends)) then
+	if not util.table_has_key(backend, _valid_backends) then
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
 	local backend_m = require("resty.waf.storage." .. backend)
 
-	if (not util.table_has_key(backend, _valid_backends)) then
+	if not util.table_has_key(backend, _valid_backends) then
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
 
 	--_LOG_'Persisting storage type ' .. backend
 
 	for col in pairs(storage) do
-		if (col ~= 'TX') then
+		if col ~= 'TX' then
 			--_LOG_'Examining ' .. col
 
-			if (storage[col]["__altered"]) then
+			if storage[col]["__altered"] then
 				storage[col]["__altered"] = nil -- dont need to persist this flag
 				backend_m.persist(waf, col, storage[col])
 			else
@@ -128,5 +129,7 @@ function _M.persist(waf, storage)
 		end
 	end
 end
+
+_M.col_prefix = 'lua_resty_waf_'
 
 return _M

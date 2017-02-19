@@ -1,10 +1,11 @@
 local _M = {}
 
+local base    = require "resty.waf.base"
 local logger  = require "resty.waf.log"
 local storage = require "resty.waf.storage"
 local util    = require "resty.waf.util"
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.alter_actions = {
 	ACCEPT = true,
@@ -15,7 +16,7 @@ _M.alter_actions = {
 _M.disruptive_lookup = {
 	ACCEPT = function(waf, ctx)
 		--_LOG_"Rule action was ACCEPT, so ending this phase with ngx.OK"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ngx.OK)
 		end
 	end,
@@ -24,13 +25,13 @@ _M.disruptive_lookup = {
 	end,
 	DENY = function(waf, ctx)
 		--_LOG_"Rule action was DENY, so telling nginx to quit"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ctx.rule_status or waf._deny_status)
 		end
 	end,
 	DROP = function(waf, ctx)
 		--_LOG_"Rule action was DROP, ending eith ngx.HTTP_CLOSE"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ngx.HTTP_CLOSE)
 		end
 	end,
@@ -76,7 +77,23 @@ _M.nondisruptive_lookup = {
 		--_LOG_"Overriding status from " .. waf._deny_status .. " to " .. status
 
 		ctx.rule_status = status
-	end
+	end,
+	rule_remove_id = function(waf, rule)
+		--_LOG_"Runtime ignoring rule " .. rule
+
+		waf._ignore_rule[rule] = true
+	end,
+	rule_remove_by_meta = function(waf, data, ctx)
+		--_LOG_"Runtime ignoring rules by meta"
+
+		-- this lookup table holds
+		local meta_rules = waf._meta_exception.meta_ids[ctx.id] or {}
+
+		for i, id in ipairs(meta_rules) do
+			--_LOG_"Runtime ignoring rule " .. id
+			waf._ignore_rule[id] = true
+		end
+	end,
 }
 
 return _M

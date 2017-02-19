@@ -19,20 +19,20 @@ __DATA__
 === TEST 1: Merge done in init
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -46,20 +46,20 @@ false
 === TEST 2: One-time global merge
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -74,12 +74,12 @@ false
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -93,22 +93,22 @@ true
 === TEST 4: Individual merge needed (scope-local ruleset change)
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
 			waf:set_option("ignore_ruleset", "42000_xss")
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -123,22 +123,22 @@ true
 === TEST 5: Ignoring ruleset triggers merge
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
 			waf:set_option("ignore_ruleset", "42000_xss")
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -153,22 +153,22 @@ true
 === TEST 6: Adding ruleset triggers merge
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
 			waf:set_option("add_ruleset", "extra")
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -183,22 +183,22 @@ true
 === TEST 7: Adding ruleset string triggers merge
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
 			waf:set_option("add_ruleset_string", "foo")
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request
@@ -213,22 +213,22 @@ true
 === TEST 8: Ignoring single rule does not trigger merge
 --- http_config eval
 $::HttpConfig . q#
-init_by_lua '
+init_by_lua_block {
 	local lua_resty_waf = require "resty.waf"
 
 	lua_resty_waf.init()
-';
+}
 #
 --- config
 	location /t {
-		access_by_lua '
+		access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
 			ngx.say(waf.need_merge)
 			waf:set_option("ignore_rule", 42001)
 			ngx.say(waf.need_merge)
-		';
+		}
 
 	}
 --- request

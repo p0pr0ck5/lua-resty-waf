@@ -1,7 +1,6 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base      = require "resty.waf.base"
 local logger    = require "resty.waf.log"
 local request   = require "resty.waf.request"
 local util      = require "resty.waf.util"
@@ -9,6 +8,8 @@ local util      = require "resty.waf.util"
 local string_format = string.format
 local string_match  = string.match
 local table_concat  = table.concat
+
+_M.version = base.version
 
 _M.lookup = {
 	access = function(waf, collections, ctx)
@@ -71,12 +72,12 @@ _M.lookup = {
 		local res_length = tonumber(collections.RESPONSE_HEADERS["content-length"])
 		local res_type   = collections.RESPONSE_HEADERS["content-type"]
 
-		if (not res_length or res_length > waf._res_body_max_size) then
+		if not res_length or res_length > waf._res_body_max_size then
 			ctx.short_circuit = not eof
 			return
 		end
 
-		if (not res_type or not util.table_has_key(res_type, waf._res_body_mime_types)) then
+		if not res_type or not util.table_has_key(res_type, waf._res_body_mime_types) then
 			ctx.short_circuit = not eof
 			return
 		end

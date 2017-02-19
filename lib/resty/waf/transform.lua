@@ -1,5 +1,6 @@
 local _M = {}
 
+local base   = require "resty.waf.base"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
@@ -9,13 +10,13 @@ local string_len   = string.len
 local string_lower = string.lower
 local string_sub   = string.sub
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.lookup = {
 	base64_decode = function(waf, value)
 		--_LOG_"Decoding from base64: " .. tostring(value)
 		local t_val = ngx.decode_base64(tostring(value))
-		if (t_val) then
+		if t_val then
 			--_LOG_"Decode successful, decoded value is " .. t_val
 			return t_val
 		else
@@ -89,7 +90,7 @@ _M.lookup = {
 		return ngx.sha1_bin(value)
 	end,
 	sql_hex_decode = function(waf, value)
-		if (string_find(value, '0x', 1, true)) then
+		if string_find(value, '0x', 1, true) then
 			value = string_sub(value, 3)
 			return util.hex_decode(value)
 		else

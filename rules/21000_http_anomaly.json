@@ -111,7 +111,7 @@
          },
          "id" : 21005,
          "msg" : "Accept header has no value",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^$",
          "vars" : [
             {
@@ -170,7 +170,7 @@
          },
          "id" : 21007,
          "msg" : "User-Agent header has no value",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^$",
          "vars" : [
             {
@@ -221,7 +221,7 @@
          "id" : 21009,
          "msg" : "Request contains content, but missing Content-Type header",
          "op_negated" : 1,
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^0$",
          "vars" : [
             {
@@ -250,7 +250,7 @@
          },
          "id" : 21010,
          "msg" : "Host header contains an IP address",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^[\\d.:]+$",
          "vars" : [
             {

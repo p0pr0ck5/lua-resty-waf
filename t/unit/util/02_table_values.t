@@ -20,7 +20,7 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local a = { foo = "bar" }
 			local b = util.table_values(a)
@@ -28,7 +28,7 @@ __DATA__
 			for i in ipairs(b) do
 				ngx.say(b[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t
@@ -42,7 +42,7 @@ bar
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local a = { foo = "bar", baz = "bat", qux = "frob" }
 			local b = util.table_values(a)
@@ -50,7 +50,7 @@ bar
 			for i in ipairs(b) do
 				ngx.say(b[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t
@@ -66,7 +66,7 @@ frob
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local a = { foo = { "bar", "baz", "bat" }, qux = { "frob" } }
 			local b = util.table_values(a)
@@ -74,7 +74,7 @@ frob
 			for i in ipairs(b) do
 				ngx.say(b[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,7 +92,7 @@ frob
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
             local util = require "resty.waf.util"
             local a = { foo = "bar", foo = "baz" }
             local b = util.table_values(a)
@@ -100,7 +100,7 @@ frob
             for i in ipairs(b) do
                 ngx.say(b[i])
             end
-        ';
+        }
     }
 --- request
 GET /t
@@ -114,7 +114,7 @@ baz
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local util = require "resty.waf.util"
 			local a = "foo, bar"
 			local b = util.table_values(a)
@@ -122,7 +122,7 @@ baz
 			for i in ipairs(b) do
 				ngx.say(b[i])
 			end
-		';
+		}
 	}
 --- request
 GET /t

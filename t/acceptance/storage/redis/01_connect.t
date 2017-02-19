@@ -19,13 +19,13 @@ __DATA__
 === TEST 1: Connect with defaults
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -42,9 +42,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -58,14 +58,14 @@ Error in connecting to redis
 === TEST 2: Connect with invalid port
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 	lua_socket_log_errors off;
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
 
@@ -84,9 +84,9 @@ $::HttpConfig . q#
 
 			local storage = require "resty.waf.storage"
 			storage.initialize(waf, data, "FOO")
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

@@ -1,10 +1,11 @@
 local _M = {}
 
 local actions = require "resty.waf.actions"
+local base    = require "resty.waf.base"
 local logger  = require "resty.waf.log"
 local util    = require "resty.waf.util"
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.lookup = {
 	ignore_ruleset = function(waf, value)
@@ -23,12 +24,12 @@ _M.lookup = {
 		waf._ignore_rule[value] = true
 	end,
 	disable_pcre_optimization = function(waf, value)
-		if (value == true) then
+		if value == true then
 			waf._pcre_flags = 'i'
 		end
 	end,
 	storage_zone = function(waf, value)
-		if (not ngx.shared[value]) then
+		if not ngx.shared[value] then
 			logger.fatal_fail("Attempted to set lua-resty-waf storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 		end
 		waf._storage_zone = value
@@ -46,11 +47,11 @@ _M.lookup = {
 		waf._nameservers[#waf._nameservers + 1] = value
 	end,
 	hook_action = function(waf, value, hook)
-		if (not util.table_has_key(value, actions.disruptive_lookup)) then
+		if not util.table_has_key(value, actions.disruptive_lookup) then
 			logger.fatal_fail(value .. " is not a valid action to override")
 		end
 
-		if (type(hook) ~= "function") then
+		if type(hook) ~= "function" then
 			logger.fatal_fail("hook_action must be defined as a function")
 		end
 

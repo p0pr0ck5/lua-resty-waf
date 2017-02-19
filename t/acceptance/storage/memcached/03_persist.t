@@ -19,13 +19,13 @@ __DATA__
 === TEST 1: Persist a collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -36,20 +36,22 @@ $::HttpConfig . q#
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			local element = { col = "FOO", key = "COUNT", value = 1 }
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -65,13 +67,13 @@ Not persisting a collection that wasn't altered
 === TEST 2: Don't persist an unaltered collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -82,17 +84,19 @@ $::HttpConfig . q#
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5 })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -107,13 +111,13 @@ Persisting value: {"
 === TEST 3: Persist an unaltered collection with expired keys
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -124,17 +128,19 @@ $::HttpConfig . q#
 			local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 			local var = require("cjson").encode({ COUNT = 5, __expire_COUNT = ngx.time() - 10, BAR = 1 })
 
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
+
 			local memcached = memcached_m:new()
 			memcached:connect(waf._storage_memcached_host, waf._storage_memcached_port)
-			memcached:set("FOO", var)
+			memcached:set(storage.col_prefix .. "FOO", var)
 
-			local storage = require "resty.waf.storage"
 			storage.initialize(waf, ctx.storage, "FOO")
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t
@@ -149,13 +155,13 @@ Not persisting a collection that wasn't altered
 === TEST 4: Don't persist the TX collection
 --- http_config eval
 $::HttpConfig . q#
-	init_by_lua '
+	init_by_lua_block {
 		local lua_resty_waf = require "resty.waf"
-	';
+	}
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
 			local memcached_m   = require "resty.memcached"
 			local lua_resty_waf = require "resty.waf"
 			local waf           = lua_resty_waf:new()
@@ -172,9 +178,9 @@ $::HttpConfig . q#
 			storage.set_var(waf, ctx, element, element.value)
 
 			storage.persist(waf, ctx.storage)
-		';
+		}
 
-		content_by_lua 'ngx.exit(ngx.HTTP_OK)';
+		content_by_lua_block {ngx.exit(ngx.HTTP_OK)}
 	}
 --- request
 GET /t

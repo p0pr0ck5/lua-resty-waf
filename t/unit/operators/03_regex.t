@@ -20,11 +20,11 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
 			ngx.say(value[0])
-		';
+		}
 	}
 --- request
 GET /t
@@ -38,11 +38,11 @@ hello
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "hello, 1234"}, "([a-z])[a-z]+")
 			ngx.say(value[0])
-		';
+		}
 	}
 --- request
 GET /t
@@ -56,11 +56,11 @@ hello
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, "HELLO, 1234", "([a-z])[a-z]+")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -74,11 +74,11 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, { "99-99-99", "	_\\\\", "HELLO, 1234"}, "([a-z])[a-z]+")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -92,11 +92,11 @@ nil
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match = op.regex({ _pcre_flags = "" }, "hello, 1234", "+([a-z])[a-z]+")
 			ngx.say(match)
-		';
+		}
 	}
 --- request
 GET /t
@@ -110,7 +110,7 @@ error in ngx.re.match:
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])([a-z]+)")
 			ngx.say(match)
@@ -118,7 +118,7 @@ error in ngx.re.match:
 			for k in ipairs(value) do
 				ngx.say(value[k])
 			end
-		';
+		}
 	}
 --- request
 GET /t
@@ -135,12 +135,12 @@ ello
 --- http_config eval: $::HttpConfig
 --- config
     location = /t {
-        content_by_lua '
+        content_by_lua_block {
 			local op    = require "resty.waf.operators"
 			local match, value = op.regex({ _pcre_flags = "" }, "hello, 1234", "([a-z])[a-z]+")
 			ngx.say(type(match))
 			ngx.say(type(value))
-		';
+		}
 	}
 --- request
 GET /t

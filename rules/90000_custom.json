@@ -35,7 +35,7 @@
          },
          "id" : 90002,
          "msg" : "SSH key scan (https://isc.sans.edu/forums/diary/Gimme+your+keys+/18231)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^\\/(?:(?:id_)?[dr]sa(?:\\.old)?|key(?:\\.priv)?)$",
          "vars" : [
             {
@@ -78,7 +78,7 @@
             "disrupt" : "CHAIN"
          },
          "id" : 90005,
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "nolog" : true
          },
@@ -115,7 +115,7 @@
          },
          "id" : 90007,
          "msg" : "Timthumb zero-day (http://seclists.org/fulldisclosure/2014/Jun/117)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "\\$\\(.*\\)",
          "vars" : [
             {
@@ -149,7 +149,7 @@
          },
          "id" : 90009,
          "msg" : "Brute force botnet affecting Wordpress domains",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "WinHttp\\.WinHttpRequest\\.5",
          "vars" : [
             {
@@ -167,7 +167,7 @@
          },
          "id" : 90010,
          "msg" : "Known *Coin miner worm (https://isc.sans.edu/forums/diary/Multi+Platform+Coin+Miner+Attacking+Routers+on+Port+32764/18353)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "Mozilla/5\\.0 \\(compatible; Zollard; Linux\\)",
          "vars" : [
             {
@@ -317,7 +317,7 @@
          },
          "id" : 90018,
          "msg" : "Slider Revolution WordPress Plugin LFI Vulnerability",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^\\.\\./wp-*|\\.php$",
          "vars" : [
             {
@@ -335,7 +335,7 @@
          },
          "id" : 90019,
          "msg" : "Bash environmental variable injection (CVE-2014-6271)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^\\(\\)",
          "vars" : [
             {
@@ -353,7 +353,7 @@
          },
          "id" : 90020,
          "msg" : "Bash environmental variable injection (CVE-2014-6271)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "^\\(\\)",
          "vars" : [
             {

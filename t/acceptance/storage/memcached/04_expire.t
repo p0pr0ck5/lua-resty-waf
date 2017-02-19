@@ -20,18 +20,21 @@ __DATA__
 === TEST 1: Initialize empty, persist and re-initialize a collection
 --- http_config eval
 $::HttpConfig . q#
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
 			waf:set_option("storage_backend", "memcached")
 			waf:set_option("debug", true)
+
+			local storage = require "resty.waf.storage"
+			storage.col_prefix = ngx.worker.pid()
 
 			local memcached_m = require "resty.memcached"
 			local memcached   = memcached_m:new()
@@ -40,20 +43,19 @@ $::HttpConfig . q#
 
             local ctx = { storage = {}, col_lookup = { FOO = "FOO" } }
 
-            local storage = require "resty.waf.storage"
             storage.initialize(waf, ctx.storage, "FOO")
 
             local element = { col = "FOO", key = "COUNT", value = 1 }
             storage.set_var(waf, ctx, element, element.value)
 
             storage.persist(waf, ctx.storage)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -66,15 +68,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered") then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -95,13 +97,13 @@ Not persisting a collection that wasn't altered
 === TEST 2: Initialize empty, set with future expiry, persist, delay, and re-initialize a collection
 --- http_config eval
 $::HttpConfig . q#
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -125,13 +127,13 @@ $::HttpConfig . q#
             storage.persist(waf, ctx.storage)
 
 			ngx.sleep(.5)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -144,15 +146,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -175,13 +177,13 @@ Not persisting a collection that wasn't altered
 === TEST 3: Initialize empty, set with expiry, persist, delay, re-initialize, and re-persist
 --- http_config eval
 $::HttpConfig . q#
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -205,13 +207,13 @@ $::HttpConfig . q#
             storage.persist(waf, ctx.storage)
 
 			ngx.sleep(.5)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -224,15 +226,15 @@ $::HttpConfig . q#
 			storage.initialize(waf, data, "FOO")
 
 			ngx.ctx = data["FOO"]
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]
@@ -254,13 +256,13 @@ Not persisting a collection that wasn't altered
 === TEST 4: Initialize empty, set some with expiry, persist, delay, re-initialize, and re-persist
 --- http_config eval
 $::HttpConfig . q#
-    init_by_lua '
+    init_by_lua_block {
         local lua_resty_waf = require "resty.waf"
-    ';
+    }
 #
 --- config
     location = /t {
-        access_by_lua '
+        access_by_lua_block {
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
 
@@ -286,13 +288,13 @@ $::HttpConfig . q#
             storage.expire_var(waf, ctx, element, 1)
 
             storage.persist(waf, ctx.storage)
-        ';
+        }
 
-        content_by_lua 'ngx.say("OK")';
+        content_by_lua_block {ngx.say("OK")}
     }
 
     location = /s {
-		access_by_lua '
+		access_by_lua_block {
 			ngx.sleep(.5)
             local lua_resty_waf = require "resty.waf"
             local waf           = lua_resty_waf:new()
@@ -308,15 +310,15 @@ $::HttpConfig . q#
 			ngx.ctx = data["FOO"]
 
 			storage.persist(waf, data)
-		';
+		}
 
-		content_by_lua '
+		content_by_lua_block {
 			for k in pairs(ngx.ctx) do
 				if (k ~= "__altered" and not k:find("__", 1, true)) then
 					ngx.say(tostring(k) .. ": " .. tostring(ngx.ctx[k]))
 				end
 			end
-		';
+		}
 	}
 --- request eval
 ["GET /t", "GET /s"]

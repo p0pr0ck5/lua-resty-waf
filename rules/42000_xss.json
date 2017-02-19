@@ -95,7 +95,7 @@
          },
          "id" : 42002,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -130,7 +130,7 @@
          },
          "id" : 42003,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -165,7 +165,7 @@
          },
          "id" : 42004,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -200,7 +200,7 @@
          },
          "id" : 42005,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -235,7 +235,7 @@
          },
          "id" : 42006,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -270,7 +270,7 @@
          },
          "id" : 42007,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -305,7 +305,7 @@
          },
          "id" : 42008,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -340,7 +340,7 @@
          },
          "id" : 42009,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -375,7 +375,7 @@
          },
          "id" : 42010,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -410,7 +410,7 @@
          },
          "id" : 42011,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -445,7 +445,7 @@
          },
          "id" : 42012,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -480,7 +480,7 @@
          },
          "id" : 42013,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -515,7 +515,7 @@
          },
          "id" : 42014,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -550,7 +550,7 @@
          },
          "id" : 42015,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -585,7 +585,7 @@
          },
          "id" : 42016,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -620,7 +620,7 @@
          },
          "id" : 42017,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -655,7 +655,7 @@
          },
          "id" : 42018,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -690,7 +690,7 @@
          },
          "id" : 42019,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -725,7 +725,7 @@
          },
          "id" : 42020,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -760,7 +760,7 @@
          },
          "id" : 42021,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -795,7 +795,7 @@
          },
          "id" : 42022,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -830,7 +830,7 @@
          },
          "id" : 42023,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -865,7 +865,7 @@
          },
          "id" : 42024,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -900,7 +900,7 @@
          },
          "id" : 42025,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -935,7 +935,7 @@
          },
          "id" : 42026,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -970,7 +970,7 @@
          },
          "id" : 42027,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1005,7 +1005,7 @@
          },
          "id" : 42028,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1040,7 +1040,7 @@
          },
          "id" : 42029,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1075,7 +1075,7 @@
          },
          "id" : 42030,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1110,7 +1110,7 @@
          },
          "id" : 42031,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1145,7 +1145,7 @@
          },
          "id" : 42032,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1180,7 +1180,7 @@
          },
          "id" : 42033,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1215,7 +1215,7 @@
          },
          "id" : 42034,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1250,7 +1250,7 @@
          },
          "id" : 42035,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1285,7 +1285,7 @@
          },
          "id" : 42036,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1320,7 +1320,7 @@
          },
          "id" : 42037,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1355,7 +1355,7 @@
          },
          "id" : 42038,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1390,7 +1390,7 @@
          },
          "id" : 42039,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1425,7 +1425,7 @@
          },
          "id" : 42040,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1460,7 +1460,7 @@
          },
          "id" : 42041,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1495,7 +1495,7 @@
          },
          "id" : 42042,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1530,7 +1530,7 @@
          },
          "id" : 42043,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1565,7 +1565,7 @@
          },
          "id" : 42044,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1600,7 +1600,7 @@
          },
          "id" : 42045,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1635,7 +1635,7 @@
          },
          "id" : 42046,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1670,7 +1670,7 @@
          },
          "id" : 42047,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1705,7 +1705,7 @@
          },
          "id" : 42048,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1740,7 +1740,7 @@
          },
          "id" : 42049,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1775,7 +1775,7 @@
          },
          "id" : 42050,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1810,7 +1810,7 @@
          },
          "id" : 42051,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1845,7 +1845,7 @@
          },
          "id" : 42052,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1880,7 +1880,7 @@
          },
          "id" : 42053,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1915,7 +1915,7 @@
          },
          "id" : 42054,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1950,7 +1950,7 @@
          },
          "id" : 42055,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -1985,7 +1985,7 @@
          },
          "id" : 42056,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2020,7 +2020,7 @@
          },
          "id" : 42057,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2055,7 +2055,7 @@
          },
          "id" : 42058,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2090,7 +2090,7 @@
          },
          "id" : 42059,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2125,7 +2125,7 @@
          },
          "id" : 42060,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2160,7 +2160,7 @@
          },
          "id" : 42061,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2195,7 +2195,7 @@
          },
          "id" : 42062,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2230,7 +2230,7 @@
          },
          "id" : 42063,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2265,7 +2265,7 @@
          },
          "id" : 42064,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2300,7 +2300,7 @@
          },
          "id" : 42065,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2335,7 +2335,7 @@
          },
          "id" : 42066,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2370,7 +2370,7 @@
          },
          "id" : 42067,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2405,7 +2405,7 @@
          },
          "id" : 42068,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "pattern" : "\\.fromcharcode\\b",
          "vars" : [
             {
@@ -2434,7 +2434,7 @@
          },
          "id" : 42069,
          "msg" : "XSS (Cross-Site Scripting) - HTML Tag Handler",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2469,7 +2469,7 @@
          },
          "id" : 42070,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2504,7 +2504,7 @@
          },
          "id" : 42071,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2539,7 +2539,7 @@
          },
          "id" : 42072,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2574,7 +2574,7 @@
          },
          "id" : 42073,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2609,7 +2609,7 @@
          },
          "id" : 42074,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2644,7 +2644,7 @@
          },
          "id" : 42075,
          "msg" : "XSS (Cross-Site Scripting) - Style Tag Manipulation",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2679,7 +2679,7 @@
          },
          "id" : 42076,
          "msg" : "XSS (Cross-Site Scripting) - JS Fragments",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2714,7 +2714,7 @@
          },
          "id" : 42077,
          "msg" : "XSS (Cross-Site Scripting) - CSS Fragments",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2749,7 +2749,7 @@
          },
          "id" : 42078,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2784,7 +2784,7 @@
          },
          "id" : 42079,
          "msg" : "XSS (Cross-Site Scripting) - xss testing alert",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2819,7 +2819,7 @@
          },
          "id" : 42080,
          "msg" : "XSS (Cross-Site Scripting) - ASCII alert",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2854,7 +2854,7 @@
          },
          "id" : 42081,
          "msg" : "XSS (Cross-Site Scripting) - xss testing alert",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2889,7 +2889,7 @@
          },
          "id" : 42082,
          "msg" : "XSS (Cross-Site Scripting)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2924,7 +2924,7 @@
          },
          "id" : 42083,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2959,7 +2959,7 @@
          },
          "id" : 42084,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -2994,7 +2994,7 @@
          },
          "id" : 42085,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3029,7 +3029,7 @@
          },
          "id" : 42086,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3064,7 +3064,7 @@
          },
          "id" : 42087,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3099,7 +3099,7 @@
          },
          "id" : 42088,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3134,7 +3134,7 @@
          },
          "id" : 42089,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3169,7 +3169,7 @@
          },
          "id" : 42090,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3204,7 +3204,7 @@
          },
          "id" : 42091,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3239,7 +3239,7 @@
          },
          "id" : 42092,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3274,7 +3274,7 @@
          },
          "id" : 42093,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3309,7 +3309,7 @@
          },
          "id" : 42094,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3344,7 +3344,7 @@
          },
          "id" : 42095,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3379,7 +3379,7 @@
          },
          "id" : 42096,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",
@@ -3414,7 +3414,7 @@
          },
          "id" : 42097,
          "msg" : "XSS (Cross-Site Scripting) - IE Filter",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : [
                "html_decode",

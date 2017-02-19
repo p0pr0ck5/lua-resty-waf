@@ -20,12 +20,12 @@ __DATA__
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local random = require "resty.waf.random"
 			local string = random.random_bytes(8)
 
 			ngx.say(string)
-		';
+		}
 	}
 --- request
 GET /t
@@ -39,12 +39,12 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local random = require "resty.waf.random"
 			local string = random.random_bytes(16)
 
 			ngx.say(string)
-		';
+		}
 	}
 --- request
 GET /t
@@ -58,13 +58,13 @@ GET /t
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
-		content_by_lua '
+		content_by_lua_block {
 			local random = require "resty.waf.random"
 			local str1   = random.random_bytes(8)
 			local str2   = random.random_bytes(8)
 
 			ngx.say(str1 == str2)
-		';
+		}
 	}
 --- request
 GET /t

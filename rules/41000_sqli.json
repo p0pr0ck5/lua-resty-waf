@@ -17,7 +17,7 @@
          },
          "id" : 41001,
          "msg" : "SQL Comment Sequence",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -49,7 +49,7 @@
          },
          "id" : 41002,
          "msg" : "SQL Hex Encoding",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -81,7 +81,7 @@
          },
          "id" : 41003,
          "msg" : "SQL String Termination",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -113,7 +113,7 @@
          },
          "id" : 41004,
          "msg" : "SQL Operators",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -145,7 +145,7 @@
          },
          "id" : 41005,
          "msg" : "SQL Tautologies",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -177,7 +177,7 @@
          },
          "id" : 41006,
          "msg" : "Common database name detected",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -209,7 +209,7 @@
          },
          "id" : 41007,
          "msg" : "Blind SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -241,7 +241,7 @@
          },
          "id" : 41008,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -273,7 +273,7 @@
          },
          "id" : 41009,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -305,7 +305,7 @@
          },
          "id" : 41010,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -337,7 +337,7 @@
          },
          "id" : 41011,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -369,7 +369,7 @@
          },
          "id" : 41012,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -401,7 +401,7 @@
          },
          "id" : 41013,
          "msg" : "SQL Injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -433,7 +433,7 @@
          },
          "id" : 41014,
          "msg" : "SQL Injection character anomaly - COOKIES",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -465,7 +465,7 @@
          },
          "id" : 41015,
          "msg" : "SQL Injection character anomaly - ARGS",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -497,7 +497,7 @@
          },
          "id" : 41016,
          "msg" : "SQL Injection payload",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -529,7 +529,7 @@
          },
          "id" : 41017,
          "msg" : "MSSQL code injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -561,7 +561,7 @@
          },
          "id" : 41018,
          "msg" : "MySQL comment-/space-obfuscated injections and backtick termination",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -593,7 +593,7 @@
          },
          "id" : 41019,
          "msg" : "Chained SQL injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -625,7 +625,7 @@
          },
          "id" : 41020,
          "msg" : "SQL integer overflow",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -657,7 +657,7 @@
          },
          "id" : 41021,
          "msg" : "SQL sleep and benchmark queries",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -689,7 +689,7 @@
          },
          "id" : 41022,
          "msg" : "Conditional SQL injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -721,7 +721,7 @@
          },
          "id" : 41023,
          "msg" : "MySQL charset switch attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -753,7 +753,7 @@
          },
          "id" : 41024,
          "msg" : "SQL MERGE, EXECUTE, IMMEDIATE, HAVING injections",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -785,7 +785,7 @@
          },
          "id" : 41025,
          "msg" : "SQL injection (authentication bypass)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -817,7 +817,7 @@
          },
          "id" : 41026,
          "msg" : "Common MySQL and Oracle SQL injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -849,7 +849,7 @@
          },
          "id" : 41027,
          "msg" : "Posgres pg_sleep injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -881,7 +881,7 @@
          },
          "id" : 41028,
          "msg" : "MongoDB SQL injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -913,7 +913,7 @@
          },
          "id" : 41029,
          "msg" : "MySQL comment and char injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -945,7 +945,7 @@
          },
          "id" : 41030,
          "msg" : "Chained SQL injection attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -977,7 +977,7 @@
          },
          "id" : 41031,
          "msg" : "MySQL stored procedure function injection",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -1009,7 +1009,7 @@
          },
          "id" : 41032,
          "msg" : "SQL probing attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -1041,7 +1041,7 @@
          },
          "id" : 41033,
          "msg" : " SQL injection (authentication bypass)",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -1073,7 +1073,7 @@
          },
          "id" : 41034,
          "msg" : "MySQL UDF injection/data structure manipulation",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -1105,7 +1105,7 @@
          },
          "id" : 41035,
          "msg" : "Concatenated SQL injection / SQLLFI",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
@@ -1137,7 +1137,7 @@
          },
          "id" : 41036,
          "msg" : "SQL probing attempt",
-         "operator" : "REGEX",
+         "operator" : "REFIND",
          "opts" : {
             "transform" : "uri_decode"
          },
