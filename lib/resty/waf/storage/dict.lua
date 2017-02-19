@@ -1,10 +1,11 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base    = require "resty.waf.base"
 local cjson   = require "cjson"
 local logger  = require "resty.waf.log"
 local storage = require "resty.waf.storage"
+
+_M.version = base.version
 
 _M.col_prefix = storage.col_prefix
 

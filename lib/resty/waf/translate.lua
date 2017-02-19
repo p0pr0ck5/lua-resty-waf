@@ -1,6 +1,6 @@
 local _M = {}
 
-_M.version = "0.9"
+local base = require "resty.waf.base"
 
 local re_find   = ngx.re.find
 local re_match  = ngx.re.match
@@ -11,6 +11,8 @@ local str_fmt   = string.format
 
 local log = ngx.log
 local WARN = ngx.WARN
+
+_M.version = base.version
 
 -- table.new(narr, nrec)
 local succ, new_tab = pcall(require, "table.new")

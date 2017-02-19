@@ -1,10 +1,11 @@
 local _M = {}
 
+local base    = require "resty.waf.base"
 local logger  = require "resty.waf.log"
 local storage = require "resty.waf.storage"
 local util    = require "resty.waf.util"
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.alter_actions = {
 	ACCEPT = true,

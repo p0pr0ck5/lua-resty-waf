@@ -1,5 +1,6 @@
 local _M = {}
 
+local base   = require "resty.waf.base"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
@@ -9,7 +10,7 @@ local string_len   = string.len
 local string_lower = string.lower
 local string_sub   = string.sub
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.lookup = {
 	base64_decode = function(waf, value)

@@ -1,8 +1,7 @@
 local _M = {}
 
-_M.version = "0.9"
-
 local actions       = require "resty.waf.actions"
+local base          = require "resty.waf.base"
 local calc          = require "resty.waf.rule_calc"
 local collections_t = require "resty.waf.collections"
 local logger        = require "resty.waf.log"
@@ -22,6 +21,8 @@ local ngx_INFO = ngx.INFO
 local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
 local mt = { __index = _M }
+
+_M.version = base.lua
 
 -- default list of rulesets
 local _global_rulesets = {

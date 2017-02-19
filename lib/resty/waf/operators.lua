@@ -1,8 +1,7 @@
 local _M = {}
 
-_M.version = "0.9"
-
 local ac        = require "resty.waf.load_ac"
+local base      = require "resty.waf.base"
 local dns       = require "resty.dns.resolver"
 local iputils   = require "resty.iputils"
 local libinject = require "resty.libinjection"
@@ -17,6 +16,8 @@ local _ac_dicts = {}
 
 -- module-level cache of cidr objects
 local _cidr_cache = {}
+
+_M.version = base.version
 
 function _M.equals(a, b)
 	local equals, value

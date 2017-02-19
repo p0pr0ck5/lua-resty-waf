@@ -1,7 +1,6 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base   = require "resty.waf.base"
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
 
@@ -13,6 +12,8 @@ local string_gmatch = string.gmatch
 local string_match  = string.match
 local string_upper  = string.upper
 local table_concat  = table.concat
+
+_M.version = base.version
 
 -- duplicate a table using recursion if necessary for multi-dimensional tables
 -- useful for getting a local copy of a table

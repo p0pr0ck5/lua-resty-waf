@@ -1,10 +1,11 @@
 local _M = {}
 
 local actions = require "resty.waf.actions"
+local base    = require "resty.waf.base"
 local logger  = require "resty.waf.log"
 local util    = require "resty.waf.util"
 
-_M.version = "0.9"
+_M.version = base.version
 
 _M.lookup = {
 	ignore_ruleset = function(waf, value)

@@ -1,15 +1,16 @@
 local _M = {}
 
-_M.version = "0.9"
-
 local cookiejar = require "resty.cookie"
 local upload	= require "resty.upload"
 
+local base   = require "resty.waf.base"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
 local table_concat = table.concat
 local table_insert = table.insert
+
+_M.version = base.version
 
 function _M.parse_request_body(waf, request_headers)
 	local content_type_header = request_headers["content-type"]

@@ -1,8 +1,9 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base = require "resty.waf.base"
 local util = require "resty.waf.util"
+
+_M.version = base.version
 
 _M.phases = { access = 1, header_filter = 2, body_filter = 3, log = 4 }
 

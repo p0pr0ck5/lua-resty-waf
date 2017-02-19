@@ -1,9 +1,11 @@
 local _M = {}
 
+local base = require "resty.waf.base"
+
 local table_concat = table.concat
 local table_insert = table.insert
 
-_M.version = "0.9"
+_M.version = base.version
 
 local function _transform_collection_key(transform)
 	if not transform then

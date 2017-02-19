@@ -1,7 +1,6 @@
 local _M = {}
 
-_M.version = "0.9"
-
+local base      = require "resty.waf.base"
 local logger    = require "resty.waf.log"
 local request   = require "resty.waf.request"
 local util      = require "resty.waf.util"
@@ -9,6 +8,8 @@ local util      = require "resty.waf.util"
 local string_format = string.format
 local string_match  = string.match
 local table_concat  = table.concat
+
+_M.version = base.version
 
 _M.lookup = {
 	access = function(waf, collections, ctx)
