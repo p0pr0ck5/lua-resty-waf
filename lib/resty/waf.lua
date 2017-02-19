@@ -36,6 +36,7 @@ local _global_rulesets = {
 	"90000_custom",
 	"99000_scoring"
 }
+_M.global_rulesets = _global_rulesets
 
 -- ruleset table cache
 local _ruleset_defs = {}
