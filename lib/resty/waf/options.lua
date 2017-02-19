@@ -23,12 +23,12 @@ _M.lookup = {
 		waf._ignore_rule[value] = true
 	end,
 	disable_pcre_optimization = function(waf, value)
-		if (value == true) then
+		if value == true then
 			waf._pcre_flags = 'i'
 		end
 	end,
 	storage_zone = function(waf, value)
-		if (not ngx.shared[value]) then
+		if not ngx.shared[value] then
 			logger.fatal_fail("Attempted to set lua-resty-waf storage zone as " .. tostring(value) .. ", but that lua_shared_dict does not exist")
 		end
 		waf._storage_zone = value
@@ -46,11 +46,11 @@ _M.lookup = {
 		waf._nameservers[#waf._nameservers + 1] = value
 	end,
 	hook_action = function(waf, value, hook)
-		if (not util.table_has_key(value, actions.disruptive_lookup)) then
+		if not util.table_has_key(value, actions.disruptive_lookup) then
 			logger.fatal_fail(value .. " is not a valid action to override")
 		end
 
-		if (type(hook) ~= "function") then
+		if type(hook) ~= "function" then
 			logger.fatal_fail("hook_action must be defined as a function")
 		end
 

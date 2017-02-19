@@ -20,7 +20,7 @@ function _M.table_copy(orig)
 	local orig_type = type(orig)
 	local copy
 
-	if (orig_type == 'table') then
+	if orig_type == 'table' then
 		copy = {}
 
 		for orig_key, orig_value in next, orig, nil do
@@ -36,7 +36,7 @@ end
 
 -- return a table containing the keys of the provided table
 function _M.table_keys(table)
-	if (type(table) ~= "table") then
+	if type(table) ~= "table" then
 		logger.fatal_fail(type(table) .. " was given to table_keys!")
 	end
 
@@ -53,7 +53,7 @@ end
 
 -- return a table containing the values of the provided table
 function _M.table_values(table)
-	if (type(table) ~= "table") then
+	if type(table) ~= "table" then
 		logger.fatal_fail(type(table) .. " was given to table_values!")
 	end
 
@@ -63,7 +63,7 @@ function _M.table_values(table)
 	for _, value in pairs(table) do
 		-- if a table as a table of values, we need to break them out and add them individually
 		-- request_url_args is an example of this, e.g. ?foo=bar&foo=bar2
-		if (type(value) == "table") then
+		if type(value) == "table" then
 			for _, values in pairs(value) do
 				n = n + 1
 				t[n] = tostring(values)
@@ -79,7 +79,7 @@ end
 
 -- return true if the table key exists
 function _M.table_has_key(needle, haystack)
-	if (type(haystack) ~= "table") then
+	if type(haystack) ~= "table" then
 		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 
@@ -88,12 +88,12 @@ end
 
 -- determine if the haystack table has a needle for a key
 function _M.table_has_value(needle, haystack)
-	if (type(haystack) ~= "table") then
+	if type(haystack) ~= "table" then
 		logger.fatal_fail("Cannot search for a needle when haystack is type " .. type(haystack))
 	end
 
 	for _, value in pairs(haystack) do
-		if (value == needle) then
+		if value == needle then
 			return true
 		end
 	end
@@ -120,12 +120,12 @@ function _M.parse_dynamic_value(waf, key, collections)
 		local val      = collections[string_upper(m[1])]
 		local specific = m[2]
 
-		if (not val) then
+		if not val then
 			logger.fatal_fail("Bad dynamic parse, no collection key " .. m[1])
 		end
 
-		if (type(val) == "table") then
-			if (specific) then
+		if type(val) == "table" then
+			if specific then
 				return tostring(val[specific])
 			else
 				return m[1]
@@ -142,7 +142,7 @@ function _M.parse_dynamic_value(waf, key, collections)
 
 	--_LOG_"Parsed dynamic value is " .. str
 
-	if (ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags)) then
+	if ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags) then
 		return tonumber(str)
 	else
 		return str
@@ -168,7 +168,7 @@ function _M.load_ruleset_file(name)
 		local full_name = path .. "rules/" .. name .. ".json"
 
 		local f = io.open(full_name)
-		if (f ~= nil) then
+		if f ~= nil then
 			local data = f:read("*all")
 
 			f:close()
@@ -204,13 +204,13 @@ end
 
 -- build an RBLDNS query by reversing the octets of an IPv4 address and prepending that to the rbl server name
 function _M.build_rbl_query(ip, rbl_srv)
-	if (type(ip) ~= 'string') then
+	if type(ip) ~= 'string' then
 		return false
 	end
 
 	local o1, o2, o3, o4 = ip:match("(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)%.(%d%d?%d?)")
 
-	if (not o1 and not o2 and not o3 and not o4) then
+	if not o1 and not o2 and not o3 and not o4 then
 		return false
 	end
 
@@ -232,9 +232,9 @@ _M.parse_collection = {
 		local _collection = {}
 		for k, _ in pairs(collection) do
 			--_LOG_"checking " .. k
-			if (ngx.re.find(k, value, waf._pcre_flags)) then
+			if ngx.re.find(k, value, waf._pcre_flags) then
 				v = collection[k]
-				if (type(v) == "table") then
+				if type(v) == "table" then
 					for __, _v in pairs(v) do
 						n = n + 1
 						_collection[n] = _v
@@ -279,7 +279,7 @@ _M.sieve_collection = {
 		--_LOG_"Sieveing regex value " .. value
 		for k, _ in pairs(collection) do
 			--_LOG_"Checking " .. k
-			if (ngx.re.find(k, value, waf._pcre_flags)) then
+			if ngx.re.find(k, value, waf._pcre_flags) then
 				--_LOG_"Removing " .. k
 				collection[k] = nil
 			end
@@ -298,7 +298,7 @@ function _M.rule_exception(exception_table, rule)
 
 	for i, exception in ipairs(rule.exceptions) do
 		for key, rules in pairs(exception_table.msgs) do
-			if (re_find(key, exception, 'jo')) then
+			if re_find(key, exception, 'jo') then
 				for j, id in ipairs(rules) do
 					count = count + 1
 					ids[count] = id
@@ -307,7 +307,7 @@ function _M.rule_exception(exception_table, rule)
 		end
 
 		for key, rules in pairs(exception_table.tags) do
-			if (re_find(key, exception, 'jo')) then
+			if re_find(key, exception, 'jo') then
 				for j, id in ipairs(rules) do
 					count = count + 1
 					ids[count] = id

@@ -15,7 +15,7 @@ function _M.initialize(waf, storage, col)
 	local port      = waf._storage_redis_port
 
 	local ok, err = redis:connect(host, port)
-	if (not ok) then
+	if not ok then
 		logger.warn(waf, "Error in connecting to redis: " .. err)
 		storage[col] = {}
 		return
@@ -24,30 +24,30 @@ function _M.initialize(waf, storage, col)
 	local col_name = _M.col_prefix .. col
 
 	local array, err = redis:hgetall(col_name)
-	if (err) then
+	if err then
 		logger.warn(waf, "Error retrieving " .. col .. ": " .. err)
 		storage[col] = {}
 		return
 	end
 
-	if (waf._storage_keepalive) then
+	if waf._storage_keepalive then
 		local timeout = waf._storage_keepalive_timeout
 		local size    = waf._storage_keepalive_pool_size
 
 		local ok, err = redis:set_keepalive(timeout, size)
-		if (not ok) then
+		if not ok then
 			logger.warn(waf, "Error setting redis keepalive: " .. err)
 		end
 	else
 		local ok, err = redis:close()
-		if (not ok) then
+		if not ok then
 			logger.warn(waf, "Error closing redis socket: " .. err)
 		end
 	end
 
 	local altered = false
 
-	if (#array == 0) then
+	if #array == 0 then
 		--_LOG_"Initializing an empty collection for " .. col
 		storage[col] = {}
 	else
@@ -57,9 +57,9 @@ function _M.initialize(waf, storage, col)
 		-- the expired key from the in-memory collection table, and mark
 		-- the key for deletion via hdel when we persist
 		for key in pairs(data) do
-			if (not key:find("__", 1, true) and data["__expire_" .. key]) then
+			if not key:find("__", 1, true) and data["__expire_" .. key] then
 				--_LOG_"checking " .. key
-				if (tonumber(data["__expire_" .. key]) < ngx.now()) then
+				if tonumber(data["__expire_" .. key]) < ngx.now() then
 					-- do the actual removal
 					--_LOG_"Removing expired key: " .. key
 					data["__expire_" .. key] = nil
@@ -96,7 +96,7 @@ function _M.persist(waf, col, data)
 	local port  = waf._storage_redis_port
 
 	local ok, err = redis:connect(host, port)
-	if (not ok) then
+	if not ok then
 		logger.warn(waf, "Error in connecting to redis: " .. err)
 		return
 	end
@@ -107,7 +107,7 @@ function _M.persist(waf, col, data)
 	local col_name = _M.col_prefix .. col
 
 	-- build the hdel command to drop expired/deleted keys
-	if (waf._storage_redis_delkey_n > 0) then
+	if waf._storage_redis_delkey_n > 0 then
 		--_LOG_"Redis hdel"
 		for i=1, waf._storage_redis_delkey_n do
 			local k = waf._storage_redis_delkey[i]
@@ -116,28 +116,28 @@ function _M.persist(waf, col, data)
 	end
 
 	-- build the hmset command to save affected keys
-	if (waf._storage_redis_setkey_t) then
+	if waf._storage_redis_setkey_t then
 		--_LOG_"Redis hmset"
 		redis:hmset(col_name, waf._storage_redis_setkey)
 	end
 
 	-- do it
 	local ok, err = redis:commit_pipeline()
-	if (not ok) then
+	if not ok then
 		logger.warn(waf, "Error in redis pipelining: " .. err)
 	end
 
-	if (waf._storage_keepalive) then
+	if waf._storage_keepalive then
 		local timeout = waf._storage_keepalive_timeout
 		local size    = waf._storage_keepalive_pool_size
 
 		local ok, err = redis:set_keepalive(timeout, size)
-		if (not ok) then
+		if not ok then
 			logger.warn(waf, "Error setting redis keepalive: " .. err)
 		end
 	else
 		local ok, err = redis:close()
-		if (not ok) then
+		if not ok then
 			logger.warn(waf, "Error closing redis socket: " .. err)
 		end
 	end

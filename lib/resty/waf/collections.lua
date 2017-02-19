@@ -71,12 +71,12 @@ _M.lookup = {
 		local res_length = tonumber(collections.RESPONSE_HEADERS["content-length"])
 		local res_type   = collections.RESPONSE_HEADERS["content-type"]
 
-		if (not res_length or res_length > waf._res_body_max_size) then
+		if not res_length or res_length > waf._res_body_max_size then
 			ctx.short_circuit = not eof
 			return
 		end
 
-		if (not res_type or not util.table_has_key(res_type, waf._res_body_mime_types)) then
+		if not res_type or not util.table_has_key(res_type, waf._res_body_mime_types) then
 			ctx.short_circuit = not eof
 			return
 		end

@@ -15,7 +15,7 @@ _M.lookup = {
 	base64_decode = function(waf, value)
 		--_LOG_"Decoding from base64: " .. tostring(value)
 		local t_val = ngx.decode_base64(tostring(value))
-		if (t_val) then
+		if t_val then
 			--_LOG_"Decode successful, decoded value is " .. t_val
 			return t_val
 		else
@@ -89,7 +89,7 @@ _M.lookup = {
 		return ngx.sha1_bin(value)
 	end,
 	sql_hex_decode = function(waf, value)
-		if (string_find(value, '0x', 1, true)) then
+		if string_find(value, '0x', 1, true) then
 			value = string_sub(value, 3)
 			return util.hex_decode(value)
 		else

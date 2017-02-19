@@ -15,7 +15,7 @@ _M.alter_actions = {
 _M.disruptive_lookup = {
 	ACCEPT = function(waf, ctx)
 		--_LOG_"Rule action was ACCEPT, so ending this phase with ngx.OK"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ngx.OK)
 		end
 	end,
@@ -24,13 +24,13 @@ _M.disruptive_lookup = {
 	end,
 	DENY = function(waf, ctx)
 		--_LOG_"Rule action was DENY, so telling nginx to quit"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ctx.rule_status or waf._deny_status)
 		end
 	end,
 	DROP = function(waf, ctx)
 		--_LOG_"Rule action was DROP, ending eith ngx.HTTP_CLOSE"
-		if (waf._mode == "ACTIVE") then
+		if waf._mode == "ACTIVE" then
 			ngx.exit(ngx.HTTP_CLOSE)
 		end
 	end,

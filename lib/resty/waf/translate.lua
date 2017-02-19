@@ -179,7 +179,7 @@ local function table_copy(orig)
 	local orig_type = type(orig)
 	local copy
 
-	if (orig_type == 'table') then
+	if orig_type == 'table' then
 		copy = {}
 
 		for orig_key, orig_value in next, orig, nil do
@@ -248,7 +248,7 @@ local ctl_lookup = {
 }
 
 function _M.strip_encap_quotes(str)
-	if (re_find(str, [=[^(['"])(.*)\1$]=])) then
+	if re_find(str, [=[^(['"])(.*)\1$]=]) then
 		return re_sub(str, [=[^(['"])(.*)\1$]=], "$2")
 	end
 
@@ -327,7 +327,7 @@ function _M.clean_input(input)
 			-- trim whitespace
 			line = re_gsub(line, [[^\s*|\s*$]], '')
 
-			if (re_match(line, [[\s*\\\s*$]])) then
+			if re_match(line, [[\s*\\\s*$]]) then
 				-- strip the multi-line escape and surrounding whitespace
 				line = re_gsub(line, [[\s*\\\s*$]], '')
 				table.insert(line_buf, line)
@@ -360,11 +360,11 @@ function _M.tokenize(line)
 	repeat
 		local m = re_match(line, re_quoted)
 
-		if (not m) then
+		if not m then
 			m = re_match(line, re_unquoted)
 		end
 
-		if (not m) then
+		if not m then
 			error('token did not match quoted or unquoted patterns')
 		end
 
@@ -406,7 +406,7 @@ function _M.parse_vars(raw_vars)
 			if not inbuf then sentinal = true end
 		end
 
-		if (re_find(chunk, [[\/'?$]])) then
+		if re_find(chunk, [[\/'?$]]) then
 			sentinal = true
 		end
 
@@ -430,12 +430,12 @@ function _M.parse_vars(raw_vars)
 
 		local dopush = true
 
-		if (string.find(var, '&', 1, true)) then
+		if string.find(var, '&', 1, true) then
 			var = string.sub(var, 2, #var)
 			parsed.modifier = '&'
 		end
 
-		if (string.find(var, '!', 1, true)) then
+		if string.find(var, '!', 1, true) then
 			var = string.sub(var, 2, #var)
 			parsed.modifier = '!'
 
@@ -515,7 +515,7 @@ function _M.parse_actions(raw_actions)
 			if not inbuf then sentinal = true end
 		end
 
-		if (re_find(chunk, [['$]])) then
+		if re_find(chunk, [['$]]) then
 			sentinal = true
 		end
 
@@ -557,13 +557,13 @@ function _M.parse_tokens(tokens)
 	entry["original"] = table.concat(tokens, ' ')
 
 	directive = table.remove(tokens, 1)
-	if (directive == 'SecRule') then
+	if directive == 'SecRule' then
 		vars = table.remove(tokens, 1)
 		operator = table.remove(tokens, 1)
 	end
 	actions = table.remove(tokens)
 
-	if (#tokens ~= 0) then error(#tokens .. " tokens when we should have 0") end
+	if #tokens ~= 0 then error(#tokens .. " tokens when we should have 0") end
 
 	entry.directive = directive
 	if vars then entry.vars = _M.parse_vars(vars) end
@@ -585,7 +585,7 @@ function _M.build_chains(rules)
 		table.insert(chain, rule)
 
 		local is_chain
-		if (type(rule.actions) == 'table') then
+		if type(rule.actions) == 'table' then
 			for j = 1, #rule.actions do
 				local action = rule.actions[j]
 				if action.action == 'chain' then is_chain = true; break end
@@ -610,7 +610,7 @@ function _M.translate_vars(rule, translation, force)
 			local original_var = var.variable
 			local lookup_var   = table_copy(valid_vars[original_var])
 
-			if (not lookup_var or not lookup_var.type) then
+			if not lookup_var or not lookup_var.type then
 				error("no valid var " .. original_var)
 			end
 
@@ -960,15 +960,15 @@ function _M.translate_chain(chain, opts)
 
 		local directive = rule.directive
 
-		if (rule.directive == 'SecRule') then
+		if rule.directive == 'SecRule' then
 			_M.translate_vars(rule, translation, opts.force)
 			_M.translate_operator(rule, translation, opts.path)
-		elseif (directive == 'SecAction' or directive == 'SecMarker') then
+		elseif directive == 'SecAction' or directive == 'SecMarker' then
 			translation.vars = { unconditional = true }
 
 			-- SecMarker is a rule that never matches
 			-- with its only action representing its ID
-			if (directive == 'SecMarker') then
+			if directive == 'SecMarker' then
 				translation.op_negated = true
 
 				local marker = table.remove(rule.actions, 1)
@@ -1000,13 +1000,13 @@ function _M.translate_chain(chain, opts)
 
 		-- if we've reached the end of the chain, assign our values that
 		-- had to be pushed from the chain starter, or assign the default
-		if (i == #chain) then
+		if i == #chain then
 			for j = 1, #end_actions do
 				local end_action = end_actions[j]
 
-				if (chain_action[end_action]) then
+				if chain_action[end_action] then
 					translation[end_action] = chain_action[end_action]
-				elseif (action_defaults[end_action]) then
+				elseif action_defaults[end_action] then
 					translation[end_action] = action_defaults[end_action]
 				end
 			end
