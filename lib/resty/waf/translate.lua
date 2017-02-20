@@ -1051,7 +1051,8 @@ function _M.translate_chains(chains, opts)
 	local lua_resty_waf_chains = {
 		access        = {},
 		body_filter   = {},
-		header_filter = {}
+		header_filter = {},
+		log           = {},
 	}
 
 	local errs = {}

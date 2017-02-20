@@ -11,6 +11,7 @@ describe("translate_chains", function()
 			access        = {},
 			header_filter = {},
 			body_filter   = {},
+			log           = {},
 		})
 		assert.is.equals(err, nil)
 	end)
@@ -39,6 +40,7 @@ describe("translate_chains", function()
 			},
 			header_filter = {},
 			body_filter   = {},
+			log           = {},
 		})
 		assert.is.equals(err, nil)
 		assert.spy(s).was.called(1)
@@ -80,6 +82,7 @@ describe("translate_chains", function()
 			},
 			header_filter = {},
 			body_filter   = {},
+			log           = {},
 		})
 		assert.is.equals(err, nil)
 		assert.spy(s).was.called(1)
@@ -132,6 +135,7 @@ describe("translate_chains", function()
 			},
 			header_filter = {},
 			body_filter   = {},
+			log           = {},
 		})
 		assert.is.equals(err, nil)
 		assert.spy(s).was.called(2)
@@ -157,6 +161,7 @@ describe("translate_chains", function()
 				access        = {},
 				header_filter = {},
 				body_filter   = {},
+				log           = {},
 			})
 			assert.are.same(err[1].orig, { 'orig' })
 			assert.is_true(not not ngx.re.match(err[1].err, [[nope!]]))
@@ -210,6 +215,7 @@ describe("translate_chains", function()
 			},
 			header_filter = {},
 			body_filter   = {},
+			log           = {},
 		})
 		assert.are.same(err[1].orig, { 'orig12345', 'orig12346' })
 		assert.is_true(not not ngx.re.match(err[1].err, [[meganope]]))
