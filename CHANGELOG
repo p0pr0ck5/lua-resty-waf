@@ -4,6 +4,8 @@ v0.10.1                                                             Feb 20, 2017
 
     * Bugfix: Accurate handling of macro expansion in operators
 
+    * Improvement: Do not execute when translaction was previously altered
+
 v0.10                                                               Feb 18, 2017
 
     * Feature: Implement in-line SecRules translation
