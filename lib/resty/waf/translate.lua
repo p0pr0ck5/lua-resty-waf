@@ -734,7 +734,11 @@ function _M.translate_operator(rule, translation, path)
 		translation.pattern = pattern
 	end
 
-	if expand_operators[original_operator] then
+	local doexpand = expand_operators[original_operator] or
+		(type(translation.pattern) == 'string' and
+		re_find(translation.pattern, "%{([^}]+)}"))
+
+	if doexpand then
 		if not translation.opts then translation.opts = {} end
 		translation.opts.parsepattern = true
 		translation.pattern = _M.translate_macro(translation.pattern)
