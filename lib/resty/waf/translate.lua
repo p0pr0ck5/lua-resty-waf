@@ -74,6 +74,7 @@ local valid_vars = {
 	TIME_YEAR               = { type = 'TIME_YEAR' },
 	TX                      = { type = 'TX', storage = true },
 	IP                      = { type = 'IP', storage = true },
+	GLOBAL                  = { type = 'GLOBAL', storage = true },
 }
 
 local valid_operators = {
