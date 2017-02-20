@@ -55,6 +55,7 @@ local valid_vars = {
 	REQUEST_METHOD          = { type = 'METHOD' },
 	REQUEST_PROTOCOL        = { type = 'PROTOCOL' },
 	REQUEST_URI             = { type = 'REQUEST_URI' },
+	REQUEST_URI_RAW         = { type = 'REQUEST_URI_RAW' },
 	RESPONSE_BODY           = { type = 'RESPONSE_BODY' },
 	RESPONSE_CONTENT_LENGTH = { type = 'RESPONSE_HEADERS', parse = { "specific", 'Content-Length' } },
 	RESPONSE_CONTENT_TYPE   = { type = 'RESPONSE_HEADERS', parse = { "specific", 'Content-Type' } },

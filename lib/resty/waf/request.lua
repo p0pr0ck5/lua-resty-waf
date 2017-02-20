@@ -133,6 +133,10 @@ function _M.request_uri()
 	return table_concat(request_line, '')
 end
 
+function _M.request_uri_raw(request_line, method)
+	return string.sub(request_line, #method + 2, -10)
+end
+
 function _M.basename(waf, uri)
 	local m = ngx.re.match(uri, [=[(/[^/]*+)+]=], waf._pcre_flags)
 	return m[1]
