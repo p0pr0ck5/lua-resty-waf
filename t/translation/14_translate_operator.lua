@@ -49,6 +49,29 @@ describe("translate_operator", function()
 		})
 	end)
 
+	it("translates an operator that looks like it should macro expand",
+		function()
+
+		local rule = {
+			operator = {
+				operator = 'rx',
+				pattern  = '%{tx.foo}'
+			}
+		}
+
+		local s = spy.on(lib, 'translate_macro')
+
+		assert.has.no_errors(function() t(rule, translation) end)
+		assert.is.same(translation, {
+			operator = 'REFIND',
+			pattern  = '%{TX.FOO}',
+			opts = {
+				parsepattern = true
+			}
+		})
+		assert.spy(s).was.called(1)
+	end)
+
 	it("translates an operator with the negated flag", function()
 		local rule = {
 			operator = {

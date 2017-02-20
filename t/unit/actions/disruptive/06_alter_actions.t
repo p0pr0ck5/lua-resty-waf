@@ -16,7 +16,7 @@ run_tests();
 
 __DATA__
 
-=== TEST 1: ACCEPT is an alter action
+=== TEST 1: ACCEPT is not an alter action
 --- http_config eval: $::HttpConfig
 --- config
 	location /t {
@@ -33,7 +33,7 @@ __DATA__
 --- request
 GET /t
 --- error_code: 200
---- response_body_like
+--- response_body_unlike
 ACCEPT
 --- no_error_log
 [error]
