@@ -130,3 +130,24 @@ GET /t
 --- no_error_log
 [error]
 
+=== TEST 7: remove_nulls
+--- http_config eval: $::HttpConfig
+--- config
+	location /t {
+		content_by_lua_block {
+			local lookup    = require "resty.waf.transform"
+			local value     = "a \0b \0\0 c"
+			local transform = lookup.lookup["remove_nulls"]({ _pcre_flags = "" }, value)
+			ngx.say(transform)
+			ngx.say(transform == value)
+		}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+a b  c
+false
+--- no_error_log
+[error]
+

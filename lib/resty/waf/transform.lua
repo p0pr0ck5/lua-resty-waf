@@ -80,6 +80,9 @@ _M.lookup = {
 	remove_comments_char = function(waf, value)
 		return ngx.re.gsub(value, [=[\/\*|\*\/|--|#]=], '', waf._pcre_flags)
 	end,
+	remove_nulls = function(waf, value)
+		return ngx.re.gsub(value, [[\0]], '', waf._pcre_flags)
+	end,
 	remove_whitespace = function(waf, value)
 		return ngx.re.gsub(value, [=[\s+]=], '', waf._pcre_flags)
 	end,
