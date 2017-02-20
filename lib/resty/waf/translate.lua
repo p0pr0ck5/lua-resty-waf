@@ -119,6 +119,7 @@ local valid_transforms = {
 	removecommentschar = 'remove_comments_char',
 	removeNulls        = 'remove_nulls',
 	replacecomments    = 'replace_comments',
+	replaceNulls       = 'replace_nulls',
 	sha1               = 'sha1',
 	sqlhexdecode       = 'sql_hex_decode',
 	trim               = 'trim',

@@ -89,6 +89,9 @@ _M.lookup = {
 	replace_comments = function(waf, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], ' ', waf._pcre_flags)
 	end,
+	replace_nulls = function(waf, value)
+		return ngx.re.gsub(value, [[\0]], ' ', waf._pcre_flags)
+	end,
 	sha1 = function(waf, value)
 		return ngx.sha1_bin(value)
 	end,
