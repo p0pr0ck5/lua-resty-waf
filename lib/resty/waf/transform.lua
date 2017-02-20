@@ -6,6 +6,7 @@ local util   = require "resty.waf.util"
 
 local string_char  = string.char
 local string_find  = string.find
+local string_gsub  = string.gsub
 local string_len   = string.len
 local string_lower = string.lower
 local string_sub   = string.sub
@@ -73,6 +74,10 @@ _M.lookup = {
 			value = ngx.re.gsub(value, [=[[^/][^/]*/\.\./|/\./|/{2,}]=], '/', waf._pcre_flags)
 		end
 		return value
+	end,
+	normalise_path_win = function(waf, value)
+		value = string_gsub(value, [[\]], [[/]])
+		return _M.lookup['normalise_path'](waf, value)
 	end,
 	remove_comments = function(waf, value)
 		return ngx.re.gsub(value, [=[\/\*(\*(?!\/)|[^\*])*\*\/]=], '', waf._pcre_flags)
