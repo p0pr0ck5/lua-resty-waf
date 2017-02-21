@@ -257,15 +257,15 @@ local ctl_lookup = {
 }
 
 function _M.strip_encap_quotes(str)
-	if re_find(str, [=[^(['"])(.*)\1$]=]) then
-		return re_sub(str, [=[^(['"])(.*)\1$]=], "$2")
+	if re_find(str, [=[^(['"])(.*)\1$]=], 'oj') then
+		return re_sub(str, [=[^(['"])(.*)\1$]=], "$2", 'oj')
 	end
 
 	return str
 end
 
 function _M.translate_macro(string)
-	local iterator = re_gmatch(string, "%{([^}]+)}")
+	local iterator = re_gmatch(string, "%{([^}]+)}", 'oj')
 
 	while true do
 		local m = iterator()
@@ -301,7 +301,7 @@ function _M.translate_macro(string)
 
 		replacement = str_fmt("%%{%s}", replacement)
 
-		string = re_sub(string, [[\Q%{]] .. macro .. [[}\E]], replacement)
+		string = re_sub(string, [[\Q%{]] .. macro .. [[}\E]], replacement, 'oj')
 	end
 
 	return string
@@ -313,7 +313,7 @@ function _M.valid_line(line)
 	for i = 1, #valid_directives do
 		local directive = valid_directives[i]
 
-		if re_find(line, '^' .. directive) then return true end
+		if re_find(line, '^' .. directive, 'oj') then return true end
 	end
 
 	return false
@@ -329,16 +329,16 @@ function _M.clean_input(input)
 		-- ignore comments and blank lines
 		local skip
 		if #line == 0 then skip = true end
-		if re_match(line, [[^\s*$]]) then skip = true end
-		if re_match(line, [[^\s*#]]) then skip = true end
+		if re_match(line, [[^\s*$]], 'oj') then skip = true end
+		if re_match(line, [[^\s*#]], 'oj') then skip = true end
 
 		if not skip then
 			-- trim whitespace
-			line = re_gsub(line, [[^\s*|\s*$]], '')
+			line = re_gsub(line, [[^\s*|\s*$]], '', 'oj')
 
-			if re_match(line, [[\s*\\\s*$]]) then
+			if re_match(line, [[\s*\\\s*$]], 'oj') then
 				-- strip the multi-line escape and surrounding whitespace
-				line = re_gsub(line, [[\s*\\\s*$]], '')
+				line = re_gsub(line, [[\s*\\\s*$]], '', 'oj')
 				table.insert(line_buf, line)
 			else
 				-- either the end of a mutli line directive, or standalone line
@@ -367,10 +367,10 @@ function _M.tokenize(line)
 	local x = 0
 
 	repeat
-		local m = re_match(line, re_quoted)
+		local m = re_match(line, re_quoted, 'oj')
 
 		if not m then
-			m = re_match(line, re_unquoted)
+			m = re_match(line, re_unquoted, 'oj')
 		end
 
 		if not m then
@@ -382,11 +382,11 @@ function _M.tokenize(line)
 
 		local toremove = [["?\Q]] .. token .. [[\E"?]]
 
-		line = re_sub(line, toremove, '')
-		line = re_sub(line, [[^\s*]], '')
+		line = re_sub(line, toremove, '', 'oj')
+		line = re_sub(line, [[^\s*]], '', 'oj')
 
 		-- remove any escaping backslashes from escaped quotes
-		token = re_gsub(token, [[\\"]], [["]])
+		token = re_gsub(token, [[\\"]], [["]], 'oj')
 
 		table.insert(tokens, token)
 	until #line == 0
@@ -406,16 +406,16 @@ function _M.parse_vars(raw_vars)
 		local chunk = table.remove(split_vars, 1)
 		table.insert(var_buf, chunk)
 
-		if (not re_find(chunk, [[(?:\/'?|'?\/)]])
+		if (not re_find(chunk, [[(?:\/'?|'?\/)]], 'oj')
 			or not string.find(chunk, ':', 1, true)) then
 
 			local inbuf = (#var_buf > 1
-				and re_find(var_buf[1], [[(?:\/'?|'?\/)]]))
+				and re_find(var_buf[1], [[(?:\/'?|'?\/)]], 'oj'))
 
 			if not inbuf then sentinal = true end
 		end
 
-		if re_find(chunk, [[\/'?$]]) then
+		if re_find(chunk, [[\/'?$]], 'oj') then
 			sentinal = true
 		end
 
@@ -481,7 +481,7 @@ end
 function _M.parse_operator(raw_operator)
 	local op_regex = [[\s*(?:(\!)?(?:\@([a-zA-Z]+)\s*)?)?(.*)$]]
 
-	local m = re_match(raw_operator, op_regex)
+	local m = re_match(raw_operator, op_regex, 'oj')
 	if not m then error("Could not match again op_regex: " .. raw_operator) end
 
 	local negated = m[1]
@@ -524,7 +524,7 @@ function _M.parse_actions(raw_actions)
 			if not inbuf then sentinal = true end
 		end
 
-		if re_find(chunk, [['$]]) then
+		if re_find(chunk, [['$]], 'oj') then
 			sentinal = true
 		end
 
@@ -543,7 +543,7 @@ function _M.parse_actions(raw_actions)
 		local action = table.remove(token_parts, 1)
 		local value = table.concat(token_parts, ':')
 
-		action = re_gsub(action, [[^\s*|\s*$]], '')
+		action = re_gsub(action, [[^\s*|\s*$]], '', 'oj')
 
 		local parsed = {
 			action = action
@@ -633,8 +633,8 @@ function _M.translate_vars(rule, translation, force)
 			local specific = var.specific or ''
 
 			local specific_regex
-			if re_find(specific, [=[^'?\/]=]) then
-				specific = re_sub(specific, [=[^'?\/(.*)\/'?]=], "$1")
+			if re_find(specific, [=[^'?\/]=], 'oj') then
+				specific = re_sub(specific, [=[^'?\/(.*)\/'?]=], "$1", 'oj')
 				specific_regex = true
 			end
 
@@ -643,8 +643,8 @@ function _M.translate_vars(rule, translation, force)
 					local elt = var.ignore[j]
 
 					local elt_regex
-					if re_find(elt, [=[^'?\/]=]) then
-						elt = re_sub(elt, [=[^'?\/(.*)\/'?]=], "$1")
+					if re_find(elt, [=[^'?\/]=], 'oj') then
+						elt = re_sub(elt, [=[^'?\/(.*)\/'?]=], "$1", 'oj')
 						elt_regex = true
 					end
 
@@ -702,7 +702,7 @@ function _M.translate_operator(rule, translation, path)
 	local isnum = tonumber(translation.pattern)
 	translation.pattern = isnum and isnum or translation.pattern
 
-	if re_find(rule.operator.operator, "[fF]$|FromFile$") then
+	if re_find(rule.operator.operator, "[fF]$|FromFile$", 'oj') then
 		local buffer = {}
 		local pattern_file = rule.operator.pattern
 
@@ -717,8 +717,8 @@ function _M.translate_operator(rule, translation, path)
 
 			local skip
 			if #line == 0 then skip = true end
-			if re_match(line, [[^\s*$]]) then skip = true end
-			if re_match(line, [[^\s*#]]) then skip = true end
+			if re_match(line, [[^\s*$]], 'oj') then skip = true end
+			if re_match(line, [[^\s*#]], 'oj') then skip = true end
 
 			if not skip then
 				table.insert(buffer, line)
@@ -743,7 +743,7 @@ function _M.translate_operator(rule, translation, path)
 
 	local doexpand = expand_operators[original_operator] or
 		(type(translation.pattern) == 'string' and
-		re_find(translation.pattern, "%{([^}]+)}"))
+		re_find(translation.pattern, "%{([^}]+)}", 'oj'))
 
 	if doexpand then
 		if not translation.opts then translation.opts = {} end
@@ -878,7 +878,7 @@ function _M.translate_actions(rule, translation, opts)
 				local element = table.concat(tt, '.')
 				-- delete
 				if not val then
-					if re_find(var, [=[^\!]=]) then
+					if re_find(var, [=[^\!]=], 'oj') then
 						collection = string.sub(collection, 2, #collection)
 						local e = {
 							action = 'deletevar',
@@ -896,7 +896,7 @@ function _M.translate_actions(rule, translation, opts)
 						col = string.upper(collection),
 						key = string.upper(element)
 					}
-					if re_find(val, [=[^\+]=]) then
+					if re_find(val, [=[^\+]=], 'oj') then
 						setvar.inc = true
 						val = string.sub(val, 2, #val)
 					end
