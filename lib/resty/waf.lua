@@ -689,7 +689,7 @@ function _M.load_secrules(ruleset, opts)
 	local chains, errs = translate.translate(rules_tab, opts)
 
 	if errs then
-		for i = 1, #errs do ngx.log(ngx.ERR, errs[i]) end
+		for i = 1, #errs do ngx.log(ngx.ERR, errs[i].err) end
 	end
 
 	local name = string.gsub(ruleset, "(.*/)(.*)", "%2")
