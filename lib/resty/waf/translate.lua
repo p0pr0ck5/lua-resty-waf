@@ -236,6 +236,25 @@ local function meta_exception(translation)
 end
 
 local ctl_lookup = {
+	ruleEngine = function(value, translation)
+		local mode
+		if value == 'On' then
+			mode = 'ACTIVE'
+		elseif value == 'Off' then
+			mode = 'INACTIVE'
+		elseif value == 'DetectionOnly' then
+			mode = 'SIMULATE'
+		else
+			error("Invalid ctl:ruleEngine mode")
+		end
+
+		local action = {
+			action = 'mode_update',
+			data   = mode,
+		}
+
+		table.insert(translation.actions.nondisrupt, action)
+	end,
 	ruleRemoveById = function(value, translation)
 		local action = {
 			action = 'rule_remove_id',

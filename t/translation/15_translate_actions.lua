@@ -686,6 +686,33 @@ describe("translate_actions", function()
 		assert.equals(#translation.actions.nondisrupt, 1)
 	end)
 
+	it("translates ctl:ruleEngine", function()
+		local rule = {
+			actions = {{
+				action = 'ctl',
+				value  = 'ruleEngine=DetectionOnly'
+			}}
+		}
+
+		assert.has.no_errors(function() t(rule, translation) end)
+		assert.is.same(translation.actions.nondisrupt[1], {
+			action = 'mode_update',
+			data   = 'SIMULATE',
+		})
+	end)
+
+	it("translates ctl:ruleEngine with an invalid mode", function()
+		local rule = {
+			actions = {{
+				action = 'ctl',
+				value  = 'ruleEngine=foo'
+			}}
+		}
+
+		assert.has.errors(function() t(rule, translation) end)
+		assert.is_nil(translation.actions.nondisrupt[1])
+	end)
+
 	it("errors on invalid ctl", function()
 		local rule = {
 			actions = {{

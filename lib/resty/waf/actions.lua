@@ -93,6 +93,11 @@ _M.nondisruptive_lookup = {
 			waf._ignore_rule[id] = true
 		end
 	end,
+	mode_update = function(waf, mode)
+		--_LOG_"Overriding mode from " .. waf._mode .. " to " .. mode
+
+		waf._mode = mode
+	end,
 }
 
 return _M
