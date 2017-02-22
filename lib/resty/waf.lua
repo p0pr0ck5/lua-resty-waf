@@ -218,7 +218,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local opts     = rule.opts or {}
 	local pattern  = rule.pattern
 	local operator = rule.operator
-	local offset
+	local offset   = rule.offset_nomatch
 
 	ctx.id = id
 
