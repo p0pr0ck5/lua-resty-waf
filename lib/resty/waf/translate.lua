@@ -907,26 +907,26 @@ function _M.translate_actions(rule, translation, opts)
 							}
 						}
 						table.insert(translation.actions.nondisrupt, e)
+						return
 					else
-						error("no assignment in setvar, but not a delete")
+						val = 1
 					end
-				else
-					local setvar = {
-						col = string.upper(collection),
-						key = string.upper(element)
-					}
-					if re_find(val, [=[^\+]=], 'oj') then
-						setvar.inc = true
-						val = string.sub(val, 2, #val)
-					end
-					setvar.value = tonumber(val) and tonumber(val)
-						or _M.translate_macro(val)
-					local e = {
-						action = 'setvar',
-						data = setvar
-					}
-					table.insert(translation.actions.nondisrupt, e)
 				end
+				local setvar = {
+					col = string.upper(collection),
+					key = string.upper(element)
+				}
+				if re_find(val, [=[^\+]=], 'oj') then
+					setvar.inc = true
+					val = string.sub(val, 2, #val)
+				end
+				setvar.value = tonumber(val) and tonumber(val)
+					or _M.translate_macro(val)
+				local e = {
+					action = 'setvar',
+					data = setvar
+				}
+				table.insert(translation.actions.nondisrupt, e)
 				return
 			end
 			if key == 'status' then

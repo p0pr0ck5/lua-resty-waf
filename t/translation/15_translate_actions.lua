@@ -362,7 +362,7 @@ describe("translate_actions", function()
 		assert.spy(s).was.not_called()
 	end)
 
-	it("errors on strict set/delete confusion", function()
+	it("translates a var with no val defined (defaulting to 1)", function()
 		local rule = {
 			actions = {{
 				action = 'setvar',
@@ -370,21 +370,22 @@ describe("translate_actions", function()
 			}}
 		}
 
-		assert.has.errors(function() t(rule, translation) end)
-	end)
+		local s = spy.on(lib, 'translate_macro')
 
-	it("warns on set/delete confusion", function()
-		local rule = {
-			actions = {{
-				action = 'setvar',
-				value  = 'IP.foo'
-			}}
-		}
-
-		local opts = { loose = true }
-
-		assert.has.no_errors(function() t(rule, translation, opts) end)
-		assert.is.same(translation, {})
+		assert.has.no_errors(function() t(rule, translation) end)
+		assert.is.same(translation, {
+			actions = {
+				nondisrupt = {{
+					action = 'setvar',
+					data   = {
+						col   = 'IP',
+						key   = 'FOO',
+						value = 1,
+					}
+				}}
+			}
+		})
+		assert.spy(s).was.not_called()
 	end)
 
 	it("translates status", function()
