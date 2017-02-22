@@ -446,7 +446,7 @@ function _M.exec(self, opts)
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	-- also https://github.com/p0pr0ck5/lua-resty-waf/issues/229
-	if ctx.altered == true then
+	if ctx.altered == true and self._mode == 'ACTIVE' then
 		--_LOG_"Transaction was already altered, not running!"
 		return
 	end
