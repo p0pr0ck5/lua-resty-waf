@@ -290,7 +290,7 @@ local function _process_rule(self, rule, collections, ctx)
 				--_LOG_"Match of rule " .. id
 
 				-- store this match as the most recent match
-				collections.MATCHED_VAR      = value
+				collections.MATCHED_VAR      = value or ''
 				collections.MATCHED_VAR_NAME = var
 
 				-- also add the match to our list of matches for the transaction
