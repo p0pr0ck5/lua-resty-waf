@@ -100,6 +100,7 @@ local valid_operators = {
 	rx               = 'REFIND',
 	streq            = 'EQUALS',
 	strmatch         = 'STR_MATCH',
+	verifyCC         = 'VERIFY_CC',
 	within           = 'STR_EXISTS',
 };
 
