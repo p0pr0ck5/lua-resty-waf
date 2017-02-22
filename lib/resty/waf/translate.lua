@@ -1035,7 +1035,7 @@ function _M.translate_chain(chain, opts)
 			translation.opts.transform = nil
 		end
 
-		if #translation.opts == 0 then
+		if #translation.opts == 0 and not next(translation.opts) then
 			translation.opts = nil
 		end
 
