@@ -13,6 +13,14 @@ local string_sub   = string.sub
 
 _M.version = base.version
 
+local function ascii_dec(n)
+	return string_char(tonumber(string_sub(n, 3, -2)))
+end
+
+local function ascii_hex(n)
+	return string_char(tonumber(string_sub(n, 4, -2), 16))
+end
+
 _M.lookup = {
 	base64_decode = function(waf, value)
 		--_LOG_"Decoding from base64: " .. tostring(value)
@@ -50,13 +58,13 @@ _M.lookup = {
 		return util.hex_encode(value)
 	end,
 	html_decode = function(waf, value)
-		local str = ngx.re.gsub(value, [=[&lt;]=], '<', waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&gt;]=], '>', waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&quot;]=], '"', waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&apos;]=], "'", waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&#(\d+);]=], function(n) return string_char(n[1]) end, waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&#x(\d+);]=], function(n) return string_char(tonumber(n[1],16)) end, waf._pcre_flags)
-		str = ngx.re.gsub(str, [=[&amp;]=], '&', waf._pcre_flags)
+		local str = string_gsub(value, [=[&lt;]=], '<')
+		str = string_gsub(str, [=[&gt;]=], '>')
+		str = string_gsub(str, [=[&quot;]=], '"')
+		str = string_gsub(str, [=[&apos;]=], "'")
+		str = string_gsub(str, [=[&#%d+;]=], ascii_dec)
+		str = string_gsub(str, [=[&#x%d+;]=], ascii_hex)
+		str = string_gsub(str, [=[&amp;]=], '&')
 		--_LOG_"html decoded value is " .. str
 		return str
 	end,

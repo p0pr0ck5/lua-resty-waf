@@ -22,7 +22,7 @@ __DATA__
 	location /t {
 		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#41;&quot;]]
+			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#x29;&quot;]]
 			local transform = lookup.lookup["html_decode"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
 		}
