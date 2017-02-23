@@ -135,7 +135,8 @@ function _M.parse_dynamic_value(waf, key, collections)
 
 		if type(lval) == "table" then
 			if specific then
-				return tostring(lval[specific])
+				return lval[specific] and tostring(lval[specific]) or
+					tostring(lval[string.lower(specific)])
 			else
 				return val
 			end
