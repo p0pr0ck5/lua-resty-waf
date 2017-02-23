@@ -56,7 +56,8 @@ debug-macro:
 	./tools/debug-macro.sh
 
 lua-aho-corasick:
-	cd lua-aho-corasick && make && cp libac.so ../lib/
+	cd $@ && make
+	cp $@/libac.so lib/
 
 lua-resty-htmlentities:
 	cd $@ && make
@@ -64,7 +65,8 @@ lua-resty-htmlentities:
 	cp $@/libhtmlentities.so lib/
 
 libinjection:
-	cd libinjection && make && cp src/libinjection.so ../lib/
+	cd $@ && make
+	cp $@/src/$@.so lib/
 
 test-unit:
 	PATH=$(OPENRESTY_PREFIX)/nginx/sbin:$$PATH prove -r ./t/unit
