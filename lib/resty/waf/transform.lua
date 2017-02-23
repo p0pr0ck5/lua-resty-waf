@@ -16,14 +16,6 @@ _M.version = base.version
 
 hdec.new() -- load the module on require
 
-local function ascii_dec(n)
-	return string_char(tonumber(string_sub(n, 3, -2)))
-end
-
-local function ascii_hex(n)
-	return string_char(tonumber(string_sub(n, 4, -2), 16))
-end
-
 _M.lookup = {
 	base64_decode = function(waf, value)
 		--_LOG_"Decoding from base64: " .. tostring(value)
