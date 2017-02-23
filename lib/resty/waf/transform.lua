@@ -1,6 +1,7 @@
 local _M = {}
 
 local base   = require "resty.waf.base"
+local hdec   = require "resty.htmlentities"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
@@ -12,6 +13,8 @@ local string_lower = string.lower
 local string_sub   = string.sub
 
 _M.version = base.version
+
+hdec.new() -- load the module on require
 
 local function ascii_dec(n)
 	return string_char(tonumber(string_sub(n, 3, -2)))
@@ -58,13 +61,7 @@ _M.lookup = {
 		return util.hex_encode(value)
 	end,
 	html_decode = function(waf, value)
-		local str = string_gsub(value, [=[&lt;]=], '<')
-		str = string_gsub(str, [=[&gt;]=], '>')
-		str = string_gsub(str, [=[&quot;]=], '"')
-		str = string_gsub(str, [=[&apos;]=], "'")
-		str = string_gsub(str, [=[&#%d+;]=], ascii_dec)
-		str = string_gsub(str, [=[&#x%d+;]=], ascii_hex)
-		str = string_gsub(str, [=[&amp;]=], '&')
+		local str = hdec.decode(value)
 		--_LOG_"html decoded value is " .. str
 		return str
 	end,
