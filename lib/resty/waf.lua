@@ -296,7 +296,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value or ''
-				collections.MATCHED_VAR_NAME = var
+				collections.MATCHED_VAR_NAME = var.type
 
 				-- also add the match to our list of matches for the transaction
 				if value then
