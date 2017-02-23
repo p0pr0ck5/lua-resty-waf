@@ -632,6 +632,7 @@ end
 
 function _M.translate_vars(rule, translation, force)
 	translation.vars = {}
+	local n = 0
 
 	for i = 1, #rule.vars do
 		local ok, err = pcall(function()
@@ -689,15 +690,19 @@ function _M.translate_vars(rule, translation, force)
 			end
 
 			if type(translation.vars) ~= 'table' then translation.vars = {} end
-			table.insert(translation.vars, translated_var)--]]
+			table.insert(translation.vars, translated_var)
 		end)
 
 		if err then
 			warn(err)
 
 			if not force then error(err) end
+		else
+			n = n + 1
 		end
 	end
+
+	if n == 0 then error("rule had no valid vars") end
 end
 
 function _M.translate_operator(rule, translation, path)
