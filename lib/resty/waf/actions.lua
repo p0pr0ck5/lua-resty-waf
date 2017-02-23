@@ -63,6 +63,7 @@ _M.nondisruptive_lookup = {
 		collections[col]    = ctx.storage[parsed]
 	end,
 	setvar = function(waf, data, ctx, collections)
+		data.key    = util.parse_dynamic_value(waf, data.key, collections)
 		local value = util.parse_dynamic_value(waf, data.value, collections)
 
 		storage.set_var(waf, ctx, data, value)
