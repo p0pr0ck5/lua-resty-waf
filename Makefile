@@ -120,10 +120,10 @@ install-link: install-check
 install: install-check install-opm-libs
 	$(INSTALL) -d $(LUA_LIB_DIR)/resty/waf/storage
 	$(INSTALL) -d $(LUA_LIB_DIR)/rules
-	$(INSTALL) lib/resty/*.lua $(LUA_LIB_DIR)/resty/
-	$(INSTALL) lib/resty/waf/*.lua $(LUA_LIB_DIR)/resty/waf/
-	$(INSTALL) lib/resty/waf/storage/*.lua $(LUA_LIB_DIR)/resty/waf/storage/
-	$(INSTALL) lib/*.so $(LUA_LIB_DIR)
-	$(INSTALL) rules/*.json $(LUA_LIB_DIR)/rules/
+	$(INSTALL) -m 644 lib/resty/*.lua $(LUA_LIB_DIR)/resty/
+	$(INSTALL) -m 644 lib/resty/waf/*.lua $(LUA_LIB_DIR)/resty/waf/
+	$(INSTALL) -m 644 lib/resty/waf/storage/*.lua $(LUA_LIB_DIR)/resty/waf/storage/
+	$(INSTALL) -m 644 lib/*.so $(LUA_LIB_DIR)
+	$(INSTALL) -m 644 rules/*.json $(LUA_LIB_DIR)/rules/
 
 install-soft: install-check install-opm-libs install-link
