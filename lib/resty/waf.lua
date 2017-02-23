@@ -20,6 +20,11 @@ local string_lower = string.lower
 local ngx_INFO = ngx.INFO
 local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
+local ok, tab_new = pcall(require, "table.new")
+if not ok then
+	tab_new = function(narr, nrec) return {} end
+end
+
 local mt = { __index = _M }
 
 _M.version = base.lua
@@ -425,11 +430,11 @@ function _M.exec(self, opts)
 		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
 	end
 
-	local ctx         = ngx.ctx.lua_resty_waf or {}
-	local collections = ctx.collections or {}
+	local ctx         = ngx.ctx.lua_resty_waf or tab_new(0, 20)
+	local collections = ctx.collections or tab_new(0, 36)
 
 	ctx.lrw_initted   = true
-	ctx.col_lookup    = ctx.col_lookup or {}
+	ctx.col_lookup    = ctx.col_lookup or tab_new(0, 3)
 	ctx.log_entries   = ctx.log_entries or {}
 	ctx.log_entries_n = ctx.log_entries_n or 0
 	ctx.storage       = ctx.storage or {}
@@ -551,7 +556,7 @@ end
 
 -- instantiate a new instance of the module
 function _M.new()
-	local ctx = ngx.ctx.lua_resty_waf or {}
+	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 20)
 
 	-- restore options and self from a previous phase
 	if ctx.opts then
