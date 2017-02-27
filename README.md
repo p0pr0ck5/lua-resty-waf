@@ -132,16 +132,12 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 
 ```lua
 	http {
-		-- include lua_resty_waf in the appropriate paths
-		lua_package_path '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
-		lua_package_cpath '/usr/local/openresty/lualib/lua_resty_waf/?.lua;;';
-
 		init_by_lua_block {
 			-- use resty.core for performance improvement, see the status note above
 			require "resty.core"
 
 			-- require the base module
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
@@ -151,7 +147,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 	server {
 		location / {
 			access_by_lua_block {
-				local lua_resty_waf = require "waf"
+				local lua_resty_waf = require "resty.waf"
 
 				local waf = lua_resty_waf:new()
 
@@ -172,7 +168,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			}
 
 			header_filter_by_lua_block {
-				local lua_resty_waf = require "waf"
+				local lua_resty_waf = require "rest.waf"
 
 				-- note that options set in previous handlers (in the same scope)
 				-- do not need to be set again
@@ -182,7 +178,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			}
 
 			body_filter_by_lua_block {
-				local lua_resty_waf = require "waf"
+				local lua_resty_waf = require "resty.waf"
 
 				local waf = lua_resty_waf:new()
 
@@ -190,7 +186,7 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			}
 
 			log_by_lua_block {
-				local lua_resty_waf = require "waf"
+				local lua_resty_waf = require "resty.waf"
 
 				local waf = lua_resty_waf:new()
 
@@ -211,7 +207,7 @@ Translate and initialize a ModSecurity SecRules file from disk. Note that this s
 ```lua
 	http {
 		init_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			-- this translates and calculates a ruleset called 'ruleset_name'
 			local ok, errs = pcall(function()
@@ -228,7 +224,7 @@ Translate and initialize a ModSecurity SecRules file from disk. Note that this s
 	server {
 		location / {
 			access_by_lua_block {
-				local lua_resty_waf = require "waf"
+				local lua_resty_waf = require "resty.waf"
 
 				local waf = lua_resty_waf:new()
 
@@ -256,7 +252,7 @@ Perform some pre-computation of rules and rulesets, based on what's been made av
 ```lua
 	http {
 		init_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			lua_resty_waf.init()
 		}
@@ -274,7 +270,7 @@ Instantiate a new instance of lua-resty-waf. You must call this in every request
 ```lua
 	location / {
 		access_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			local waf = lua_resty_waf:new()
 		}
@@ -290,7 +286,7 @@ Configure an option on a per-scope basis.
 ```lua
 	location / {
 		access_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			local waf = lua_resty_waf:new()
 
@@ -309,7 +305,7 @@ Define a transaction variable (stored in the `TX` variable collection) before ex
 ```lua
 	location / {
 		access_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			local waf = lua_resty_waf:new()
 
@@ -329,7 +325,7 @@ Run the rule engine. By default, the engine is executed according to the current
 ```lua
 	location / {
 		access_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			local waf = lua_resty_waf:new()
 
@@ -367,7 +363,7 @@ Write any audit log entries that were generated from the transaction. This is on
 ```lua
 	location / {
 		log_by_lua_block {
-			local lua_resty_waf = require "waf"
+			local lua_resty_waf = require "resty.waf"
 
 			local waf = lua_resty_waf:new()
 
