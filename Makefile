@@ -11,8 +11,8 @@ LIBS       = waf waf.lua htmlentities.lua
 C_LIBS     = lua-aho-corasick lua-resty-htmlentities libinjection
 OPM_LIBS   = hamishforbes/lua-resty-iputils p0pr0ck5/lua-resty-cookie \
 	p0pr0ck5/lua-ffi-libinjection p0pr0ck5/lua-resty-logger-socket
-MAKE_LIBS  = $(C_LIBS)
-SO_LIBS    = libac.so libinjection.so libhtmlentities.so
+MAKE_LIBS  = $(C_LIBS) decode
+SO_LIBS    = libac.so libinjection.so libhtmlentities.so libdecode.so
 RULES      = rules
 
 LOCAL_LIB_DIR = lib/resty
@@ -24,7 +24,7 @@ clean-libinjection clean-lua-aho-corasick install-opm-libs clean-opm-libs
 all: $(MAKE_LIBS) debug-macro
 
 clean: clean-libinjection clean-lua-aho-corasick clean-lua-resty-htmlentities \
-	clean-libs clean-test clean-debug-macro
+	clean-decode clean-libs clean-test clean-debug-macro
 
 clean-debug-macro:
 	./tools/debug-macro.sh clean
@@ -32,6 +32,9 @@ clean-debug-macro:
 clean-install: clean-opm-libs
 	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm -f $(SO_LIBS) && cd resty/ && \
 		rm -rf $(LIBS)
+
+clean-decode:
+	cd src && make clean
 
 clean-lua-aho-corasick:
 	cd lua-aho-corasick && make clean
@@ -54,6 +57,10 @@ clean-test:
 
 debug-macro:
 	./tools/debug-macro.sh
+
+decode:
+	cd src/ && make
+	cp src/libdecode.so lib/
 
 lua-aho-corasick:
 	cd $@ && make
