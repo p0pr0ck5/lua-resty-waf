@@ -522,6 +522,8 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 	}
 ```
 
+*Note: This behavior is deprecated and will be removed in future versions.*
+
 ###event_log_altered_only
 
 *Default*: true
