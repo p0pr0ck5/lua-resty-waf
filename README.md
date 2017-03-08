@@ -142,55 +142,55 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 			-- perform some preloading and optimization
 			lua_resty_waf.init()
 		}
-	}
 
-	server {
-		location / {
-			access_by_lua_block {
-				local lua_resty_waf = require "resty.waf"
+		server {
+			location / {
+				access_by_lua_block {
+					local lua_resty_waf = require "resty.waf"
 
-				local waf = lua_resty_waf:new()
+					local waf = lua_resty_waf:new()
 
-				-- define options that will be inherited across all scopes
-				waf:set_option("debug", true)
-				waf:set_option("mode", "ACTIVE")
+					-- define options that will be inherited across all scopes
+					waf:set_option("debug", true)
+					waf:set_option("mode", "ACTIVE")
 
-				-- this may be desirable for low-traffic or testing sites
-				-- by default, event logs are not written until the buffer is full
-				-- for testing, flush the log buffer every 5 seconds
-				--
-				-- this is only necessary when configuring a remote TCP/UDP
-				-- socket server for event logs. otherwise, this is ignored
-				waf:set_option("event_log_periodic_flush", 5)
+					-- this may be desirable for low-traffic or testing sites
+					-- by default, event logs are not written until the buffer is full
+					-- for testing, flush the log buffer every 5 seconds
+					--
+					-- this is only necessary when configuring a remote TCP/UDP
+					-- socket server for event logs. otherwise, this is ignored
+					waf:set_option("event_log_periodic_flush", 5)
 
-				-- run the firewall
-				waf:exec()
-			}
+					-- run the firewall
+					waf:exec()
+				}
 
-			header_filter_by_lua_block {
-				local lua_resty_waf = require "rest.waf"
+				header_filter_by_lua_block {
+					local lua_resty_waf = require "rest.waf"
 
-				-- note that options set in previous handlers (in the same scope)
-				-- do not need to be set again
-				local waf = lua_resty_waf:new()
+					-- note that options set in previous handlers (in the same scope)
+					-- do not need to be set again
+					local waf = lua_resty_waf:new()
 
-				waf:exec()
-			}
+					waf:exec()
+				}
 
-			body_filter_by_lua_block {
-				local lua_resty_waf = require "resty.waf"
+				body_filter_by_lua_block {
+					local lua_resty_waf = require "resty.waf"
 
-				local waf = lua_resty_waf:new()
+					local waf = lua_resty_waf:new()
 
-				waf:exec()
-			}
+					waf:exec()
+				}
 
-			log_by_lua_block {
-				local lua_resty_waf = require "resty.waf"
+				log_by_lua_block {
+					local lua_resty_waf = require "resty.waf"
 
-				local waf = lua_resty_waf:new()
+					local waf = lua_resty_waf:new()
 
-				waf:exec()
+					waf:exec()
+				}
 			}
 		}
 	}
@@ -219,18 +219,18 @@ Translate and initialize a ModSecurity SecRules file from disk. Note that this s
 				for i = 1, #errs do ngx.log(ngx.ERR, errs[i])
 			end
 		}
-	}
 
-	server {
-		location / {
-			access_by_lua_block {
-				local lua_resty_waf = require "resty.waf"
+		server {
+			location / {
+				access_by_lua_block {
+					local lua_resty_waf = require "resty.waf"
 
-				local waf = lua_resty_waf:new()
+					local waf = lua_resty_waf:new()
 
-				-- in order to use the loaded ruleset, it must be added via
-				-- the 'add_ruleset' option
-				waf:set_option("add_ruleset", "ruleset_name")
+					-- in order to use the loaded ruleset, it must be added via
+					-- the 'add_ruleset' option
+					waf:set_option("add_ruleset", "ruleset_name")
+				}
 			}
 		}
 	}
@@ -389,11 +389,13 @@ Adds an additional ruleset to be used during processing. This allows users to im
 		-- the rule file 50000.json must live at
 		-- /path/to/extra/rulesets/rules/50000.json
 		lua_package_path '/path/to/extra/rulesets/?.lua;;';
-	}
 
-	location / {
-		access_by_lua_block {
-			waf:set_option("add_ruleset", "50000_extra_rules")
+		server {
+			location / {
+				access_by_lua_block {
+					waf:set_option("add_ruleset", "50000_extra_rules")
+				}
+			}
 		}
 	}
 ```
