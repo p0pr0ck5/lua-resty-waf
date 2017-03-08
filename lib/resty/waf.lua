@@ -453,6 +453,11 @@ function _M.exec(self, opts)
 	-- also https://github.com/p0pr0ck5/lua-resty-waf/issues/229
 	if ctx.altered == true and self._mode == 'ACTIVE' then
 		--_LOG_"Transaction was already altered, not running!"
+
+		if phase == 'log' then
+			self:write_log_events(true, ctx)
+		end
+
 		return
 	end
 
