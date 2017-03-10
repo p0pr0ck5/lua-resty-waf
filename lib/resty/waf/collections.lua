@@ -20,7 +20,7 @@ _M.lookup = {
 		local request_uri         = request.request_uri()
 		local request_uri_raw     = request.request_uri_raw(request_var, request_method)
 		local request_basename    = request.basename(waf, ngx.var.uri)
-		local request_body        = request.parse_request_body(waf, request_headers)
+		local request_body        = request.parse_request_body(waf, request_headers, collections)
 		local request_cookies     = request.cookies() or {}
 		local request_common_args = request.common_args({ request_uri_args, request_body, request_cookies })
 

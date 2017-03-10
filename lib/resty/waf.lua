@@ -431,7 +431,7 @@ function _M.exec(self, opts)
 	end
 
 	local ctx         = ngx.ctx.lua_resty_waf or tab_new(0, 20)
-	local collections = ctx.collections or tab_new(0, 36)
+	local collections = ctx.collections or tab_new(0, 41)
 
 	ctx.lrw_initted   = true
 	ctx.col_lookup    = ctx.col_lookup or tab_new(0, 3)
