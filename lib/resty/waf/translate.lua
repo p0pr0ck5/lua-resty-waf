@@ -648,9 +648,13 @@ function _M.build_chains(rules)
 end
 
 pats.specific_elt = rex.new([=[^'?\/(.*)\/'?]=])
-function _M.translate_vars(rule, translation, force)
+function _M.translate_vars(rule, translation, opts)
 	translation.vars = {}
 	local n = 0
+
+	opts = opts or {}
+	local force = opts.force
+	local quiet = opts.quiet
 
 	for i = 1, #rule.vars do
 		local ok, err = pcall(function()
@@ -712,8 +716,7 @@ function _M.translate_vars(rule, translation, force)
 		end)
 
 		if err then
-			warn(err)
-
+			if not quiet then warn(err) end
 			if not force then error(err) end
 		else
 			n = n + 1
@@ -1018,7 +1021,7 @@ function _M.translate_chain(chain, opts)
 		local directive = rule.directive
 
 		if rule.directive == 'SecRule' then
-			_M.translate_vars(rule, translation, opts.force)
+			_M.translate_vars(rule, translation, opts)
 			_M.translate_operator(rule, translation, opts.path)
 		elseif directive == 'SecAction' or directive == 'SecMarker' then
 			translation.vars = { unconditional = true }

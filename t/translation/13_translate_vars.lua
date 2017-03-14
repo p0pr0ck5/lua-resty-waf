@@ -329,7 +329,8 @@ describe("translate_vars", function()
 			}
 		}
 
-		assert.has.no_errors(function() t(rule, translation, true) end)
+		local opts = { force = true }
+		assert.has.no_errors(function() t(rule, translation, opts) end)
 		assert.is.same(translation.vars, {
 			{ type = 'REQUEST_ARGS', parse = { 'values', true } }
 		})
@@ -345,6 +346,7 @@ describe("translate_vars", function()
 			}
 		}
 
-		assert.has.errors(function() t(rule, translation, true) end)
+		local opts = { force = true }
+		assert.has.errors(function() t(rule, translation, opts) end)
 	end)
 end)
