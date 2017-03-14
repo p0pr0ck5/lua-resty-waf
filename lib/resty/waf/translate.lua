@@ -39,6 +39,7 @@ local valid_directives = {
 
 local valid_vars = {
 	ARGS                    = { type = 'REQUEST_ARGS', parse = { "values", true } },
+	ARGS_COMBINED_SIZE      = { type = 'ARGS_COMBINED_SIZE' },
 	ARGS_GET                = { type = 'URI_ARGS', parse = { "values", true } },
 	ARGS_GET_NAMES          = { type = 'URI_ARGS', parse = { "keys", true } },
 	ARGS_NAMES              = { type = 'REQUEST_ARGS', parse = { "keys", true } },
