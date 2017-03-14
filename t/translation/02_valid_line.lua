@@ -9,6 +9,10 @@ describe("valid_line", function()
 		assert.is_true(v('SecMarker '))
 	end)
 
+	it("starts with unsupported directives", function()
+		assert.is_false(v('SecRuleScript'))	
+	end)
+
 	it("starts with unknown directives", function()
 		assert.is_false(v('SecFoo '))
 
