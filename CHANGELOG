@@ -1,3 +1,43 @@
+v0.11                                                               Mar 20, 2017
+
+    * Feature: REQUEST_URI_RAW collection
+
+    * Feature: FILES and friends collections
+
+    * Feature: ARGS_COMBINED_SIZE collection
+
+    * Feature: null character handling transformations
+
+    * Feature: normalizePathWin transformation
+
+    * Feature: GLOBAL storage collection
+
+    * Feature: CC verification and translation
+
+    * Feature: JS and CSS decoding transformations
+
+    * Improvement: SecRules translation can now be performed in init_by_lua
+
+    * Improvement: Various performance improvements in SecRules translations
+
+    * Improvement: Performance improvement in parse_dynamic_value
+
+    * Improvement: Use FFI functions for HTML decode transformations
+
+    * Bugfix: Properly define offset for SecMarker translations
+
+    * Bugfix: Properly translate setvar definitions with no value
+
+    * Bugfix: Always assign a value to MATCHED_VAR
+
+    * Bugfix: Properly assign MATCHED_VAR_NAME
+
+    * Distribution: Install library files without executable permissions
+
+    * Maintenance: Deprecate disable_pcre_optimization options
+
+    * Bugfix: Write audit logs via exec when transaction was previously altered
+
 v0.10.1                                                             Feb 20, 2017
 
     * Bugfix: Log phase rules could not be translated
