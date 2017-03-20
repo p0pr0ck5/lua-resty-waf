@@ -1,8 +1,8 @@
-##Name
+## Name
 
 lua-resty-waf - High-performance WAF built on the OpenResty stack
 
-##Table of Contents
+## Table of Contents
 
 * [Name](#name)
 * [Status](#status)
@@ -49,7 +49,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [ignore_rule](#ignore_rule)
 	* [ignore_ruleset](#ignore_ruleset)
 	* [mode](#mode)
-	* [nameservers] (#nameservers)
+	* [nameservers](#nameservers)
 	* [process_multipart_body](#process_multipart_body)
 	* [req_tid_header](#req_tid_header)
 	* [res_body_max_size](#res_body_max_size)
@@ -77,7 +77,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 * [Bugs](#bugs)
 * [See Also](#see-also)
 
-##Status
+## Status
 
 [![Build Status](https://travis-ci.org/p0pr0ck5/lua-resty-waf.svg?branch=development)](https://travis-ci.org/p0pr0ck5/lua-resty-waf)
 [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/lua-resty-waf)
@@ -87,13 +87,13 @@ lua-resty-waf is currently in active development. New bugs and questions opened 
 
 lua-resty-waf is compatible with the master branch of `lua-resty-core`. The bundled version of `lua-resty-core` available in recent releases of OpenResty (>= 1.9.7.4) is compatible with lua-resty-waf; versions bundled with older OpenResty bundles are not, so users wanting to leverage `resty.core` will either need to replace the local version with the one available from the [GitHub project](https://github.com/openresty/lua-resty-core), or patch the module based off [this commit](https://github.com/openresty/lua-resty-core/commit/40445b12c0359eb82702f0097cd65948c245b6a4).
 
-##Description
+## Description
 
 lua-resty-waf is a reverse proxy WAF built using the OpenResty stack. It uses the Nginx Lua API to analyze HTTP request information and process against a flexible rule structure. lua-resty-waf is distributed with a ruleset that mimics the ModSecurity CRS, as well as a few custom rules built during initial development and testing, and a small virtual patchset for emerging threats. Additionally, lua-resty-waf is distributed with tooling to automatically translate existing ModSecurity rules, allowing users to extend lua-resty-waf implementation without the need to learn a new rule syntax.
 
 lua-resty-waf was initially developed by Robert Paprocki for his Master's thesis at Western Governor's University.
 
-##Requirements
+## Requirements
 
 lua-resty-waf requires several third-party resty lua modules, though these are all packaged with lua-resty-waf, and thus do not need to be installed separately. It is recommended to install lua-resty-waf on a system running the OpenResty software bundle; lua-resty-waf has not been tested on platforms built using separate Nginx source and Nginx Lua module packages.
 
@@ -105,13 +105,13 @@ For optimal regex compilation performance, it is recommended to build Nginx/Open
 
 You can download the PCRE source from the [PCRE website](http://www.pcre.org/). See also this [blog post](https://www.cryptobells.com/building-openresty-with-pcre-jit/) for a step-by-step walkthrough on building OpenResty with a JIT-enabled PCRE library.
 
-##Performance
+## Performance
 
 lua-resty-waf was designed with efficiency and scalability in mind. It leverages Nginx's asynchronous processing model and an efficient design to process each transaction as quickly as possible. Load testing has show that deployments implementing all provided rulesets, which are designed to mimic the logic behind the ModSecurity CRS, process transactions in roughly 300-500 microseconds per request; this equals the performance advertised by [Cloudflare's WAF](https://www.cloudflare.com/waf). Tests were run on a reasonable hardware stack (E3-1230 CPU, 32 GB RAM, 2 x 840 EVO in RAID 0), maxing at roughly 15,000 requests per second. See [this blog post](http://www.cryptobells.com/freewaf-a-high-performance-scalable-open-web-firewall) for more information.
 
 lua-resty-waf workload is almost exclusively CPU bound. Memory footprint in the Lua VM (excluding persistent storage backed by `lua-shared-dict`) is roughly 2MB.
 
-##Installation
+## Installation
 
 A simple Makefile is provided:
 
@@ -129,7 +129,7 @@ lua-resty-waf makes use of the [OPM](https://github.com/openresty/opm) package m
 
 Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately affecting an application; users who wish to enable rule actions must explicitly set the operational mode to ACTIVE.
 
-##Synopsis
+## Synopsis
 
 ```lua
 	http {
@@ -197,9 +197,9 @@ Note that by default lua-resty-waf runs in SIMULATE mode, to prevent immediately
 	}
 ```
 
-##Public Functions
+## Public Functions
 
-###lua-resty-waf.load_secrules()
+### lua-resty-waf.load_secrules()
 
 Translate and initialize a ModSecurity SecRules file from disk. Note that this still requires the ruleset to be added via [add_ruleset](#add_ruleset) (the basename of the file must be given as the key).
 
@@ -244,7 +244,7 @@ Additionally, `load_secrules` can take an optional second argument as a table of
 * *loose*: Do not error and abort when failing to translate a rule action
 * *quiet*: Do not error or warn when failing to translate a rule action
 
-###lua-resty-waf.init()
+### lua-resty-waf.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should never be called outside this scope.
 
@@ -260,9 +260,9 @@ Perform some pre-computation of rules and rulesets, based on what's been made av
 	}
 ```
 
-##Public Methods
+## Public Methods
 
-###lua-resty-waf:new()
+### lua-resty-waf:new()
 
 Instantiate a new instance of lua-resty-waf. You must call this in every request handler phase you wish to run lua-resty-waf, and use the return result to call further object methods.
 
@@ -278,7 +278,7 @@ Instantiate a new instance of lua-resty-waf. You must call this in every request
 	}
 ```
 
-###lua-resty-waf:set_option()
+### lua-resty-waf:set_option()
 
 Configure an option on a per-scope basis.
 
@@ -297,7 +297,7 @@ Configure an option on a per-scope basis.
 	}
 ```
 
-###lua-resty-waf:set_var()
+### lua-resty-waf:set_var()
 
 Define a transaction variable (stored in the `TX` variable collection) before executing the WAF. This can be used to define variables used by complex rulesets such as the [OWASP CRS](https://github.com/SpiderLabs/owasp-modsecurity-crs).
 
@@ -317,7 +317,7 @@ Define a transaction variable (stored in the `TX` variable collection) before ex
 
 Note that as with any other ModSecurity rule, the existence of a variable bears no functional change to WAF processing; it is the responsibility of the rule author to understand and use `TX` variables.
 
-###lua-resty-waf:exec()
+### lua-resty-waf:exec()
 
 Run the rule engine. By default, the engine is executed according to the currently running phase. An optional table may be passed, allowing users to "mock" execution of a different phase.
 
@@ -355,7 +355,7 @@ Run the rule engine. By default, the engine is executed according to the current
 	}
 ```
 
-###lua-resty-waf:write_log_events()
+### lua-resty-waf:write_log_events()
 
 Write any audit log entries that were generated from the transaction. This is only optional when `exec` is called in a `log_by_lua` handler.
 
@@ -375,9 +375,9 @@ Write any audit log entries that were generated from the transaction. This is on
 	}
 ```
 
-##Options
+## Options
 
-###add_ruleset
+### add_ruleset
 
 *Default*: none
 
@@ -401,7 +401,7 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 Multiple rulesets may be added by passing a table of values to `set_option`. Note that ruleset names are sorted before processing. Rulesets are processed in a low-to-high sorted order.
 
-###add_ruleset_string
+### add_ruleset_string
 
 *Default*: none
 
@@ -419,7 +419,7 @@ Adds an additional ruleset to be used during processing. This allows users to im
 
 Note that ruleset names are sorted before processing, and must be given as strings. Rulesets are processed in a low-to-high sorted order.
 
-###allow_unknown_content_types
+### allow_unknown_content_types
 
 *Default*: false
 
@@ -435,7 +435,7 @@ Instructs lua-resty-waf to continue processing the request when a Content-Type h
 	}
 ```
 
-###allowed_content_types
+### allowed_content_types
 
 *Default*: none
 
@@ -458,7 +458,7 @@ Defines one or more Content-Type headers that will be allowed, in addition to th
 
 Note that mutiple `set_option` calls with a parameter of `allowed_content_types` will simply override the existing options table, so if you want to define multiple allowed content types, you must define them as a Lua table as shown above.
 
-###debug
+### debug
 
 *Default*: false
 
@@ -474,7 +474,7 @@ Disables/enables debug logging. Debug log statements are printed to the error_lo
 	}
 ```
 
-###debug_log_level
+### debug_log_level
 
 *Default*: ngx.INFO
 
@@ -490,7 +490,7 @@ Sets the nginx log level constant used for debug logging.
 	}
 ```
 
-###deny_status
+### deny_status
 
 *Default*: ngx.HTTP_FORBIDDEN
 
@@ -506,7 +506,7 @@ Sets the status to use when denying requests.
 	}
 ```
 
-###disable_pcre_optimization
+### disable_pcre_optimization
 
 *Default*: false
 
@@ -524,7 +524,7 @@ Removes the `oj` flags from all `ngx.re.match`, `ngx.re.find`, and `ngx.re.sub` 
 
 *Note: This behavior is deprecated and will be removed in future versions.*
 
-###event_log_altered_only
+### event_log_altered_only
 
 *Default*: true
 
@@ -542,7 +542,7 @@ Determines whether to write log entries for rule matches in a transaction that w
 
 Note that `mode` will not have an effect on determing whether a transaction is considered altered. That is, if a rule with a `DENY` action is matched, but lua-resty-waf is running in `SIMULATE` mode, the transaction will still be considered altered, and rule matches will be logged.
 
-###event_log_buffer_size
+### event_log_buffer_size
 
 *Default*: 4096
 
@@ -559,7 +559,7 @@ Defines the threshold size, in bytes, of the buffer to be used to hold event log
 	}
 ```
 
-###event_log_level
+### event_log_level
 
 *Default*: ngx.INFO
 
@@ -575,7 +575,7 @@ Sets the nginx log level constant used for event logging.
 	}
 ```
 
-###event_log_ngx_vars
+### event_log_ngx_vars
 
 *Default*: empty
 
@@ -603,7 +603,7 @@ The resulting event has these extra items:
 }
 ```
 
-###event_log_periodic_flush
+### event_log_periodic_flush
 
 *Default*: none
 
@@ -620,7 +620,7 @@ Defines an interval, in seconds, at which the event log buffer will periodically
 	}
 ```
 
-###event_log_request_arguments
+### event_log_request_arguments
 
 *Default*: false
 
@@ -636,7 +636,7 @@ When set to true, the log entries contain the request arguments under the `uri_a
 	}
 ```
 
-###event_log_request_body
+### event_log_request_body
 
 *Default*: false
 
@@ -652,7 +652,7 @@ When set to true, the log entries contain the request body under the `request_bo
 	}
 ```
 
-###event_log_request_headers
+### event_log_request_headers
 
 *Default*: false
 
@@ -679,7 +679,7 @@ The resulting event has these extra items:
 }
 ```
 
-###event_log_ssl
+### event_log_ssl
 
 *Default*: false
 
@@ -695,7 +695,7 @@ Enable SSL connections when logging via TCP/UDP.
 	}
 ```
 
-###event_log_ssl_sni_host
+### event_log_ssl_sni_host
 
 *Default*: none
 
@@ -711,7 +711,7 @@ Set the SNI host for `lua-resty-logger-socket` connections.
 	}
 ```
 
-###event_log_ssl_verify
+### event_log_ssl_verify
 
 *Default*: false
 
@@ -727,7 +727,7 @@ Enable certification verification for SSL connections when logging via TCP/UDP.
 	}
 ```
 
-###event_log_socket_proto
+### event_log_socket_proto
 
 *Default*: udp
 
@@ -744,7 +744,7 @@ Defines which IP protocol to use (TCP or UDP) when shipping event logs via a rem
 	}
 ```
 
-###event_log_target
+### event_log_target
 
 *Default*: error
 
@@ -769,7 +769,7 @@ Defines the destination for event logs. lua-resty-waf currently supports logging
 
 Note that, due to a limition in the logging library used, only a single target socket can be defined. This is to say, you may only configure one `socket` target with a specific host/port combination; if you configure a second host/port combination, data will not be properly logged.
 
-###event_log_target_host
+### event_log_target_host
 
 *Default*: none
 
@@ -785,7 +785,7 @@ Defines the target server for event logs that target a remote server.
 	}
 ```
 
-###event_log_target_path
+### event_log_target_path
 
 *Default*: none
 
@@ -803,7 +803,7 @@ Defines the target path for event logs that target a local file system location.
 
 This path must be in a location writeable by the nginx user. Note that, by nature, on-disk logging can cause significant performance degredation in high-concurrency environments.
 
-###event_log_target_port
+### event_log_target_port
 
 *Default*: none
 
@@ -819,7 +819,7 @@ Defines the target port for event logs that target a remote server.
 	}
 ```
 
-###hook_action
+### hook_action
 
 *Default*: none
 
@@ -842,7 +842,7 @@ Override the functionality of actions taken when a rule is matched. See the exam
 		}
 ```
 
-###ignore_rule
+### ignore_rule
 
 *Default*: none
 
@@ -861,7 +861,7 @@ Instructs the module to ignore a specified rule ID. Note that ignoring a rule in
 
 Multiple rules can be ignored by passing a table of rule IDs to `set_option`.
 
-###ignore_ruleset
+### ignore_ruleset
 
 *Default*: none
 
@@ -877,7 +877,7 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 	}
 ```
 
-###mode
+### mode
 
 *Default*: SIMULATE
 
@@ -895,7 +895,7 @@ By default, SIMULATE is selected if a mode is not explicitly set; this requires 
 	}
 ```
 
-###nameservers
+### nameservers
 
 *Default*: none
 
@@ -911,7 +911,7 @@ Sets the DNS resolver(s) to be used for RBL lookups. Currently only UDP/53 traff
 	}
 ```
 
-###process_multipart_body
+### process_multipart_body
 
 *Default* true
 
@@ -929,7 +929,7 @@ Enable processing of multipart/form-data request bodies (when present), using th
 	}
 ```
 
-###req_tid_header
+### req_tid_header
 
 *Default*: false
 
@@ -945,7 +945,7 @@ Set an HTTP header `X-Lua-Resty-WAF-ID` in the upstream request, with the value 
 	}
 ```
 
-###res_body_max_size
+### res_body_max_size
 
 *Default*: 1048576 (1 MB)
 
@@ -963,7 +963,7 @@ Defines the content length threshold beyond which response bodies will not be pr
 ```
 Note that by nature, it is required to buffer the entire response body in order to properly use the response as a collection, so increasing this number significantly is not recommended without justification (and ample server resources).
 
-###res_body_mime_types
+### res_body_mime_types
 
 *Default*: "text/plain", "text/html"
 
@@ -982,7 +982,7 @@ Defines the MIME types with which lua-resty-waf will process the response body. 
 
 Multiple MIME types can be added by passing a table of types to `set_option`.
 
-###res_tid_header
+### res_tid_header
 
 *Default*: false
 
@@ -998,7 +998,7 @@ Set an HTTP header `X-Lua-Resty-WAF-ID` in the downstream response, with the val
 	}
 ```
 
-###score_threshold
+### score_threshold
 
 *Default*: 5
 
@@ -1014,7 +1014,7 @@ Sets the threshold for anomaly scoring. When the threshold is reached, lua-resty
 	}
 ```
 
-###storage_backend
+### storage_backend
 
 *Default*: dict
 
@@ -1030,7 +1030,7 @@ Define an engine to use for persistent variable storage. Current available optio
 	}
 ```
 
-###storage_keepalive
+### storage_keepalive
 
 *Default*: true
 
@@ -1046,7 +1046,7 @@ Enable or disable TCP keepalive for connections to remote persistent storage hos
 	}
 ```
 
-###storage_keepalive_timeout
+### storage_keepalive_timeout
 
 *Default*: 10000
 
@@ -1062,7 +1062,7 @@ Configure (in milliseconds) the timeout for the cosocket keepalive pool for remo
 	}
 ```
 
-###storage_keepalive_pool_size
+### storage_keepalive_pool_size
 
 *Default*: 100
 
@@ -1078,7 +1078,7 @@ Configure the pool size for the cosocket keepalive pool for remote persistent st
 	}
 ```
 
-###storage_memcached_host
+### storage_memcached_host
 
 *Default*: 127.0.0.1
 
@@ -1094,7 +1094,7 @@ Define a host to use when using memcached as a persistent variable storage engin
 	}
 ```
 
-###storage_memcached_port
+### storage_memcached_port
 
 *Default*: 11211
 
@@ -1110,7 +1110,7 @@ Define a port to use when using memcached as a persistent variable storage engin
 	}
 ```
 
-###storage_redis_host
+### storage_redis_host
 
 *Default*: 127.0.0.1
 
@@ -1126,7 +1126,7 @@ Define a host to use when using redis as a persistent variable storage engine.
 	}
 ```
 
-###storage_redis_port
+### storage_redis_port
 
 *Default*: 6379
 
@@ -1142,7 +1142,7 @@ Define a port to use when using redis as a persistent variable storage engine.
 	}
 ```
 
-###storage_zone
+### storage_zone
 
 *Default*: none
 
@@ -1167,7 +1167,7 @@ Multiple shared zones can be defined and used, though only one zone can be defin
 
 `Error adding key to persistent storage, increase the size of the lua_shared_dict`
 
-##Phase Handling
+## Phase Handling
 
 lua-resty-waf is designed to run in multiple phases of the request lifecycle. Rules can be processed in the following phases:
 
@@ -1178,7 +1178,7 @@ lua-resty-waf is designed to run in multiple phases of the request lifecycle. Ru
 
 These phases correspond to their appropriate Nginx lua handlers (`access_by_lua`, `header_filter_by_lua`, `body_filter_by_lua`, and `log_by_lua`, respectively). Note that running lua-resty-waf in a lua phase handler not in this list will lead to broken behavior. All data available in an earlier phase is available in a later phase. That is, data available in the `access` phase is also available in the `header_filter` and `body_filter` phases, but not vice versa.
 
-##Included Rulesets
+## Included Rulesets
 
 lua-resty-waf is distributed with a number of rulesets that are designed to mimic the functionality of the ModSecurity CRS. For reference, these rulesets are listed here:
 
@@ -1192,15 +1192,15 @@ lua-resty-waf is distributed with a number of rulesets that are designed to mimi
 * **90000_custom**: Custom rules/virtual patching
 * **99000_scoring**: Anomaly score handling
 
-##Rule Definitions
+## Rule Definitions
 
 lua-resty-waf parses rules definitions from JSON blobs stored on-disk. Rules are grouped based on purpose and severity, defined as a ruleset. The included rulesets were created to mimic some functionality of the ModSecurity CRS, particularly the `base_rules` definitions. Additionally, the included `modsec2lua-resty-waf.pl` script can be used to translate additional or custom rulesets to a lua-resty-waf-compatible JSON blob.
 
 Note that there are several limitations in the translation script, with respect to unsupported actions, collections, and operators. Please see [this wiki page](https://github.com/p0pr0ck5/lua-resty-waf/wiki/Known-ModSecurity-Translation-Limitations) for an up-to-date list of known incompatibilities.
 
-##Notes
+## Notes
 
-###Community
+### Community
 
 There is a Freenode IRC channel `#lua-resty-waf`. Travis CI sends notifications here; feel free to ask questions/leave comments in this channel as well.
 
@@ -1208,11 +1208,11 @@ Additionally, Q/A is available on CodeWake:
 
 [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/lua-resty-waf)
 
-###Pull Requests
+### Pull Requests
 
 Please target all pull requests towards the development branch, or a feature branch if the PR is a significant change. Commits to master should only come in the form of documentation updates or other changes that have no impact of the module itself (and can be cleanly merged into development).
 
-##Roadmap
+## Roadmap
 
 * **Expanded virtual patch ruleset**: Increase coverage of emerging threats.
 * **Expanded integration/acceptance testing**: Increase coverage of common threats and usage scenarios.
@@ -1220,11 +1220,11 @@ Please target all pull requests towards the development branch, or a feature bra
 * **Common application profiles**: Tuned rulesets for common CMS/applications.
 * **Support multiple socket/file logger targets**: Likely requires forking the lua-resty-logger-socket project.
 
-##Limitations
+## Limitations
 
 lua-resty-waf is undergoing continual development and improvement, and as such, may be limited in its functionality and performance. Currently known limitations can be found within the GitHub issue tracker for this repo.
 
-##License
+## License
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -1239,11 +1239,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-##Bugs
+## Bugs
 
 Please report bugs by creating a ticket with the GitHub issue tracker.
 
-##See Also
+## See Also
 
 - The OpenResty project: <http://openresty.org/>
 - My personal blog for updates and notes on lua-resty-waf development: <http://www.cryptobells.com/tag/lua-resty-waf/>
