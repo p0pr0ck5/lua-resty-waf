@@ -20,6 +20,11 @@ local string_lower = string.lower
 local ngx_INFO = ngx.INFO
 local ngx_HTTP_FORBIDDEN = ngx.HTTP_FORBIDDEN
 
+local ok, tab_new = pcall(require, "table.new")
+if not ok then
+	tab_new = function(narr, nrec) return {} end
+end
+
 local mt = { __index = _M }
 
 _M.version = base.lua
@@ -218,7 +223,7 @@ local function _process_rule(self, rule, collections, ctx)
 	local opts     = rule.opts or {}
 	local pattern  = rule.pattern
 	local operator = rule.operator
-	local offset
+	local offset   = rule.offset_nomatch
 
 	ctx.id = id
 
@@ -290,8 +295,8 @@ local function _process_rule(self, rule, collections, ctx)
 				--_LOG_"Match of rule " .. id
 
 				-- store this match as the most recent match
-				collections.MATCHED_VAR      = value
-				collections.MATCHED_VAR_NAME = var
+				collections.MATCHED_VAR      = value or ''
+				collections.MATCHED_VAR_NAME = var.type
 
 				-- also add the match to our list of matches for the transaction
 				if value then
@@ -425,11 +430,11 @@ function _M.exec(self, opts)
 		logger.fatal_fail("lua-resty-waf should not be run in phase " .. phase)
 	end
 
-	local ctx         = ngx.ctx.lua_resty_waf or {}
-	local collections = ctx.collections or {}
+	local ctx         = ngx.ctx.lua_resty_waf or tab_new(0, 20)
+	local collections = ctx.collections or tab_new(0, 41)
 
 	ctx.lrw_initted   = true
-	ctx.col_lookup    = ctx.col_lookup or {}
+	ctx.col_lookup    = ctx.col_lookup or tab_new(0, 3)
 	ctx.log_entries   = ctx.log_entries or {}
 	ctx.log_entries_n = ctx.log_entries_n or 0
 	ctx.storage       = ctx.storage or {}
@@ -446,8 +451,13 @@ function _M.exec(self, opts)
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
 	-- also https://github.com/p0pr0ck5/lua-resty-waf/issues/229
-	if ctx.altered == true then
+	if ctx.altered == true and self._mode == 'ACTIVE' then
 		--_LOG_"Transaction was already altered, not running!"
+
+		if phase == 'log' then
+			self:write_log_events(true, ctx)
+		end
+
 		return
 	end
 
@@ -551,7 +561,7 @@ end
 
 -- instantiate a new instance of the module
 function _M.new()
-	local ctx = ngx.ctx.lua_resty_waf or {}
+	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 20)
 
 	-- restore options and self from a previous phase
 	if ctx.opts then
@@ -689,7 +699,10 @@ function _M.load_secrules(ruleset, opts)
 	local chains, errs = translate.translate(rules_tab, opts)
 
 	if errs then
-		for i = 1, #errs do ngx.log(ngx.ERR, errs[i]) end
+		for i = 1, #errs do
+			ngx.log(ngx.ERR, errs[i].err)
+			ngx.log(ngx.ERR, table.concat(errs[i].orig, "\n") .. "\n\n")
+		end
 	end
 
 	local name = string.gsub(ruleset, "(.*/)(.*)", "%2")

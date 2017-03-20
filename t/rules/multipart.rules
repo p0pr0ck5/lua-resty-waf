@@ -1,0 +1,15 @@
+SecRule ARGS "@streq 12345a" "id:12345,phase:2,chain,deny"
+SecRule FILES "@streq a.txt" "id:12345,phase:2,deny"
+
+SecRule ARGS "@streq 12346a" "id:12346,phase:2,chain,deny"
+SecRule FILES_NAMES "@streq test"
+
+SecRule ARGS "@streq 12347a" "id:12347,phase:2,chain,deny"
+SecRule FILES_COMBINED_SIZE "@gt 10"
+
+SecRule ARGS "@streq 12348a" "id:12348,phase:2,chain,deny"
+SecRule FILES_SIZES "@gt 10"
+
+SecRule ARGS "@streq 12349a" "id:12349,phase:2,chain,deny"
+SecRule FILES_TMP_CONTENT "[Hh]ello,\s+world"
+

@@ -1,5 +1,5 @@
 package = "lua-resty-waf"
-version = "0.10.1-1"
+version = "0.11-1"
 source = {
    url = "gitrec+https://github.com/p0pr0ck5/lua-resty-waf",
 }
@@ -15,5 +15,5 @@ dependencies = {
 }
 build = {
    type = "make",
-   install_target = "install",
+   install_target = "install-hard",
 }

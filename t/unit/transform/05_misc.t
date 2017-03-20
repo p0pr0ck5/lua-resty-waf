@@ -22,7 +22,7 @@ __DATA__
 	location /t {
 		content_by_lua_block {
 			local lookup    = require "resty.waf.transform"
-			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#41;&quot;]]
+			local value     = [[&quot;He said &apos;hi&apos; to &#40;&lt;him&gt; &amp; &lt;her&gt;&#x29;&quot;]]
 			local transform = lookup.lookup["html_decode"]({ _pcre_flags = "" }, value)
 			ngx.say(transform)
 		}
@@ -127,6 +127,86 @@ GET /t
 --- error_code: 200
 --- response_body
 /a/b/c/
+--- no_error_log
+[error]
+
+=== TEST 7: normalise_path_win (back reference)
+--- http_config eval: $::HttpConfig
+--- config
+	location /t {
+		content_by_lua_block {
+			local lookup    = require "resty.waf.transform"
+			local value     = [[\a\d\..\b\c]]
+			local transform = lookup.lookup["normalise_path_win"]({ _pcre_flags = "" }, value)
+			ngx.say(transform)
+		}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+/a/b/c
+--- no_error_log
+[error]
+
+=== TEST 8: normalise_path_win (mulitple normalizations)
+--- http_config eval: $::HttpConfig
+--- config
+	location /t {
+		content_by_lua_block {
+			local lookup    = require "resty.waf.transform"
+			local value     = [[\a\\\b\d\..\c\.\e\..\]]
+			local transform = lookup.lookup["normalise_path_win"]({ _pcre_flags = "" }, value)
+			ngx.say(transform)
+		}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+/a/b/c/
+--- no_error_log
+[error]
+
+=== TEST 9: remove_nulls
+--- http_config eval: $::HttpConfig
+--- config
+	location /t {
+		content_by_lua_block {
+			local lookup    = require "resty.waf.transform"
+			local value     = "a \0b \0\0 c"
+			local transform = lookup.lookup["remove_nulls"]({ _pcre_flags = "" }, value)
+			ngx.say(transform)
+			ngx.say(transform == value)
+		}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+a b  c
+false
+--- no_error_log
+[error]
+
+=== TEST 10: replace_nulls
+--- http_config eval: $::HttpConfig
+--- config
+	location /t {
+		content_by_lua_block {
+			local lookup    = require "resty.waf.transform"
+			local value     = "a \0b \0\0 c"
+			local transform = lookup.lookup["replace_nulls"]({ _pcre_flags = "" }, value)
+			ngx.say(transform)
+			ngx.say(transform == value)
+		}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- response_body
+a  b    c
+false
 --- no_error_log
 [error]
 

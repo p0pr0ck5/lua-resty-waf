@@ -2,12 +2,18 @@ local _M = {}
 
 local base = require "resty.waf.base"
 
-local re_find   = ngx.re.find
-local re_match  = ngx.re.match
-local re_gmatch = ngx.re.gmatch
-local re_sub    = ngx.re.sub
-local re_gsub   = ngx.re.gsub
-local str_fmt   = string.format
+local rex = require "rex_pcre"
+
+local re_find   = rex.find
+local re_match  = rex.match
+local re_gmatch = rex.gmatch
+local re_gsub   = rex.gsub
+
+local str_fmt  = string.format
+local str_find = string.find
+local str_gsub = string.gsub
+
+local pats = {}
 
 local log = ngx.log
 local WARN = ngx.WARN
@@ -33,11 +39,17 @@ local valid_directives = {
 
 local valid_vars = {
 	ARGS                    = { type = 'REQUEST_ARGS', parse = { "values", true } },
+	ARGS_COMBINED_SIZE      = { type = 'ARGS_COMBINED_SIZE' },
 	ARGS_GET                = { type = 'URI_ARGS', parse = { "values", true } },
 	ARGS_GET_NAMES          = { type = 'URI_ARGS', parse = { "keys", true } },
 	ARGS_NAMES              = { type = 'REQUEST_ARGS', parse = { "keys", true } },
 	ARGS_POST               = { type = 'REQUEST_BODY', parse = { "values", true } },
 	ARGS_POST_NAMES         = { type = 'REQUEST_BODY', parse = { "keys", true } },
+	FILES                   = { type = 'FILES' },
+	FILES_COMBINED_SIZE     = { type = 'FILES_COMBINED_SIZE' },
+	FILES_NAMES             = { type = 'FILES_NAMES' },
+	FILES_SIZES             = { type = 'FILES_SIZES' },
+	FILES_TMP_CONTENT       = { type = 'FILES_TMP_CONTENT', parse = { "values", true } },
 	MATCHED_VAR             = { type = 'MATCHED_VAR' },
 	MATCHED_VARS            = { type = 'MATCHED_VARS' },
 	MATCHED_VAR_NAME        = { type = 'MATCHED_VAR_NAME' },
@@ -55,6 +67,7 @@ local valid_vars = {
 	REQUEST_METHOD          = { type = 'METHOD' },
 	REQUEST_PROTOCOL        = { type = 'PROTOCOL' },
 	REQUEST_URI             = { type = 'REQUEST_URI' },
+	REQUEST_URI_RAW         = { type = 'REQUEST_URI_RAW' },
 	RESPONSE_BODY           = { type = 'RESPONSE_BODY' },
 	RESPONSE_CONTENT_LENGTH = { type = 'RESPONSE_HEADERS', parse = { "specific", 'Content-Length' } },
 	RESPONSE_CONTENT_TYPE   = { type = 'RESPONSE_HEADERS', parse = { "specific", 'Content-Type' } },
@@ -73,6 +86,7 @@ local valid_vars = {
 	TIME_YEAR               = { type = 'TIME_YEAR' },
 	TX                      = { type = 'TX', storage = true },
 	IP                      = { type = 'IP', storage = true },
+	GLOBAL                  = { type = 'GLOBAL', storage = true },
 }
 
 local valid_operators = {
@@ -98,6 +112,7 @@ local valid_operators = {
 	rx               = 'REFIND',
 	streq            = 'EQUALS',
 	strmatch         = 'STR_MATCH',
+	verifyCC         = 'VERIFY_CC',
 	within           = 'STR_EXISTS',
 };
 
@@ -105,19 +120,26 @@ local valid_transforms = {
 	base64decode       = 'base64_decode',
 	base64decodeext    = 'base64_decode',
 	base64encode       = 'base64_encode',
+	cssdecode          = 'css_decode',
 	cmdline            = 'cmd_line',
 	compresswhitespace = 'compress_whitespace',
 	hexdecode          = 'hex_decode',
 	hexencode          = 'hex_encode',
 	htmlentitydecode   = 'html_decode',
+	jsdecode           = 'js_decode',
 	length             = 'length',
 	lowercase          = 'lowercase',
 	md5                = 'md5',
 	normalisepath      = 'normalise_path',
+	normalizepath      = 'normalise_path',
+	normalisepathwin   = 'normalise_path_win',
+	normalizepathwin   = 'normalise_path_win',
 	removewhitespace   = 'remove_whitespace',
 	removecomments     = 'remove_comments',
 	removecommentschar = 'remove_comments_char',
+	removenulls        = 'remove_nulls',
 	replacecomments    = 'replace_comments',
+	replacenulls       = 'replace_nulls',
 	sha1               = 'sha1',
 	sqlhexdecode       = 'sql_hex_decode',
 	trim               = 'trim',
@@ -229,6 +251,25 @@ local function meta_exception(translation)
 end
 
 local ctl_lookup = {
+	ruleEngine = function(value, translation)
+		local mode
+		if value == 'On' then
+			mode = 'ACTIVE'
+		elseif value == 'Off' then
+			mode = 'INACTIVE'
+		elseif value == 'DetectionOnly' then
+			mode = 'SIMULATE'
+		else
+			error("Invalid ctl:ruleEngine mode")
+		end
+
+		local action = {
+			action = 'mode_update',
+			data   = mode,
+		}
+
+		table.insert(translation.actions.nondisrupt, action)
+	end,
 	ruleRemoveById = function(value, translation)
 		local action = {
 			action = 'rule_remove_id',
@@ -249,23 +290,24 @@ local ctl_lookup = {
 	end,
 }
 
+pats.encap_quotes = rex.new([=[^(['"])(.*)\1$]=])
 function _M.strip_encap_quotes(str)
-	if re_find(str, [=[^(['"])(.*)\1$]=]) then
-		return re_sub(str, [=[^(['"])(.*)\1$]=], "$2")
+	if re_find(str, pats.encap_quotes) then
+		local _, s = re_match(str, pats.encap_quotes)
+		return s
 	end
 
 	return str
 end
 
+pats.macro = rex.new("%{([^}]+)}")
 function _M.translate_macro(string)
-	local iterator = re_gmatch(string, "%{([^}]+)}")
+	local iterator = re_gmatch(string, pats.macro)
 
 	while true do
-		local m = iterator()
+		local macro = iterator()
 
-		if not m then break end
-
-		local macro = m[1]
+		if not macro then break end
 
 		local t = split(macro, "%.")
 		local key = t[1]
@@ -292,9 +334,9 @@ function _M.translate_macro(string)
 			replacement = macro
 		end
 
-		replacement = str_fmt("%%{%s}", replacement)
+		replacement = str_fmt("%%%s", replacement)
 
-		string = re_sub(string, [[\Q%{]] .. macro .. [[}\E]], replacement)
+		string = re_gsub(string, macro, replacement)
 	end
 
 	return string
@@ -306,12 +348,14 @@ function _M.valid_line(line)
 	for i = 1, #valid_directives do
 		local directive = valid_directives[i]
 
-		if re_find(line, '^' .. directive) then return true end
+		if str_find(line, '^' .. directive .. ' ') then return true end
 	end
 
 	return false
 end
 
+pats.trim_whitespace = rex.new([[^\s*|\s*$]])
+pats.line_escape = rex.new([[\s*\\\s*$]])
 function _M.clean_input(input)
 	local lines    = {}
 	local line_buf = {}
@@ -322,16 +366,16 @@ function _M.clean_input(input)
 		-- ignore comments and blank lines
 		local skip
 		if #line == 0 then skip = true end
-		if re_match(line, [[^\s*$]]) then skip = true end
-		if re_match(line, [[^\s*#]]) then skip = true end
+		if str_find(line, [[^%s*$]]) then skip = true end
+		if str_find(line, [[^%s*#]]) then skip = true end
 
 		if not skip then
 			-- trim whitespace
-			line = re_gsub(line, [[^\s*|\s*$]], '')
+			line = re_gsub(line, pats.trim_whitespace, '')
 
-			if re_match(line, [[\s*\\\s*$]]) then
+			if re_match(line, pats.line_escape) then
 				-- strip the multi-line escape and surrounding whitespace
-				line = re_gsub(line, [[\s*\\\s*$]], '')
+				line = re_gsub(line, pats.line_escape, '')
 				table.insert(line_buf, line)
 			else
 				-- either the end of a mutli line directive, or standalone line
@@ -352,18 +396,17 @@ function _M.clean_input(input)
 	return lines
 end
 
+pats.token_quoted = rex.new([[^"((?:[^"\\]+|\\.)*)"]])
+pats.token_unquoted = rex.new([[([^\s]+)]])
 function _M.tokenize(line)
-	local re_quoted   = [[^"((?:[^"\\]+|\\.)*)"]]
-	local re_unquoted = [[([^\s]+)]]
-
 	local tokens = {}
 	local x = 0
 
 	repeat
-		local m = re_match(line, re_quoted)
+		local m = re_match(line, pats.token_quoted)
 
 		if not m then
-			m = re_match(line, re_unquoted)
+			m = re_match(line, pats.token_unquoted)
 		end
 
 		if not m then
@@ -371,15 +414,15 @@ function _M.tokenize(line)
 		end
 
 		-- got our token!
-		local token = m[1]
+		local token = m
 
-		local toremove = [["?\Q]] .. token .. [[\E"?]]
+		local toremove = [[^"?\Q]] .. token .. [[\E"?]]
 
-		line = re_sub(line, toremove, '')
-		line = re_sub(line, [[^\s*]], '')
+		line = re_gsub(line, toremove, '')
+		line = re_gsub(line, [[^\s*]], '')
 
 		-- remove any escaping backslashes from escaped quotes
-		token = re_gsub(token, [[\\"]], [["]])
+		token = str_gsub(token, [[\"]], [["]])
 
 		table.insert(tokens, token)
 	until #line == 0
@@ -387,6 +430,7 @@ function _M.tokenize(line)
 	return tokens
 end
 
+pats.elt_wrap = rex.new([[(?:\/'?|'?\/)]])
 function _M.parse_vars(raw_vars)
 	local tokens = {}
 	local parsed_vars = {}
@@ -399,16 +443,16 @@ function _M.parse_vars(raw_vars)
 		local chunk = table.remove(split_vars, 1)
 		table.insert(var_buf, chunk)
 
-		if (not re_find(chunk, [[(?:\/'?|'?\/)]])
-			or not string.find(chunk, ':', 1, true)) then
+		if (not re_find(chunk, pats.elt_wrap)
+			or not str_find(chunk, ':', 1, true)) then
 
 			local inbuf = (#var_buf > 1
-				and re_find(var_buf[1], [[(?:\/'?|'?\/)]]))
+				and re_find(var_buf[1], pats.elt_wrap))
 
 			if not inbuf then sentinal = true end
 		end
 
-		if re_find(chunk, [[\/'?$]]) then
+		if str_find(chunk, [[/'?$]]) then
 			sentinal = true
 		end
 
@@ -471,16 +515,16 @@ function _M.parse_vars(raw_vars)
 	return parsed_vars
 end
 
+pats.operator = rex.new([[\s*(?:(\!)?(?:\@([a-zA-Z]+)\s*)?)?(.*)$]])
 function _M.parse_operator(raw_operator)
-	local op_regex = [[\s*(?:(\!)?(?:\@([a-zA-Z]+)\s*)?)?(.*)$]]
+	local op_regex = pats.operator
 
-	local m = re_match(raw_operator, op_regex)
-	if not m then error("Could not match again op_regex: " .. raw_operator) end
+	local negated, operator, pattern = re_match(raw_operator, op_regex)
+	if not operator and not pattern then
+		error("Could not match again op_regex: " .. raw_operator)
+	end
 
-	local negated = m[1]
-	local operator = m[2]
 	if not operator then operator = 'rx' end
-	local pattern = m[3]
 
 	local parsed = {}
 
@@ -517,7 +561,7 @@ function _M.parse_actions(raw_actions)
 			if not inbuf then sentinal = true end
 		end
 
-		if re_find(chunk, [['$]]) then
+		if str_find(chunk, [['$]]) then
 			sentinal = true
 		end
 
@@ -536,7 +580,7 @@ function _M.parse_actions(raw_actions)
 		local action = table.remove(token_parts, 1)
 		local value = table.concat(token_parts, ':')
 
-		action = re_gsub(action, [[^\s*|\s*$]], '')
+		action = re_gsub(action, pats.trim_whitespace, '')
 
 		local parsed = {
 			action = action
@@ -603,8 +647,14 @@ function _M.build_chains(rules)
 	return chains
 end
 
-function _M.translate_vars(rule, translation, force)
+pats.specific_elt = rex.new([=[^'?\/(.*)\/'?]=])
+function _M.translate_vars(rule, translation, opts)
 	translation.vars = {}
+	local n = 0
+
+	opts = opts or {}
+	local force = opts.force
+	local quiet = opts.quiet
 
 	for i = 1, #rule.vars do
 		local ok, err = pcall(function()
@@ -626,8 +676,8 @@ function _M.translate_vars(rule, translation, force)
 			local specific = var.specific or ''
 
 			local specific_regex
-			if re_find(specific, [=[^'?\/]=]) then
-				specific = re_sub(specific, [=[^'?\/(.*)\/'?]=], "$1")
+			if str_find(specific, [=[^'?/]=]) then
+				specific = re_gsub(specific, pats.specific_elt, '%1')
 				specific_regex = true
 			end
 
@@ -636,8 +686,8 @@ function _M.translate_vars(rule, translation, force)
 					local elt = var.ignore[j]
 
 					local elt_regex
-					if re_find(elt, [=[^'?\/]=]) then
-						elt = re_sub(elt, [=[^'?\/(.*)\/'?]=], "$1")
+					if str_find(elt, [=[^'?/]=]) then
+						elt = re_gsub(elt, pats.specific_elt, "%1")
 						elt_regex = true
 					end
 
@@ -662,15 +712,18 @@ function _M.translate_vars(rule, translation, force)
 			end
 
 			if type(translation.vars) ~= 'table' then translation.vars = {} end
-			table.insert(translation.vars, translated_var)--]]
+			table.insert(translation.vars, translated_var)
 		end)
 
 		if err then
-			warn(err)
-
+			if not quiet then warn(err) end
 			if not force then error(err) end
+		else
+			n = n + 1
 		end
 	end
+
+	if n == 0 then error("rule had no valid vars") end
 end
 
 function _M.translate_operator(rule, translation, path)
@@ -695,7 +748,8 @@ function _M.translate_operator(rule, translation, path)
 	local isnum = tonumber(translation.pattern)
 	translation.pattern = isnum and isnum or translation.pattern
 
-	if re_find(rule.operator.operator, "[fF]$|FromFile$") then
+	if str_find(rule.operator.operator, "[fF]$") or
+		str_find(rule.operator.operator, "FromFile$") then
 		local buffer = {}
 		local pattern_file = rule.operator.pattern
 
@@ -710,8 +764,8 @@ function _M.translate_operator(rule, translation, path)
 
 			local skip
 			if #line == 0 then skip = true end
-			if re_match(line, [[^\s*$]]) then skip = true end
-			if re_match(line, [[^\s*#]]) then skip = true end
+			if str_find(line, [[^%s*$]]) then skip = true end
+			if str_find(line, [[^%s*#]]) then skip = true end
 
 			if not skip then
 				table.insert(buffer, line)
@@ -736,7 +790,7 @@ function _M.translate_operator(rule, translation, path)
 
 	local doexpand = expand_operators[original_operator] or
 		(type(translation.pattern) == 'string' and
-		re_find(translation.pattern, "%{([^}]+)}"))
+		re_find(translation.pattern, pats.macro))
 
 	if doexpand then
 		if not translation.opts then translation.opts = {} end
@@ -871,7 +925,7 @@ function _M.translate_actions(rule, translation, opts)
 				local element = table.concat(tt, '.')
 				-- delete
 				if not val then
-					if re_find(var, [=[^\!]=]) then
+					if str_find(var, [=[^!]=]) then
 						collection = string.sub(collection, 2, #collection)
 						local e = {
 							action = 'deletevar',
@@ -881,26 +935,26 @@ function _M.translate_actions(rule, translation, opts)
 							}
 						}
 						table.insert(translation.actions.nondisrupt, e)
+						return
 					else
-						error("no assignment in setvar, but not a delete")
+						val = 1
 					end
-				else
-					local setvar = {
-						col = string.upper(collection),
-						key = string.upper(element)
-					}
-					if re_find(val, [=[^\+]=]) then
-						setvar.inc = true
-						val = string.sub(val, 2, #val)
-					end
-					setvar.value = tonumber(val) and tonumber(val)
-						or _M.translate_macro(val)
-					local e = {
-						action = 'setvar',
-						data = setvar
-					}
-					table.insert(translation.actions.nondisrupt, e)
 				end
+				local setvar = {
+					col = string.upper(collection),
+					key = string.upper(element)
+				}
+				if str_find(val, [=[^%+]=]) then
+					setvar.inc = true
+					val = string.sub(val, 2, #val)
+				end
+				setvar.value = tonumber(val) and tonumber(val)
+					or _M.translate_macro(val)
+				local e = {
+					action = 'setvar',
+					data = setvar
+				}
+				table.insert(translation.actions.nondisrupt, e)
 				return
 			end
 			if key == 'status' then
@@ -967,7 +1021,7 @@ function _M.translate_chain(chain, opts)
 		local directive = rule.directive
 
 		if rule.directive == 'SecRule' then
-			_M.translate_vars(rule, translation, opts.force)
+			_M.translate_vars(rule, translation, opts)
 			_M.translate_operator(rule, translation, opts.path)
 		elseif directive == 'SecAction' or directive == 'SecMarker' then
 			translation.vars = { unconditional = true }
@@ -1028,7 +1082,7 @@ function _M.translate_chain(chain, opts)
 			translation.opts.transform = nil
 		end
 
-		if #translation.opts == 0 then
+		if #translation.opts == 0 and not next(translation.opts) then
 			translation.opts = nil
 		end
 

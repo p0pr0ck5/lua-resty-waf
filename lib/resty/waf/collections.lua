@@ -14,32 +14,42 @@ _M.version = base.version
 _M.lookup = {
 	access = function(waf, collections, ctx)
 		local request_headers     = ngx.req.get_headers()
+		local request_var         = ngx.var.request
+		local request_method      = ngx.req.get_method()
 		local request_uri_args    = ngx.req.get_uri_args()
 		local request_uri         = request.request_uri()
+		local request_uri_raw     = request.request_uri_raw(request_var, request_method)
 		local request_basename    = request.basename(waf, ngx.var.uri)
-		local request_body        = request.parse_request_body(waf, request_headers)
+		local request_body        = request.parse_request_body(waf, request_headers, collections)
 		local request_cookies     = request.cookies() or {}
 		local request_common_args = request.common_args({ request_uri_args, request_body, request_cookies })
+		local query_string        = ngx.var.query_string
+
+		local query_str_size = query_string and #query_string or 0
+		local body_size = ngx.var.http_content_length and tonumber(ngx.var.http_content_length) or 0
 
 		collections.REMOTE_ADDR       = ngx.var.remote_addr
 		collections.HTTP_VERSION      = ngx.req.http_version()
-		collections.METHOD            = ngx.req.get_method()
+		collections.METHOD            = request_method
 		collections.URI               = ngx.var.uri
 		collections.URI_ARGS          = request_uri_args
-		collections.QUERY_STRING      = ngx.var.query_string
+		collections.QUERY_STRING      = query_string
 		collections.REQUEST_URI       = request_uri
+		collections.REQUEST_URI_RAW   = request_uri_raw
 		collections.REQUEST_BASENAME  = request_basename
 		collections.REQUEST_HEADERS   = request_headers
 		collections.COOKIES           = request_cookies
 		collections.REQUEST_BODY      = request_body
 		collections.REQUEST_ARGS      = request_common_args
-		collections.REQUEST_LINE      = ngx.var.request
+		collections.REQUEST_LINE      = request_var
 		collections.PROTOCOL          = ngx.var.server_protocol
 		collections.TX                = ctx.storage["TX"]
 		collections.NGX_VAR           = ngx.var
 		collections.MATCHED_VARS      = {}
 		collections.MATCHED_VAR_NAMES = {}
 		collections.SCORE_THRESHOLD   = waf._score_threshold
+
+		collections.ARGS_COMBINED_SIZE = query_str_size + body_size
 
 		local year, month, day, hour, minute, second = string_match(ngx.localtime(),
 			"(%d%d%d%d)-(%d%d)-(%d%d) (%d%d):(%d%d):(%d%d)")

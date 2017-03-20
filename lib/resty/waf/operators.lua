@@ -2,6 +2,7 @@ local _M = {}
 
 local ac        = require "resty.waf.load_ac"
 local base      = require "resty.waf.base"
+local bit       = require "bit"
 local dns       = require "resty.dns.resolver"
 local iputils   = require "resty.iputils"
 local libinject = require "resty.libinjection"
@@ -9,7 +10,10 @@ local logger    = require "resty.waf.log"
 local util      = require "resty.waf.util"
 
 local string_find = string.find
+local string_gsub = string.gsub
 local string_sub  = string.sub
+
+local band, bor, bxor = bit.band, bit.bor, bit.bxor
 
 -- module-level cache of aho-corasick dictionary objects
 local _ac_dicts = {}
@@ -440,6 +444,58 @@ function _M.str_match(input, pattern)
 	return false, nil
 end
 
+function _M.verify_cc(waf, input, pattern)
+	local match, value
+	match = false
+
+	if type(input) == 'table' then
+		for _, v in pairs(input) do
+			match, value = _M.verify_cc(waf, v, pattern)
+
+			if match then
+				break
+			end
+		end
+	else
+		-- first match based on the given pattern
+		-- if we matched, proceed to Luhn checksum
+		do
+			local m = _M.refind(waf, input, pattern)
+
+			if not m then return false, nil end
+		end
+
+		-- remove all non digits
+		input = string_gsub(input, "[^%d]", '')
+
+		-- Luhn checksum
+		-- https://www.alienvault.com/blogs/labs-research/luhn-checksum-algorithm-lua-implementation
+		local num = 0
+		local len = input:len()
+		local odd = band(len, 1)
+
+		for count = 0, len - 1 do
+			local digit = tonumber(string_sub(input, count + 1, count + 1))
+			if bxor(band(count, 1), odd) == 0 then
+				digit = digit * 2
+			end
+
+			if digit > 9 then
+				digit = digit - 9
+			end
+
+			num = num + digit
+		end
+
+		if (num % 10) == 0 then
+			match = true
+			value = input
+		end
+	end
+
+	return match, value
+end
+
 _M.lookup = {
 	REGEX        = function(waf, collection, pattern) return _M.regex(waf, collection, pattern) end,
 	REFIND       = function(waf, collection, pattern) return _M.refind(waf, collection, pattern) end,
@@ -458,6 +514,7 @@ _M.lookup = {
 	DETECT_SQLI  = function(waf, collection, pattern) return _M.detect_sqli(collection) end,
 	DETECT_XSS   = function(waf, collection, pattern) return _M.detect_xss(collection) end,
 	STR_MATCH    = function(waf, collection, pattern) return _M.str_match(collection, pattern) end,
+	VERIFY_CC    = function(waf, collection, pattern) return _M.verify_cc(waf, collection, pattern) end,
 }
 
 return _M

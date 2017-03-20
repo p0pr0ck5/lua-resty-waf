@@ -7,9 +7,12 @@ local logger = require "resty.waf.log"
 local re_find       = ngx.re.find
 local string_byte   = string.byte
 local string_char   = string.char
+local string_find   = string.find
 local string_format = string.format
 local string_gmatch = string.gmatch
+local string_gsub   = string.gsub
 local string_match  = string.match
+local string_sub    = string.sub
 local string_upper  = string.upper
 local table_concat  = table.concat
 
@@ -117,37 +120,36 @@ end
 
 -- pick out dynamic data from storage key definitions
 function _M.parse_dynamic_value(waf, key, collections)
-	local lookup = function(m)
-		local val      = collections[string_upper(m[1])]
-		local specific = m[2]
-
-		if not val then
-			logger.fatal_fail("Bad dynamic parse, no collection key " .. m[1])
+	local lookup = function(macro)
+		local val, specific
+		-- cheat on the start index
+		local dot = string_find(macro, "%.", 5)
+		if dot then
+			val = string_sub(macro, 3, dot - 1)
+			specific = string_sub(macro, dot + 1, -2)
+		else
+			val = string_sub(macro, 3, -2)
 		end
 
-		if type(val) == "table" then
+		local lval = collections[val]
+
+		if type(lval) == "table" then
 			if specific then
-				return tostring(val[specific])
+				return lval[specific] and tostring(lval[specific]) or
+					tostring(lval[string.lower(specific)])
 			else
-				return m[1]
+				return val
 			end
 		else
-			return val
+			return lval
 		end
 	end
 
-	-- grab something that looks like
-	-- %{VAL} or %{VAL.foo}
-	-- and find it in the lookup table
-	local str = ngx.re.gsub(key, [[%{([A-Za-z_]+)(?:\.([^}]+))?}]], lookup, waf._pcre_flags)
+	local str = string_gsub(key, "%%%b{}", lookup)
 
 	--_LOG_"Parsed dynamic value is " .. str
 
-	if ngx.re.find(str, [=[^\d+$]=], waf._pcre_flags) then
-		return tonumber(str)
-	else
-		return str
-	end
+	return tonumber(str) and tonumber(str) or str
 end
 
 -- safely attempt to parse a JSON string as a ruleset

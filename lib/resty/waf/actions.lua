@@ -63,6 +63,7 @@ _M.nondisruptive_lookup = {
 		collections[col]    = ctx.storage[parsed]
 	end,
 	setvar = function(waf, data, ctx, collections)
+		data.key    = util.parse_dynamic_value(waf, data.key, collections)
 		local value = util.parse_dynamic_value(waf, data.value, collections)
 
 		storage.set_var(waf, ctx, data, value)
@@ -92,6 +93,11 @@ _M.nondisruptive_lookup = {
 			--_LOG_"Runtime ignoring rule " .. id
 			waf._ignore_rule[id] = true
 		end
+	end,
+	mode_update = function(waf, mode)
+		--_LOG_"Overriding mode from " .. waf._mode .. " to " .. mode
+
+		waf._mode = mode
 	end,
 }
 

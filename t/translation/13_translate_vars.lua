@@ -329,13 +329,14 @@ describe("translate_vars", function()
 			}
 		}
 
-		assert.has.no_errors(function() t(rule, translation, true) end)
+		local opts = { force = true }
+		assert.has.no_errors(function() t(rule, translation, opts) end)
 		assert.is.same(translation.vars, {
 			{ type = 'REQUEST_ARGS', parse = { 'values', true } }
 		})
 	end)
 
-	it("results in empty translation when forced with no valid vars", function()
+	it("results error when forced with no valid vars", function()
 		local rule = {
 			vars = {
 				{
@@ -345,7 +346,7 @@ describe("translate_vars", function()
 			}
 		}
 
-		assert.has.no_errors(function() t(rule, translation, true) end)
-		assert.is.same(translation.vars, {})
+		local opts = { force = true }
+		assert.has.errors(function() t(rule, translation, opts) end)
 	end)
 end)

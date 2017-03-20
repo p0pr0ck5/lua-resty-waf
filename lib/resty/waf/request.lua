@@ -12,7 +12,7 @@ local table_insert = table.insert
 
 _M.version = base.version
 
-function _M.parse_request_body(waf, request_headers)
+function _M.parse_request_body(waf, request_headers, collections)
 	local content_type_header = request_headers["content-type"]
 
 	-- multiple content-type headers are likely an evasion tactic
@@ -32,6 +32,8 @@ function _M.parse_request_body(waf, request_headers)
 		return nil
 	end
 
+	--_LOG_"Examining content type " .. content_type_header
+
 	-- handle the request body based on the Content-Type header
 	-- multipart/form-data requests will be streamed in via lua-resty-upload,
 	-- which provides some basic sanity checking as far as form and protocol goes
@@ -47,6 +49,11 @@ function _M.parse_request_body(waf, request_headers)
 			ngx.exit(400) -- may move this into a ruleset along with other strict checking
 		end
 
+		local FILES = {}
+		local FILES_NAMES = {}
+		local FILES_SIZES = {}
+		local FILES_TMP_CONTENT = {}
+
 		ngx.req.init_body()
 		form:set_timeout(1000)
 
@@ -54,7 +61,10 @@ function _M.parse_request_body(waf, request_headers)
 		ngx.req.append_body("--" .. form.boundary)
 
 		-- this is gonna need some tlc, but it seems to work for now
-		local lasttype, chunk
+		local lasttype, chunk, file, body, body_size, files_size
+		files_size = 0
+		body_size  = 0
+		body = ''
 		while true do
 			local typ, res, err = form:read()
 			if not typ then
@@ -62,6 +72,17 @@ function _M.parse_request_body(waf, request_headers)
 			end
 
 			if typ == "header" then
+				if res[1]:lower() == 'content-disposition' then
+					local header = res[2]
+
+					local s, f = header:find(' name="([^"]+")')
+					file = header:sub(s + 7, f - 1)
+					table.insert(FILES_NAMES, file)
+
+					s, f = header:find('filename="([^"]+")')
+					if s then table.insert(FILES, header:sub(s + 10, f - 1)) end
+				end
+
 				chunk = res[3] -- form:read() returns { key, value, line } here
 				ngx.req.append_body("\r\n" .. chunk)
 			elseif typ == "body" then
@@ -69,8 +90,23 @@ function _M.parse_request_body(waf, request_headers)
 				if lasttype == "header" then
 					ngx.req.append_body("\r\n\r\n")
 				end
+
+				local chunk_size = #chunk
+
+				body = body .. chunk
+				body_size = body_size + #chunk
+
+				--_LOG_"c:" .. chunk_size .. ", b:" .. body_size
+
 				ngx.req.append_body(chunk)
 			elseif typ == "part_end" then
+				table.insert(FILES_SIZES, body_size)
+				files_size = files_size + body_size
+				body_size = 0
+
+				FILES_TMP_CONTENT[file] = body
+				body = ''
+
 				ngx.req.append_body("\r\n--" .. form.boundary)
 			elseif typ == "eof" then
 				ngx.req.append_body("--\r\n")
@@ -84,6 +120,12 @@ function _M.parse_request_body(waf, request_headers)
 		-- the last part of the data off the socket
 		form:read()
 		ngx.req.finish_body()
+
+		collections.FILES = FILES
+		collections.FILES_NAMES = FILES_NAMES
+		collections.FILES_SIZES = FILES_SIZES
+		collections.FILES_TMP_CONTENT = FILES_TMP_CONTENT
+		collections.FILES_COMBINED_SIZE = files_size
 
 		return nil
 	elseif ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags) then
@@ -131,6 +173,10 @@ function _M.request_uri()
 	end
 
 	return table_concat(request_line, '')
+end
+
+function _M.request_uri_raw(request_line, method)
+	return string.sub(request_line, #method + 2, -10)
 end
 
 function _M.basename(waf, uri)

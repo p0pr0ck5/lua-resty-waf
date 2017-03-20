@@ -24,6 +24,7 @@ _M.lookup = {
 		waf._ignore_rule[value] = true
 	end,
 	disable_pcre_optimization = function(waf, value)
+		logger.deprecate(waf, 'PCRE flags will force JIT/cache', '0.12')
 		if value == true then
 			waf._pcre_flags = 'i'
 		end
