@@ -23,17 +23,15 @@ LOCAL_LIB_DIR = lib/resty
 test-translate lua-aho-corasick lua-resty-htmlentities libinjection \
 clean-libinjection clean-lua-aho-corasick install-opm-libs clean-opm-libs
 
-all: $(MAKE_LIBS) debug-macro
+all: $(MAKE_LIBS) debug-macro crs-rules
 
 clean: clean-libinjection clean-lua-aho-corasick clean-lua-resty-htmlentities \
-	clean-decode clean-libs clean-test clean-debug-macro
+	clean-decode clean-libs clean-test clean-debug-macro clean-crs-rules
 
 clean-debug-macro:
 	./tools/debug-macro.sh clean
 
-clean-install: clean-deps
-	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm -f $(SO_LIBS) && cd resty/ && \
-		rm -rf $(LIBS)
+clean-install: clean-deps clean-waf
 
 clean-decode:
 	cd src && make clean
@@ -61,8 +59,18 @@ clean-rocks:
 		$(LUAROCKS) remove $$ROCK; \
 	done
 
+clean-crs-rules:
+	for i in $$(ls owasp-modsecurity-crs/rules); do rm -fv rules/$$i; done
+
 clean-test:
 	rm -rf t/servroot*
+
+clean-waf:
+	cd $(LUA_LIB_DIR) && rm -rf $(RULES) && rm -f $(SO_LIBS) && cd resty/ && \
+		rm -rf $(LIBS)
+
+crs-rules:
+	cp $(PWD)/owasp-modsecurity-crs/rules/* rules/
 
 debug-macro:
 	./tools/debug-macro.sh
