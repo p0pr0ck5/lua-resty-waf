@@ -7,6 +7,32 @@ local util    = require "resty.waf.util"
 
 _M.version = base.version
 
+_M.crs_config = {
+	"PARANOIA_LEVEL", 1,
+	"CRITICAL_ANOMALY_SCORE", 5,
+	"ERROR_ANOMALY_SCORE", 4,
+	"WARNING_ANOMALY_SCORE", 3,
+	"NOTICE_ANOMALY_SCORE", 2,
+	"INBOUND_ANOMALY_SCORE_THRESHOLD", 5,
+	"OUTBOUND_ANOMALY_SCORE_THRESHOLD", 4,
+	"ALLOWED_METHODS", "GET HEAD POST OPTIONS",
+	"ALLOWED_REQUEST_CONTENT_TYPE", "application/x-www-form-urlencoded|multipart/form-data|text/xml|application/xml|application/x-amf|application/json|text/plain",
+	"ALLOWED_HTTP_VERSIONS", "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0",
+	"RESTRICTED_EXTENSIONS", ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .resources/ .resx/ .sql/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/",
+	"RESTRICTED_HEADERS", "/proxy/ /lock-token/ /content-range/ /translate/ /if/",
+	"STATIC_EXTENSIONS", "/.jpg/ /.jpeg/ /.png/ /.gif/ /.js/ /.css/ /.ico/ /.svg/ /.webp/",
+	"MAX_NUM_ARGS", 255,
+	"ARG_NAME_LENGTH", 100,
+	"ARG_LENGTH", 400,
+	"TOTAL_ARG_LENGTH", 64000,
+	"MAX_FILE_SIZE", 1048576,
+	"COMBINED_FILE_SIZES", 1048576,
+	"DOS_BURST_TIME_SLICE", 60,
+	"DOS_COUNTER_THRESHOLD", 100,
+	"DOS_BLOCK_TIMEOUT", 600,
+	"CRS_SETUP_VERSION", 300,
+}
+
 _M.lookup = {
 	ignore_ruleset = function(waf, value)
 		waf._ignore_ruleset[#waf._ignore_ruleset + 1] = value

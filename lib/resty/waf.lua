@@ -415,6 +415,21 @@ local function _merge_rulesets(self)
 	self._active_rulesets = t
 end
 
+local function _init_tx()
+	local tx = tab_new(0, 100) -- give it room to grow
+
+	local i = 1
+	local n = 46 -- # k/v pairs
+
+	while true do
+		tx[options.crs_config[i]] = options.crs_config[i + 1]
+		i = i + 2
+		if i > n then break end
+	end
+
+	return tx
+end
+
 -- main entry point
 function _M.exec(self, opts)
 	if self._mode == "INACTIVE" then
@@ -446,7 +461,7 @@ function _M.exec(self, opts)
 	ctx.nameservers   = self._nameservers
 
 	-- pre-initialize the TX collection
-	ctx.storage["TX"]    = ctx.storage["TX"] or {}
+	ctx.storage["TX"]    = ctx.storage["TX"] or _init_tx()
 	ctx.col_lookup["TX"] = "TX"
 
 	-- see https://groups.google.com/forum/#!topic/openresty-en/LVR9CjRT5-Y
