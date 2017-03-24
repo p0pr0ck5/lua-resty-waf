@@ -72,6 +72,8 @@ function _M.parse_request_body(waf, request_headers, collections)
 			end
 
 			if typ == "header" then
+				ngx.log(ngx.DEBUG, res[1]:lower())
+
 				if res[1]:lower() == 'content-disposition' then
 					local header = res[2]
 

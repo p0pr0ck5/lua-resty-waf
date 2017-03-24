@@ -30,7 +30,7 @@ local mt = { __index = _M }
 _M.version = base.lua
 
 -- default list of rulesets
-local _global_rulesets = {
+local _global_rulesets = {}--[[
 	"11000_whitelist",
 	"20000_http_violation",
 	"21000_http_anomaly",
@@ -41,7 +41,7 @@ local _global_rulesets = {
 	"90000_custom",
 	"99000_scoring"
 }
-_M.global_rulesets = _global_rulesets
+_M.global_rulesets = _global_rulesets]]
 
 -- ruleset table cache
 local _ruleset_defs = {}
@@ -715,8 +715,8 @@ function _M.load_secrules(ruleset, opts)
 
 	if errs then
 		for i = 1, #errs do
-			ngx.log(ngx.ERR, errs[i].err)
-			ngx.log(ngx.ERR, table.concat(errs[i].orig, "\n") .. "\n\n")
+			ngx.log(ngx.WARN, errs[i].err)
+			ngx.log(ngx.WARN, table.concat(errs[i].orig, "\n") .. "\n\n")
 		end
 	end
 

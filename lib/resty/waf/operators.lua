@@ -55,6 +55,8 @@ function _M.greater(a, b)
 			end
 		end
 	else
+		a = tonumber(a) and tonumber(a) or a
+		b = tonumber(b) and tonumber(b) or b
 		greater = a > b
 
 		if greater then
