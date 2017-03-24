@@ -849,8 +849,6 @@ function _M.translate_actions(rule, translation, opts)
 			if key == 'capture' then
 				if translation.operator == 'REFIND' then
 					translation.operator = 'REGEX'
-				else
-					error('capture set when translated operator was not REFIND')
 				end
 				return
 			end
