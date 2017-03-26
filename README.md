@@ -244,6 +244,8 @@ Additionally, `load_secrules` can take an optional second argument as a table of
 * *loose*: Do not error and abort when failing to translate a rule action
 * *quiet*: Do not error or warn when failing to translate a rule action
 
+This function can also take a third option as a table to catch translation errors, for later processing. If this option is not present or a not a table, translation errors will instead be logged to the error log.
+
 ### lua-resty-waf.init()
 
 Perform some pre-computation of rules and rulesets, based on what's been made available via the default distributed rulesets. It's recommended, but not required, to call this function (not doing so will result in a small performance penalty). This function should never be called outside this scope.

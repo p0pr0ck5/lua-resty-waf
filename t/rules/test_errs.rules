@@ -1,0 +1,2 @@
+# this is a set of test rules
+SecRule ARGS "foo" "id:12345,phase:2,msg:'hello world',deny,foo"

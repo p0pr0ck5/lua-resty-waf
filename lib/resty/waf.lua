@@ -14,6 +14,7 @@ local transform_t   = require "resty.waf.transform"
 local translate     = require "resty.waf.translate"
 local util          = require "resty.waf.util"
 
+local table_insert = table.insert
 local table_sort   = table.sort
 local string_lower = string.lower
 
@@ -680,7 +681,7 @@ function _M.init()
 end
 
 -- translate and add a SecRule files to ruleset defs
-function _M.load_secrules(ruleset, opts)
+function _M.load_secrules(ruleset, opts, err_tab)
 	local rules_tab = {}
 	local rules_cnt = 0
 	local f = assert(io.open(ruleset, 'r'))
@@ -700,8 +701,12 @@ function _M.load_secrules(ruleset, opts)
 
 	if errs then
 		for i = 1, #errs do
-			ngx.log(ngx.ERR, errs[i].err)
-			ngx.log(ngx.ERR, table.concat(errs[i].orig, "\n") .. "\n\n")
+			if type(err_tab) ~= 'table' then
+				ngx.log(ngx.WARN, errs[i].err)
+				ngx.log(ngx.WARN, table.concat(errs[i].orig, "\n") .. "\n\n")
+			else
+				table_insert(err_tab, errs[i])
+			end
 		end
 	end
 
