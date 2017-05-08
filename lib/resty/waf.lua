@@ -217,6 +217,47 @@ local function _do_transform(self, collection, transform)
 	return t
 end
 
+local function _build_collection(self, rule, var, collections, ctx, opts)
+	if var.unconditional then
+		return true
+	end
+
+	local collection_key = var.collection_key
+	local collection
+
+	--_LOG_"Checking for collection_key " .. collection_key
+
+	if not var.storage and not ctx.transform_key[collection_key] then
+		--_LOG_"Collection cache miss"
+		collection = _parse_collection(self, collections[var.type], var)
+
+		if opts.transform then
+			collection = _do_transform(self, collection, opts.transform)
+		end
+
+		ctx.transform[collection_key]     = collection
+		ctx.transform_key[collection_key] = true
+	elseif var.storage then
+		--_LOG_"Forcing cache miss"
+		collection = _parse_collection(self, collections[var.type], var)
+	else
+		--_LOG_"Collection cache hit!"
+		collection = ctx.transform[collection_key]
+	end
+
+	if var.length then
+		if type(collection) == 'table' then
+			collection = #collection
+		elseif(collection) then
+			collection = 1
+		else
+			collection = 0
+		end
+	end
+
+	return collection
+end
+
 -- process an individual rule
 local function _process_rule(self, rule, collections, ctx)
 	local opts    = rule.opts or {}
@@ -228,7 +269,7 @@ local function _process_rule(self, rule, collections, ctx)
 	ctx.rule_status = nil
 
 	for k, v in ipairs(rule.vars) do
-		local collection, var
+		local var
 
 		if self.target_update_map[rule.id] then
 			var = self.target_update_map[rule.id][k]
@@ -236,41 +277,7 @@ local function _process_rule(self, rule, collections, ctx)
 			var = rule.vars[k]
 		end
 
-		if var.unconditional then
-			collection = true
-		else
-			local collection_key = var.collection_key
-
-			--_LOG_"Checking for collection_key " .. collection_key
-
-			if not var.storage and not ctx.transform_key[collection_key] then
-				--_LOG_"Collection cache miss"
-				collection = _parse_collection(self, collections[var.type], var)
-
-				if opts.transform then
-					collection = _do_transform(self, collection, opts.transform)
-				end
-
-				ctx.transform[collection_key]     = collection
-				ctx.transform_key[collection_key] = true
-			elseif var.storage then
-				--_LOG_"Forcing cache miss"
-				collection = _parse_collection(self, collections[var.type], var)
-			else
-				--_LOG_"Collection cache hit!"
-				collection = ctx.transform[collection_key]
-			end
-
-			if var.length then
-				if type(collection) == 'table' then
-					collection = #collection
-				elseif(collection) then
-					collection = 1
-				else
-					collection = 0
-				end
-			end
-		end
+		local collection = _build_collection(self, rule, var, collections, ctx, opts)
 
 		if not collection then
 			--_LOG_"No values for this collection"
