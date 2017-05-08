@@ -219,24 +219,21 @@ end
 
 -- process an individual rule
 local function _process_rule(self, rule, collections, ctx)
-	local id       = rule.id
-	local vars     = rule.vars
-	local opts     = rule.opts or {}
-	local pattern  = rule.pattern
-	local operator = rule.operator
-	local offset   = rule.offset_nomatch
+	local opts    = rule.opts or {}
+	local pattern = rule.pattern
+	local offset  = rule.offset_nomatch
 
-	ctx.id = id
+	ctx.id = rule.id
 
 	ctx.rule_status = nil
 
-	for k, v in ipairs(vars) do
+	for k, v in ipairs(rule.vars) do
 		local collection, var
 
-		if self.target_update_map[id] then
-			var = self.target_update_map[id][k]
+		if self.target_update_map[rule.id] then
+			var = self.target_update_map[rule.id][k]
 		else
-			var = vars[k]
+			var = rule.vars[k]
 		end
 
 		if var.unconditional then
@@ -290,7 +287,7 @@ local function _process_rule(self, rule, collections, ctx)
 				match = true
 				value = 1
 			else
-				match, value = operators.lookup[operator](self, collection, pattern, ctx)
+				match, value = operators.lookup[rule.operator](self, collection, pattern, ctx)
 			end
 
 			if rule.op_negated then
@@ -298,7 +295,7 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			if match then
-				--_LOG_"Match of rule " .. id
+				--_LOG_"Match of rule " .. rule.id
 
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value or ''
@@ -314,7 +311,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 				-- auto populate collection elements
 				if not rule.op_negated then
-					if operator == "REGEX" then
+					if rule.operator == "REGEX" then
 						collections.TX["0"] = value[0]
 						for i in ipairs(value) do
 							collections.TX[tostring(i)] = value[i]
@@ -533,10 +530,8 @@ function _M.exec(self, opts)
 		local rule   = rs[phase][offset]
 
 		while rule do
-			local id = rule.id
-
-			if not util.table_has_key(id, self._ignore_rule) then
-				--_LOG_"Processing rule " .. id
+			if not util.table_has_key(rule.id, self._ignore_rule) then
+				--_LOG_"Processing rule " .. rule.id
 
 				local returned_offset = _process_rule(self, rule, collections, ctx)
 				if returned_offset then
@@ -545,7 +540,7 @@ function _M.exec(self, opts)
 					offset = nil
 				end
 			else
-				--_LOG_"Ignoring rule " .. id
+				--_LOG_"Ignoring rule " .. rule.id
 
 				local rule_nomatch = rule.offset_nomatch
 
