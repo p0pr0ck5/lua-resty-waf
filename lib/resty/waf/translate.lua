@@ -88,6 +88,7 @@ local valid_vars = {
 	IP                      = { type = 'IP', storage = true },
 	GLOBAL                  = { type = 'GLOBAL', storage = true },
 }
+_M.valid_vars = valid_vars
 
 local valid_operators = {
 	beginsWith       = function(pattern) return 'REFIND', '^' .. pattern end,

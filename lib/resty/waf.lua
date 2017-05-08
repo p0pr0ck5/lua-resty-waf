@@ -232,7 +232,12 @@ local function _process_rule(self, rule, collections, ctx)
 
 	for k, v in ipairs(vars) do
 		local collection, var
-		var = vars[k]
+
+		if self.target_update_map[id] then
+			var = self.target_update_map[id][k]
+		else
+			var = vars[k]
+		end
 
 		if var.unconditional then
 			collection = true
@@ -562,7 +567,7 @@ end
 
 -- instantiate a new instance of the module
 function _M.new()
-	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 20)
+	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 21)
 
 	-- restore options and self from a previous phase
 	if ctx.opts then
@@ -616,6 +621,7 @@ function _M.new()
 		_storage_redis_host          = '127.0.0.1',
 		_storage_redis_port          = 6379,
 		_storage_zone                = nil,
+		target_update_map            = {},
 		transaction_id               = random.random_bytes(10),
 		var_count                    = 0,
 		var                          = {},
@@ -716,6 +722,68 @@ function _M.load_secrules(ruleset, opts, err_tab)
 
 	_ruleset_defs[name] = chains
 	_ruleset_def_cnt = _ruleset_def_cnt + 1
+end
+
+-- add extra sieve elements to a rule on a per-instance basis
+function _M.sieve_rule(self, id, sieves)
+	-- pointer to our rule
+	local orig_rule
+
+	-- get a copy of the rule (meaning we have to search for it)
+	for r, ruleset in pairs(_ruleset_defs) do
+		if self.target_update_map[id] then break end
+
+		for phase, rules in pairs(ruleset) do
+			if self.target_update_map[id] then break end
+
+			for i, rule in ipairs(rules) do
+				if rule.id == id then
+					orig_rule = rule
+					self.target_update_map[id] = util.table_copy(rule.vars)
+					break
+				end
+			end
+		end
+	end
+
+	for _, sieve in ipairs(sieves) do
+		local found
+		local arg = ""
+
+		if translate.valid_vars[sieve.type] then
+			arg = translate.valid_vars[sieve.type].type
+		end
+
+		-- search for the rule here
+		for i = 1, #self.target_update_map[id] do
+			-- found it, append the sieves (ignore for now)
+			if arg == self.target_update_map[id][i].type then
+				local elts = type(sieve.elts) == "table" and sieve.elts
+					or { sieve.elts }
+
+				if not self.target_update_map[id][i].ignore then
+					self.target_update_map[id][i].ignore = tab_new(#elts, 0)
+				end
+
+				for j = 1, #elts do
+					self.target_update_map[id][i].ignore[j] = { sieve.action, elts[j] }
+				end
+
+				-- set/update the var's collection key
+				self.target_update_map[id][i].collection_key =
+					calc.build_collection_key(
+						self.target_update_map[id][i],
+						orig_rule.opts.transform)
+
+				found = true
+				break
+			end
+
+			if not found then
+				ngx.log(ngx.WARN, arg .. " undefined in rule " .. id)
+			end
+		end
+	end
 end
 
 -- push log data regarding matching rule(s) to the configured target
