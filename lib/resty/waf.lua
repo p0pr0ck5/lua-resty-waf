@@ -14,6 +14,7 @@ local transform_t   = require "resty.waf.transform"
 local translate     = require "resty.waf.translate"
 local util          = require "resty.waf.util"
 
+local table_insert = table.insert
 local table_sort   = table.sort
 local string_lower = string.lower
 
@@ -216,58 +217,67 @@ local function _do_transform(self, collection, transform)
 	return t
 end
 
+local function _build_collection(self, rule, var, collections, ctx, opts)
+	if var.unconditional then
+		return true
+	end
+
+	local collection_key = var.collection_key
+	local collection
+
+	--_LOG_"Checking for collection_key " .. collection_key
+
+	if not var.storage and not ctx.transform_key[collection_key] then
+		--_LOG_"Collection cache miss"
+		collection = _parse_collection(self, collections[var.type], var)
+
+		if opts.transform then
+			collection = _do_transform(self, collection, opts.transform)
+		end
+
+		ctx.transform[collection_key]     = collection
+		ctx.transform_key[collection_key] = true
+	elseif var.storage then
+		--_LOG_"Forcing cache miss"
+		collection = _parse_collection(self, collections[var.type], var)
+	else
+		--_LOG_"Collection cache hit!"
+		collection = ctx.transform[collection_key]
+	end
+
+	if var.length then
+		if type(collection) == 'table' then
+			collection = #collection
+		elseif(collection) then
+			collection = 1
+		else
+			collection = 0
+		end
+	end
+
+	return collection
+end
+
 -- process an individual rule
 local function _process_rule(self, rule, collections, ctx)
-	local id       = rule.id
-	local vars     = rule.vars
-	local opts     = rule.opts or {}
-	local pattern  = rule.pattern
-	local operator = rule.operator
-	local offset   = rule.offset_nomatch
+	local opts    = rule.opts or {}
+	local pattern = rule.pattern
+	local offset  = rule.offset_nomatch
 
-	ctx.id = id
+	ctx.id = rule.id
 
 	ctx.rule_status = nil
 
-	for k, v in ipairs(vars) do
-		local collection, var
-		var = vars[k]
+	for k, v in ipairs(rule.vars) do
+		local var
 
-		if var.unconditional then
-			collection = true
+		if self.target_update_map[rule.id] then
+			var = self.target_update_map[rule.id][k]
 		else
-			local collection_key = var.collection_key
-
-			--_LOG_"Checking for collection_key " .. collection_key
-
-			if not var.storage and not ctx.transform_key[collection_key] then
-				--_LOG_"Collection cache miss"
-				collection = _parse_collection(self, collections[var.type], var)
-
-				if opts.transform then
-					collection = _do_transform(self, collection, opts.transform)
-				end
-
-				ctx.transform[collection_key]     = collection
-				ctx.transform_key[collection_key] = true
-			elseif var.storage then
-				--_LOG_"Forcing cache miss"
-				collection = _parse_collection(self, collections[var.type], var)
-			else
-				--_LOG_"Collection cache hit!"
-				collection = ctx.transform[collection_key]
-			end
-
-			if var.length then
-				if type(collection) == 'table' then
-					collection = #collection
-				elseif(collection) then
-					collection = 1
-				else
-					collection = 0
-				end
-			end
+			var = rule.vars[k]
 		end
+
+		local collection = _build_collection(self, rule, var, collections, ctx, opts)
 
 		if not collection then
 			--_LOG_"No values for this collection"
@@ -284,7 +294,7 @@ local function _process_rule(self, rule, collections, ctx)
 				match = true
 				value = 1
 			else
-				match, value = operators.lookup[operator](self, collection, pattern, ctx)
+				match, value = operators.lookup[rule.operator](self, collection, pattern, ctx)
 			end
 
 			if rule.op_negated then
@@ -292,7 +302,7 @@ local function _process_rule(self, rule, collections, ctx)
 			end
 
 			if match then
-				--_LOG_"Match of rule " .. id
+				--_LOG_"Match of rule " .. rule.id
 
 				-- store this match as the most recent match
 				collections.MATCHED_VAR      = value or ''
@@ -308,7 +318,7 @@ local function _process_rule(self, rule, collections, ctx)
 
 				-- auto populate collection elements
 				if not rule.op_negated then
-					if operator == "REGEX" then
+					if rule.operator == "REGEX" then
 						collections.TX["0"] = value[0]
 						for i in ipairs(value) do
 							collections.TX[tostring(i)] = value[i]
@@ -527,10 +537,8 @@ function _M.exec(self, opts)
 		local rule   = rs[phase][offset]
 
 		while rule do
-			local id = rule.id
-
-			if not util.table_has_key(id, self._ignore_rule) then
-				--_LOG_"Processing rule " .. id
+			if not util.table_has_key(rule.id, self._ignore_rule) then
+				--_LOG_"Processing rule " .. rule.id
 
 				local returned_offset = _process_rule(self, rule, collections, ctx)
 				if returned_offset then
@@ -539,7 +547,7 @@ function _M.exec(self, opts)
 					offset = nil
 				end
 			else
-				--_LOG_"Ignoring rule " .. id
+				--_LOG_"Ignoring rule " .. rule.id
 
 				local rule_nomatch = rule.offset_nomatch
 
@@ -561,7 +569,7 @@ end
 
 -- instantiate a new instance of the module
 function _M.new()
-	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 20)
+	local ctx = ngx.ctx.lua_resty_waf or tab_new(0, 21)
 
 	-- restore options and self from a previous phase
 	if ctx.opts then
@@ -615,6 +623,7 @@ function _M.new()
 		_storage_redis_host          = '127.0.0.1',
 		_storage_redis_port          = 6379,
 		_storage_zone                = nil,
+		target_update_map            = {},
 		transaction_id               = random.random_bytes(10),
 		var_count                    = 0,
 		var                          = {},
@@ -680,7 +689,7 @@ function _M.init()
 end
 
 -- translate and add a SecRule files to ruleset defs
-function _M.load_secrules(ruleset, opts)
+function _M.load_secrules(ruleset, opts, err_tab)
 	local rules_tab = {}
 	local rules_cnt = 0
 	local f = assert(io.open(ruleset, 'r'))
@@ -700,8 +709,12 @@ function _M.load_secrules(ruleset, opts)
 
 	if errs then
 		for i = 1, #errs do
-			ngx.log(ngx.ERR, errs[i].err)
-			ngx.log(ngx.ERR, table.concat(errs[i].orig, "\n") .. "\n\n")
+			if type(err_tab) ~= 'table' then
+				ngx.log(ngx.WARN, errs[i].err)
+				ngx.log(ngx.WARN, table.concat(errs[i].orig, "\n") .. "\n\n")
+			else
+				table_insert(err_tab, errs[i])
+			end
 		end
 	end
 
@@ -711,6 +724,68 @@ function _M.load_secrules(ruleset, opts)
 
 	_ruleset_defs[name] = chains
 	_ruleset_def_cnt = _ruleset_def_cnt + 1
+end
+
+-- add extra sieve elements to a rule on a per-instance basis
+function _M.sieve_rule(self, id, sieves)
+	-- pointer to our rule
+	local orig_rule
+
+	-- get a copy of the rule (meaning we have to search for it)
+	for r, ruleset in pairs(_ruleset_defs) do
+		if self.target_update_map[id] then break end
+
+		for phase, rules in pairs(ruleset) do
+			if self.target_update_map[id] then break end
+
+			for i, rule in ipairs(rules) do
+				if rule.id == id then
+					orig_rule = rule
+					self.target_update_map[id] = util.table_copy(rule.vars)
+					break
+				end
+			end
+		end
+	end
+
+	for _, sieve in ipairs(sieves) do
+		local found
+		local arg = ""
+
+		if translate.valid_vars[sieve.type] then
+			arg = translate.valid_vars[sieve.type].type
+		end
+
+		-- search for the rule here
+		for i = 1, #self.target_update_map[id] do
+			-- found it, append the sieves (ignore for now)
+			if arg == self.target_update_map[id][i].type then
+				local elts = type(sieve.elts) == "table" and sieve.elts
+					or { sieve.elts }
+
+				if not self.target_update_map[id][i].ignore then
+					self.target_update_map[id][i].ignore = tab_new(#elts, 0)
+				end
+
+				for j = 1, #elts do
+					self.target_update_map[id][i].ignore[j] = { sieve.action, elts[j] }
+				end
+
+				-- set/update the var's collection key
+				self.target_update_map[id][i].collection_key =
+					calc.build_collection_key(
+						self.target_update_map[id][i],
+						orig_rule.opts.transform)
+
+				found = true
+				break
+			end
+
+			if not found then
+				ngx.log(ngx.WARN, arg .. " undefined in rule " .. id)
+			end
+		end
+	end
 end
 
 -- push log data regarding matching rule(s) to the configured target

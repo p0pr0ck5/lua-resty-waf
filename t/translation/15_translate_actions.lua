@@ -607,14 +607,15 @@ describe("translate_actions", function()
 		assert.is.same(translation, { operator = 'REGEX' })
 	end)
 
-	it("errors when capture is set and the operator is not REFIND", function()
+	it("does not retranslate the operator when capture is set " ..
+		"and the operator is not REFIND", function()
 		local rule = {
 			actions = { { action = 'capture' } }
 		}
 
 		translation = { operator = 'foo' }
 
-		assert.has.errors(function() t(rule, translation) end)
+		assert.has.no_errors(function() t(rule, translation) end)
 	end)
 
 	it("translates ctl:ruleRemoveById", function()

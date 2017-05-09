@@ -12,7 +12,7 @@ local string_upper = string.upper
 local _valid_backends = { dict = true, memcached = true, redis = true }
 
 function _M.initialize(waf, storage, col)
-	local backend   = waf._storage_backend
+	local backend = waf._storage_backend
 	if not util.table_has_key(backend, _valid_backends) then
 		logger.fatal_fail(backend .. " is not a valid persistent storage backend")
 	end
@@ -25,7 +25,12 @@ function _M.initialize(waf, storage, col)
 end
 
 function _M.set_var(waf, ctx, element, value)
-	local col     = ctx.col_lookup[string_upper(element.col)]
+	local col = ctx.col_lookup[string_upper(element.col)]
+	if not col then
+		--_LOG_element.col .. " not initialized"
+		return
+	end
+
 	local key     = element.key
 	local inc     = element.inc
 	local storage = ctx.storage
@@ -63,13 +68,17 @@ function _M.set_var(waf, ctx, element, value)
 end
 
 function _M.expire_var(waf, ctx, element, value)
-	local col     = ctx.col_lookup[string_upper(element.col)]
+	local col = ctx.col_lookup[string_upper(element.col)]
+	if not col then
+		--_LOG_element.col .. " not initialized"
+		return
+	end
+
 	local key     = element.key
 	local storage = ctx.storage
 	local expire  = ngx.now() + value
 
 	--_LOG_"Expiring " .. element.col .. ":" .. element.key .. " in " .. value
-
 
 	storage[col]["__expire_" .. key] = expire
 	storage[col]["__altered"]        = true
@@ -82,7 +91,12 @@ function _M.expire_var(waf, ctx, element, value)
 end
 
 function _M.delete_var(waf, ctx, element)
-	local col     = ctx.col_lookup[string_upper(element.col)]
+	local col = ctx.col_lookup[string_upper(element.col)]
+	if not col then
+		--_LOG_element.col .. " not initialized"
+		return
+	end
+
 	local key     = element.key
 	local storage = ctx.storage
 

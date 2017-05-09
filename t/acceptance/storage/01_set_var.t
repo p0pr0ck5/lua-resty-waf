@@ -9,7 +9,7 @@ our $HttpConfig = qq{
 };
 
 repeat_each(3);
-plan tests => repeat_each() * 4 * blocks() + 3;
+plan tests => repeat_each() * 4 * blocks();
 
 no_shuffle();
 run_tests();
@@ -333,3 +333,33 @@ Setting FOO:COUNT to 3
 --- no_error_log
 [error]
 
+=== TEST 8: Bail out when collection is unitialized
+--- http_config eval
+$::HttpConfig . q#
+	lua_shared_dict store 10m;
+#
+--- config
+    location = /t {
+        access_by_lua_block {
+			local lua_resty_waf = require "resty.waf"
+			local waf           = lua_resty_waf:new()
+			local storage       = require "resty.waf.storage"
+
+			waf:set_option("storage_zone", "store")
+			waf:set_option("debug", true)
+
+			local ctx = { storage = {}, col_lookup = {} }
+
+			local element = { col = "FOO", key = "COUNT", value = 1 }
+			storage.set_var(waf, ctx, element, element.value)
+		}
+
+		content_by_lua_block {ngx.exit(ngx.OK)}
+	}
+--- request
+GET /t
+--- error_code: 200
+--- error_log
+FOO not initialized
+--- no_error_log
+[error]

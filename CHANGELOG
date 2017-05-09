@@ -1,3 +1,17 @@
+v0.11.1                                                              May 8, 2017
+
+    * Feature: configurable rule-based collection sieving
+
+    * Maintenance: Minor refactor of rule process loop
+
+    * Improvement: alternate error handling in SecRules translation
+
+    * Bugfix: Appropriate handling of capture action in SecRules translation
+
+    * Improvement: Better handling of uninitialized storage collections
+
+    * Improvement: Translate human-readable SecRules phase names
+
 v0.11                                                               Mar 20, 2017
 
     * Feature: REQUEST_URI_RAW collection

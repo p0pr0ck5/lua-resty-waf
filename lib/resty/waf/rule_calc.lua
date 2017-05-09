@@ -46,6 +46,7 @@ local function _build_collection_key(var, transform)
 
 	return table_concat(key, "|")
 end
+_M.build_collection_key = _build_collection_key
 
 local function _write_chain_offsets(chain, max, cur_offset)
 	local chain_length = #chain

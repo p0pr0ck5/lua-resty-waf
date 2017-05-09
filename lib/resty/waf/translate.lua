@@ -88,6 +88,7 @@ local valid_vars = {
 	IP                      = { type = 'IP', storage = true },
 	GLOBAL                  = { type = 'GLOBAL', storage = true },
 }
+_M.valid_vars = valid_vars
 
 local valid_operators = {
 	beginsWith       = function(pattern) return 'REFIND', '^' .. pattern end,
@@ -191,11 +192,14 @@ local action_defaults = {
 }
 
 local phase_lookup = {
-	'access',
-	'access',
-	'header_filter',
-	'body_filter',
-	'log',
+	[1]          = 'access',
+	[2]          = 'access',
+	[3]          = 'header_filter',
+	[4]          = 'body_filter',
+	[5]          = 'log',
+	["request"]  = 'access',
+	["response"] = 'body_filter',
+	["logging"]  = 'log',
 }
 _M.phase_lookup = phase_lookup
 
@@ -846,8 +850,6 @@ function _M.translate_actions(rule, translation, opts)
 			if key == 'capture' then
 				if translation.operator == 'REFIND' then
 					translation.operator = 'REGEX'
-				else
-					error('capture set when translated operator was not REFIND')
 				end
 				return
 			end
@@ -1093,7 +1095,7 @@ function _M.translate_chain(chain, opts)
 end
 
 function _M.figure_phase(translation)
-	local phase = tonumber(translation[1].phase)
+	local phase = tonumber(translation[1].phase) or translation[1].phase
 
 	translation[1].phase = nil
 
