@@ -18,6 +18,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 	* [lua-resty-waf:new()](#lua-resty-wafnew)
 	* [lua-resty-waf:set_option()](#lua-resty-wafset_option)
 	* [lua-resty-waf:set_var()](#lua-resty-wafset_var)
+	* [lua-resty-waf:sieve_rule()](#lua-resty-wafsieve_rule)
 	* [lua-resty-waf:exec()](#lua-resty-wafexec)
 	* [lua-resty-waf:write_log_events()](#lua-resty-wafwrite_log_events)
 * [Options](#options)
@@ -318,6 +319,34 @@ location / {
 ```
 
 Note that as with any other ModSecurity rule, the existence of a variable bears no functional change to WAF processing; it is the responsibility of the rule author to understand and use `TX` variables.
+
+### lua-resty-waf:sieve_rule()
+
+Define a collection exclusion for a given rule.
+
+*Example*:
+
+```lua
+location / {
+    access_by_lua_block {
+        local lua_resty_waf = require "resty.waf"
+
+        local waf = lua_resty_waf:new()
+
+        local sieves = {
+            {
+                type   = "ARGS",
+                elts   = "foo",
+                action = "ignore",
+            }
+        }
+
+        waf:sieve_rule("12345", sieves)
+    }
+}
+```
+
+See the [rule sieves](https://github.com/p0pr0ck5/lua-resty-waf/wiki/Rule-Sieves) wiki page for details and advanced usage examples.
 
 ### lua-resty-waf:exec()
 
