@@ -412,7 +412,7 @@ location / {
 
 *Default*: none
 
-Adds an additional ruleset to be used during processing. This allows users to implement custom rulesets without stomping over the included rules directory. Additional rulesets much reside within a folder called "rules" that lives within the `lua_package_path`.
+Adds an additional ruleset to be used during processing. This allows users to implement custom rulesets without stomping over the included rules directory. Additional rulesets must reside within a folder called "rules" that lives within the `lua_package_path`.
 
 *Example*:
 
