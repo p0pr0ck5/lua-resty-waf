@@ -219,8 +219,8 @@ http {
         -- errs is an array-like table
         if errs then
             for i = 1, #errs do
-	        ngx.log(ngx.ERR, errs[i])
-	    end
+                ngx.log(ngx.ERR, errs[i])
+            end
         end
     }
 
