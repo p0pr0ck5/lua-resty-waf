@@ -748,18 +748,23 @@ function _M.sieve_rule(self, id, sieves)
 		end
 	end
 
+	if not  self.target_update_map[id] then
+		ngx.log(ngx.WARN, "Rule `" .. id .. "` is not valid to sieve from")
+		return
+	end
+
 	for _, sieve in ipairs(sieves) do
 		local found
 		local arg = ""
 
 		if translate.valid_vars[sieve.type] then
-			arg = translate.valid_vars[sieve.type].type
+			arg = translate.valid_vars[sieve.type]
 		end
 
 		-- search for the rule here
 		for i = 1, #self.target_update_map[id] do
 			-- found it, append the sieves (ignore for now)
-			if arg == self.target_update_map[id][i].type then
+			if arg.type == self.target_update_map[id][i].type and self.target_update_map[id][i].parse[1] == arg.parse[1] then
 				local elts = type(sieve.elts) == "table" and sieve.elts
 					or { sieve.elts }
 
@@ -782,7 +787,7 @@ function _M.sieve_rule(self, id, sieves)
 			end
 
 			if not found then
-				ngx.log(ngx.WARN, arg .. " undefined in rule " .. id)
+				ngx.log(ngx.WARN, arg.type .. " undefined in rule " .. id)
 			end
 		end
 	end
