@@ -83,5 +83,5 @@ Accept: */*
 "alerts":[{"match":"bar","id":"12346","match_var":"bar","match_var_name":"REQUEST_ARGS"}]
 --- no_error_log
 [error]
-"match":"foo2","id":"12346","match_var":"bar","match_var_name":"REQUEST_ARGS"
+"match":"foo2","id":"12346","match_var":"foo2","match_var_name":"REQUEST_ARGS"
 
