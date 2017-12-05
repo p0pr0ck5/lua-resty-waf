@@ -34,5 +34,5 @@ before_script:
 script:
     - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -v --exec "$RUNNER"  t/acceptance/logging/03_log_event.t
     - ./tools/lua-releng -L
-    - tree -f /usr/local/openresty || true
-    - cat /usr/local/openresty/logs/error.log
+    - cat /usr/local/openresty/nginx/logs/access.log
+    - cat /usr/local/openresty/nginx/logs/error.log
