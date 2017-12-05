@@ -80,8 +80,8 @@ User-Agent: testy mctesterson
 Accept: */*
 --- error_code: 200
 --- error_log
-"alerts":[{"match":"bar","id":"12346","match_var":"bar","match_var_name":"REQUEST_ARGS"}]
+"alerts":[{"match_var_name":"REQUEST_ARGS","match_var":"bar","match":"bar","id":"12346"}]
 --- no_error_log
 [error]
-"match":"foo2","id":"12346","match_var":"foo2","match_var_name":"REQUEST_ARGS"
+"match_var_name":"REQUEST_ARGS","match_var":"foo2","match":"foo2","id":"12346"
 
