@@ -23,7 +23,7 @@ install:
 before_script:
     - export PATH=/usr/local/openresty/bin/:$PATH
     - sudo apt-get update -q
-    - sudo apt-get install lua5.1 liblua5.1-0-dev luarocks libpcre3-dev -y
+    - sudo apt-get install lua5.1 liblua5.1-0-dev luarocks libpcre3-dev tree -y
     - sudo wget -O /usr/local/bin/rebusted https://raw.githubusercontent.com/thibaultcha/lua-resty-busted/master/bin/busted
     - sudo chmod +x /usr/local/bin/rebusted
     - wget https://s3.amazonaws.com/p0pr0ck5-data/openresty-$V_OPENRESTY-$DATE.tar.bz2
@@ -32,5 +32,7 @@ before_script:
     - sudo make install-link install-rocks
     - sudo luarocks install lrexlib-pcre 2.7.2-1 PCRE_LIBDIR=/lib/x86_64-linux-gnu
 script:
-    - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -v --exec "$RUNNER" -r t/$TEST/*
+    - PATH=/usr/local/openresty/nginx/sbin:$PATH prove -v --exec "$RUNNER"  t/acceptance/logging/03_log_event.t
     - ./tools/lua-releng -L
+    - tree -f /usr/local/openresty || true
+    - cat /usr/local/openresty/logs/error.log
