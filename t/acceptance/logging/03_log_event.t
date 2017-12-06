@@ -84,4 +84,3 @@ Accept: */*
 --- no_error_log
 [error]
 "match_var":"foo2","id":"12346","match_var_name":"REQUEST_ARGS","match":"foo2"
-
