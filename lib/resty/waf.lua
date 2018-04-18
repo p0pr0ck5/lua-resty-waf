@@ -28,7 +28,7 @@ end
 
 local mt = { __index = _M }
 
-_M.version = base.lua
+_M.version = base.version
 
 -- default list of rulesets
 local _global_rulesets = {
