@@ -66,22 +66,22 @@ int js_decode(unsigned char *input, long int input_len) {
 			}
 			else if ((i + 1 < input_len) && ISODIGIT(input[i + 1])) {
 				/* \OOO (only one byte, \000 - \377) */
-				char input[4];
+				char buf[4];
 				int j = 0;
 
 				while((i + 1 + j < input_len)&&(j < 3)) {
-					input[j] = input[i + 1 + j];
+					buf[j] = input[i + 1 + j];
 					j++;
 					if (!ISODIGIT(input[i + 1 + j])) break;
 				}
-				input[j] = '\0';
+				buf[j] = '\0';
 
 				if (j > 0) {
-					if ((j == 3) && (input[0] > '3')) {
+					if ((j == 3) && (buf[0] > '3')) {
 						j = 2;
-						input[j] = '\0';
+						buf[j] = '\0';
 					}
-					*d++ = (unsigned char)strtol(input, NULL, 8);
+					*d++ = (unsigned char)strtol(buf, NULL, 8);
 					i += 1 + j;
 					count++;
 				}
