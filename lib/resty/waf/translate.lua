@@ -115,6 +115,7 @@ local valid_operators = {
 	strmatch         = 'STR_MATCH',
 	verifyCC         = 'VERIFY_CC',
 	within           = 'STR_EXISTS',
+	validateByteRange= 'BYTERANGE',
 };
 
 local valid_transforms = {
@@ -788,6 +789,11 @@ function _M.translate_operator(rule, translation, path)
 	end
 
 	if translated_operator == 'CIDR_MATCH' then
+		local pattern = split(rule.operator.pattern, ",")
+		translation.pattern = pattern
+	end
+
+	if translated_operator == 'BYTERANGE' then
 		local pattern = split(rule.operator.pattern, ",")
 		translation.pattern = pattern
 	end
