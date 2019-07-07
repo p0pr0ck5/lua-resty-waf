@@ -21,6 +21,9 @@ local _ac_dicts = {}
 -- module-level cache of cidr objects
 local _cidr_cache = {}
 
+-- module-level cache of byterange
+local _byterange_cache = {}
+
 _M.version = base.version
 
 function _M.equals(a, b)
@@ -496,6 +499,67 @@ function _M.verify_cc(waf, input, pattern)
 	return match, value
 end
 
+function _M.byterange(input, range_pattern, ctx)
+	local id = ctx.id
+
+	local ranges = {}
+	if not _byterange_cache[id] then
+		if type(range_pattern) ~= "table" then
+			range_pattern = { range_pattern }
+		end
+
+		-- parse ranges into numbers
+		for _, v in ipairs(range_pattern) do
+			if v:match('%-') ~= nil then
+				local elements = {}
+				string_gsub(v, '([^-]+)', function(value)
+					elements[#elements + 1] = tonumber(value)
+				end)
+				ranges[#ranges + 1] = elements
+			else
+				ranges[#ranges + 1] = tonumber(v)
+			end
+		end
+
+		_byterange_cache[id] = ranges
+	else
+		ranges = _byterange_cache[id]
+	end
+
+	if type(input) == 'table' then
+		for _, v in ipairs(input) do
+			local match, value = _M.byterange(v, range_pattern, ctx)
+
+			if match then
+				return match, value
+			end
+		end
+	else
+		for pos = 1,#input do
+			local match = false
+			for _, range in ipairs(ranges) do
+				if type(range) == 'table' then
+					local min = range[1]
+					local max = range[2]
+
+					if (input:byte(pos) >= min and input:byte(pos) <= max) then
+						match = true
+					end
+				elseif input:byte(pos) == range then
+					match = true
+				end
+			 end
+
+			if match == false then
+				return true, input
+			end
+		end
+	end
+
+	return false, input
+end
+
+
 _M.lookup = {
 	REGEX        = function(waf, collection, pattern) return _M.regex(waf, collection, pattern) end,
 	REFIND       = function(waf, collection, pattern) return _M.refind(waf, collection, pattern) end,
@@ -515,6 +579,7 @@ _M.lookup = {
 	DETECT_XSS   = function(waf, collection, pattern) return _M.detect_xss(collection) end,
 	STR_MATCH    = function(waf, collection, pattern) return _M.str_match(collection, pattern) end,
 	VERIFY_CC    = function(waf, collection, pattern) return _M.verify_cc(waf, collection, pattern) end,
+	BYTERANGE    = function(waf, collection, pattern, ctx) return _M.byterange(collection, pattern, ctx) end,
 }
 
 return _M
