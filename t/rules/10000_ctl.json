@@ -1,1 +1,0 @@
-{"access":[{"actions":{"disrupt":"IGNORE","nondisrupt":[{"action":"rule_remove_id","data":"12346"}]},"id":"12345","opts":{"nolog":1},"vars":[{"unconditional":1}]},{"actions":{"disrupt":"DENY"},"id":"12346","operator":"REFIND","pattern":"foo","vars":[{"parse":["values","1"],"type":"REQUEST_ARGS"}]}],"body_filter":[],"header_filter":[]}

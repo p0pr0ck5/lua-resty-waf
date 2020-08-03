@@ -1,3 +1,0 @@
-# this is a set of test rules
-SecRule ARGS "@streq b" "id:12345,phase:1,pass,nolog,ctl:ruleEngine=DetectionOnly"
-SecRule ARGS "@streq d" "id:12346,phase:1,deny"

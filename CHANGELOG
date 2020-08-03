@@ -1,3 +1,7 @@
+v?                                                                   Unreleased
+
+    * Complete rewrite
+
 v0.11.1                                                              May 8, 2017
 
     * Feature: configurable rule-based collection sieving
