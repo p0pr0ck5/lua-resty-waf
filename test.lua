@@ -7,11 +7,11 @@ local ok = waf:add_rules({
         phase = "access",
         tags = { "foo" },
 
-        match = [[ngx.re.find("foo", "foobar")]],
-        --ignore = {
-            --headers = { "foo" },
-            --query = {"bar", "baz"},
-        --},
+        match = [[ngx.re.find("foo", "f")]],
+        ignore = {
+            headers = { "foo" },
+            query = {"bar", "baz"},
+        },
 
         --tfn = { "tfn1", "tfn2" },
 
@@ -24,6 +24,8 @@ local ok = waf:add_rules({
 })
 if not ok then error("nope") end
 
+waf.config.active = true
+
 local err
 ok, err = waf:compile("access")
 if not ok then
@@ -31,7 +33,9 @@ if not ok then
 end
 print(waf._compiled.access.raw)
 
+waf:exec("access")
 
---for i = 1, 10000000 do
---    waf:exec("access")
---end
+
+for i = 1, 300000 do
+    waf:exec("access")
+end

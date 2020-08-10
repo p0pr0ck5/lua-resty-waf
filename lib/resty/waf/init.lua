@@ -25,6 +25,8 @@ function waf.new(opts)
         ignored_rules = {},
         ignored_tags = {},
 
+        config = {},
+
         _ccount = {},
         _compiled = {},
     }, {
@@ -106,7 +108,7 @@ function waf:should_rule(phase, rule)
 end
 
 
-local function render(tpl, context)
+function waf:render(tpl, context)
     if tpl == nil then
         return tpl
     end
@@ -134,14 +136,14 @@ local function render(tpl, context)
             local ctx = copy(context)
             for _, elt in ipairs(context[tbl]) do
                 ctx[key] = elt
-                c[#c + 1] = render(match.content, ctx)
+                c[#c + 1] = self:render(match.content, ctx)
             end
             return table.concat(c)
         end
     end
 
     -- logic first
-    local rendered = ngx.re.gsub(tpl, [[{~\s*(?<op>\w+)(?<expr>.*?)\s*~}(?<content>[\s\S]+?)(?<haselse>{~\s*else\s*~}(?<elsecontent>[\s\S]+))?{~\s*end(?P=op)\s*~}]], eval, "jo")
+    local rendered = ngx.re.gsub(tpl, [[{~\s*(?<op>\w+)(?<expr>.*?)\s*~}(?<content>[\s\S]+?)(?<haselse>{~\s*else\s*~}(?<elsecontent>[\s\S]+))?{~\s*end(?P=op)\s*~}]], eval)
 
     -- text rendering
     local mm, _, _ = ngx.re.gsub(rendered, [[{{\s*(?<f>.*)\s+}}]], function(m)
@@ -152,9 +154,9 @@ local function render(tpl, context)
             t[#t + 1] = elts[i]
         end
         return
-            type(context[s]) == "function" and context[s](context, table.unpack(t)) or render(context[s], context)
+            type(context[s]) == "function" and context[s](context, table.unpack(t)) or self:render(context[s], context)
                 or
-            type(template[s]) == "function" and template[s](context, table.unpack(t)) or render(template[s], context)
+            type(template[s]) == "function" and template[s](context, table.unpack(t)) or self:render(template[s], context)
                 or
             m[0]
     end)
@@ -162,14 +164,14 @@ local function render(tpl, context)
 end
 
 
-local function add_rule(t, rule)
+function waf:add_rule(t, rule)
     local rule_str = template.rule
 
     -- render the rule function itself
-    rule.fn = render(rule.fn, rule)
+    rule.fn = self:render(rule.fn, rule)
 
     -- render the template
-    local c = render(rule_str, rule)
+    local c = self:render(rule_str, rule)
 
     t[#t + 1] = c
 end
@@ -184,26 +186,28 @@ function waf:compile(phase)
     self._ccount[phase] = ccount
 
     local t = {
-        string.format(template.header, phase, ccount, ngx.now())
+        string.format(template.header, phase, ccount, ngx.now()),
+        self:render(template.prologue)
     }
 
     for _, rule in ipairs(self.rules[phase]) do
         if self:should_rule(phase, rule) then
-            add_rule(t, rule)
+            self:add_rule(t, rule)
         end
     end
 
     local raw = table.concat(t)
+
+    self._compiled[phase] = {
+        raw = raw,
+    }
 
     local chunk, err = loadstring(raw)
     if err ~= nil then
         return false, err
     end
 
-    self._compiled[phase] = {
-        raw = raw,
-        chunk = chunk,
-    }
+    self._compiled[phase].chunk = chunk
 
     return true, nil
 end
@@ -215,7 +219,13 @@ function waf:exec(phase)
         return
     end
 
-    c.chunk()
+    local chunk = c.chunk
+    setfenv(chunk, setmetatable({
+        waf_t = self,
+    }, {
+        __index = _G,
+    }))
+    chunk()
 end
 
 
