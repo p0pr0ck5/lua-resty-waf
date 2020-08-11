@@ -1,3 +1,4 @@
+local request = require "resty.waf.request"
 local template = require "resty.waf.template"
 local re = require "ngx.re"
 
@@ -17,6 +18,10 @@ end
 
 
 local waf = {}
+
+
+waf.get_headers = request.get_headers
+waf.get_uri_args = request.get_uri_args
 
 
 function waf.new(opts)
@@ -135,7 +140,8 @@ function waf:render(tpl, context)
             end
             c[#c + 1] = " ]] end"
 
-            local chunk = loadstring(table.concat(c))
+            local chunk, err = loadstring(table.concat(c))
+            if err then print(err) end
             setfenv(chunk, setmetatable(context, {
                 __index = _G,
             }))
@@ -148,7 +154,7 @@ function waf:render(tpl, context)
             local key = m[1]
             local tbl = m[2]
             local ctx = copy(context)
-            for _, elt in ipairs(context[tbl]) do
+            for _, elt in ipairs(context[tbl] or {}) do
                 ctx[key] = elt
                 c[#c + 1] = self:render(match.content, ctx)
             end

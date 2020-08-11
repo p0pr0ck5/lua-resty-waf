@@ -13,13 +13,18 @@ local ok = waf:add_rules({
 
         severity = 1,
 
-        match = [[ngx.re.find("foo", "f")]],
+        match = [[ngx.re.find(target, "FOO", "jo")]],
         ignore = {
             headers = { "foo" },
             query = {"bar", "baz"},
         },
 
-        --tfn = { "tfn1", "tfn2" },
+        loop = {
+            headers = { keys = true, values = true, },
+            query = { keys = true, values = true, },
+        },
+
+        tfn = { "string.upper" },
 
         fn =
 [[

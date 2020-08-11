@@ -10,8 +10,8 @@ return {
 {* waf_t is provided into the env via setfenv *}
 local waf = waf_t:new_runner()
 
-local headers = ngx.req.get_headers()
-local query = ngx.req.get_uri_args()
+local headers, headers_complex = waf_t.get_headers()
+local query, query_complex = waf_t.get_uri_args()
 
 ]],
 
@@ -36,23 +36,63 @@ end
 {{ req_query_loop }}
 ]],
 
+    ignore_tpl = function(context, str)
+      return string.format(
+[[
+{~ if ignore and ignore.%s ~}
+  if {{ ignore_fn %s }} then
+    goto continue
+  end
+{~ endif ~}
+]], str, str
+)
+    end,
+
+    transformation_tpl = function(context)
+      return
+[[
+{~ if tfn ~}
+{~ each transformation in tfn ~}
+  target = {{ transformation }}(target)
+{~ endeach ~}
+{~ endif ~}
+]]
+    end,
+
     loop_fn = function(context, str)
       return string.format(
 [[
-  for k, v in pairs(%s) do
-    {~ if ignore and ignore.%s ~}if {{ ignore_fn %s }} then goto continue end{~ endif ~}
-    {~ if tfn ~}
-    local s = v
-    {~ each transformation in tfn ~}
-    s = {{ transformation }}(s)
-    {~ endeach ~}
-    {~ endif ~}
-    if {{ match }} then
-      waf:rule_match()
-    end
-  {~ if ignore and ignore.%s ~}:: continue ::{~ endif ~}
+for i = 1, #%s_complex do
+  ngx.log(ngx.WARN, "%s ", i)
+  local target
+
+{~ if loop.%s.keys ~}
+  target = %s_complex[i].key
+  ngx.log(ngx.WARN, "key ", target)
+
+{{ transformation_tpl }}
+  ngx.log(ngx.WARN, "key ", target)
+
+  if {{ match }} then
+    waf:rule_match()
   end
-]], str, str, str, str
+{~ endif ~}
+
+{~ if loop.%s.values ~}
+  target = %s_complex[i].value
+  ngx.log(ngx.WARN, "value ", target)
+
+{{ ignore_tpl %s }}
+{{ transformation_tpl }}
+  ngx.log(ngx.WARN, "value ", target)
+
+  if {{ match }} then
+    waf:rule_match()
+  end
+{~ endif ~}
+
+{~ if ignore and ignore.%s ~}:: continue ::{~ endif ~}
+end]], str, str, str, str, str, str, str, str
       )
     end,
 
