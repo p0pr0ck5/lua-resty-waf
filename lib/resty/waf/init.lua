@@ -63,7 +63,7 @@ function waf:validate_rule(rule)
         return false
     end
 
-    if type(rule.severity) ~= "number" then
+    if type(rule.strictness) ~= "number" then
         return false
     end
 
@@ -108,7 +108,7 @@ function waf:should_rule(phase, rule)
         return false
     end
 
-    if rule.severity > self.config.severity then
+    if rule.strictness > self.config.strictness then
         return false
     end
 
@@ -276,8 +276,8 @@ function runner:write_logs()
 end
 
 
-function runner:rule_match(id, msg, score)
-    self:log_rule_match(id, msg)
+function runner:rule_match(id, msg, value, score)
+    self:log_rule_match(id, msg, value)
 
     if self.config.mode == "scoring" then
         self.anomaly_score = self.anomaly_score + score
@@ -291,8 +291,8 @@ function runner:rule_match(id, msg, score)
 end
 
 
-function runner:log_rule_match(id, msg)
-    self.log_msgs[#self.log_msgs+1] = string.format("%s%s", id, msg)
+function runner:log_rule_match(id, msg, value)
+    self.log_msgs[#self.log_msgs+1] = string.format("%s - found %s: %s", id, value, msg)
 end
 
 

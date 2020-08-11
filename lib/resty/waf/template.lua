@@ -10,8 +10,9 @@ return {
 {* waf_t is provided into the env via setfenv *}
 local waf = waf_t:new_runner()
 
-local headers, headers_complex = waf_t.get_headers()
-local query, query_complex = waf_t.get_uri_args()
+local method = ngx.req.get_method()
+local headers_t, headers = waf_t.get_headers()
+local query_t, query = waf_t.get_uri_args()
 
 ]],
 
@@ -77,24 +78,24 @@ end
     loop_fn = function(context, str)
       return string.format(
 [[
-for i = 1, #%s_complex do
+for i = 1, #%s do
   ngx.log(ngx.WARN, "%s ", i)
   local target
 
 {~ if loop.%s.keys ~}
-  target = %s_complex[i].key
+  target = %s[i].key
   ngx.log(ngx.WARN, "key ", target)
 
 {{ transformation_tpl }}
   ngx.log(ngx.WARN, "key ", target)
 
   if {{ match }} then
-    {{ rule_match }}
+    {{ rule_match target }}
   end
 {~ endif ~}
 
 {~ if loop.%s.values ~}
-  target = %s_complex[i].value
+  target = %s[i].value
   ngx.log(ngx.WARN, "value ", target)
 
 {{ ignore_tpl %s }}
@@ -102,7 +103,7 @@ for i = 1, #%s_complex do
   ngx.log(ngx.WARN, "value ", target)
 
   if {{ match }} then
-    {{ rule_match }}
+    {{ rule_match target }}
   end
 {~ endif ~}
 
@@ -115,5 +116,7 @@ end]], str, str, str, str, str, str, str, str
 
     req_query_loop = [[{{ loop_fn query }}]],
 
-    rule_match = [[waf:rule_match("{{ id }}", "msg", {{ anomaly_score }})]]
+    rule_match = function(context, value)
+      return string.format([[waf:rule_match("{{ id }}", "{{ message }}", ]] .. tostring(value) .. [[, {{ anomaly_score }})]])
+    end,
 }

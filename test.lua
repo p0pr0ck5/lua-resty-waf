@@ -1,7 +1,7 @@
 local f = require ("resty.waf")
 local waf = f.new({
     config = {
-        severity = 4,
+        strictness = 4,
     }
 })
 
@@ -11,7 +11,7 @@ local ok = waf:add_rules({
         phase = "access",
         tags = { "foo" },
 
-        severity = 1,
+        strictness = 1,
 
         anomaly_score = 3,
 
@@ -37,7 +37,7 @@ local ok = waf:add_rules({
     {
         id = "12346",
         phase = "access",
-        severity = 1,
+        strictness = 1,
         anomaly_score = 3,
 
         fn =
@@ -54,6 +54,7 @@ end
 ]],
     },
 })
+waf:add_rules(require("resty.waf.rules.method-enforcement"))
 if not ok then error("nope") end
 
 waf.config.active = true
