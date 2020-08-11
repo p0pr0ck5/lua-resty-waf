@@ -86,7 +86,7 @@ function waf:add_rules(rules)
             self.rules[phase] = {}
         end
 
-        self.rules[phase][#self.rules + 1] = rule
+        self.rules[phase][#self.rules[phase] + 1] = rule
     end
 
     return true
@@ -169,7 +169,7 @@ function waf:render(tpl, context)
     tpl = ngx.re.gsub(tpl, [[{~\s*(?<op>\w+)(?<expr>.*?)\s*~}(?<content>[\s\S]+?)(?<haselse>{~\s*else\s*~}(?<elsecontent>[\s\S]+))?{~\s*end(?P=op)\s*~}]], eval)
 
     -- text rendering
-    local mm, _, _ = ngx.re.gsub(tpl, [[{{\s*(?<f>.*)\s+}}]], function(m)
+    local mm, _, _ = ngx.re.gsub(tpl, [[{{\s*(?<f>.*?)\s+}}]], function(m)
         local t = {}
         local elts = re.split(m.f, [[\s+]])
         local s = elts[1]
@@ -219,6 +219,8 @@ function waf:compile(phase)
         end
     end
 
+    t[#t + 1] = self:render(template.epilogue, self.config)
+
     local raw = table.concat(t)
 
     self._compiled[phase] = {
@@ -267,8 +269,15 @@ function waf:new_runner()
 end
 
 
-function runner:rule_match(id, msg, matched_var, matched_var_name, score)
-    self:log_rule_match(id, msg, matched_var, matched_var_name)
+function runner:write_logs()
+    for _, msg in ipairs(self.log_msgs) do
+        ngx.log(ngx.WARN, msg)
+    end
+end
+
+
+function runner:rule_match(id, msg, score)
+    self:log_rule_match(id, msg)
 
     if self.config.mode == "scoring" then
         self.anomaly_score = self.anomaly_score + score
@@ -276,13 +285,14 @@ function runner:rule_match(id, msg, matched_var, matched_var_name, score)
     end
 
     if self.config.active == true then
+        self:write_logs()
         self:action()
     end
 end
 
 
-function runner:log_rule_match(id, msg, matched_var, matched_var_name)
-    ngx.log(ngx.WARN, id, msg, matched_var, matched_var_name)
+function runner:log_rule_match(id, msg)
+    self.log_msgs[#self.log_msgs+1] = string.format("%s%s", id, msg)
 end
 
 

@@ -15,6 +15,20 @@ local query, query_complex = waf_t.get_uri_args()
 
 ]],
 
+    epilogue =
+[[
+
+waf:write_logs()
+
+{~ if mode == "scoring" ~}
+ngx.log(ngx.WARN, "score: ", waf.anomaly_score)
+{~ endif ~}
+
+if waf.anomaly_score > {{ anomaly_score_threshold }} then
+  waf:action()
+end
+]],
+
     rule =
 [[
 -- BEGIN RULE {{ id }}
@@ -24,7 +38,8 @@ do
 
 end
 -- END RULE {{ id }}
-    ]],
+
+]],
 
     ignore_fn = function(context, phase)
       return table.concat(context.ignore[phase], " or ")
@@ -74,7 +89,7 @@ for i = 1, #%s_complex do
   ngx.log(ngx.WARN, "key ", target)
 
   if {{ match }} then
-    waf:rule_match()
+    {{ rule_match }}
   end
 {~ endif ~}
 
@@ -87,7 +102,7 @@ for i = 1, #%s_complex do
   ngx.log(ngx.WARN, "value ", target)
 
   if {{ match }} then
-    waf:rule_match()
+    {{ rule_match }}
   end
 {~ endif ~}
 
@@ -99,4 +114,6 @@ end]], str, str, str, str, str, str, str, str
     req_header_loop = [[{{ loop_fn headers }}]],
 
     req_query_loop = [[{{ loop_fn query }}]],
+
+    rule_match = [[waf:rule_match("{{ id }}", "msg", {{ anomaly_score }})]]
 }

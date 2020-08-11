@@ -13,6 +13,8 @@ local ok = waf:add_rules({
 
         severity = 1,
 
+        anomaly_score = 3,
+
         match = [[ngx.re.find(target, "FOO", "jo")]],
         ignore = {
             headers = { "foo" },
@@ -31,10 +33,31 @@ local ok = waf:add_rules({
 {{ req_loop }}
 ]],
     },
+
+    {
+        id = "12346",
+        phase = "access",
+        severity = 1,
+        anomaly_score = 3,
+
+        fn =
+[[
+for i = 1, #headers do
+    local set = {}
+
+    if set[headers[i].key] then
+        waf:rule_match()
+    end
+
+    set[headers[i].key] = true
+end
+]],
+    },
 })
 if not ok then error("nope") end
 
 waf.config.active = true
+waf.config.anomaly_score_threshold = 5
 
 local err
 ok, err = waf:compile("access")
