@@ -20,7 +20,7 @@ local waf = {}
 
 
 function waf.new(opts)
-    return setmetatable({
+    local t = setmetatable({
         rules = {},
         ignored_rules = {},
         ignored_tags = {},
@@ -32,6 +32,12 @@ function waf.new(opts)
     }, {
         __index = waf,
     })
+
+    for k, v in pairs(opts) do
+        t[k] = v
+    end
+
+    return t
 end
 
 
@@ -49,6 +55,10 @@ function waf:validate_rule(rule)
     end
 
     if type(rule.fn) ~= "string" then
+        return false
+    end
+
+    if type(rule.severity) ~= "number" then
         return false
     end
 
@@ -90,7 +100,11 @@ end
 
 function waf:should_rule(phase, rule)
     if rule.phase ~= phase then
-        return true
+        return false
+    end
+
+    if rule.severity > self.config.severity then
+        return false
     end
 
     if self.ignored_rules[rule.id] then
@@ -142,11 +156,14 @@ function waf:render(tpl, context)
         end
     end
 
+    -- strip comments
+    tpl = ngx.re.gsub(tpl, [[{\*.*?\*}\n?]], "")
+
     -- logic first
-    local rendered = ngx.re.gsub(tpl, [[{~\s*(?<op>\w+)(?<expr>.*?)\s*~}(?<content>[\s\S]+?)(?<haselse>{~\s*else\s*~}(?<elsecontent>[\s\S]+))?{~\s*end(?P=op)\s*~}]], eval)
+    tpl = ngx.re.gsub(tpl, [[{~\s*(?<op>\w+)(?<expr>.*?)\s*~}(?<content>[\s\S]+?)(?<haselse>{~\s*else\s*~}(?<elsecontent>[\s\S]+))?{~\s*end(?P=op)\s*~}]], eval)
 
     -- text rendering
-    local mm, _, _ = ngx.re.gsub(rendered, [[{{\s*(?<f>.*)\s+}}]], function(m)
+    local mm, _, _ = ngx.re.gsub(tpl, [[{{\s*(?<f>.*)\s+}}]], function(m)
         local t = {}
         local elts = re.split(m.f, [[\s+]])
         local s = elts[1]
@@ -154,9 +171,9 @@ function waf:render(tpl, context)
             t[#t + 1] = elts[i]
         end
         return
-            type(context[s]) == "function" and context[s](context, table.unpack(t)) or self:render(context[s], context)
+            type(context[s]) == "function" and self:render(context[s](context, table.unpack(t)), context) or self:render(context[s], context)
                 or
-            type(template[s]) == "function" and template[s](context, table.unpack(t)) or self:render(template[s], context)
+            type(template[s]) == "function" and self:render(template[s](context, table.unpack(t)), context) or self:render(template[s], context)
                 or
             m[0]
     end)
@@ -226,6 +243,45 @@ function waf:exec(phase)
         __index = _G,
     }))
     chunk()
+end
+
+
+local runner = {}
+
+
+function waf:new_runner()
+    return setmetatable({
+        anomaly_score = 0,
+        log_msgs = {},
+
+        config = self.config,
+    }, {
+        __index = runner,
+    })
+end
+
+
+function runner:rule_match(id, msg, matched_var, matched_var_name, score)
+    self:log_rule_match(id, msg, matched_var, matched_var_name)
+
+    if self.config.mode == "scoring" then
+        self.anomaly_score = self.anomaly_score + score
+        return
+    end
+
+    if self.config.active == true then
+        self:action()
+    end
+end
+
+
+function runner:log_rule_match(id, msg, matched_var, matched_var_name)
+    ngx.log(ngx.WARN, id, msg, matched_var, matched_var_name)
+end
+
+
+function runner:action()
+    ngx.exit(403)
 end
 
 

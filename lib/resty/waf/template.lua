@@ -7,12 +7,11 @@ return {
 
     prologue =
 [[
-
-local utils = require "resty.waf.utils"
-local waf = utils.new_runner(waf_t.config)
+{* waf_t is provided into the env via setfenv *}
+local waf = waf_t:new_runner()
 
 local headers = ngx.req.get_headers()
-local args = ngx.req.get_uri_args()
+local query = ngx.req.get_uri_args()
 
 ]],
 
@@ -31,37 +30,33 @@ end
       return table.concat(context.ignore[phase], " or ")
     end,
 
-    req_header_loop =
+    req_loop =
 [[
-for k, v in pairs(headers) do
-  {~ if ignore and ignore.headers ~}if {{ ignore_fn headers }} then goto continue end{~ endif ~}
-  {~ if tfn ~}
-  local s = v
-  {~ each transformation in tfn ~}
-  s = {{ transformation }}(s)
-  {~ endeach ~}
-  {~ endif ~}
-  if {{ match }} then
-    waf:rule_match()
-  end
-{~ if ignore and ignore.headers ~}:: continue ::{~ endif ~}
-end
+{{ req_header_loop }}
+{{ req_query_loop }}
 ]],
 
-    req_query_loop =
+    loop_fn = function(context, str)
+      return string.format(
 [[
-for k, v in pairs(args) do
-  {~ if ignore and ignore.query ~}if {{ ignore_fn query }} then goto continue end{~ endif ~}
-  {~ if tfn ~}
-  local s = v
-  {~ each transformation in tfn ~}
-  s = {{ transformation }}(s)
-  {~ endeach ~}
-  {~ endif ~}
-  if {{ match }} then
-    waf:rule_match()
+  for k, v in pairs(%s) do
+    {~ if ignore and ignore.%s ~}if {{ ignore_fn %s }} then goto continue end{~ endif ~}
+    {~ if tfn ~}
+    local s = v
+    {~ each transformation in tfn ~}
+    s = {{ transformation }}(s)
+    {~ endeach ~}
+    {~ endif ~}
+    if {{ match }} then
+      waf:rule_match()
+    end
+  {~ if ignore and ignore.%s ~}:: continue ::{~ endif ~}
   end
-{~ if ignore and ignore.query ~}:: continue ::{~ endif ~}
-end
-]],
+]], str, str, str, str
+      )
+    end,
+
+    req_header_loop = [[{{ loop_fn headers }}]],
+
+    req_query_loop = [[{{ loop_fn query }}]],
 }

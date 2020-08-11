@@ -1,11 +1,17 @@
 local f = require ("resty.waf")
-local waf = f.new()
+local waf = f.new({
+    config = {
+        severity = 4,
+    }
+})
 
 local ok = waf:add_rules({
     {
         id = "12345",
         phase = "access",
         tags = { "foo" },
+
+        severity = 1,
 
         match = [[ngx.re.find("foo", "f")]],
         ignore = {
@@ -17,8 +23,7 @@ local ok = waf:add_rules({
 
         fn =
 [[
-{{ req_header_loop }}
-{{ req_query_loop }}
+{{ req_loop }}
 ]],
     },
 })
@@ -33,9 +38,9 @@ if not ok then
 end
 print(waf._compiled.access.raw)
 
-waf:exec("access")
+--waf:exec("access")
 
 
-for i = 1, 300000 do
-    waf:exec("access")
-end
+--for i = 1, 300000 do
+--    waf:exec("access")
+--end
