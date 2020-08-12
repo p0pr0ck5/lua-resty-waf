@@ -1,0 +1,18 @@
+return {
+	"80legs",
+	"black widow",
+	"blackwidow",
+	"prowebwalker",
+	"pymills-spider/",
+	"AhrefsBot",
+	"PiplBot",
+	"GrapeshotCrawler/2.0",
+	"grapeFX",
+	"SearchmetricsBot",
+	"SemrushBot",
+	"rogerbot",
+	"MJ12bot",
+	"Owlin bot",
+	"Lingewoud-550-Spyder",
+	"Wappalyzer",
+ }

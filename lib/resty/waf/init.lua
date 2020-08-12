@@ -1,3 +1,4 @@
+local operators = require "resty.waf.operators"
 local request = require "resty.waf.request"
 local template = require "resty.waf.template"
 local re = require "ngx.re"
@@ -27,6 +28,7 @@ waf.get_uri_args = request.get_uri_args
 function waf.new(opts)
     local t = setmetatable({
         rules = {},
+        rule_data = {},
         ignored_rules = {},
         ignored_tags = {},
 
@@ -196,6 +198,12 @@ function waf:add_rule(t, rule)
     -- render the template
     local c = self:render(rule_str, rule)
 
+    -- run rule's data fn, if any
+    local fn = rule.data_fn
+    if type(fn) == "function" then
+        self.rule_data[rule.id] = fn()
+    end
+
     t[#t + 1] = c
 end
 
@@ -213,7 +221,7 @@ function waf:compile(phase)
         self:render(template.prologue)
     }
 
-    for _, rule in ipairs(self.rules[phase]) do
+    for _, rule in ipairs(self.rules[phase] or {}) do
         if self:should_rule(phase, rule) then
             self:add_rule(t, rule)
         end
@@ -263,6 +271,9 @@ function waf:new_runner()
         log_msgs = {},
 
         config = self.config,
+        rule_data = self.rule_data,
+
+        operators = operators,
     }, {
         __index = runner,
     })

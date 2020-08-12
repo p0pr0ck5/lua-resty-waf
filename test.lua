@@ -42,7 +42,7 @@ local ok = waf:add_rules({
 
         fn =
 [[
-for i = 1, #headers do
+for i = 1, #headers doexec
     local set = {}
 
     if set[headers[i].key] then
@@ -55,6 +55,7 @@ end
     },
 })
 waf:add_rules(require("resty.waf.rules.method-enforcement"))
+ok = waf:add_rules(require("resty.waf.rules.scanner-detection"))
 if not ok then error("nope") end
 
 waf.config.active = true

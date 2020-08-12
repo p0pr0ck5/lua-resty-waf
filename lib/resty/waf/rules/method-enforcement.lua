@@ -20,10 +20,10 @@ return {
 
         fn =
 [[
-local ok = true
+local ok = false
 for i = 1, #waf.config.allowed_methods do
-    if method ~= waf.config.allowed_methods[i] then
-        ok = false
+    if method == waf.config.allowed_methods[i] then
+        ok = true
         break
     end
 end

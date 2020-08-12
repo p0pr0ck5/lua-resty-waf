@@ -13,6 +13,7 @@ local waf = waf_t:new_runner()
 local method = ngx.req.get_method()
 local headers_t, headers = waf_t.get_headers()
 local query_t, query = waf_t.get_uri_args()
+local uri = ngx.var.uri
 
 ]],
 
@@ -75,19 +76,26 @@ end
 ]]
     end,
 
+    target_loop =
+[[
+local target
+{~ each target in targets ~}
+target = {{ target }}
+if target and {{ match }} then
+  {{ rule_match target }}
+end
+{~ endeach ~}
+]],
+
     loop_fn = function(context, str)
       return string.format(
 [[
 for i = 1, #%s do
-  ngx.log(ngx.WARN, "%s ", i)
   local target
 
 {~ if loop.%s.keys ~}
   target = %s[i].key
-  ngx.log(ngx.WARN, "key ", target)
-
 {{ transformation_tpl }}
-  ngx.log(ngx.WARN, "key ", target)
 
   if {{ match }} then
     {{ rule_match target }}
@@ -96,12 +104,8 @@ for i = 1, #%s do
 
 {~ if loop.%s.values ~}
   target = %s[i].value
-  ngx.log(ngx.WARN, "value ", target)
-
 {{ ignore_tpl %s }}
 {{ transformation_tpl }}
-  ngx.log(ngx.WARN, "value ", target)
-
   if {{ match }} then
     {{ rule_match target }}
   end
