@@ -63,6 +63,8 @@ if not ok then error("nope") end
 
 waf.config.active = true
 waf.config.anomaly_score_threshold = 5
+waf.config.allowed_methods = { "GET", "POST" }
+waf.config.max_argument_count = 2
 
 local err
 ok, err = waf:compile("access")

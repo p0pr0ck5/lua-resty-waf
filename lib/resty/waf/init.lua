@@ -125,6 +125,13 @@ function waf:should_rule(phase, rule)
         end
     end
 
+    local fn = rule.load_precondition
+    if type(fn) == "function" then
+        if not fn(self) then
+            return false
+        end
+    end
+
     return true
 end
 
@@ -266,7 +273,7 @@ local runner = {}
 
 
 function waf:new_runner()
-    return setmetatable({
+    return (setmetatable({
         anomaly_score = 0,
         log_msgs = {},
 
@@ -276,7 +283,7 @@ function waf:new_runner()
         operators = operators,
     }, {
         __index = runner,
-    })
+    }))
 end
 
 

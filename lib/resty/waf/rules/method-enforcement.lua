@@ -18,6 +18,11 @@ return {
             "OWASP_CRS/3.3.0",
         },
 
+        load_precondition = function(waf)
+            print(require("cjson").encode(waf.config))
+            return waf.config.allowed_methods ~= nil
+        end,
+
         fn =
 [[
 local ok = false

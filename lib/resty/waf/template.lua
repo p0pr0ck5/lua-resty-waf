@@ -23,7 +23,7 @@ local uri = ngx.var.uri
 waf:write_logs()
 
 {~ if mode == "scoring" ~}
-ngx.log(ngx.WARN, "score: ", waf.anomaly_score)
+--ngx.log(ngx.WARN, "score: ", waf.anomaly_score)
 {~ endif ~}
 
 if waf.anomaly_score > {{ anomaly_score_threshold }} then
