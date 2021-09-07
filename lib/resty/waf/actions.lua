@@ -87,7 +87,9 @@ _M.nondisruptive_lookup = {
 		--_LOG_"Runtime ignoring rules by meta"
 
 		-- this lookup table holds
-		local meta_rules = waf._meta_exception.meta_ids[ctx.id] or {}
+		local meta_rules = waf._meta_exception.meta_ids[ctx.id]
+
+		if not meta_rules then return end
 
 		for i, id in ipairs(meta_rules) do
 			--_LOG_"Runtime ignoring rule " .. id

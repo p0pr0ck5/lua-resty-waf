@@ -204,7 +204,7 @@ local function _do_transform(self, collection, transform)
 			for k, v in pairs(collection) do
 				t[k] = _do_transform(self, collection[k], transform)
 			end
-		else
+		elseif type(collection) == "string" then
 			if not collection then
 				return collection -- dont transform if the collection was nil, i.e. a specific arg key dne
 			end
