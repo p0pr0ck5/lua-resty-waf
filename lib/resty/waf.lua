@@ -788,6 +788,65 @@ function _M.sieve_rule(self, id, sieves)
 	end
 end
 
+-- add extra sieve elements to a rule on a per-instance basis / apply to a whole ruleset at a time
+-- ruleset_name example: "42000_xss"
+function _M.sieve_ruleset(self, ruleset_name, sieves)
+	-- pointer to a rule
+	local target_update_map_opts_transform = {}
+
+	for r, ruleset in pairs(_ruleset_defs) do
+		if r == ruleset_name then
+			for phase, rules in pairs(ruleset) do
+				for i, rule in ipairs(rules) do
+					self.target_update_map[rule.id] = util.table_copy(rule.vars)
+					target_update_map_opts_transform[rule.id] = rule.opts.transform
+				end
+			end
+		end
+	end
+
+	for _, sieve in ipairs(sieves) do
+		local found
+		local arg = ""
+
+		if translate.valid_vars[sieve.type] then
+			arg = translate.valid_vars[sieve.type].type
+		end
+
+		-- search for the rule here
+		for rule_id, rule in pairs(self.target_update_map) do
+			for i = 1, #rule do
+				-- found it, append the sieves (ignore for now)
+				if arg == rule[i].type then
+					local elts = type(sieve.elts) == "table" and sieve.elts
+						or { sieve.elts }
+
+					if not rule[i].ignore then
+						rule[i].ignore = tab_new(#elts, 0)
+					end
+
+					for j = 1, #elts do
+						rule[i].ignore[j] = { sieve.action, elts[j] }
+					end
+
+					-- set/update the var's collection key
+					rule[1].collection_key =
+						calc.build_collection_key(
+							rule[i],
+							target_update_map_opts_transform[rule_id])
+
+					found = true
+					break
+				end
+			end
+
+			if not found then
+				ngx.log(ngx.WARN, arg .. " undefined in rule " .. rule_id)
+			end
+		end
+	end
+end
+
 -- push log data regarding matching rule(s) to the configured target
 -- in the case of socket or file logging, this data will be buffered
 function _M.write_log_events(self, has_ctx, ctx)
