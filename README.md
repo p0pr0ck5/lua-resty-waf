@@ -85,9 +85,7 @@ lua-resty-waf - High-performance WAF built on the OpenResty stack
 [![Codewake](https://www.codewake.com/badges/ask_question.svg)](https://www.codewake.com/p/lua-resty-waf)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/761/badge)](https://bestpractices.coreinfrastructure.org/projects/761)
 
-lua-resty-waf is currently in active development. New bugs and questions opened in the issue tracker will be answered within a day or two, and performance impacting / security related issues will be patched with high priority. Larger feature sets and enhancements will be added when development resources are available (see the [Roadmap](#roadmap) section for an outline of planned features).
-
-lua-resty-waf is compatible with the master branch of `lua-resty-core`. The bundled version of `lua-resty-core` available in recent releases of OpenResty (>= 1.9.7.4) is compatible with lua-resty-waf; versions bundled with older OpenResty bundles are not, so users wanting to leverage `resty.core` will either need to replace the local version with the one available from the [GitHub project](https://github.com/openresty/lua-resty-core), or patch the module based off [this commit](https://github.com/openresty/lua-resty-core/commit/40445b12c0359eb82702f0097cd65948c245b6a4).
+*NOTE*: `lua-resty-waf` is essentially abandoned. This project had a use in a time when ModSecurity for Nginx was not a viable option; this is no longer the case. There was an attempt to revitalize the project in 2020, but I do not have the resources to complete this; this work is partially complete in the `redux` branch.
 
 ## Description
 
