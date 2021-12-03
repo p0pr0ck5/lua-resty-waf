@@ -7,8 +7,11 @@ local base   = require "resty.waf.base"
 local logger = require "resty.waf.log"
 local util   = require "resty.waf.util"
 
+local decode   = require "cjson.safe".decode
+
 local table_concat = table.concat
 local table_insert = table.insert
+
 
 _M.version = base.version
 
@@ -128,6 +131,16 @@ function _M.parse_request_body(waf, request_headers, collections)
 		collections.FILES_COMBINED_SIZE = files_size
 
 		return nil
+	elseif waf._allow_json_content_type and util.table_has_value(content_type_header, waf.json_content_types) then
+		-- read the request body as JSON content
+		-- return the nginx content as an array with unpacked nested elements
+		ngx.req.read_body()
+		if ngx.req.get_body_file() == nil then
+			return util.unpack_json(decode(ngx.req.get_body_data()),'')
+		else
+			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
+			return nil
+		end
 	elseif ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags) then
 		-- use the underlying ngx API to read the request body
 		-- ignore processing the request body if the content length is larger than client_body_buffer_size

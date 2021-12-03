@@ -56,6 +56,19 @@ _M._meta_exception = {
 	meta_ids = {},
 }
 
+local _json_content_types = {
+	"application/json",
+	"application/javascript",
+	"application/x-javascript",
+	"application/json-rpc",
+	"application/hal+json",
+	"application/geo+json",
+	"text/javascript",
+	"text/json"
+}
+
+_M.json_content_types = _json_content_types
+
 -- this function runs when a new ruleset has been introduced to
 -- _ruleset_defs. it reads over all the rules, looking for msg and tag
 -- elements, and building a lookup table for exceptions
@@ -582,6 +595,7 @@ function _M.new()
 		_add_ruleset_string          = {},
 		_allow_unknown_content_types = false,
 		_allowed_content_types       = {},
+		_allow_json_content_type     = false,
 		_debug                       = false,
 		_debug_log_level             = ngx_INFO,
 		_deny_status                 = ngx_HTTP_FORBIDDEN,

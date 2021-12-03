@@ -324,4 +324,21 @@ function _M.rule_exception(exception_table, rule)
 	end
 end
 
+-- function to unpack a nested json array into a single array
+function _M.unpack_json(json_object, parent_key)
+    local return_array = {}
+    for key, val in pairs(json_object) do
+        -- only concatenate parent_key and key if parent_key is not empty
+        local parent_key_plus_key = parent_key=="" and key or parent_key.."."..key
+        if type(val) == "table" then
+            for inside_key,inside_val in pairs(unpack_json(val, parent_key_plus_key)) do
+               return_array[inside_key]=inside_val
+            end
+        else
+            return_array[parent_key_plus_key] = val
+        end
+    end
+    return return_array
+end
+
 return _M
