@@ -495,6 +495,23 @@ location / {
 }
 ```
 
+### allow_json_content_type
+
+*Default*: false
+
+Instructs lua-resty-waf to process and parse the request body when a JSON Content-Type header has been set. A request whose content type matches a JSON content type will have the `REQUEST_BODY` collection parsed as a table.
+Nested JSON content will be unpacked as a single table: `{'foo': {'bar':'bas', 'bat':'bau'}}` will be parsed as `{'foo.bar':'baz', 'foo.bat':'bau'}`.
+
+*Example*:
+
+```lua
+location / {
+    access_by_lua_block {
+        waf:set_option("allow_json_content_type", true)
+    }
+}
+```
+
 ### allowed_content_types
 
 *Default*: none
