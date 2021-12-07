@@ -3,6 +3,8 @@ local _M = {}
 local base   = require "resty.waf.base"
 local cjson  = require "cjson"
 local logger = require "resty.waf.log"
+-- util must be imported from https://github.com/mozilla-services/lua_sandbox_extensions/blob/main/heka/modules/heka/util.lua
+local util = require("util")
 
 local re_find       = ngx.re.find
 local string_byte   = string.byte
@@ -325,20 +327,10 @@ function _M.rule_exception(exception_table, rule)
 end
 
 -- function to unpack a nested json array into a single array
-function _M.unpack_json(json_object, parent_key)
-    local return_array = {}
-    for key, val in pairs(json_object) do
-        -- only concatenate parent_key and key if parent_key is not empty
-        local parent_key_plus_key = parent_key=="" and key or parent_key.."."..key
-        if type(val) == "table" then
-            for inside_key,inside_val in pairs(unpack_json(val, parent_key_plus_key)) do
-               return_array[inside_key]=inside_val
-            end
-        else
-            return_array[parent_key_plus_key] = val
-        end
-    end
-    return return_array
+function _M.unpack_json(json_object)
+    local flat = {}
+    util.table_to_fields(json_object, flat, nil, ".", waf._max_json_depth)
+    return flat
 end
 
 return _M

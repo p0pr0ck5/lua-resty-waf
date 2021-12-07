@@ -512,6 +512,8 @@ location / {
 }
 ```
 
+*Note: [util.lua](https://github.com/mozilla-services/lua_sandbox_extensions/blob/main/heka/modules/heka/util.lua) is required in the lua path if this setting is set to true*
+
 ### allowed_content_types
 
 *Default*: none
@@ -950,6 +952,22 @@ Instructs the module to ignore an entire ruleset. This can be useful when some r
 location / {
     access_by_lua_block {
         waf:set_option("ignore_ruleset", "41000_sqli")
+    }
+}
+```
+
+### max_json_depth
+
+*Default*: 1000
+
+Sets the maximum depth for parsing json objects to prevent denial of service.
+
+*Example*:
+
+```lua
+location / {
+    access_by_lua_block {
+        waf:set_option("max_json_depth", 500)
     }
 }
 ```

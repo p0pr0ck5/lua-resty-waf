@@ -619,6 +619,7 @@ function _M.new()
 		_hook_actions                = {},
 		_ignore_rule                 = {},
 		_ignore_ruleset              = {},
+		_max_json_depth              = 1000,
 		_mode                        = 'SIMULATE',
 		_nameservers                 = {},
 		_pcre_flags                  = 'oij',
