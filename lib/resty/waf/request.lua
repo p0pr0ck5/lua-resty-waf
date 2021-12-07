@@ -96,7 +96,6 @@ function _M.parse_request_body(waf, request_headers, collections)
 
 				local chunk_size = #chunk
 
-				body = body .. chunk
 				body_size = body_size + #chunk
 
 				--_LOG_"c:" .. chunk_size .. ", b:" .. body_size
