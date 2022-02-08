@@ -135,7 +135,7 @@ function _M.parse_request_body(waf, request_headers, collections)
 		-- return the nginx content as an array with unpacked nested elements
 		ngx.req.read_body()
 		if ngx.req.get_body_file() == nil then
-			return util.unpack_json(decode(ngx.req.get_body_data()),'')
+			return util.unpack_json(waf, decode(ngx.req.get_body_data()),'')
 		else
 			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil

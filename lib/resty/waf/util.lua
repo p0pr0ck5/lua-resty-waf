@@ -327,7 +327,7 @@ function _M.rule_exception(exception_table, rule)
 end
 
 -- function to unpack a nested json array into a single array
-function _M.unpack_json(json_object)
+function _M.unpack_json(waf, json_object)
     local flat = {}
     util.table_to_fields(json_object, flat, nil, ".", waf._max_json_depth)
     return flat
