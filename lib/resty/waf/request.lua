@@ -135,7 +135,13 @@ function _M.parse_request_body(waf, request_headers, collections)
 		-- return the nginx content as an array with unpacked nested elements
 		ngx.req.read_body()
 		if ngx.req.get_body_file() == nil then
-			return util.unpack_json(waf, decode(ngx.req.get_body_data()),'')
+			local body_data = decode(ngx.req.get_body_data())
+				if type(body_data) == "table" then
+					return util.unpack_json(waf, decode(ngx.req.get_body_data()),'')
+				else
+					-- consider the body data as a string that is inserted into a table if it's not a well-formated JSON string
+					return { body_data }
+				end
 		else
 			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
 			return nil
