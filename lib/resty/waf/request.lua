@@ -35,8 +35,10 @@ function _M.parse_request_body(waf, request_headers, collections)
 		return nil
 	end
 
-	--_LOG_"Examining content type " .. content_type_header
+	-- remove charset from the content-type (e.g. application/json;charset=utf-8 -> application/json)
+	content_type_header = string.match(content_type_header, "[^;]+")
 
+	--_LOG_"Examining content type " .. content_type_header
 	-- handle the request body based on the Content-Type header
 	-- multipart/form-data requests will be streamed in via lua-resty-upload,
 	-- which provides some basic sanity checking as far as form and protocol goes
