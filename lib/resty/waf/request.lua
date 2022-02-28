@@ -35,9 +35,6 @@ function _M.parse_request_body(waf, request_headers, collections)
 		return nil
 	end
 
-	-- remove charset from the content-type (e.g. application/json;charset=utf-8 -> application/json)
-	content_type_header = string.match(content_type_header, "[^;]+")
-
 	--_LOG_"Examining content type " .. content_type_header
 	-- handle the request body based on the Content-Type header
 	-- multipart/form-data requests will be streamed in via lua-resty-upload,
@@ -132,53 +129,58 @@ function _M.parse_request_body(waf, request_headers, collections)
 		collections.FILES_COMBINED_SIZE = files_size
 
 		return nil
-	elseif waf._allow_json_content_type and util.table_has_value(content_type_header, waf.json_content_types) then
-		-- read the request body as JSON content
-		-- return the nginx content as an array with unpacked nested elements
-		ngx.req.read_body()
-		if ngx.req.get_body_file() == nil then
-			local body_data = decode(ngx.req.get_body_data())
-				if type(body_data) == "table" then
-					return util.unpack_json(waf, decode(ngx.req.get_body_data()),'')
-				else
-					-- consider the body data as a string that is inserted into a table if it's not a well-formated JSON string
-					return { body_data }
-				end
-		else
-			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
-			return nil
-		end
-	elseif ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags) then
-		-- use the underlying ngx API to read the request body
-		-- ignore processing the request body if the content length is larger than client_body_buffer_size
-		-- to avoid wasting resources on ruleset matching of very large data sets
-		ngx.req.read_body()
-
-		if ngx.req.get_body_file() == nil then
-			return ngx.req.get_post_args()
-		else
-			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
-			return nil
-		end
-	elseif util.table_has_key(content_type_header, waf._allowed_content_types) then
-		-- if the content type has been whitelisted by the user, set REQUEST_BODY as a string
-		ngx.req.read_body()
-
-		if ngx.req.get_body_file() == nil then
-			return ngx.req.get_body_data()
-		else
-			--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
-			return nil
-		end
 	else
-		if waf._allow_unknown_content_types then
-			--_LOG_"Allowing request with content type " .. tostring(content_type_header)
-			return nil
+		-- remove charset from the content-type (e.g. application/json;charset=utf-8 -> application/json)
+		content_type_header = string.match(content_type_header, "[^;]+")
+		
+		if waf._allow_json_content_type and util.table_has_value(content_type_header, waf.json_content_types) then
+			-- read the request body as JSON content
+			-- return the nginx content as an array with unpacked nested elements
+			ngx.req.read_body()
+			if ngx.req.get_body_file() == nil then
+				local body_data = decode(ngx.req.get_body_data())
+					if type(body_data) == "table" then
+						return util.unpack_json(waf, decode(ngx.req.get_body_data()),'')
+					else
+						-- consider the body data as a string that is inserted into a table if it's not a well-formated JSON string
+						return { body_data }
+					end
+			else
+				--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
+				return nil
+			end
+		elseif ngx.re.find(content_type_header, [=[^application/x-www-form-urlencoded]=], waf._pcre_flags) then
+			-- use the underlying ngx API to read the request body
+			-- ignore processing the request body if the content length is larger than client_body_buffer_size
+			-- to avoid wasting resources on ruleset matching of very large data sets
+			ngx.req.read_body()
+	
+			if ngx.req.get_body_file() == nil then
+				return ngx.req.get_post_args()
+			else
+				--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
+				return nil
+			end
+		elseif util.table_has_key(content_type_header, waf._allowed_content_types) then
+			-- if the content type has been whitelisted by the user, set REQUEST_BODY as a string
+			ngx.req.read_body()
+	
+			if ngx.req.get_body_file() == nil then
+				return ngx.req.get_body_data()
+			else
+				--_LOG_"Request body size larger than client_body_buffer_size, ignoring request body"
+				return nil
+			end
 		else
-			--_LOG_tostring(content_type_header) .. " not a valid content type!"
-			logger.warn(waf, tostring(content_type_header) .. " not a valid content type!")
-			if waf._mode == "ACTIVE" then
-				ngx.exit(ngx.HTTP_FORBIDDEN)
+			if waf._allow_unknown_content_types then
+				--_LOG_"Allowing request with content type " .. tostring(content_type_header)
+				return nil
+			else
+				--_LOG_tostring(content_type_header) .. " not a valid content type!"
+				logger.warn(waf, tostring(content_type_header) .. " not a valid content type!")
+				if waf._mode == "ACTIVE" then
+					ngx.exit(ngx.HTTP_FORBIDDEN)
+				end
 			end
 		end
 	end
