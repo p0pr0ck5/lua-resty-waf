@@ -891,7 +891,7 @@ function _M.write_log_events(self, has_ctx, ctx)
 	end
 
 	local entry = {
-		timestamp = ngx.time(),
+		timestamp = ngx.var.msec,
 		client    = ctx.collections["REMOTE_ADDR"],
 		method    = ctx.collections["METHOD"],
 		uri       = ctx.collections["URI"],
