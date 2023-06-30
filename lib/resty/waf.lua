@@ -13,7 +13,6 @@ local storage       = require "resty.waf.storage"
 local transform_t   = require "resty.waf.transform"
 local translate     = require "resty.waf.translate"
 local util          = require "resty.waf.util"
-
 local table_insert = table.insert
 local table_sort   = table.sort
 local string_lower = string.lower
@@ -101,8 +100,8 @@ local function _parse_collection(self, collection, var)
 		return collection
 	end
 
-	local key   = parse[1]
-	local value = parse[2]
+	local key   = parse[1]--"all"
+	local value = parse[2]-- 1
 
 	-- if this var has an ignore, we need to copy this collection table
 	-- as we're going to be removing some of its elements, so we can no
@@ -129,10 +128,12 @@ end
 -- all event logs will be written out at the completion of the transaction if either:
 -- 1. the transaction was altered (e.g. a rule matched with an ACCEPT or DENY action), or
 -- 2. the event_log_altered_only option is unset
-local function _log_event(self, rule, value, ctx)
+local function _log_event(self, rule, value, ctx, match_var, match_var_name)
 	local t = {
 		id    = rule.id,
-		match = value
+		match = value,
+		match_var = match_var,
+		match_var_name= match_var_name,
 	}
 
 	if rule.msg then
@@ -301,13 +302,13 @@ local function _process_rule(self, rule, collections, ctx)
 				pattern = util.parse_dynamic_value(self, pattern, collections)
 			end
 
-			local match, value
+			local match, value, match_var
 
 			if var.unconditional then
 				match = true
 				value = 1
 			else
-				match, value = operators.lookup[rule.operator](self, collection, pattern, ctx)
+				match, value, match_var = operators.lookup[rule.operator](self, collection, pattern, ctx)
 			end
 
 			if rule.op_negated then
@@ -349,7 +350,8 @@ local function _process_rule(self, rule, collections, ctx)
 
 				-- log the event
 				if rule.actions.disrupt ~= "CHAIN" and not opts.nolog then
-					_log_event(self, rule, value, ctx)
+
+					_log_event(self, rule, value, ctx, match_var, collections.MATCHED_VAR_NAME)
 				end
 
 				-- wrapper for the rules action
