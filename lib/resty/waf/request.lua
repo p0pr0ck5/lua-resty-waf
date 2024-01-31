@@ -133,6 +133,15 @@ function _M.parse_request_body(waf, request_headers, collections)
 		-- remove charset from the content-type (e.g. application/json;charset=utf-8 -> application/json)
 		content_type_header = string.match(content_type_header, "[^;]+")
 		
+		-- check that the request has a content length, which otherwise triggers an error with HTTP2 and HTTP3 requests
+		-- https://github.com/openresty/lua-nginx-module/commit/86bea01b244938e0ab6eda780906c06fa62c3b5c
+		if ngx.req.http_version() >= 2 and request_headers["content-length"] == nil then
+			logger.warn(waf, "HTTP2/HTTP3 request without a Content-Length header")
+			if waf._mode == "ACTIVE" then
+				ngx.exit(ngx.HTTP_FORBIDDEN)
+			end
+		end
+
 		if waf._allow_json_content_type and util.table_has_value(content_type_header, waf.json_content_types) then
 			-- read the request body as JSON content
 			-- return the nginx content as an array with unpacked nested elements
